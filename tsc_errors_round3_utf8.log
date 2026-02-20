@@ -1,0 +1,48 @@
+﻿src/components/file-engine/DownloadMenu.tsx(127,32): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/components/FileEngineAppV2.tsx(292,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/ai-fixer.ts(78,42): error TS2802: Type 'Map<string, ValidationError[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/audit.ts(687,33): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/audit.ts(729,33): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/audit.ts(887,33): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/deploy.ts(226,56): error TS2345: Argument of type '{ path: string; content: string; }[]' is not assignable to parameter of type 'string'.
+src/lib/deploy.ts(240,25): error TS2339: Property 'error' does not exist on type 'DeploymentResult'.
+src/lib/orchestrator.ts(9,31): error TS2305: Module '"./memory"' has no exported member 'MemoryItem'.
+src/lib/orchestrator.ts(187,24): error TS7022: 'patterns' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+src/lib/orchestrator.ts(187,45): error TS2448: Block-scoped variable 'patterns' used before its declaration.
+src/lib/orchestrator.ts(431,13): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type '{ prompt?: string | undefined; framework?: string | undefined; projectId?: string | undefined; }'.
+src/lib/orchestrator.ts(434,11): error TS2740: Type '{ codingStyle: CodingStyle; preferences: UserPreferences; recentProjects: ProjectMemory[]; relevantCorrections: any[]; }' is missing the following properties from type 'MemoryItem[]': length, pop, push, concat, and 35 more.
+src/lib/orchestrator.ts(440,47): error TS2339: Property 'results' does not exist on type 'SmartSearchResult'.
+src/lib/project-memory.ts(424,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(431,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(472,27): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(667,27): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(668,28): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(669,27): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/queue.ts(2,30): error TS2307: Cannot find module 'redis' or its corresponding type declarations.
+src/lib/sandbox.ts(248,23): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(210,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(249,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(321,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(328,69): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/lib/semantic.ts(357,31): error TS2802: Type 'Map<string, Set<string>>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(377,29): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(407,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(462,51): error TS2802: Type 'Set<unknown>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(521,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(598,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/smart-context.ts(383,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-context.ts(397,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-context.ts(409,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-context.ts(423,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/utils.ts(304,14): error TS2802: Type 'Set<T>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(609,37): error TS2802: Type 'Map<string, number[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(1176,43): error TS2802: Type 'Map<string, string[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(1221,40): error TS2802: Type 'Map<string, ValidationError[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(1420,22): error TS2802: Type 'MapIterator<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(144,57): error TS2802: Type 'Set<string | undefined>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(224,41): error TS2802: Type 'Map<string, number>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(354,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(355,47): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/lib/vercel-proof.ts(654,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(675,107): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.

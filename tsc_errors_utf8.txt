@@ -1,0 +1,151 @@
+﻿src/app/projects/[id]/page.tsx(252,19): error TS2322: Type '{ files: { filepath: string; content: string; language: string; }[]; selectedFile: string; onSelectFile: (path: string) => void; }' is not assignable to type 'IntrinsicAttributes & PreviewPanelProps'.
+  Property 'files' does not exist on type 'IntrinsicAttributes & PreviewPanelProps'. Did you mean 'file'?
+src/components/file-engine/DownloadMenu.tsx(127,32): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/components/file-engine/PreviewPanelV2.tsx(374,24): error TS2367: This comparison appears to be unintentional because the types '"previewing"' and '"fixing"' have no overlap.
+src/components/file-engine/PreviewPanelV2.tsx(388,26): error TS2367: This comparison appears to be unintentional because the types '"previewing"' and '"deploying"' have no overlap.
+src/components/FileEngineApp.tsx(618,5): error TS2353: Object literal may only specify known properties, and 'chatId' does not exist in type 'ChatOptions'.
+src/components/FileEngineApp.tsx(619,21): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/components/FileEngineApp.tsx(1534,47): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ create: string; action: string; settings: string; help: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ create: string; action: string; settings: string; help: string; }'.
+src/components/FileEngineApp.tsx(2169,71): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ analyzing: string; connecting: string; generating: string; validating: string; writing: string; }'.
+src/components/FileEngineApp.tsx(2223,54): error TS7006: Parameter 'imp' implicitly has an 'any' type.
+src/components/FileEngineApp.tsx(2223,59): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/components/FileEngineApp.tsx(2385,61): error TS2339: Property 'pool' does not exist on type 'QueueStats'.
+src/components/FileEngineApp.tsx(2385,96): error TS2339: Property 'pool' does not exist on type 'QueueStats'.
+src/components/FileEngineApp.tsx(2405,58): error TS2339: Property 'value' does not exist on type 'EventTarget'.
+src/components/FileEngineApp.tsx(2717,57): error TS2339: Property 'value' does not exist on type 'EventTarget'.
+src/components/FileEngineAppV2.tsx(285,5): error TS2353: Object literal may only specify known properties, and 'chatId' does not exist in type 'ChatOptions'.
+src/components/FileEngineAppV2.tsx(287,21): error TS7006: Parameter 'newChatId' implicitly has an 'any' type.
+src/components/FileEngineAppV2.tsx(287,32): error TS7006: Parameter 'title' implicitly has an 'any' type.
+src/components/preview/LivePreview.tsx(73,47): error TS2307: Cannot find module '@webcontainer/api' or its corresponding type declarations.
+src/components/ProjectMemoryPanel.tsx(357,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/hooks/useFileUpload.ts(231,23): error TS2339: Property '_data' does not exist on type 'JSZipObject'.
+src/hooks/useFileUpload.ts(231,40): error TS2339: Property '_data' does not exist on type 'JSZipObject'.
+src/hooks/useRealtime.ts(86,45): error TS2349: This expression is not callable.
+  Type 'never[]' has no call signatures.
+src/lib/ai-fixer.ts(78,42): error TS2802: Type 'Map<string, ValidationError[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/audit.ts(687,33): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/audit.ts(729,33): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/audit.ts(887,33): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/deploy.ts(226,56): error TS2345: Argument of type '{ path: string; content: string; }[]' is not assignable to parameter of type 'string'.
+src/lib/deploy.ts(240,25): error TS2339: Property 'error' does not exist on type 'DeploymentResult'.
+src/lib/memory.ts(81,14): error TS2323: Cannot redeclare exported variable 'MemoryManager'.
+src/lib/memory.ts(240,8): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/memory.ts(240,14): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/lib/memory.ts(274,23): error TS2323: Cannot redeclare exported variable 'getUserCodingStyle'.
+src/lib/memory.ts(296,23): error TS2323: Cannot redeclare exported variable 'updateUserCodingStyle'.
+src/lib/memory.ts(306,23): error TS2323: Cannot redeclare exported variable 'getUserPreferences'.
+src/lib/memory.ts(325,23): error TS2323: Cannot redeclare exported variable 'updateUserPreferences'.
+src/lib/memory.ts(335,23): error TS2323: Cannot redeclare exported variable 'rememberProject'.
+src/lib/memory.ts(344,23): error TS2323: Cannot redeclare exported variable 'getProjectMemories'.
+src/lib/memory.ts(351,23): error TS2323: Cannot redeclare exported variable 'rememberConversation'.
+src/lib/memory.ts(360,23): error TS2323: Cannot redeclare exported variable 'searchConversations'.
+src/lib/memory.ts(372,23): error TS2323: Cannot redeclare exported variable 'learnFromCorrection'.
+src/lib/memory.ts(386,23): error TS2323: Cannot redeclare exported variable 'getRelevantMemories'.
+src/lib/memory.ts(433,3): error TS2323: Cannot redeclare exported variable 'MemoryManager'.
+src/lib/memory.ts(433,3): error TS2484: Export declaration conflicts with exported declaration of 'MemoryManager'.
+src/lib/memory.ts(434,3): error TS2323: Cannot redeclare exported variable 'getUserCodingStyle'.
+src/lib/memory.ts(434,3): error TS2484: Export declaration conflicts with exported declaration of 'getUserCodingStyle'.
+src/lib/memory.ts(435,3): error TS2323: Cannot redeclare exported variable 'updateUserCodingStyle'.
+src/lib/memory.ts(435,3): error TS2484: Export declaration conflicts with exported declaration of 'updateUserCodingStyle'.
+src/lib/memory.ts(436,3): error TS2323: Cannot redeclare exported variable 'getUserPreferences'.
+src/lib/memory.ts(436,3): error TS2484: Export declaration conflicts with exported declaration of 'getUserPreferences'.
+src/lib/memory.ts(437,3): error TS2323: Cannot redeclare exported variable 'updateUserPreferences'.
+src/lib/memory.ts(437,3): error TS2484: Export declaration conflicts with exported declaration of 'updateUserPreferences'.
+src/lib/memory.ts(438,3): error TS2323: Cannot redeclare exported variable 'rememberProject'.
+src/lib/memory.ts(438,3): error TS2484: Export declaration conflicts with exported declaration of 'rememberProject'.
+src/lib/memory.ts(439,3): error TS2323: Cannot redeclare exported variable 'getProjectMemories'.
+src/lib/memory.ts(439,3): error TS2484: Export declaration conflicts with exported declaration of 'getProjectMemories'.
+src/lib/memory.ts(440,3): error TS2323: Cannot redeclare exported variable 'rememberConversation'.
+src/lib/memory.ts(440,3): error TS2484: Export declaration conflicts with exported declaration of 'rememberConversation'.
+src/lib/memory.ts(441,3): error TS2323: Cannot redeclare exported variable 'searchConversations'.
+src/lib/memory.ts(441,3): error TS2484: Export declaration conflicts with exported declaration of 'searchConversations'.
+src/lib/memory.ts(442,3): error TS2323: Cannot redeclare exported variable 'learnFromCorrection'.
+src/lib/memory.ts(442,3): error TS2484: Export declaration conflicts with exported declaration of 'learnFromCorrection'.
+src/lib/memory.ts(443,3): error TS2323: Cannot redeclare exported variable 'getRelevantMemories'.
+src/lib/memory.ts(443,3): error TS2484: Export declaration conflicts with exported declaration of 'getRelevantMemories'.
+src/lib/orchestrator.ts(9,31): error TS2305: Module '"./memory"' has no exported member 'MemoryItem'.
+src/lib/orchestrator.ts(187,24): error TS7022: 'patterns' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+src/lib/orchestrator.ts(187,45): error TS2448: Block-scoped variable 'patterns' used before its declaration.
+src/lib/orchestrator.ts(431,13): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type '{ prompt?: string | undefined; framework?: string | undefined; projectId?: string | undefined; }'.
+src/lib/orchestrator.ts(434,11): error TS2740: Type '{ codingStyle: CodingStyle; preferences: UserPreferences; recentProjects: ProjectMemory[]; relevantCorrections: any[]; }' is missing the following properties from type 'MemoryItem[]': length, pop, push, concat, and 35 more.
+src/lib/orchestrator.ts(440,47): error TS2339: Property 'results' does not exist on type 'SmartSearchResult'.
+src/lib/project-memory.ts(424,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(431,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(472,27): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(667,27): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(668,28): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/project-memory.ts(669,27): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/queue.ts(2,30): error TS2307: Cannot find module 'redis' or its corresponding type declarations.
+src/lib/sandbox.ts(248,23): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/search.ts(52,23): error TS2323: Cannot redeclare exported variable 'webSearch'.
+src/lib/search.ts(81,23): error TS2323: Cannot redeclare exported variable 'searchNpmPackages'.
+src/lib/search.ts(119,23): error TS2323: Cannot redeclare exported variable 'getPackageInfo'.
+src/lib/search.ts(154,23): error TS2323: Cannot redeclare exported variable 'searchGitHub'.
+src/lib/search.ts(192,23): error TS2323: Cannot redeclare exported variable 'searchStackOverflow'.
+src/lib/search.ts(227,23): error TS2323: Cannot redeclare exported variable 'fetchDocumentation'.
+src/lib/search.ts(267,23): error TS2323: Cannot redeclare exported variable 'smartSearch'.
+src/lib/search.ts(333,23): error TS2323: Cannot redeclare exported variable 'searchErrorSolution'.
+src/lib/search.ts(407,3): error TS2323: Cannot redeclare exported variable 'webSearch'.
+src/lib/search.ts(407,3): error TS2484: Export declaration conflicts with exported declaration of 'webSearch'.
+src/lib/search.ts(408,3): error TS2323: Cannot redeclare exported variable 'searchNpmPackages'.
+src/lib/search.ts(408,3): error TS2484: Export declaration conflicts with exported declaration of 'searchNpmPackages'.
+src/lib/search.ts(409,3): error TS2323: Cannot redeclare exported variable 'getPackageInfo'.
+src/lib/search.ts(409,3): error TS2484: Export declaration conflicts with exported declaration of 'getPackageInfo'.
+src/lib/search.ts(410,3): error TS2323: Cannot redeclare exported variable 'searchGitHub'.
+src/lib/search.ts(410,3): error TS2484: Export declaration conflicts with exported declaration of 'searchGitHub'.
+src/lib/search.ts(411,3): error TS2323: Cannot redeclare exported variable 'searchStackOverflow'.
+src/lib/search.ts(411,3): error TS2484: Export declaration conflicts with exported declaration of 'searchStackOverflow'.
+src/lib/search.ts(412,3): error TS2323: Cannot redeclare exported variable 'fetchDocumentation'.
+src/lib/search.ts(412,3): error TS2484: Export declaration conflicts with exported declaration of 'fetchDocumentation'.
+src/lib/search.ts(413,3): error TS2323: Cannot redeclare exported variable 'smartSearch'.
+src/lib/search.ts(413,3): error TS2484: Export declaration conflicts with exported declaration of 'smartSearch'.
+src/lib/search.ts(414,3): error TS2323: Cannot redeclare exported variable 'searchErrorSolution'.
+src/lib/search.ts(414,3): error TS2484: Export declaration conflicts with exported declaration of 'searchErrorSolution'.
+src/lib/semantic.ts(210,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(249,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(321,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(328,69): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/lib/semantic.ts(357,31): error TS2802: Type 'Map<string, Set<string>>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(377,29): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(407,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(462,51): error TS2802: Type 'Set<unknown>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(521,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/semantic.ts(598,35): error TS2802: Type 'Map<string, string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/smart-context.ts(383,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-context.ts(397,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-context.ts(409,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-context.ts(423,10): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
+src/lib/smart-prompts.ts(117,14): error TS2323: Cannot redeclare exported variable 'UNIVERSAL_GUARDRAILS'.
+src/lib/smart-prompts.ts(184,14): error TS2323: Cannot redeclare exported variable 'NEXTJS_GUARDRAILS'.
+src/lib/smart-prompts.ts(219,14): error TS2323: Cannot redeclare exported variable 'REACT_GUARDRAILS'.
+src/lib/smart-prompts.ts(258,14): error TS2323: Cannot redeclare exported variable 'PROMPT_TEMPLATES'.
+src/lib/smart-prompts.ts(605,14): error TS2323: Cannot redeclare exported variable 'QUICK_PROMPTS'.
+src/lib/smart-prompts.ts(863,7): error TS2322: Type 'SmartPrompt | { id: string; name: string; category: PromptCategory; systemPrompt: string; userPrompt: string; requiredContext: { type: string; description: string; autoLoad: boolean; }[]; ... 6 more ...; estimatedTime: string; } | { ...; }' is not assignable to type 'SmartPrompt'.
+  Type '{ id: string; name: string; category: PromptCategory; systemPrompt: string; userPrompt: string; requiredContext: { type: string; description: string; autoLoad: boolean; }[]; optionalContext: never[]; ... 5 more ...; estimatedTime: string; }' is not assignable to type 'SmartPrompt'.
+    Types of property 'requiredContext' are incompatible.
+      Type '{ type: string; description: string; autoLoad: boolean; }[]' is not assignable to type 'ContextRequirement[]'.
+        Type '{ type: string; description: string; autoLoad: boolean; }' is not assignable to type 'ContextRequirement'.
+          Types of property 'type' are incompatible.
+            Type 'string' is not assignable to type '"component" | "file" | "decision" | "project_memory" | "style_guide" | "custom"'.
+src/lib/smart-prompts.ts(983,3): error TS2323: Cannot redeclare exported variable 'UNIVERSAL_GUARDRAILS'.
+src/lib/smart-prompts.ts(983,3): error TS2484: Export declaration conflicts with exported declaration of 'UNIVERSAL_GUARDRAILS'.
+src/lib/smart-prompts.ts(984,3): error TS2323: Cannot redeclare exported variable 'NEXTJS_GUARDRAILS'.
+src/lib/smart-prompts.ts(984,3): error TS2484: Export declaration conflicts with exported declaration of 'NEXTJS_GUARDRAILS'.
+src/lib/smart-prompts.ts(985,3): error TS2323: Cannot redeclare exported variable 'REACT_GUARDRAILS'.
+src/lib/smart-prompts.ts(985,3): error TS2484: Export declaration conflicts with exported declaration of 'REACT_GUARDRAILS'.
+src/lib/smart-prompts.ts(986,3): error TS2323: Cannot redeclare exported variable 'PROMPT_TEMPLATES'.
+src/lib/smart-prompts.ts(986,3): error TS2484: Export declaration conflicts with exported declaration of 'PROMPT_TEMPLATES'.
+src/lib/smart-prompts.ts(987,3): error TS2323: Cannot redeclare exported variable 'QUICK_PROMPTS'.
+src/lib/smart-prompts.ts(987,3): error TS2484: Export declaration conflicts with exported declaration of 'QUICK_PROMPTS'.
+src/lib/utils.ts(304,14): error TS2802: Type 'Set<T>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(609,37): error TS2802: Type 'Map<string, number[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(1176,43): error TS2802: Type 'Map<string, string[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(1221,40): error TS2802: Type 'Map<string, ValidationError[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/validation.ts(1420,22): error TS2802: Type 'MapIterator<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(144,57): error TS2802: Type 'Set<string | undefined>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(224,41): error TS2802: Type 'Map<string, number>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(354,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(355,47): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/lib/vercel-proof.ts(654,25): error TS2802: Type 'RegExpStringIterator<RegExpExecArray>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/vercel-proof.ts(675,107): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.

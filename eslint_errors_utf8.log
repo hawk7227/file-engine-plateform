@@ -1,0 +1,2757 @@
+﻿node.exe : 
+At E:\home\sajjad\.npm
+-global\pnpm.ps1:24 
+char:5
++     & "node$exe"  "$
+basedir/node_modules/p
+npm/bin/pnpm.cjs" 
+$args
++     ~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (:String) [   
+ ], RemoteExceptio    
+n
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+./src/app/admin/page.t
+sx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/admin/ai
+-edit/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/admin/he
+alth/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/admin/ke
+ys/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/admin/se
+ttings/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/ai/fix-e
+rrors/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/ai/visio
+n/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/audit/ro
+ute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/billing/
+route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/builds/r
+oute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/builds/[
+id]/status/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/chat/rou
+te.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/chat/sav
+e-chat.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/chat/sav
+e-project-files.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/chats/ro
+ute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/checkout
+/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/contact/
+route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/deploy/r
+oute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/fetch-ur
+l/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/file-eng
+ine/auto-fix/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/file-eng
+ine/deploy-both/route.
+ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/file-eng
+ine/deploy-vercel/rout
+e.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/file-eng
+ine/push-github/route.
+ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/file-eng
+ine/user-fix/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/file-eng
+ine/verify-build/route
+.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/generate
+/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/generate
+-validated/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/media/ro
+ute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/project-
+files/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/projects
+/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/queue/st
+ats/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/sandbox/
+execute/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/search/w
+eb/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/status/r
+oute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/team/rou
+te.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/usage/ro
+ute.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/validate
+/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/api/webhook/
+stripe/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/auth/callbac
+k/route.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/auth/forgot-
+password/page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+39:36  Error: `'` can 
+be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+
+./src/app/auth/login/p
+age.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+88:16  Error: `'` can 
+be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+
+./src/app/auth/reset-p
+assword/page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/auth/signup/
+page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+54:70  Error: `'` can 
+be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+
+./src/app/auth/verify-
+otp/page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/contact/page
+.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/dashboard/pa
+ge.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/dashboard/[c
+hatId]/page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/error.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/global-error
+.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/layout.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/loading.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/not-found.ts
+x
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+79:6  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'typingExamples'. 
+Either include it or 
+remove the dependency 
+array.  react-hooks/ex
+haustive-deps
+
+./src/app/pricing/page
+.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+175:65  Error: `'` 
+can be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+175:126  Error: `'` 
+can be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+180:72  Error: `'` 
+can be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+
+./src/app/privacy/page
+.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/projects/[id
+]/page.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/app/terms/page.t
+sx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/actio
+ns/QuickActions.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/activ
+ity/ActivityFeed.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/Admin
+Dashboard.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/Analy
+ticsDashboard.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/chat/
+AttachButton.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+170:19  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+230:38  Error: `"` 
+can be escaped with 
+`&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`.  r
+eact/no-unescaped-enti
+ties
+230:42  Error: `"` 
+can be escaped with 
+`&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`.  r
+eact/no-unescaped-enti
+ties
+
+./src/components/chat/
+ChatContainer.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/chat/
+ChatInput.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+225:21  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+
+./src/components/chat/
+ChatMessage.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+256:23  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+
+./src/components/chat/
+ChatPanel.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/chat/
+ChatsDialog.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/chat/
+ModelSelector.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/chat/
+NewChatPanel.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+213:6  Warning: React 
+Hook useMemo has a 
+missing dependency: 
+'templates'. Either 
+include it or remove 
+the dependency array. 
+ react-hooks/exhaustiv
+e-deps
+
+./src/components/chat/
+UrlImportButton.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/comma
+nd/CommandPalette.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+84:9  Warning: The 
+'allItems' array 
+makes the 
+dependencies of 
+useEffect Hook (at 
+line 118) change on 
+every render. To fix 
+this, wrap the 
+initialization of 
+'allItems' in its own 
+useMemo() Hook.  react
+-hooks/exhaustive-deps
+
+./src/components/edito
+r/CodeEditor.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/Error
+Boundary.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/DeployMenu.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/DownloadMenu.ts
+x
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/FeedbackInput.t
+sx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/index.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/MinimizedCodeBl
+ock.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/PreviewPanelV2.
+tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/file-
+engine/PreviewToolbar.
+tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/FileE
+ngineApp.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+725:6  Warning: React 
+Hook useEffect has 
+missing dependencies: 
+'adminCostSettings' 
+and 'authUser'. 
+Either include them 
+or remove the 
+dependency array.  rea
+ct-hooks/exhaustive-de
+ps
+898:6  Warning: React 
+Hook useEffect has 
+missing dependencies: 
+'currentProjectName' 
+and 'previewHook'. 
+Either include them 
+or remove the 
+dependency array.  rea
+ct-hooks/exhaustive-de
+ps
+907:6  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'showNotification'. 
+Either include it or 
+remove the dependency 
+array.  react-hooks/ex
+haustive-deps
+953:6  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'showNotification'. 
+Either include it or 
+remove the dependency 
+array.  react-hooks/ex
+haustive-deps
+1011:6  Warning: 
+React Hook useEffect 
+has missing 
+dependencies: 
+'executeCommand' and 
+'newProject'. Either 
+include them or 
+remove the dependency 
+array.  react-hooks/ex
+haustive-deps
+1698:82  Error: `"` 
+can be escaped with 
+`&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`.  r
+eact/no-unescaped-enti
+ties
+1698:99  Error: `"` 
+can be escaped with 
+`&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`.  r
+eact/no-unescaped-enti
+ties
+1754:7  Warning: 
+Custom fonts not 
+added in 
+`pages/_document.js` 
+will only load for a 
+single page. This is 
+discouraged. See: http
+s://nextjs.org/docs/me
+ssages/no-page-custom-
+font  @next/next/no-pa
+ge-custom-font
+1853:19  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+1870:27  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+2584:41  Error: `'` 
+can be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+2676:118  Error: `'` 
+can be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  r
+eact/no-unescaped-enti
+ties
+
+./src/components/FileE
+ngineAppV2.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+494:27  Warning: 
+Custom fonts not 
+added in 
+`pages/_document.js` 
+will only load for a 
+single page. This is 
+discouraged. See: http
+s://nextjs.org/docs/me
+ssages/no-page-custom-
+font  @next/next/no-pa
+ge-custom-font
+511:36  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+519:42  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+
+./src/components/layou
+t/Header.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/modal
+s/ProfileModal.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/modal
+s/SettingsModal.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/modal
+s/SettingsPanel.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/notif
+ications/Notifications
+.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+110:6  Warning: React 
+Hook useCallback has 
+a missing dependency: 
+'dismiss'. Either 
+include it or remove 
+the dependency array. 
+ react-hooks/exhaustiv
+e-deps
+
+./src/components/onboa
+rding/Onboarding.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/previ
+ew/LivePreview.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/previ
+ew/PreviewPanel.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/previ
+ew/UniversalPreviewer.
+tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+454:13  Warning: 
+Using `<img>` could 
+result in slower LCP 
+and higher bandwidth. 
+Consider using 
+`<Image />` from 
+`next/image` to 
+automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: ht
+tps://nextjs.org/docs/
+messages/no-img-elemen
+t  @next/next/no-img-e
+lement
+
+./src/components/proje
+ct/ProjectsDialog.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/Proje
+ctMemoryPanel.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/setti
+ngs/SettingsPage.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/sideb
+ar/Sidebar.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/smart
+/SmartSuggestions.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/ui/Bu
+tton.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/ui/In
+put.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/ui/Mo
+dal.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/ui/Sp
+inner.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/components/ui/To
+ast.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useAuth.ts
+x
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+83:6  Warning: React 
+Hook useEffect has 
+missing dependencies: 
+'loadUser' and 
+'supabase.auth'. 
+Either include them 
+or remove the 
+dependency array.  rea
+ct-hooks/exhaustive-de
+ps
+
+./src/hooks/useBuilds.
+ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useBuildSt
+atus.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useChat.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useFileEng
+inePreview.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useFileUpl
+oad.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+372:6  Warning: React 
+Hook useCallback has 
+an unnecessary 
+dependency: 
+'readAsArrayBuffer'. 
+Either exclude it or 
+remove the dependency 
+array.  react-hooks/ex
+haustive-deps
+
+./src/hooks/useGenerat
+e.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useProject
+s.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useQueueSt
+ats.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useRealtim
+e.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/hooks/useSavedCh
+ats.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/admin-cost-s
+ettings.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/agent.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/ai-config.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/ai-fixer.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/ai.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/analytics.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/artifacts.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/audit.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/batch-operat
+ions.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+643:1  Warning: 
+Assign object to a 
+variable before 
+exporting as module 
+default  import/no-ano
+nymous-default-export
+
+./src/lib/brand.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/context.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/deploy.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/export.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/file-engine/
+auto-fix-engine.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/file-engine/
+github-api.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/file-engine/
+index.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/file-engine/
+preview-manager.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/file-engine/
+vercel-api.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/key-pool.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/media-route.
+ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/media-tools.
+ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/memory.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/orchestrator
+.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/project-memo
+ry.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/queue.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/sandbox.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/search.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/semantic.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/skills.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/smart-contex
+t.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/smart-prompt
+s.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+984:1  Warning: 
+Assign object to a 
+variable before 
+exporting as module 
+default  import/no-ano
+nymous-default-export
+
+./src/lib/stripe-billi
+ng.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/stripe.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/supabase/cli
+ent.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/supabase/ser
+ver.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/supabase.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/team-collabo
+ration.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/team.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/tool-operati
+ons.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/tools.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/types.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/usage-limits
+.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/utils.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/validation.t
+s
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/vercel-proof
+.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/lib/vision.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/middleware.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/providers/Provid
+ers.tsx
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+./src/worker.ts
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-u
+nused-vars' was not 
+found.  @typescript-es
+lint/no-unused-vars
+1:1  Error: 
+Definition for rule '@
+typescript-eslint/no-e
+xplicit-any' was not 
+found.  @typescript-es
+lint/no-explicit-any
+
+info  - Need to 
+disable some ESLint 
+rules? Learn more 
+here: https://nextjs.o
+rg/docs/basic-features
+/eslint#disabling-rule
+s

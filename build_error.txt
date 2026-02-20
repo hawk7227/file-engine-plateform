@@ -1,0 +1,164 @@
+﻿
+> file-engine@0.1.0 build
+> next build
+
+node.exe :  ΓÜá 
+Invalid 
+next.config.js 
+options detected: 
+At C:\Program Files\n
+odejs\npm.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ( ΓÜá In   
+ valid ne...ions     
+detected: :Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+ ΓÜá     
+Unrecognized key(s) 
+in object: 'api'
+ ΓÜá See more info 
+here: https://nextjs.
+org/docs/messages/inv
+alid-next-config
+   Γû▓ Next.js 14.0.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+
+> Build error 
+occurred
+Error: Page config 
+in E:\JS react 
+,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\src\app
+/api/webhook/stripe/r
+oute.ts is 
+deprecated. Replace 
+`export const 
+config=ΓÇª` with the 
+following:
+Visit https://nextjs.
+org/docs/app/api-refe
+rence/file-convention
+s/route-segment-confi
+g for more 
+information.
+    at 
+getPageStaticInfo 
+(E:\JS react 
+,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\analysis
+\get-page-static-info
+.js:419:27)
+    at async getStati
+cInfoIncludingLayouts
+ (E:\JS react 
+,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\entries.
+js:105:28)
+    at async E:\JS 
+react ,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\entries.
+js:397:32
+    at async 
+Promise.all (index 
+29)
+    at async 
+Promise.all (index 0)
+    at async 
+createEntrypoints 
+(E:\JS react 
+,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\entries.
+js:528:5)
+    at async 
+Span.traceAsyncFn 
+(E:\JS react 
+,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\trace\trace.js
+:147:20)
+    at async 
+webpackBuildImpl 
+(E:\JS react 
+,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\webpack-
+build\impl.js:101:25)
+    at async 
+webpackBuild (E:\JS 
+react ,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\webpack-
+build\index.js:165:16
+)
+    at async E:\JS 
+react ,nextjs\huk 
+client\Plateform 
+Project\New folder (2
+)\file-engine\node_mo
+dules\.pnpm\next@14.0
+.4_react-dom@18.3.1_r
+eact@18.3.1__react@18
+.3.1\node_modules\nex
+t\dist\build\index.js
+:695:115
