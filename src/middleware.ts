@@ -36,7 +36,8 @@ const publicRoutes = [
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.url
+
   // Skip middleware for static files and public assets
   if (
     pathname.startsWith('/_next') ||
@@ -45,61 +46,61 @@ export async function middleware(request: NextRequest) {
   ) {
     return NextResponse.next()
   }
-  
+
   // Check if route is public
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
   if (isPublicRoute) {
     return NextResponse.next()
   }
-  
+
   // Get the session token from cookies
   const supabaseAccessToken = request.cookies.get('sb-access-token')?.value
   const supabaseRefreshToken = request.cookies.get('sb-refresh-token')?.value
-  
+
   // Try to get auth from Authorization header (for API routes)
   const authHeader = request.headers.get('Authorization')
   const bearerToken = authHeader?.replace('Bearer ', '')
-  
+
   // Determine if user is authenticated
   const isAuthenticated = !!(supabaseAccessToken || bearerToken)
-  
+
   // Check if this is a protected route
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-  
+
   // Check if this is an auth route (login/signup)
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
-  
+
   // Redirect logic
   if (isProtectedRoute && !isAuthenticated) {
     // Not authenticated, trying to access protected route
-    const loginUrl = new URL('/auth/login', request.url)
+    const loginUrl = new URL('/auth/login', baseUrl)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
-  
+
   if (isAuthRoute && isAuthenticated) {
     // Already authenticated, trying to access auth routes
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/dashboard', baseUrl))
   }
-  
+
   // Add user info to headers for API routes
   if (isAuthenticated && pathname.startsWith('/api')) {
     const requestHeaders = new Headers(request.headers)
-    
+
     // Pass the token along
     if (bearerToken) {
       requestHeaders.set('x-user-token', bearerToken)
     } else if (supabaseAccessToken) {
       requestHeaders.set('x-user-token', supabaseAccessToken)
     }
-    
+
     return NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     })
   }
-  
+
   return NextResponse.next()
 }
 

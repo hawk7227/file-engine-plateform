@@ -3,11 +3,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
     const { searchParams, origin } = new URL(request.url)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || origin
     const code = searchParams.get('code')
     const next = searchParams.get('next') ?? '/dashboard'
 
     if (code) {
-        const response = NextResponse.redirect(`${origin}${next}`)
+        const response = NextResponse.redirect(`${baseUrl.replace(/\/$/, '')}${next.startsWith('/') ? next : `/${next}`}`)
 
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,5 +38,5 @@ export async function GET(request: NextRequest) {
     }
 
     // No code or exchange failed — redirect to login
-    return NextResponse.redirect(`${origin}/auth/login`)
+    return NextResponse.redirect(`${baseUrl.replace(/\/$/, '')}/auth/login`)
 }

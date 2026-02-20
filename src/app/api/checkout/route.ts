@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const profile = await getProfile(user.id)
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const origin = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || 'http://localhost:3000'
 
     const checkoutUrl = await createCheckoutSession({
       userId: user.id,
