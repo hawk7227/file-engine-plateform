@@ -42,23 +42,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function loadUser() {
     setLoading(true)
-    const { data: { session } } = await supabase.auth.getSession()
-    setSession(session)
-    const u = session?.user ?? null
-    setUser(u)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      setSession(session)
+      const u = session?.user ?? null
+      setUser(u)
 
-    if (u) {
-      const [profileData, subData, usage] = await Promise.all([
-        getProfile(u.id),
-        getSubscription(u.id),
-        getUsageToday(u.id),
-      ])
-      setProfile(profileData as Profile | null)
-      setSubscription(subData as Subscription | null)
-      setUsageToday(usage)
+      if (u) {
+        const [profileData, subData, usage] = await Promise.all([
+          getProfile(u.id).catch((err) => { console.error('getProfile error:', err); return null; }),
+          getSubscription(u.id).catch((err) => { console.error('getSubscription error:', err); return null; }),
+          getUsageToday(u.id).catch((err) => { console.error('getUsageToday error:', err); return 0; }),
+        ])
+        setProfile(profileData as Profile | null)
+        setSubscription(subData as Subscription | null)
+        setUsageToday(usage)
+      }
+    } catch (err) {
+      console.error('Error in loadUser:', err)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   useEffect(() => {
