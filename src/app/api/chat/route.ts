@@ -433,9 +433,9 @@ export async function POST(request: NextRequest) {
     let resolvedModel: string
     if (model === 'auto') {
       const tiers: Record<string, Record<string, string>> = {
-        fast: { anthropic: 'claude-haiku-4-20250514', openai: 'gpt-4o-mini' },
+        fast: { anthropic: 'claude-haiku-4-5-20251001', openai: 'gpt-4o-mini' },
         pro: { anthropic: 'claude-sonnet-4-20250514', openai: 'gpt-4o' },
-        premium: { anthropic: 'claude-opus-4-20250514', openai: 'o1' },
+        premium: { anthropic: 'claude-opus-4-0-20250115', openai: 'o1' },
       }
       resolvedModel = tiers[smartCtx.modelTier]?.[provider] || getActualModelId(model, provider)
     } else {
@@ -849,3 +849,4 @@ function langFromPath(p: string): string {
   const m: Record<string, string> = { ts: 'typescript', tsx: 'tsx', js: 'javascript', jsx: 'jsx', py: 'python', html: 'html', css: 'css', json: 'json', md: 'markdown', yaml: 'yaml', yml: 'yaml', sql: 'sql', sh: 'bash' }
   return m[ext] || 'text'
 }
+
