@@ -1,6 +1,4 @@
 /**
-import { BRAND_NAME } from '@/lib/brand'
-
  * FILE ENGINE - GitHub API Integration
  * 
  * Handles all GitHub API calls for:
@@ -8,6 +6,8 @@ import { BRAND_NAME } from '@/lib/brand'
  * - File pushing/committing
  * - Branch management
  */
+
+import { BRAND_NAME } from '@/lib/brand'
 
 // ============================================
 // TYPES
