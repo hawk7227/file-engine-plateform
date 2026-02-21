@@ -70,7 +70,7 @@ const XIcon = () => (
 export default function ChatInput({
   onSend,
   isLoading = false,
-  placeholder = "Ask ${BRAND_NAME} to build something...",
+  placeholder = `Ask ${BRAND_NAME} to build something...`,
   disabled = false,
   onStop
 }: ChatInputProps) {

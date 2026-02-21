@@ -546,10 +546,10 @@ const FILE_STRUCTURES = {
 };
 
 const MODELS = [
-  { id: "auto", name: `${BRAND_NAME} Auto`, tier: "standard", desc: "Best model for your task" },
-  { id: "fast", name: `${BRAND_NAME} Fast`, tier: "fast", desc: "Quick iterations" },
-  { id: "pro", name: `${BRAND_NAME} Pro`, tier: "standard", desc: "Balanced speed & quality" },
-  { id: "premium", name: `${BRAND_NAME} Premium`, tier: "premium", desc: "Highest quality output" },
+  { id: "auto", name: BRAND_NAME + " Auto", tier: "standard", desc: "Best model for your task" },
+  { id: "fast", name: BRAND_NAME + " Fast", tier: "fast", desc: "Quick iterations" },
+  { id: "pro", name: BRAND_NAME + " Pro", tier: "standard", desc: "Balanced speed & quality" },
+  { id: "premium", name: BRAND_NAME + " Premium", tier: "premium", desc: "Highest quality output" },
 ];
 
 const COMMANDS = [
@@ -565,7 +565,7 @@ const COMMANDS = [
 ];
 
 const ONBOARDING_STEPS = [
-  { title: `Welcome to ${BRAND_NAME}! 🚀", desc: "Build complete projects by describing what you want. No boilerplate, no setup - just results." },
+  { title: `Welcome to ${BRAND_NAME}! 🚀`, desc: "Build complete projects by describing what you want. No boilerplate, no setup - just results." },
   { title: "Tell us about yourself", desc: "This helps us customize suggestions for you.", hasSkill: true },
   { title: "You\u2019re ready! 🎉", desc: "Start building. We\u2019ll show helpful tips as you go." },
 ];
@@ -1554,7 +1554,7 @@ export function FileEngineApp() {
     ));
   };
 
-  const selectedModelName = MODELS.find((m) => m.id === selectedModel)?.name || `${BRAND_NAME} Auto`;
+  const selectedModelName = MODELS.find((m) => m.id === selectedModel)?.name || BRAND_NAME + " Auto";
 
   const renderOnboardingContent = () => {
     const step = ONBOARDING_STEPS[onboardingStep];

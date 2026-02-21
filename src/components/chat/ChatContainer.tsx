@@ -226,10 +226,10 @@ export default function ChatContainer({
             onSend={sendMessage}
             isLoading={isLoading}
             onStop={stopGeneration}
-            placeholder="Ask ${BRAND_NAME} to build something..."
+            placeholder={`Ask ${BRAND_NAME} to build something...`}
           />
           <p className="mt-2 text-xs text-center text-gray-400">
-            ${BRAND_NAME} can make mistakes. Review generated code carefully.
+            {BRAND_NAME} can make mistakes. Review generated code carefully.
           </p>
         </div>
       </div>

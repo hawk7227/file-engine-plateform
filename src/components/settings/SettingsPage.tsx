@@ -192,13 +192,13 @@ function GeneralSettings({ user }: { user: any }) {
         <div className="space-y-4">
           <ToggleSetting
             label="Response completions"
-            description="Get notified when {BRAND_NAME} has finished a response. Most useful for long-running tasks."
+            description={`Get notified when ${BRAND_NAME} has finished a response. Most useful for long-running tasks.`}
             defaultValue={false}
           />
           
           <ToggleSetting
             label="Email notifications"
-            description="Get an email when {BRAND_NAME} has finished building or needs your response."
+            description={`Get an email when ${BRAND_NAME} has finished building or needs your response.`}
             defaultValue={false}
           />
         </div>
@@ -291,7 +291,7 @@ function PrivacySettings() {
         
         <div className="space-y-4">
           <ToggleSetting
-            label="Improve {BRAND_NAME}"
+            label={`Improve ${BRAND_NAME}`}
             description="Allow your conversations to help improve our AI models. Your data is anonymized."
             defaultValue={true}
           />
@@ -476,13 +476,13 @@ function CapabilitiesSettings() {
         <div className="space-y-4">
           <ToggleSetting
             label="Web search"
-            description="Let {BRAND_NAME} search the web for up-to-date information."
+            description={`Let ${BRAND_NAME} search the web for up-to-date information.`}
             defaultValue={true}
           />
           
           <ToggleSetting
             label="Code execution"
-            description="Let {BRAND_NAME} run code to verify it works."
+            description={`Let ${BRAND_NAME} run code to verify it works.`}
             defaultValue={true}
           />
           

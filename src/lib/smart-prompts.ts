@@ -692,7 +692,7 @@ export class NotificationGenerator {
     return {
       id: 'notif_welcome',
       type: 'welcome',
-      title: '👋 Welcome to ${BRAND_NAME}',
+      title: `👋 Welcome to ${BRAND_NAME}`,
       description: 'Start with a template or describe what you want to build',
       priority: 100,
       prompt: {
