@@ -225,4 +225,3 @@ export async function* generate(
     yield* generateWithOpenAI(prompt, model, apiKey, context)
   }
 }
-
