@@ -4,6 +4,8 @@
 // Users interact with "File Engine AI" not Claude/OpenAI
 // =====================================================
 
+import { BRAND_NAME, BRAND_AI_NAME, getBrandIdentityPrompt, getBrandModelNames, sanitizeBrandOutput } from '@/lib/brand'
+
 // =====================================================
 // TYPES
 // =====================================================
@@ -40,17 +42,7 @@ export interface AIModel {
 // Users never see "Claude" or "GPT" - only File Engine branding
 // =====================================================
 
-const MODEL_DISPLAY_NAMES: Record<string, string> = {
-  // All models displayed as File Engine tiers - NO provider branding
-  'claude-sonnet-4-20250514': 'File Engine Pro',
-  'claude-opus-4-20250514': 'File Engine Premium',
-  'claude-haiku-4-20250514': 'File Engine Fast',
-  'gpt-4o': 'File Engine Pro',
-  'gpt-4o-mini': 'File Engine Fast',
-  'gpt-4-turbo': 'File Engine Pro',
-  'o1': 'File Engine Premium',
-  'auto': 'File Engine Auto'
-}
+const MODEL_DISPLAY_NAMES: Record<string, string> = getBrandModelNames()
 
 const MODEL_DESCRIPTIONS: Record<string, string> = {
   'claude-sonnet-4-20250514': 'Best balance of speed and quality for most tasks',
@@ -71,28 +63,28 @@ const MODEL_DESCRIPTIONS: Record<string, string> = {
 export const USER_MODEL_OPTIONS = [
   {
     id: 'auto',
-    name: 'File Engine Auto',
+    name: `${BRAND_NAME} Auto`,
     description: 'Automatically selects the best model for your task',
     icon: '✨',
     recommended: true
   },
   {
     id: 'fast',
-    name: 'File Engine Fast',
+    name: `${BRAND_NAME} Fast`,
     description: 'Quick responses for rapid iteration',
     icon: '⚡',
     recommended: false
   },
   {
     id: 'pro',
-    name: 'File Engine Pro',
+    name: `${BRAND_NAME} Pro`,
     description: 'Best balance of speed and quality',
     icon: '🚀',
     recommended: false
   },
   {
     id: 'premium',
-    name: 'File Engine Premium',
+    name: `${BRAND_NAME} Premium`,
     description: 'Highest quality for complex projects',
     icon: '💎',
     recommended: false
@@ -112,13 +104,10 @@ const USER_TO_ACTUAL_MODEL: Record<string, { anthropic: string; openai: string }
 // White-labeled - AI identifies as "File Engine"
 // =====================================================
 
-export const FILE_ENGINE_SYSTEM_PROMPT = `You are File Engine, an advanced AI code generation assistant. You help developers create, fix, and improve code.
+export const FILE_ENGINE_SYSTEM_PROMPT = `You are ${BRAND_AI_NAME}, an advanced AI code generation assistant. You help developers create, fix, and improve code.
 
-IMPORTANT IDENTITY RULES:
-- You are "File Engine" - never mention being Claude, GPT, or any other AI
-- If asked who you are, say "I'm File Engine, your AI coding assistant"
-- If asked about your capabilities, describe File Engine's features
-- Never reference Anthropic, OpenAI, or other AI companies
+${getBrandIdentityPrompt()}
+
 
 YOUR CAPABILITIES:
 - Generate complete, production-ready code
@@ -144,7 +133,7 @@ RESPONSE FORMAT:
 - Explain important decisions
 - Offer suggestions for improvements`
 
-export const FILE_ENGINE_VISION_PROMPT = `You are File Engine's vision system. Analyze UI mockups and screenshots to generate accurate code.
+export const FILE_ENGINE_VISION_PROMPT = `You are ${BRAND_AI_NAME}'s vision system. Analyze UI mockups and screenshots to generate accurate code.
 
 RULES:
 - Generate pixel-perfect recreations when possible
@@ -154,7 +143,7 @@ RULES:
 - Generate responsive code by default
 - Include all visible text and content`
 
-export const FILE_ENGINE_FIX_PROMPT = `You are File Engine's error fixing system. Analyze errors and generate fixes.
+export const FILE_ENGINE_FIX_PROMPT = `You are ${BRAND_AI_NAME}'s error fixing system. Analyze errors and generate fixes.
 
 RULES:
 - Identify the root cause of errors
@@ -188,18 +177,33 @@ export function setAIConfig(config: Partial<AIConfig>): void {
 // Get the actual model ID from user-facing ID
 export function getActualModelId(userModelId: string, provider?: 'anthropic' | 'openai'): string {
   const mapping = USER_TO_ACTUAL_MODEL[userModelId]
-  if (!mapping) return userModelId // Already an actual model ID
-  
-  const selectedProvider = provider || currentConfig.provider
-  if (selectedProvider === 'auto' || selectedProvider === 'anthropic') {
-    return mapping.anthropic
+  if (mapping) {
+    const selectedProvider = provider || currentConfig.provider
+    if (selectedProvider === 'auto' || selectedProvider === 'anthropic') {
+      return mapping.anthropic
+    }
+    return mapping.openai
   }
-  return mapping.openai
+  
+  // Safety net: catch legacy/invalid model IDs stored in user profiles
+  // e.g. "file-engine-premium-20240229" from old code versions
+  const lower = userModelId.toLowerCase()
+  if (lower.includes('premium') || lower.includes('opus')) return getActualModelId('premium', provider)
+  if (lower.includes('pro') || lower.includes('sonnet')) return getActualModelId('pro', provider)
+  if (lower.includes('fast') || lower.includes('haiku') || lower.includes('mini')) return getActualModelId('fast', provider)
+  
+  // If it looks like a real API model ID (contains provider prefix), pass through
+  if (lower.startsWith('claude-') || lower.startsWith('gpt-') || lower.startsWith('o1') || lower.startsWith('o3')) {
+    return userModelId
+  }
+  
+  // Unknown model — default to auto/pro tier
+  return getActualModelId('auto', provider)
 }
 
 // Get user-friendly display name for a model
 export function getModelDisplayName(modelId: string): string {
-  return MODEL_DISPLAY_NAMES[modelId] || 'File Engine'
+  return MODEL_DISPLAY_NAMES[modelId] || BRAND_NAME
 }
 
 // Get model description
@@ -229,51 +233,31 @@ export function selectProvider(): 'anthropic' | 'openai' {
 // =====================================================
 
 export function sanitizeResponse(text: string): string {
+  // Delegate to brand.ts sanitizer — single source of truth
+  let result = sanitizeBrandOutput(text)
+  const name = BRAND_AI_NAME
   const replacements: [RegExp, string][] = [
-    // Direct name mentions
-    [/\bClaude\b/g, 'File Engine'],
-    [/\bclaude\b/g, 'File Engine'],
-    [/\bAnthropic\b/gi, 'File Engine'],
-    [/\bGPT-?4o?(?:-mini|-turbo)?\b/gi, 'File Engine'],
-    [/\bGPT-?3\.?5?(?:-turbo)?\b/gi, 'File Engine'],
-    [/\bChatGPT\b/gi, 'File Engine'],
-    [/\bOpenAI\b/gi, 'File Engine'],
-    [/\bGemini\b/gi, 'File Engine'],
-    [/\bGoogle AI\b/gi, 'File Engine'],
-    [/\bBard\b/gi, 'File Engine'],
-    [/\bCopilot\b/gi, 'File Engine'],
-    [/\bMistral\b/gi, 'File Engine'],
-    [/\bLlama\b/g, 'File Engine'],
-    
-    // Identity phrases (common AI self-references)
-    [/I'm an AI (?:assistant |language model |)(?:made|created|developed|built|trained) by [A-Za-z]+/gi, "I'm File Engine, your AI coding assistant"],
-    [/I am an AI (?:assistant |language model |)(?:made|created|developed|built|trained) by [A-Za-z]+/gi, "I am File Engine, your AI coding assistant"],
-    [/As an AI language model/gi, 'As File Engine'],
-    [/As an AI assistant/gi, 'As File Engine'],
-    [/I'm Claude/gi, "I'm File Engine"],
-    [/I am Claude/gi, "I am File Engine"],
-    [/I'm GPT/gi, "I'm File Engine"],
-    [/I am GPT/gi, "I am File Engine"],
-    [/my name is Claude/gi, "my name is File Engine"],
-    [/my name is GPT/gi, "my name is File Engine"],
-    [/I was (?:made|created|developed|built|trained) by (?:Anthropic|OpenAI|Google|Meta)/gi, "I was built by the File Engine team"],
-    [/(?:Anthropic|OpenAI)'s (?:API|model|system)/gi, "File Engine's system"],
-    
-    // Model version references
-    [/claude-[\w.-]+/gi, 'file-engine'],
-    [/gpt-[\w.-]+/gi, 'file-engine'],
-    [/o1-(?:preview|mini)/gi, 'file-engine'],
-    
-    // "Powered by" references
-    [/powered by (?:Claude|Anthropic|OpenAI|GPT)/gi, 'powered by File Engine'],
-    [/using (?:Claude|Anthropic|OpenAI|GPT)/gi, 'using File Engine'],
+    [/I'm an AI (?:assistant |language model |)(?:made|created|developed|built|trained) by [A-Za-z]+/gi, `I'm ${name}, your AI coding assistant`],
+    [/I am an AI (?:assistant |language model |)(?:made|created|developed|built|trained) by [A-Za-z]+/gi, `I am ${name}, your AI coding assistant`],
+    [/As an AI language model/gi, `As ${name}`],
+    [/As an AI assistant/gi, `As ${name}`],
+    [/I'm Claude/gi, `I'm ${name}`],
+    [/I am Claude/gi, `I am ${name}`],
+    [/I'm GPT/gi, `I'm ${name}`],
+    [/I am GPT/gi, `I am ${name}`],
+    [/my name is Claude/gi, `my name is ${name}`],
+    [/my name is GPT/gi, `my name is ${name}`],
+    [/I was (?:made|created|developed|built|trained) by (?:Anthropic|OpenAI|Google|Meta)/gi, `I was built by the ${BRAND_NAME} team`],
+    [/(?:Anthropic|OpenAI)'s (?:API|model|system)/gi, `${name}'s system`],
+    [/claude-[\w.-]+/gi, BRAND_NAME.toLowerCase().replace(/\s+/g, '-')],
+    [/gpt-[\w.-]+/gi, BRAND_NAME.toLowerCase().replace(/\s+/g, '-')],
+    [/o1-(?:preview|mini)/gi, BRAND_NAME.toLowerCase().replace(/\s+/g, '-')],
+    [/powered by (?:Claude|Anthropic|OpenAI|GPT)/gi, `powered by ${name}`],
+    [/using (?:Claude|Anthropic|OpenAI|GPT)/gi, `using ${name}`],
   ]
-  
-  let result = text
   for (const [pattern, replacement] of replacements) {
     result = result.replace(pattern, replacement)
   }
-  
   return result
 }
 
@@ -282,15 +266,15 @@ export function sanitizeResponse(text: string): string {
 // =====================================================
 
 export const ERROR_MESSAGES = {
-  API_KEY_MISSING: 'File Engine API key not configured. Please add your API key in settings.',
-  RATE_LIMITED: 'File Engine is experiencing high demand. Please try again in a moment.',
-  GENERATION_FAILED: 'File Engine encountered an error generating code. Please try again.',
-  VALIDATION_FAILED: 'File Engine found issues with the generated code and is attempting to fix them.',
-  TIMEOUT: 'File Engine is taking longer than expected. Please try a simpler request.',
-  NETWORK_ERROR: 'Unable to connect to File Engine. Please check your internet connection.',
-  INVALID_REQUEST: 'File Engine couldn\'t understand that request. Please try rephrasing.',
-  CONTENT_FILTERED: 'File Engine cannot help with that request.',
-  MAX_TOKENS: 'The response was too long. File Engine will try to provide a more concise answer.'
+  API_KEY_MISSING: `${BRAND_NAME} API key not configured. Please add your API key in settings.`,
+  RATE_LIMITED: `${BRAND_NAME} is experiencing high demand. Please try again in a moment.`,
+  GENERATION_FAILED: `${BRAND_NAME} encountered an error generating code. Please try again.`,
+  VALIDATION_FAILED: `${BRAND_NAME} found issues with the generated code and is attempting to fix them.`,
+  TIMEOUT: `${BRAND_NAME} is taking longer than expected. Please try a simpler request.`,
+  NETWORK_ERROR: `Unable to connect to ${BRAND_NAME}. Please check your internet connection.`,
+  INVALID_REQUEST: `${BRAND_NAME} couldn\'t understand that request. Please try rephrasing.`,
+  CONTENT_FILTERED: `${BRAND_NAME} cannot help with that request.`,
+  MAX_TOKENS: `The response was too long. ${BRAND_NAME} will try to provide a more concise answer.`
 }
 
 // =====================================================

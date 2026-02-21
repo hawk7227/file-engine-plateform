@@ -5,6 +5,7 @@
 // =====================================================
 
 import { NextRequest, NextResponse } from 'next/server'
+import { BRAND_NAME } from '@/lib/brand'
 import { 
   FILE_ENGINE_VISION_PROMPT, 
   sanitizeResponse, 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error('[Vision API Error]', err)
     return NextResponse.json(
-      { error: 'File Engine vision analysis failed: ' + err.message },
+      { error: `${BRAND_NAME} vision analysis failed: ` + + err.message },
       { status: 500 }
     )
   }
@@ -53,7 +54,7 @@ async function analyzeWithAnthropic(
 ): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
-    throw new Error('File Engine API key not configured')
+    throw new Error(`${BRAND_NAME} API key not configured`)
   }
   
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -104,7 +105,7 @@ async function analyzeWithOpenAI(
 ): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
-    throw new Error('File Engine API key not configured')
+    throw new Error(`${BRAND_NAME} API key not configured`)
   }
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {

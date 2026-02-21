@@ -7,6 +7,7 @@
 // =====================================================
 
 import { NextRequest } from 'next/server'
+import { BRAND_NAME, BRAND_AI_NAME } from '@/lib/brand'
 import { createClient } from '@supabase/supabase-js'
 import { sanitizeResponse, getActualModelId } from '@/lib/ai-config'
 import { buildSmartContext, SYSTEM_PROMPT_COMPACT, classifyIntent } from '@/lib/smart-context'
@@ -203,8 +204,8 @@ RULES:
 - NEVER say "I can't search" — you CAN via search_web
 
 IDENTITY:
-- You are File Engine. NEVER mention Claude, GPT, OpenAI, Anthropic or any AI provider.
-- If asked who you are: "I'm File Engine, your AI coding assistant"`
+- You are ${BRAND_AI_NAME}. NEVER mention Claude, GPT, OpenAI, Anthropic or any AI provider.
+- If asked who you are: "I'm ${BRAND_AI_NAME}, your AI coding assistant"`
 
 // =====================================================
 // TOOL HANDLERS (provider-agnostic)
@@ -426,7 +427,7 @@ export async function POST(request: NextRequest) {
     )
 
     const keyResult = getKeyWithFailover() // Round-robin: picks least-recently-used provider
-    if (!keyResult) return new Response(JSON.stringify({ error: 'File Engine API keys not available' }), { status: 503, headers: { 'Content-Type': 'application/json' } })
+    if (!keyResult) return new Response(JSON.stringify({ error: `${BRAND_NAME} API keys not available` }), { status: 503, headers: { 'Content-Type': 'application/json' } })
     const { key: apiKey, provider } = keyResult
 
     let resolvedModel: string
@@ -455,7 +456,7 @@ export async function POST(request: NextRequest) {
     return simpleStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, attachments)
   } catch (error: any) {
     console.error('[Chat API Error]', error)
-    return new Response(JSON.stringify({ error: 'File Engine encountered an error', details: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: `${BRAND_NAME} encountered an error`, details: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 
@@ -631,14 +632,14 @@ async function agentStream(
         ctrl.close()
       } catch (err: any) {
         if (err.message?.includes('rate') || err.status === 429) markRateLimited(apiKey, 60000)
-        ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse(err.message || 'File Engine error') })}\n\n`))
+        ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse(err.message || `${BRAND_NAME} error`) })}\n\n`))
         ctrl.close()
       }
     }
   })
 
   return new Response(stream, {
-    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-store', 'Connection': 'keep-alive', 'X-Powered-By': 'File Engine' }
+    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-store', 'Connection': 'keep-alive', 'X-Powered-By': BRAND_NAME }
   })
 }
 
@@ -692,7 +693,7 @@ async function simpleStream(
     }
   })
   return new Response(stream, {
-    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-store', 'Connection': 'keep-alive', 'X-Powered-By': 'File Engine' }
+    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-store', 'Connection': 'keep-alive', 'X-Powered-By': BRAND_NAME }
   })
 }
 

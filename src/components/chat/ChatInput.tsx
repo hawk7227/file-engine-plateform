@@ -5,6 +5,7 @@
 // =====================================================
 
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 import { useState, useRef, useCallback, KeyboardEvent, ChangeEvent } from 'react'
 import { Attachment } from '@/hooks/useChat'
@@ -69,7 +70,7 @@ const XIcon = () => (
 export default function ChatInput({
   onSend,
   isLoading = false,
-  placeholder = "Ask File Engine to build something...",
+  placeholder = "Ask ${BRAND_NAME} to build something...",
   disabled = false,
   onStop
 }: ChatInputProps) {

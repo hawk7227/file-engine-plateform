@@ -8,6 +8,8 @@
 // TYPES
 // =====================================================
 
+import { BRAND_NAME, BRAND_AI_NAME } from '@/lib/brand'
+
 export interface NewChatNotification {
   id: string
   type: 'welcome' | 'continue_project' | 'suggested_task' | 'daily_prompt' | 'trending'
@@ -690,7 +692,7 @@ export class NotificationGenerator {
     return {
       id: 'notif_welcome',
       type: 'welcome',
-      title: '👋 Welcome to File Engine',
+      title: '👋 Welcome to ${BRAND_NAME}',
       description: 'Start with a template or describe what you want to build',
       priority: 100,
       prompt: {
@@ -865,7 +867,7 @@ What should we work on next?`,
   }
 
   private buildSystemPrompt(includeProjectContext: boolean = false): string {
-    let prompt = `You are File Engine, an AI coding assistant. Follow these CRITICAL rules:
+    let prompt = `You are ${BRAND_AI_NAME}, an AI coding assistant. Follow these CRITICAL rules:
 
 === GUARDRAILS (NON-NEGOTIABLE) ===
 ${UNIVERSAL_GUARDRAILS.map(g => `[${g.severity.toUpperCase()}] ${g.rule}`).join('\n')}

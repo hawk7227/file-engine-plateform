@@ -5,6 +5,7 @@
 // =====================================================
 
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 import { useState, useMemo } from 'react'
 import { Message, GeneratedFile } from '@/hooks/useChat'
@@ -229,7 +230,7 @@ export default function ChatMessage({ message, onRegenerate, onCopy }: ChatMessa
           <div className="flex-1 min-w-0">
             {/* Name */}
             <p className="font-medium text-gray-900 dark:text-white mb-1">
-              {isUser ? 'You' : 'File Engine'}
+              {isUser ? 'You' : BRAND_NAME}
             </p>
             
             {/* Message content */}

@@ -5,6 +5,7 @@
 // =====================================================
 
 import { auditProject, quickAudit, type AuditResult, type MissingFile } from './audit'
+import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
 // TYPES
@@ -192,7 +193,7 @@ import '@/styles/globals.css'
 
 export const metadata: Metadata = {
   title: '${name}',
-  description: 'Built with File Engine',
+  description: 'Built with ${BRAND_NAME}',
 }
 
 export default function RootLayout({
@@ -213,7 +214,7 @@ export default function RootLayout({
     <main className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">${name}</h1>
-        <p className="text-gray-600">Built with File Engine</p>
+        <p className="text-gray-600">${BRAND_NAME}</p>
       </div>
     </main>
   )

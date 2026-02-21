@@ -1,5 +1,6 @@
 'use client'
 
+import { BRAND_NAME, BRAND_SHORT } from '@/lib/brand'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useProjects } from '@/hooks/useProjects'
@@ -495,7 +496,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     <div className="app-container">
       <header className="header">
         <div className="header-left">
-          <div className="logo"><div className="logo-mark">FE</div>File Engine</div>
+          <div className="logo"><div className="logo-mark">{BRAND_SHORT}</div>{BRAND_NAME}</div>
           <div className="header-divider"/>
           <div className="header-stats"><span><span className="stat-dot"/>Active: <span className="stat-value">{activeBuilds}/20</span></span><span>Queue: <span className="stat-value" style={{color:queuedBuilds>0?'var(--accent-yellow)':undefined}}>{queuedBuilds}</span></span></div>
         </div>

@@ -1,4 +1,5 @@
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
 // FILE ENGINE - NEW CHAT PANEL (COMPLETE)
@@ -240,7 +241,7 @@ export function NewChatPanel({
             What do you want to build?
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            Start with a template or describe what you need. File Engine will write production-ready code.
+            Start with a template or describe what you need. {BRAND_NAME} will write production-ready code.
           </p>
         </div>
       </div>

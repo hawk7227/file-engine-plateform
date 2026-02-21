@@ -1,4 +1,5 @@
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
 // FILE ENGINE - SETTINGS PAGE (Claude/ChatGPT Style)
@@ -142,7 +143,7 @@ function GeneralSettings({ user }: { user: any }) {
           </div>
           
           <div>
-            <label className="block text-sm text-zinc-400 mb-2">What should File Engine call you?</label>
+            <label className="block text-sm text-zinc-400 mb-2">What should {BRAND_NAME} call you?</label>
             <input
               type="text"
               value={callName}
@@ -171,7 +172,7 @@ function GeneralSettings({ user }: { user: any }) {
         
         <div className="mt-6">
           <label className="block text-sm text-zinc-400 mb-2">
-            What <span className="text-blue-400 underline cursor-pointer">personal preferences</span> should File Engine consider in responses?
+            What <span className="text-blue-400 underline cursor-pointer">personal preferences</span> should {BRAND_NAME} consider in responses?
           </label>
           <p className="text-xs text-zinc-500 mb-2">Your preferences will apply to all conversations.</p>
           <textarea
@@ -191,13 +192,13 @@ function GeneralSettings({ user }: { user: any }) {
         <div className="space-y-4">
           <ToggleSetting
             label="Response completions"
-            description="Get notified when File Engine has finished a response. Most useful for long-running tasks."
+            description="Get notified when {BRAND_NAME} has finished a response. Most useful for long-running tasks."
             defaultValue={false}
           />
           
           <ToggleSetting
             label="Email notifications"
-            description="Get an email when File Engine has finished building or needs your response."
+            description="Get an email when {BRAND_NAME} has finished building or needs your response."
             defaultValue={false}
           />
         </div>
@@ -290,7 +291,7 @@ function PrivacySettings() {
         
         <div className="space-y-4">
           <ToggleSetting
-            label="Improve File Engine"
+            label="Improve {BRAND_NAME}"
             description="Allow your conversations to help improve our AI models. Your data is anonymized."
             defaultValue={true}
           />
@@ -475,13 +476,13 @@ function CapabilitiesSettings() {
         <div className="space-y-4">
           <ToggleSetting
             label="Web search"
-            description="Let File Engine search the web for up-to-date information."
+            description="Let {BRAND_NAME} search the web for up-to-date information."
             defaultValue={true}
           />
           
           <ToggleSetting
             label="Code execution"
-            description="Let File Engine run code to verify it works."
+            description="Let {BRAND_NAME} run code to verify it works."
             defaultValue={true}
           />
           
@@ -541,7 +542,7 @@ function ConnectorsSettings() {
     <div className="space-y-8">
       <section>
         <h4 className="text-lg font-semibold mb-4">Integrations</h4>
-        <p className="text-sm text-zinc-400 mb-6">Connect external services to enhance File Engine&apos;s capabilities.</p>
+        <p className="text-sm text-zinc-400 mb-6">Connect external services to enhance {BRAND_NAME}&apos;s capabilities.</p>
         
         <div className="space-y-3">
           <ConnectorCard
@@ -583,7 +584,7 @@ function APISettings() {
       <section>
         <h4 className="text-lg font-semibold mb-4">Your API Keys</h4>
         <p className="text-sm text-zinc-400 mb-6">
-          Use these keys to access the File Engine API programmatically.
+          Use these keys to access the {BRAND_NAME} API programmatically.
         </p>
         
         <div className="p-4 bg-zinc-800/50 rounded-lg">

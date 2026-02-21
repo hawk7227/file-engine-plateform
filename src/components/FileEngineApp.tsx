@@ -1,4 +1,5 @@
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -545,10 +546,10 @@ const FILE_STRUCTURES = {
 };
 
 const MODELS = [
-  { id: "auto", name: "File Engine Auto", tier: "standard", desc: "Best model for your task" },
-  { id: "fast", name: "File Engine Fast", tier: "fast", desc: "Quick iterations" },
-  { id: "pro", name: "File Engine Pro", tier: "standard", desc: "Balanced speed & quality" },
-  { id: "premium", name: "File Engine Premium", tier: "premium", desc: "Highest quality output" },
+  { id: "auto", name: `${BRAND_NAME} Auto`, tier: "standard", desc: "Best model for your task" },
+  { id: "fast", name: `${BRAND_NAME} Fast`, tier: "fast", desc: "Quick iterations" },
+  { id: "pro", name: `${BRAND_NAME} Pro`, tier: "standard", desc: "Balanced speed & quality" },
+  { id: "premium", name: `${BRAND_NAME} Premium`, tier: "premium", desc: "Highest quality output" },
 ];
 
 const COMMANDS = [
@@ -564,7 +565,7 @@ const COMMANDS = [
 ];
 
 const ONBOARDING_STEPS = [
-  { title: "Welcome to File Engine! 🚀", desc: "Build complete projects by describing what you want. No boilerplate, no setup - just results." },
+  { title: `Welcome to ${BRAND_NAME}! 🚀", desc: "Build complete projects by describing what you want. No boilerplate, no setup - just results." },
   { title: "Tell us about yourself", desc: "This helps us customize suggestions for you.", hasSkill: true },
   { title: "You\u2019re ready! 🎉", desc: "Start building. We\u2019ll show helpful tips as you go." },
 ];
@@ -1553,7 +1554,7 @@ export function FileEngineApp() {
     ));
   };
 
-  const selectedModelName = MODELS.find((m) => m.id === selectedModel)?.name || "File Engine Auto";
+  const selectedModelName = MODELS.find((m) => m.id === selectedModel)?.name || `${BRAND_NAME} Auto`;
 
   const renderOnboardingContent = () => {
     const step = ONBOARDING_STEPS[onboardingStep];
@@ -1757,7 +1758,7 @@ export function FileEngineApp() {
         {/* Header */}
         <header className="header">
           <div className="header-left">
-            <div className="logo"><div className="logo-mark">FE</div><span>File Engine</span></div>
+            <div className="logo"><div className="logo-mark">FE</div><span>{BRAND_NAME}</span></div>
             <div className="header-divider"></div>
             <div className="live-stats">
               <div className="stat-item"><span className="stat-pulse"></span><span>Active:</span><span className="stat-value">{realActiveBuilds}/20</span></div>
@@ -2084,7 +2085,7 @@ export function FileEngineApp() {
               <div className="savings-bar"><div className="savings-bar-fill" style={{ width: `${Math.min(100, savings.pct)}%` }}></div></div>
               <div style={{ marginTop: "8px" }}>
                 <div className="savings-row"><span className="savings-row-label">Without optimization</span><span className="savings-row-value">${savings.withoutOpt.toFixed(2)}</span></div>
-                <div className="savings-row"><span className="savings-row-label">With File Engine</span><span className="savings-row-value green">${savings.withOpt.toFixed(2)}</span></div>
+                <div className="savings-row"><span className="savings-row-label">With {BRAND_NAME}</span><span className="savings-row-value green">${savings.withOpt.toFixed(2)}</span></div>
               </div>
             </div>
             {/* Upsell for free users */}
@@ -2119,7 +2120,7 @@ export function FileEngineApp() {
               <div className="welcome-container">
                 <div className="welcome-logo">⚡</div>
                 <h1 className="welcome-title">Build Anything. No Limits.</h1>
-                <p className="welcome-subtitle">Describe what you want. File Engine writes code, generates files, and deploys — all from one conversation.</p>
+                <p className="welcome-subtitle">Describe what you want. {BRAND_NAME} writes code, generates files, and deploys — all from one conversation.</p>
                 <div className="welcome-badges">
                   <div className="welcome-badge"><span>⚡</span><strong>20</strong> concurrent builds</div>
                   <div className="welcome-badge"><span>🚀</span>Zero throttling</div>
@@ -2569,7 +2570,7 @@ export function FileEngineApp() {
             </div>
             <div className="modal-section">
               <div className="modal-section-title">API Keys (Optional)</div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Add your own API keys for unlimited generation. File Engine will use them automatically.</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Add your own API keys for unlimited generation. {BRAND_NAME} will use them automatically.</div>
               <div className="form-group"><label className="form-label">Primary API Key</label><input type="password" className="form-input" placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (authUser) { try { const key = apiKeySlot1.trim(); await supabase.from("profiles").update({ claude_api_key: key || null }).eq("id", authUser.id); showNotification("success", "API key saved"); } catch (err: any) { showNotification("error", "Save failed", err.message); } } }} /></div>
               <div className="form-group"><label className="form-label">Secondary API Key</label><input type="password" className="form-input" placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (authUser) { try { const key = apiKeySlot2.trim(); await supabase.from("profiles").update({ openai_api_key: key || null }).eq("id", authUser.id); showNotification("success", "API key saved"); } catch (err: any) { showNotification("error", "Save failed", err.message); } } }} /></div>
             </div>

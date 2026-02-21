@@ -5,6 +5,7 @@
 // =====================================================
 
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 import { useRef, useEffect, useCallback } from 'react'
 import { useChat, Message, Attachment } from '@/hooks/useChat'
@@ -60,7 +61,7 @@ function WelcomeScreen({ onSuggestionClick }: { onSuggestionClick: (text: string
           </svg>
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Welcome to File Engine
+          Welcome to {BRAND_NAME}
         </h1>
         <p className="text-gray-600 dark:text-gray-400 max-w-md">
           I can help you build, fix, and improve code. Start with a prompt below or try one of these suggestions.
@@ -102,7 +103,7 @@ function LoadingIndicator() {
         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
       </div>
-      <span className="text-sm">File Engine is thinking...</span>
+      <span className="text-sm">{BRAND_NAME} is thinking...</span>
     </div>
   )
 }
@@ -225,10 +226,10 @@ export default function ChatContainer({
             onSend={sendMessage}
             isLoading={isLoading}
             onStop={stopGeneration}
-            placeholder="Ask File Engine to build something..."
+            placeholder="Ask ${BRAND_NAME} to build something..."
           />
           <p className="mt-2 text-xs text-center text-gray-400">
-            File Engine can make mistakes. Review generated code carefully.
+            ${BRAND_NAME} can make mistakes. Review generated code carefully.
           </p>
         </div>
       </div>

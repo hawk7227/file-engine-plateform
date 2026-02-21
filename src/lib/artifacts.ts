@@ -53,13 +53,14 @@ export interface ArtifactStorage {
 export const ARTIFACT_TEMPLATES = {
   react: `
 import React, { useState } from 'react';
+import { BRAND_NAME } from '@/lib/brand'
 
 export default function App() {
   const [count, setCount] = useState(0);
   
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold">Hello File Engine!</h1>
+      <h1 className="text-2xl font-bold">Hello ${BRAND_NAME}!</h1>
       <button 
         onClick={() => setCount(c => c + 1)}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
@@ -77,11 +78,11 @@ export default function App() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File Engine Artifact</title>
+  <title>${BRAND_NAME} Artifact</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="p-4">
-  <h1 class="text-2xl font-bold">Hello File Engine!</h1>
+  <h1 class="text-2xl font-bold">Hello ${BRAND_NAME}!</h1>
   <p class="mt-2 text-gray-600">This is an HTML artifact.</p>
 </body>
 </html>

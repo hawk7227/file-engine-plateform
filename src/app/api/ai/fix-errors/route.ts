@@ -5,6 +5,7 @@
 // =====================================================
 
 import { NextRequest, NextResponse } from 'next/server'
+import { BRAND_NAME } from '@/lib/brand'
 import { 
   FILE_ENGINE_FIX_PROMPT, 
   sanitizeResponse, 
@@ -82,7 +83,7 @@ Return ONLY valid JSON, no markdown code blocks.`
   } catch (err: any) {
     console.error('[Fix API Error]', err)
     return NextResponse.json(
-      { error: 'File Engine fix failed: ' + err.message, fixes: [], fixedFiles: [] },
+      { error: `${BRAND_NAME} fix failed: ` + + err.message, fixes: [], fixedFiles: [] },
       { status: 500 }
     )
   }
@@ -91,7 +92,7 @@ Return ONLY valid JSON, no markdown code blocks.`
 async function fixWithAnthropic(prompt: string): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
-    throw new Error('File Engine API key not configured')
+    throw new Error(`${BRAND_NAME} API key not configured`)
   }
   
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -120,7 +121,7 @@ async function fixWithAnthropic(prompt: string): Promise<string> {
 async function fixWithOpenAI(prompt: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
-    throw new Error('File Engine API key not configured')
+    throw new Error(`${BRAND_NAME} API key not configured`)
   }
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {

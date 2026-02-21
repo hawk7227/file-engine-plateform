@@ -1,4 +1,5 @@
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
 // FILE ENGINE - SIDEBAR (Claude/ChatGPT Style)
@@ -117,7 +118,7 @@ export function Sidebar({
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-lg">File Engine</span>
+              <span className="font-bold text-lg"{BRAND_NAME}</span>
             </div>
             <button onClick={onToggle} className="p-1.5 hover:bg-zinc-800 rounded-lg">
               <PanelLeftClose className="w-4 h-4 text-zinc-400" />

@@ -1,4 +1,5 @@
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
 // FILE ENGINE - CHAT PANEL
@@ -135,7 +136,7 @@ export function ChatPanel({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-medium">File Engine</span>
+                  <span className="font-medium"{BRAND_NAME}</span>
                   <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
                   <span className="text-sm text-zinc-500">Generating...</span>
                 </div>
@@ -201,7 +202,7 @@ export function ChatPanel({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask File Engine to build something..."
+                placeholder="Ask {BRAND_NAME} to build something..."
                 rows={1}
                 className="flex-1 bg-transparent text-white placeholder-zinc-500 resize-none focus:outline-none py-2 max-h-[200px]"
               />
@@ -279,7 +280,7 @@ function MessageBubble({
       <div className={`flex-1 min-w-0 ${isUser ? 'text-right' : ''}`}>
         {/* Header */}
         <div className={`flex items-center gap-2 mb-1 ${isUser ? 'justify-end' : ''}`}>
-          <span className="font-medium">{isUser ? 'You' : 'File Engine'}</span>
+          <span className="font-medium">{isUser ? 'You' : BRAND_NAME}</span>
           <span className="text-xs text-zinc-500">
             {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>

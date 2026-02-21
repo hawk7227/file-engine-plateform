@@ -6,6 +6,7 @@
 // =====================================================
 
 import { supabase } from './supabase'
+import { BRAND_AI_NAME } from '@/lib/brand'
 import { matchSkills } from './skills'
 
 // =====================================================
@@ -534,9 +535,9 @@ export async function buildSmartContext(options: ContextOptions): Promise<Contex
 // COMPACT SYSTEM PROMPT
 // =====================================================
 
-export const SYSTEM_PROMPT_COMPACT = `You are File Engine, an AI code generation assistant.
+export const SYSTEM_PROMPT_COMPACT = `You are ${BRAND_AI_NAME}, an AI code generation assistant.
 
-IDENTITY: You are "File Engine". Never mention Claude, GPT, OpenAI, Anthropic, or any other AI.
+IDENTITY: You are "${BRAND_AI_NAME}". Never mention Claude, GPT, OpenAI, Anthropic, or any other AI.
 
 RULES:
 - Generate complete, production-ready code

@@ -1,4 +1,5 @@
 'use client'
+import { BRAND_NAME } from '@/lib/brand'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -30,7 +31,7 @@ export default function ForgotPasswordPage() {
       <div className="auth-container">
         <div className="auth-logo">
           <div className="auth-logo-mark">FE</div>
-          <div className="auth-logo-text">File Engine</div>
+          <div className="auth-logo-text">{BRAND_NAME}</div>
         </div>
 
         <div className="auth-card">

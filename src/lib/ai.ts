@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { BRAND_AI_NAME } from '@/lib/brand'
 import OpenAI from 'openai'
 
 // AI Provider Types
@@ -35,7 +36,7 @@ export function createOpenAIClient(apiKey?: string) {
 }
 
 // System prompt for code generation
-export const CODE_GENERATION_SYSTEM_PROMPT = `You are File Engine, an expert AI developer that generates complete, production-ready code.
+export const CODE_GENERATION_SYSTEM_PROMPT = `You are ${BRAND_AI_NAME}, an expert AI developer that generates complete, production-ready code.
 
 ## Your Capabilities
 - Generate full project structures with multiple files

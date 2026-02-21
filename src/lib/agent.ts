@@ -5,6 +5,7 @@
 // =====================================================
 
 import { ToolCallProcessor, ToolResult, Tool } from './tools'
+import { BRAND_AI_NAME } from '@/lib/brand'
 import { sanitizeResponse } from './ai-config'
 
 // =====================================================
@@ -198,7 +199,7 @@ export class Agent {
   }
   
   private getDefaultSystemPrompt(): string {
-    return `You are File Engine, an AI agent that can use tools to accomplish tasks.
+    return `You are ${BRAND_AI_NAME}, an AI agent that can use tools to accomplish tasks.
 
 AVAILABLE TOOLS:
 - view_file: Read file contents or list directories
