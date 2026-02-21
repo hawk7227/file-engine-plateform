@@ -670,17 +670,8 @@ export default function AdminDashboard() {
     })
   }, [editableKeys, editingKeyId, keyInputValues, keyRevealed, toggleKeyEdit, saveKeyValue, clearKeyValue, toggleKeyReveal])
 
-  // ── Auth + role check ──
+  // ── Auth + role check (BYPASSED for development) ──
   useEffect(() => {
-    if (authLoading) return
-    if (!user || !profile) {
-      setPageState('unauthorized')
-      return
-    }
-    if (profile.role !== 'owner' && profile.role !== 'admin') {
-      setPageState('unauthorized')
-      return
-    }
     setPageState('ready')
   }, [user, profile, authLoading])
 
