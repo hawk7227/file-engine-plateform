@@ -81,35 +81,58 @@ export default function LandingPage() {
   const features = [
     {
       icon: <Zap className="w-6 h-6" />,
-      title: 'Lightning Fast',
-      description: 'Generate complete, production-ready code in seconds, not hours.',
+      title: 'Agentic AI — Not Just Chat',
+      description: '10+ tools: create files, edit code, run commands, search the web, deploy — all in one conversation.',
       color: 'from-yellow-500 to-orange-500'
     },
     {
       icon: <Shield className="w-6 h-6" />,
-      title: '10-Layer Validation',
-      description: 'Every line of code is validated for syntax, types, security, and best practices.',
+      title: 'Dual-Provider Failover',
+      description: 'Powered by the best AI models with automatic failover. Zero downtime when providers go down.',
       color: 'from-green-500 to-emerald-500'
     },
     {
       icon: <Cpu className="w-6 h-6" />,
-      title: 'Auto-Fix Engine',
-      description: 'AI automatically fixes errors before you even see them.',
+      title: 'Media Generation Built In',
+      description: 'Generate video, audio, voice, and 3D alongside your code. No other AI coding tool can do this.',
       color: 'from-blue-500 to-cyan-500'
     },
     {
-      icon: <Code className="w-6 h-6" />,
-      title: 'Any Stack',
-      description: 'React, Next.js, Node, Python, APIs, databases - we support it all.',
+      icon: <Globe className="w-6 h-6" />,
+      title: 'One-Click Deploy',
+      description: 'From prompt to production in minutes. Deploy to Vercel, download ZIP, or push to GitHub.',
       color: 'from-purple-500 to-pink-500'
+    },
+    {
+      icon: <Code className="w-6 h-6" />,
+      title: 'Smart Model Routing',
+      description: 'Auto-selects the best AI model for each task. Fast for chat, powerful for code, premium for complexity.',
+      color: 'from-pink-500 to-rose-500'
+    },
+    {
+      icon: <Lock className="w-6 h-6" />,
+      title: 'Vision + Web Search',
+      description: 'Upload screenshots for pixel-perfect recreations. Search the web and GitHub for code references.',
+      color: 'from-cyan-500 to-blue-500'
     }
   ]
 
   const useCases = [
-    { title: 'Landing Pages', description: 'Beautiful, responsive marketing pages in minutes', image: '🎨' },
-    { title: 'Dashboards', description: 'Admin panels with charts, tables, and real-time data', image: '📊' },
-    { title: 'APIs', description: 'REST and GraphQL APIs with auth and validation', image: '🔌' },
-    { title: 'Full Apps', description: 'Complete web applications from scratch', image: '🚀' }
+    { title: 'Full-Stack Apps', description: 'Complete web applications with frontend, backend, and database', image: '🚀' },
+    { title: 'Landing Pages', description: 'Beautiful, responsive marketing pages deployed in minutes', image: '🎨' },
+    { title: 'Dashboards', description: 'Admin panels with real-time charts, tables, and auth', image: '📊' },
+    { title: 'APIs + Backends', description: 'REST/GraphQL APIs with authentication and validation', image: '🔌' },
+    { title: 'Media Content', description: 'AI-generated videos, audio, voice, and 3D assets', image: '🎬' },
+    { title: 'Mobile-Ready UIs', description: 'Responsive React components that work on every device', image: '📱' }
+  ]
+
+  const competitors = [
+    { name: 'Claude.ai', price: '$17-100/mo', lacks: ['No file creation', 'No code execution', 'No deployment', 'No media generation', 'Chat only'] },
+    { name: 'ChatGPT', price: '$20-200/mo', lacks: ['Sandbox only (no deploy)', 'No multi-provider failover', 'No web search in code', 'Images only (no video/audio)', 'No project persistence'] },
+    { name: 'Cursor', price: '$20/mo', lacks: ['Requires VS Code + dev setup', 'IDE only (not web)', 'No media generation', 'No deployment', 'Developer-only audience'] },
+    { name: 'Bolt.new', price: '$20/mo', lacks: ['Single-shot generation', 'No iterative tool loop', 'No web/GitHub search', 'No media generation', 'No backend support'] },
+    { name: 'v0 by Vercel', price: '$20/mo', lacks: ['UI components only', 'No full-stack apps', 'No backend/API', 'No media generation', 'No vision analysis'] },
+    { name: 'Replit', price: '$25/mo', lacks: ['Locked to their IDE', 'No white-label option', 'Single provider only', 'No media generation', 'Can\'t resell'] },
   ]
 
   const testimonials = [
@@ -119,16 +142,20 @@ export default function LandingPage() {
   ]
 
   const pricingPlans = [
-    { name: 'Free', price: '$0', period: 'forever', description: `Perfect for trying out ${BRAND_NAME}`, features: ['10 generations per day', 'Basic code validation', 'Community support', 'Public projects only'], cta: 'Get Started', popular: false },
-    { name: 'Pro', price: '$29', period: 'per month', description: 'For professional developers', features: ['100 generations per day', 'Full 10-layer validation', 'Auto-fix engine', 'Priority support', 'Private projects', 'Export to GitHub'], cta: 'Start Free Trial', popular: true },
-    { name: 'Enterprise', price: '$99', period: 'per month', description: 'For teams and agencies', features: ['Unlimited generations', 'Full validation suite', 'Custom AI training', 'Dedicated support', 'Team collaboration', 'API access', 'SSO & SAML', 'SLA guarantee'], cta: 'Contact Sales', popular: false }
+    { name: 'Free', price: '$0', period: 'forever', description: `Try ${BRAND_NAME} free`, features: ['10 generations/day', 'Fast + Pro models', '3 concurrent builds', 'Basic validation'], cta: 'Get Started', popular: false },
+    { name: 'Starter', price: '$9', period: '/month', description: 'Personal projects', features: ['50 generations/day', '20 Pro + 2 Premium/day', 'Private projects', 'Standard validation'], cta: 'Start Building', popular: false },
+    { name: 'Pro', price: '$19', period: '/month', description: 'Professional developers', features: ['200 generations/day', '60 Pro + 5 Premium/day', 'Priority queue', 'Deployment + API access', '5 team members'], cta: 'Start Pro Trial', popular: true },
+    { name: 'Max', price: '$49', period: '/month', description: 'Power users & teams', features: ['500 generations/day', '100 Pro + 15 Premium/day', 'All Pro features', '10 team members', 'Custom model config'], cta: 'Go Max', popular: false },
+    { name: 'Enterprise', price: '$149', period: '/month', description: 'Organizations at scale', features: ['1,000 generations/day', '150 Pro + 25 Premium/day', 'Unlimited team members', 'SSO/SAML + SLA', 'Dedicated support'], cta: 'Contact Sales', popular: false }
   ]
 
   const faqs = [
-    { question: `What makes ${BRAND_NAME} different from other AI code tools?`, answer: `${BRAND_NAME} is the only AI code generator with a 10-layer validation system. Every piece of code is checked for syntax errors, type safety, security vulnerabilities, and best practices before you see it. Our auto-fix engine corrects issues automatically.` },
-    { question: 'What programming languages and frameworks do you support?', answer: 'We support all major languages and frameworks including React, Next.js, Vue, Angular, Node.js, Python, TypeScript, and more. Our AI adapts to your preferred stack and coding style.' },
-    { question: 'Is my code private and secure?', answer: 'Yes. On Pro and Enterprise plans, all your code is private and encrypted. We never use your code to train our models. Enterprise plans include additional security features like SSO and audit logs.' },
-    { question: 'Can I cancel my subscription anytime?', answer: 'Absolutely. You can cancel your subscription at any time with no questions asked. Your access continues until the end of your billing period.' }
+    { question: `What makes ${BRAND_NAME} different from ChatGPT or Claude?`, answer: `${BRAND_NAME} is an agentic platform — not just a chatbot. Our AI creates files, edits code, runs commands, searches the web, generates media (video/audio/3D), and deploys to production. ChatGPT and Claude can only talk about code. We actually build it.` },
+    { question: 'What AI models power the platform?', answer: `We use a dual-provider system with automatic failover and smart model routing. Simple questions get instant responses from fast models. Code generation uses powerful models. You choose your tier: Fast, Pro, or Premium — we handle the rest.` },
+    { question: 'What programming languages and frameworks do you support?', answer: 'All major languages and frameworks: React, Next.js, Vue, Angular, Node.js, Python, TypeScript, and more. Our AI adapts to your preferred stack and coding style.' },
+    { question: 'Is my code private and secure?', answer: 'Yes. On paid plans, all your code is private. We never use your code to train AI models. Enterprise plans include SSO, audit logs, and SLA guarantees.' },
+    { question: 'What happens when I hit my daily limit?', answer: 'You can still use the platform — requests automatically route to our fast-tier model which provides instant responses. Upgrade anytime for more Pro and Premium model access.' },
+    { question: 'Can I cancel my subscription anytime?', answer: 'Absolutely. Cancel anytime with no questions asked. Access continues until the end of your billing period.' }
   ]
 
   return (
@@ -181,20 +208,20 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800/50 rounded-full border border-zinc-700 mb-8">
               <Sparkles className="w-4 h-4 text-yellow-500" />
-              <span className="text-sm text-zinc-300">Powered by advanced AI</span>
+              <span className="text-sm text-zinc-300">Not just a chatbot — an agentic builder</span>
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-              Build production code
+              Describe it. Build it.
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                in seconds
+                Deploy it.
               </span>
             </h1>
 
             <p className="text-xl text-zinc-400 mb-8 max-w-2xl mx-auto">
-              The only AI code generator with 10-layer validation. 
-              Generate, validate, and deploy production-ready code instantly.
+              The AI platform that actually ships code — not just talks about it. 
+              10+ agentic tools, dual-provider AI, media generation, and one-click deploy.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -277,11 +304,11 @@ export default function LandingPage() {
       <section id="features" className="py-20 px-4 bg-zinc-900/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why developers choose {BRAND_NAME}</h2>
-            <p className="text-xl text-zinc-400 max-w-2xl mx-auto">Stop fixing AI-generated code. Start shipping.</p>
+            <h2 className="text-4xl font-bold mb-4">Everything your AI tool is missing</h2>
+            <p className="text-xl text-zinc-400 max-w-2xl mx-auto">ChatGPT talks. Cursor edits. We build, deploy, and generate media — all in one.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="p-6 bg-zinc-800/50 rounded-2xl border border-zinc-700 hover:border-zinc-600 transition-colors">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
@@ -338,7 +365,7 @@ export default function LandingPage() {
             <p className="text-xl text-zinc-400">From simple components to full applications</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {useCases.map((useCase, index) => (
               <div key={index} className="p-6 bg-zinc-800/50 rounded-2xl border border-zinc-700 hover:border-zinc-600 transition-all hover:-translate-y-1">
                 <div className="text-5xl mb-4">{useCase.image}</div>
@@ -350,8 +377,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Competitor Comparison */}
       <section className="py-20 px-4 bg-zinc-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">What we have that others don&apos;t</h2>
+            <p className="text-xl text-zinc-400">{BRAND_NAME} is the only AI platform that builds, deploys, and generates media — all in one.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {competitors.map((comp, i) => (
+              <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-zinc-300">{comp.name}</h3>
+                  <span className="text-sm text-zinc-500">{comp.price}</span>
+                </div>
+                <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider font-semibold">They don&apos;t have:</p>
+                <ul className="space-y-2">
+                  {comp.lacks.map((lack, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
+                      <span className="text-red-400 mt-0.5 flex-shrink-0">✗</span>
+                      <span>{lack}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center gap-3 bg-zinc-900 border border-zinc-700 rounded-xl px-8 py-4">
+              <span className="text-2xl">⚡</span>
+              <div className="text-left">
+                <div className="text-sm font-bold text-white">{BRAND_NAME} includes all of this — starting free</div>
+                <div className="text-xs text-zinc-400">Agentic tools • Media generation • One-click deploy • Dual-provider AI • Vision analysis • Smart routing</div>
+              </div>
+              <Link href="/auth/signup" className="ml-4 bg-white text-black font-bold px-4 py-2 rounded-lg text-sm hover:bg-zinc-200 transition-colors">
+                Try Free →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Loved by developers</h2>
@@ -390,7 +460,7 @@ export default function LandingPage() {
             <p className="text-xl text-zinc-400">Start free, upgrade when you need more</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
               <div key={index} className={`p-8 rounded-2xl border ${plan.popular ? 'bg-gradient-to-b from-blue-500/10 to-purple-500/10 border-blue-500/50' : 'bg-zinc-800/50 border-zinc-700'} relative`}>
                 {plan.popular && (

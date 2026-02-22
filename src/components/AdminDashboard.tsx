@@ -1161,6 +1161,54 @@ const AI_INSIGHTS = [
     title: 'Revenue Projection: 100 Users',
     body: 'If you hit 100 paid users with a typical mix (40 Starter, 35 Pro, 20 Max, 5 Enterprise): Revenue = $360 + $665 + $980 + $745 = $2,750/mo. At 90%+ margins, that\'s ~$2,475/mo profit. API costs: ~$275/mo. Infrastructure (Vercel/Supabase): ~$50/mo. Net profit: ~$2,425/mo.',
     tag: 'PROJECTION'
+  },
+  {
+    icon: '🏆',
+    title: 'What We Have That Claude.ai Doesn\'t',
+    body: 'Claude.ai is a chat-only interface — no file system, no code execution, no deployment, no project persistence. We offer: agentic file creation/editing, live code execution via run_command, one-click Vercel deployment, persistent projects with version history, GitHub/NPM search, vision analysis, media generation (video/audio/3D), smart model routing, and team collaboration. Claude.ai just talks — we build.',
+    tag: 'COMPETITIVE EDGE'
+  },
+  {
+    icon: '⚔️',
+    title: 'What We Have That ChatGPT Doesn\'t',
+    body: 'ChatGPT has Code Interpreter (sandbox only, no real deployment) and DALL-E (images only). We have: 10+ tool agentic loop with self-correction, real project file system, Vercel deployment, GitHub search, NPM search, multi-provider failover (their models + Anthropic), media generation across 6+ providers (video, audio, 3D, voice), white-label rebranding, and team billing. ChatGPT can\'t deploy a single line of code to production.',
+    tag: 'COMPETITIVE EDGE'
+  },
+  {
+    icon: '🎯',
+    title: 'What We Have That Cursor/Windsurf Don\'t',
+    body: 'Cursor ($20/mo) and Windsurf are IDE extensions — they require VS Code, local dev environment, and developer expertise. We\'re a zero-setup web app: open browser, describe what you want, get deployed code. No IDE, no terminal, no git knowledge needed. Plus we offer media generation, web search, vision analysis, and one-click deploy. Our audience is 10x larger because we don\'t require dev tools.',
+    tag: 'COMPETITIVE EDGE'
+  },
+  {
+    icon: '🔥',
+    title: 'What We Have That Bolt.new / v0 Don\'t',
+    body: 'Bolt.new and v0 generate UI components but can\'t: run backend code, search the web, search GitHub/NPM, generate media (video/audio/3D), analyze images, self-correct with multi-turn tool loops, or persist full projects. They\'re single-shot generators. We\'re a full agentic platform with 10+ tools, iterative refinement, and deployment. They generate a component — we ship a product.',
+    tag: 'COMPETITIVE EDGE'
+  },
+  {
+    icon: '🧩',
+    title: 'What We Have That Replit Don\'t',
+    body: 'Replit Agent ($25/mo) runs in their proprietary cloud IDE. We\'re provider-agnostic with dual-provider failover (Anthropic + OpenAI), white-label rebranding, Stripe billing you control, team management, permission gating, media generation, and 90%+ margins. Replit locks you into their ecosystem. File Engine is YOUR platform — rebrand it, set your prices, keep the profits.',
+    tag: 'COMPETITIVE EDGE'
+  },
+  {
+    icon: '💰',
+    title: 'The White-Label Advantage Nobody Else Has',
+    body: 'Claude.ai, ChatGPT, Cursor, Bolt, v0, Replit — none of them can be rebranded and resold. File Engine can be instantly rebranded (name, colors, logo, AI personality) and sold as YOUR product. Change one config object and you\'re "Acme Builder" or "Nova Code". Your users never see Anthropic or OpenAI. You own the customer relationship, the billing, and the brand.',
+    tag: 'MOAT'
+  },
+  {
+    icon: '🔄',
+    title: 'Dual-Provider Failover: Zero Downtime',
+    body: 'When Anthropic goes down (happens ~2x/month for 10-30min), Claude.ai users get nothing. When OpenAI has issues, ChatGPT users wait. Your platform automatically fails over to the other provider with round-robin key rotation. Users never notice. This alone is a selling point no single-provider platform can match.',
+    tag: 'ARCHITECTURE'
+  },
+  {
+    icon: '🎬',
+    title: 'Media Generation: Our Secret Weapon',
+    body: 'No AI coding platform offers video (Sora, Runway, Pika), audio (Suno), voice (ElevenLabs), and 3D generation alongside code. This is unique. A user can say "build me a landing page with a hero video and background music" and get it all in one conversation. Bolt can\'t do this. Cursor can\'t do this. Claude definitely can\'t do this.',
+    tag: 'FEATURE GAP'
   }
 ]
 
@@ -1318,12 +1366,18 @@ function UnitEconomicsTab() {
                 padding: '2px 8px', borderRadius: 4, fontSize: 9, fontWeight: 700, letterSpacing: '.5px',
                 textTransform: 'uppercase',
                 background: insight.tag === 'COMPETITIVE INTEL' ? 'rgba(239,68,68,0.15)' : 
+                  insight.tag === 'COMPETITIVE EDGE' ? 'rgba(251,146,60,0.15)' :
+                  insight.tag === 'MOAT' ? 'rgba(34,211,238,0.15)' :
+                  insight.tag === 'FEATURE GAP' ? 'rgba(163,230,53,0.15)' :
                   insight.tag === 'STRATEGY' ? 'rgba(59,130,246,0.15)' :
                   insight.tag === 'INSIGHT' ? 'rgba(168,85,247,0.15)' :
                   insight.tag === 'TREND' ? 'rgba(34,197,94,0.15)' :
                   insight.tag === 'PROJECTION' ? 'rgba(236,72,153,0.15)' :
                   'rgba(245,158,11,0.15)',
                 color: insight.tag === 'COMPETITIVE INTEL' ? '#ef4444' :
+                  insight.tag === 'COMPETITIVE EDGE' ? '#fb923c' :
+                  insight.tag === 'MOAT' ? '#22d3ee' :
+                  insight.tag === 'FEATURE GAP' ? '#a3e635' :
                   insight.tag === 'STRATEGY' ? '#3b82f6' :
                   insight.tag === 'INSIGHT' ? '#a855f7' :
                   insight.tag === 'TREND' ? '#22c55e' :
