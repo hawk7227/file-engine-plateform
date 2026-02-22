@@ -587,60 +587,39 @@ async function agentStream(
         let apiMsgs = buildInitialMessages(provider, messages, attachments)
 
         for (let i = 0; i < MAX_ITER; i++) {
-          // ── CALL AI (same flow for both providers) ──
-          const resp = await callAI(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking)
+          // ── STREAM AI RESPONSE (text flows immediately, tools accumulate) ──
+          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc)
 
-          if (!resp.ok) {
-            const e = await resp.json().catch(() => ({}))
-            if (resp.status === 429) markRateLimited(apiKey, 60000)
-            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse(e.error?.message || 'API error') })}\n\n`))
-            break
-          }
-
-          // ── PARSE RESPONSE (unified for both providers) ──
-          const data = await resp.json()
-          const parsed = provider === 'anthropic' ? parseAnthropicResponse(data) : parseOpenAIResponse(data)
-
-          // ── STREAM THINKING (both providers) ──
-          if (parsed.thinking) {
-            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'thinking', text: sanitizeResponse(parsed.thinking) })}\n\n`))
-          }
-
-          // ── STREAM TEXT (both providers) ──
-          if (parsed.text) {
-            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ text: sanitizeResponse(parsed.text) })}\n\n`))
-          }
+          if (!parsed) break // stream error already sent to client
 
           // ── NO TOOLS = DONE ──
           if (parsed.toolCalls.length === 0) break
 
-          // ── EXECUTE TOOLS (identical for both) ──
+          // ── EXECUTE TOOLS (identical for both providers) ──
           const results: { tool_use_id: string; content: string }[] = []
           for (const tc of parsed.toolCalls) {
-            // Stream tool call notification
             const inputSummary = tc.name === 'create_file' ? { path: tc.input.path, lines: tc.input.content?.split('\n').length }
               : tc.name === 'edit_file' ? { path: tc.input.path, description: tc.input.description }
                 : tc.name === 'think' ? { reasoning: tc.input.reasoning?.slice(0, 300) }
                   : tc.input
             ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_call', tool: tc.name, input: inputSummary })}\n\n`))
 
-            // Execute
             const r = await execTool(tc.name, tc.input, toolCtx)
             ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_result', tool: tc.name, success: r.success, result: sanitizeResponse(r.result.slice(0, 2000)) })}\n\n`))
             results.push({ tool_use_id: tc.id, content: r.result.slice(0, 4000) })
           }
 
-          // ── APPEND TO CONVERSATION (provider-specific format, same data) ──
+          // ── APPEND TO CONVERSATION ──
           apiMsgs = appendToolResults(provider, apiMsgs, parsed.text, parsed.toolCalls, results)
 
-          // ── CONTEXT COMPACTION (both providers) ──
+          // ── CONTEXT COMPACTION ──
           apiMsgs = compact(apiMsgs, maxTokens * 3)
 
-          // ── CHECK STOP REASON (normalized) ──
+          // ── CHECK STOP REASON ──
           if (parsed.stopReason !== 'tool_use') break
         }
 
-        // ── SEND FINAL FILES (both providers) ──
+        // ── SEND FINAL FILES ──
         if (Object.keys(toolCtx.files).length > 0) {
           ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
             type: 'files_updated',
@@ -661,6 +640,171 @@ async function agentStream(
   return new Response(stream, {
     headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-store', 'Connection': 'keep-alive', 'X-Powered-By': BRAND_NAME }
   })
+}
+
+// =====================================================
+// STREAMING AGENT TURN — TRUE TOKEN-BY-TOKEN STREAMING
+// Text flows to client immediately (~300ms first token)
+// Tool_use blocks accumulate progressively from stream
+// Returns ParsedResponse when stream completes
+// =====================================================
+
+async function streamAgentTurn(
+  provider: 'anthropic' | 'openai', model: string, sys: string,
+  msgs: any[], key: string, max: number, think: boolean,
+  ctrl: ReadableStreamDefaultController, enc: TextEncoder
+): Promise<ParsedResponse | null> {
+  const resp = await callAIStreaming(provider, model, sys, msgs, key, max, think)
+
+  if (!resp.ok) {
+    const e = await resp.json().catch(() => ({}))
+    if (resp.status === 429) markRateLimited(key, 60000)
+    ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse(e.error?.message || 'API error') })}\n\n`))
+    return null
+  }
+
+  const reader = resp.body?.getReader()
+  if (!reader) {
+    ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: 'No response body' })}\n\n`))
+    return null
+  }
+
+  const dec = new TextDecoder()
+  let buf = ''
+  let fullText = ''
+  let fullThinking = ''
+  let stopReason = 'end'
+
+  // Anthropic: tool blocks indexed by content_block index
+  const anthropicTools: Map<number, { id: string; name: string; jsonBuf: string }> = new Map()
+  // OpenAI: tool calls indexed by tool_call index
+  const openaiTools: Map<number, { id: string; name: string; argsBuf: string }> = new Map()
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buf += dec.decode(value, { stream: true })
+    const lines = buf.split('\n')
+    buf = lines.pop() || ''
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue
+      const d = line.slice(6).trim()
+      if (d === '[DONE]' || !d) continue
+
+      try {
+        const p = JSON.parse(d)
+
+        if (provider === 'anthropic') {
+          // ── Anthropic streaming with tools ──
+          if (p.type === 'content_block_start' && p.content_block?.type === 'tool_use') {
+            anthropicTools.set(p.index, { id: p.content_block.id, name: p.content_block.name, jsonBuf: '' })
+          }
+          if (p.type === 'content_block_delta') {
+            const delta = p.delta
+            if (delta?.type === 'text_delta' && delta.text) {
+              fullText += delta.text
+              ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ text: sanitizeResponse(delta.text) })}\n\n`))
+            }
+            if (delta?.type === 'thinking_delta' && delta.thinking) {
+              fullThinking += delta.thinking
+              ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'thinking', text: sanitizeResponse(delta.thinking) })}\n\n`))
+            }
+            if (delta?.type === 'input_json_delta' && delta.partial_json !== undefined) {
+              const tool = anthropicTools.get(p.index)
+              if (tool) tool.jsonBuf += delta.partial_json
+            }
+          }
+          if (p.type === 'message_delta' && p.delta?.stop_reason) {
+            stopReason = p.delta.stop_reason === 'tool_use' ? 'tool_use'
+              : p.delta.stop_reason === 'max_tokens' ? 'max_tokens' : 'end'
+          }
+        } else {
+          // ── OpenAI streaming with tools ──
+          const choice = p.choices?.[0]
+          if (!choice) continue
+
+          if (choice.delta?.content) {
+            fullText += choice.delta.content
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ text: sanitizeResponse(choice.delta.content) })}\n\n`))
+          }
+          if (choice.delta?.reasoning_content) {
+            fullThinking += choice.delta.reasoning_content
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'thinking', text: sanitizeResponse(choice.delta.reasoning_content) })}\n\n`))
+          }
+          if (choice.delta?.tool_calls) {
+            for (const tc of choice.delta.tool_calls) {
+              const idx = tc.index ?? 0
+              if (tc.id) {
+                openaiTools.set(idx, { id: tc.id, name: tc.function?.name || '', argsBuf: tc.function?.arguments || '' })
+              } else {
+                const existing = openaiTools.get(idx)
+                if (existing) {
+                  if (tc.function?.arguments) existing.argsBuf += tc.function.arguments
+                  if (tc.function?.name) existing.name = tc.function.name
+                }
+              }
+            }
+          }
+          if (choice.finish_reason) {
+            stopReason = (choice.finish_reason === 'tool_calls' || choice.finish_reason === 'function_call')
+              ? 'tool_use' : choice.finish_reason === 'length' ? 'max_tokens' : 'end'
+          }
+        }
+      } catch { /* skip malformed JSON */ }
+    }
+  }
+
+  // Build parsed tool calls
+  const toolCalls: ParsedResponse['toolCalls'] = []
+  if (provider === 'anthropic') {
+    for (const [, t] of anthropicTools) {
+      let input = {}
+      try { input = JSON.parse(t.jsonBuf || '{}') } catch { }
+      toolCalls.push({ id: t.id, name: t.name, input })
+    }
+  } else {
+    for (const [, t] of openaiTools) {
+      let input = {}
+      try { input = JSON.parse(t.argsBuf || '{}') } catch { }
+      toolCalls.push({ id: t.id, name: t.name, input })
+    }
+  }
+
+  return { text: fullText, thinking: fullThinking, toolCalls, stopReason }
+}
+
+// Streaming API call WITH tools (agent mode) — both providers
+async function callAIStreaming(
+  provider: 'anthropic' | 'openai', model: string, sys: string,
+  msgs: any[], key: string, max: number, think: boolean
+): Promise<Response> {
+  if (provider === 'anthropic') {
+    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), stream: true }
+    if (think && (model.includes('sonnet') || model.includes('opus'))) {
+      body.thinking = { type: 'enabled', budget_tokens: Math.min(4096, Math.floor(max * 0.3)) }
+    }
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify(body)
+    })
+  } else {
+    const oai = convertToOpenAIMessages(sys, msgs)
+    const body: any = { model, messages: oai, tools: toOpenAITools(), tool_choice: 'auto', stream: true }
+    if (model.startsWith('o1') || model.startsWith('o3')) {
+      body.max_completion_tokens = max
+      if (think) body.reasoning_effort = 'high'
+    } else {
+      body.max_tokens = max
+    }
+    return fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    })
+  }
 }
 
 // =====================================================
