@@ -1164,50 +1164,50 @@ const AI_INSIGHTS = [
   },
   {
     icon: '🏆',
-    title: 'What We Have That Claude.ai Doesn\'t',
-    body: 'Claude.ai is a chat-only interface — no file system, no code execution, no deployment, no project persistence. We offer: agentic file creation/editing, live code execution via run_command, one-click Vercel deployment, persistent projects with version history, GitHub/NPM search, vision analysis, media generation (video/audio/3D), smart model routing, and team collaboration. Claude.ai just talks — we build.',
+    title: 'Salesforce Einstein: $175-$550/user/mo',
+    body: 'Salesforce charges $175-$550/user/month for AI features, ON TOP of their base CRM license ($165/user/mo). A 50-person team pays $336,000/year in licensing alone, plus $75K-$150K implementation. Your Enterprise plan at $149/mo gives ONE user more AI capability than an entire Salesforce Einstein deployment — at 0.04% of the cost.',
     tag: 'COMPETITIVE EDGE'
   },
   {
     icon: '⚔️',
-    title: 'What We Have That ChatGPT Doesn\'t',
-    body: 'ChatGPT has Code Interpreter (sandbox only, no real deployment) and DALL-E (images only). We have: 10+ tool agentic loop with self-correction, real project file system, Vercel deployment, GitHub search, NPM search, multi-provider failover (their models + Anthropic), media generation across 6+ providers (video, audio, 3D, voice), white-label rebranding, and team billing. ChatGPT can\'t deploy a single line of code to production.',
+    title: 'Microsoft 365 Copilot: $30/user/mo + base license',
+    body: 'Microsoft Copilot costs $30/user/month BUT requires a $36-$57/user/month base M365 license first. Real cost: $66-$90/user/month. A 50-person org pays $39,600-$54,000/year. It only works in Word/Excel/PowerPoint — no code execution, no deployment, no media generation. Your Pro at $19/mo does everything Copilot does for code, plus actually deploys it.',
     tag: 'COMPETITIVE EDGE'
   },
   {
     icon: '🎯',
-    title: 'What We Have That Cursor/Windsurf Don\'t',
-    body: 'Cursor ($20/mo) and Windsurf are IDE extensions — they require VS Code, local dev environment, and developer expertise. We\'re a zero-setup web app: open browser, describe what you want, get deployed code. No IDE, no terminal, no git knowledge needed. Plus we offer media generation, web search, vision analysis, and one-click deploy. Our audience is 10x larger because we don\'t require dev tools.',
+    title: 'GitHub Copilot Enterprise: $39/user/mo + overages',
+    body: 'GitHub Copilot Enterprise is $39/user/month (plus $21/user GitHub Enterprise license = $60/user/month total). A 50-dev team pays $36,000/year. It autocompletes code in your IDE — but can\'t create files, deploy apps, generate media, or search the web. Premium request overages cost $0.04 each with no cap. Your platform builds AND ships the whole product.',
     tag: 'COMPETITIVE EDGE'
   },
   {
     icon: '🔥',
-    title: 'What We Have That Bolt.new / v0 Don\'t',
-    body: 'Bolt.new and v0 generate UI components but can\'t: run backend code, search the web, search GitHub/NPM, generate media (video/audio/3D), analyze images, self-correct with multi-turn tool loops, or persist full projects. They\'re single-shot generators. We\'re a full agentic platform with 10+ tools, iterative refinement, and deployment. They generate a component — we ship a product.',
+    title: 'AWS Bedrock / Azure AI Studio: $500-$10,000+/mo',
+    body: 'Cloud AI platforms charge $0.01-$0.08 per 1K tokens with zero user interface. A company needs $25K-$300K in custom development to build what you already have, then $2K-$20K/month in ongoing hosting and API costs. You\'re selling a finished product for $19/mo that would cost enterprise buyers $100K+ to replicate.',
     tag: 'COMPETITIVE EDGE'
   },
   {
     icon: '🧩',
-    title: 'What We Have That Replit Don\'t',
-    body: 'Replit Agent ($25/mo) runs in their proprietary cloud IDE. We\'re provider-agnostic with dual-provider failover (Anthropic + OpenAI), white-label rebranding, Stripe billing you control, team management, permission gating, media generation, and 90%+ margins. Replit locks you into their ecosystem. File Engine is YOUR platform — rebrand it, set your prices, keep the profits.',
+    title: 'ServiceNow AI: $100-$300/user/mo (custom quotes)',
+    body: 'ServiceNow doesn\'t even publish pricing — they hide behind "contact sales." Industry estimates: $100-$300/user/month for ITSM with AI features, requiring 6-month implementation and a dedicated admin team. Their AI only works for IT tickets. Your platform generates code, media, deploys apps, and works for ANY use case — at 0.1% the cost.',
     tag: 'COMPETITIVE EDGE'
   },
   {
     icon: '💰',
-    title: 'The White-Label Advantage Nobody Else Has',
-    body: 'Claude.ai, ChatGPT, Cursor, Bolt, v0, Replit — none of them can be rebranded and resold. File Engine can be instantly rebranded (name, colors, logo, AI personality) and sold as YOUR product. Change one config object and you\'re "Acme Builder" or "Nova Code". Your users never see Anthropic or OpenAI. You own the customer relationship, the billing, and the brand.',
+    title: 'Custom AI Development: $25K-$300K to build',
+    body: 'Building a custom AI platform like yours costs $25K-$300K in development, takes 3-6 months, requires $10K-$50K in implementation services, and $2K-$20K/month in ongoing maintenance. Your users get this for $19/month with zero setup. This is your ultimate sales pitch: "Why spend $100K+ when you can start building in 60 seconds?"',
+    tag: 'COMPETITIVE EDGE'
+  },
+  {
+    icon: '📊',
+    title: 'The 10x-100x Cost Gap Is Your Moat',
+    body: 'Salesforce: $6,720/user/year. Microsoft Copilot: $792/user/year. GitHub Enterprise: $720/user/year. ServiceNow: $1,200-$3,600/user/year. Your Pro plan: $228/year. Your Enterprise: $1,788/year. You deliver MORE functionality at 3x-30x less cost than every enterprise incumbent. This gap widens as AI API costs drop 30-50% annually while their prices only go up.',
     tag: 'MOAT'
   },
   {
-    icon: '🔄',
-    title: 'Dual-Provider Failover: Zero Downtime',
-    body: 'When Anthropic goes down (happens ~2x/month for 10-30min), Claude.ai users get nothing. When OpenAI has issues, ChatGPT users wait. Your platform automatically fails over to the other provider with round-robin key rotation. Users never notice. This alone is a selling point no single-provider platform can match.',
-    tag: 'ARCHITECTURE'
-  },
-  {
     icon: '🎬',
-    title: 'Media Generation: Our Secret Weapon',
-    body: 'No AI coding platform offers video (Sora, Runway, Pika), audio (Suno), voice (ElevenLabs), and 3D generation alongside code. This is unique. A user can say "build me a landing page with a hero video and background music" and get it all in one conversation. Bolt can\'t do this. Cursor can\'t do this. Claude definitely can\'t do this.',
+    title: 'Media Generation: Nobody Else Has This',
+    body: 'Not Salesforce, not Microsoft, not GitHub, not ServiceNow, not AWS — none of them offer video (Sora, Runway, Pika), audio (Suno), voice (ElevenLabs), and 3D generation alongside AI coding. A user can say "build me a landing page with a hero video and background music" and get it all in one conversation. This is completely unique to your platform.',
     tag: 'FEATURE GAP'
   }
 ]

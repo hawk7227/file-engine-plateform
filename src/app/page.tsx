@@ -127,12 +127,12 @@ export default function LandingPage() {
   ]
 
   const competitors = [
-    { name: 'Claude.ai', price: '$17-100/mo', lacks: ['No file creation', 'No code execution', 'No deployment', 'No media generation', 'Chat only'] },
-    { name: 'ChatGPT', price: '$20-200/mo', lacks: ['Sandbox only (no deploy)', 'No multi-provider failover', 'No web search in code', 'Images only (no video/audio)', 'No project persistence'] },
-    { name: 'Cursor', price: '$20/mo', lacks: ['Requires VS Code + dev setup', 'IDE only (not web)', 'No media generation', 'No deployment', 'Developer-only audience'] },
-    { name: 'Bolt.new', price: '$20/mo', lacks: ['Single-shot generation', 'No iterative tool loop', 'No web/GitHub search', 'No media generation', 'No backend support'] },
-    { name: 'v0 by Vercel', price: '$20/mo', lacks: ['UI components only', 'No full-stack apps', 'No backend/API', 'No media generation', 'No vision analysis'] },
-    { name: 'Replit', price: '$25/mo', lacks: ['Locked to their IDE', 'No white-label option', 'Single provider only', 'No media generation', 'Can\'t resell'] },
+    { name: 'Salesforce Einstein', price: '$175-$550/user/mo', monthly: '$2,100-$6,600/yr per user', lacks: ['Requires base CRM license first', 'AI add-ons cost $50-$125 extra', '$75K-$150K implementation fees', 'Only works inside Salesforce', '6-month deployment timeline'] },
+    { name: 'Microsoft 365 Copilot', price: '$30/user/mo + base license', monthly: '$66-$90/user/mo total', lacks: ['Requires $36-$57 base M365 license', 'Locked to Microsoft ecosystem', 'No code execution or deployment', 'No media generation', 'Pay-as-you-go agents cost extra'] },
+    { name: 'ServiceNow AI', price: '$100-$300/user/mo', monthly: '$1,200-$3,600/yr per user', lacks: ['No public pricing (custom quotes only)', 'Requires 6-month implementation', 'ITSM-only, not general purpose', 'Needs dedicated admin team', 'Enterprise sales process required'] },
+    { name: 'GitHub Copilot Enterprise', price: '$39/user/mo + GitHub license', monthly: '$60/user/mo total stack', lacks: ['Code autocomplete only — no deployment', 'Requires VS Code or IDE setup', 'No file creation or project building', 'No media generation', '$0.04/overage per premium request'] },
+    { name: 'AWS Bedrock / Azure AI Studio', price: '$0.01-$0.08 per 1K tokens', monthly: '$500-$10,000+/mo typical', lacks: ['Pure API — no user interface', 'Requires engineering team to build', '$10K-$100K+ development cost', 'No built-in deployment pipeline', 'Unpredictable usage-based billing'] },
+    { name: 'Custom AI Development', price: '$25K-$300K project', monthly: '$2,000-$20,000/mo ongoing', lacks: ['3-6 month build timeline', '$10K-$50K implementation services', 'Requires dedicated dev team', 'Ongoing maintenance costs', 'No instant iteration or updates'] },
   ]
 
   const testimonials = [
@@ -381,18 +381,19 @@ export default function LandingPage() {
       <section className="py-20 px-4 bg-zinc-900/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">What we have that others don&apos;t</h2>
-            <p className="text-xl text-zinc-400">{BRAND_NAME} is the only AI platform that builds, deploys, and generates media — all in one.</p>
+            <h2 className="text-4xl font-bold mb-4">Enterprise AI costs thousands. We cost $19.</h2>
+            <p className="text-xl text-zinc-400">Companies pay 10x-100x more for less functionality. Here&apos;s what they&apos;re actually charging.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {competitors.map((comp, i) => (
               <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-bold text-zinc-300">{comp.name}</h3>
-                  <span className="text-sm text-zinc-500">{comp.price}</span>
                 </div>
-                <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider font-semibold">They don&apos;t have:</p>
+                <div className="text-red-400 font-bold text-sm mb-1">{comp.price}</div>
+                <div className="text-xs text-zinc-500 mb-4">{comp.monthly}</div>
+                <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider font-semibold">What you&apos;re paying for:</p>
                 <ul className="space-y-2">
                   {comp.lacks.map((lack, j) => (
                     <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
@@ -406,14 +407,15 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-3 bg-zinc-900 border border-zinc-700 rounded-xl px-8 py-4">
-              <span className="text-2xl">⚡</span>
+            <div className="inline-flex items-center gap-3 bg-zinc-900 border border-emerald-700/50 rounded-xl px-8 py-5">
+              <span className="text-3xl">⚡</span>
               <div className="text-left">
-                <div className="text-sm font-bold text-white">{BRAND_NAME} includes all of this — starting free</div>
-                <div className="text-xs text-zinc-400">Agentic tools • Media generation • One-click deploy • Dual-provider AI • Vision analysis • Smart routing</div>
+                <div className="text-lg font-bold text-white">{BRAND_NAME} Pro: $19/mo — everything included</div>
+                <div className="text-sm text-zinc-400">Agentic AI • Code execution • One-click deploy • Media generation • Vision analysis • Dual-provider failover • No implementation fees</div>
+                <div className="text-xs text-emerald-400 mt-1 font-semibold">That&apos;s 10x-100x less than the enterprise tools above — with more features.</div>
               </div>
-              <Link href="/auth/signup" className="ml-4 bg-white text-black font-bold px-4 py-2 rounded-lg text-sm hover:bg-zinc-200 transition-colors">
-                Try Free →
+              <Link href="/auth/signup" className="ml-4 bg-emerald-500 text-black font-bold px-5 py-3 rounded-lg text-sm hover:bg-emerald-400 transition-colors whitespace-nowrap">
+                Start Free →
               </Link>
             </div>
           </div>
