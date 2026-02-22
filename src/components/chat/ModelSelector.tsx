@@ -10,7 +10,7 @@ const MODELS = [
 ]
 
 export function ModelSelector() {
-  const [selected, setSelected] = useState('auto')
+  const [selected, setSelected] = useState('fast')
   const [open, setOpen] = useState(false)
 
   useEffect(() => {

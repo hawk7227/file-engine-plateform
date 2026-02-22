@@ -17,7 +17,7 @@ const MODEL_TIERS = [
 ]
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const [model, setModel] = useState('auto')
+  const [model, setModel] = useState('fast')
   const [primaryKey, setPrimaryKey] = useState('')
   const [secondaryKey, setSecondaryKey] = useState('')
   const [hasPrimaryKey, setHasPrimaryKey] = useState(false)
@@ -37,7 +37,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       })
       if (!r.ok) return
       const d = await r.json()
-      setModel(d.model || 'auto')
+      setModel(d.model || 'fast')
       setHasPrimaryKey(d.hasPrimaryKey)
       setHasSecondaryKey(d.hasSecondaryKey)
     } catch { /* non-fatal */ }

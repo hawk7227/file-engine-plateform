@@ -124,7 +124,7 @@ function parseCodeBlocks(content: string): GeneratedFile[] {
 export function useChat(options: ChatOptions = {}): UseChatReturn {
   const {
     projectId,
-    model = 'auto',
+    model = 'fast',
     enableAgent = true,
     enableThinking = false,
     enableResearch = false,

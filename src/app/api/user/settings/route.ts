@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   // Return with generic field names — no provider names
   return NextResponse.json({
-    model: data?.preferred_model || 'auto',
+    model: data?.preferred_model || 'fast',
     primaryKey: data?.claude_api_key ? '••••' + data.claude_api_key.slice(-4) : '',
     secondaryKey: data?.openai_api_key ? '••••' + data.openai_api_key.slice(-4) : '',
     hasPrimaryKey: !!data?.claude_api_key,

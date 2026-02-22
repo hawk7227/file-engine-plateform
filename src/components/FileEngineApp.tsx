@@ -614,7 +614,7 @@ export function FileEngineApp() {
   const [editingTitle, setEditingTitle] = useState("");
 
   const { chats: savedChats, deleteChat, renameChat, refresh: refreshChats } = useSavedChats(currentProjectId || undefined);
-  const [selectedModel, setSelectedModel] = useState("auto");
+  const [selectedModel, setSelectedModel] = useState("fast");
   const chatHook = useChat({
     projectId: currentProjectId || undefined,
     chatId: currentChatId || undefined,

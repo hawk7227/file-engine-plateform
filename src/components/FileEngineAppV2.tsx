@@ -358,7 +358,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const [useLocal, setUseLocal] = useState(false)
   const [autoFix, setAutoFix] = useState(true)
   const [inputValue, setInputValue] = useState('')
-  const [selectedModel, setSelectedModel] = useState('auto')
+  const [selectedModel, setSelectedModel] = useState('fast')
   const [domainInput, setDomainInput] = useState('')
   const [toasts, setToasts] = useState<Toast[]>([])
   const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set())
