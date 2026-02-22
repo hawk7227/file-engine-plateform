@@ -24,7 +24,7 @@ import type { TeamCostSettings } from '@/lib/admin-cost-settings'
 // TYPES
 // =====================================================
 
-type AdminTab = 'brand' | 'overview' | 'cost' | 'models' | 'keys' | 'users' | 'builds' | 'billing' | 'pages' | 'health' | 'settings'
+type AdminTab = 'brand' | 'overview' | 'cost' | 'models' | 'keys' | 'users' | 'permissions' | 'builds' | 'billing' | 'pages' | 'health' | 'settings'
 type PageState = 'loading' | 'unauthorized' | 'error' | 'ready'
 
 interface Toast {
@@ -307,6 +307,7 @@ const NAV_ITEMS: { id: AdminTab; label: string; icon: string; section?: string }
   { id: 'models', label: 'Model Routing', icon: '🤖' },
   { id: 'keys', label: 'API Key Pool', icon: '🔑' },
   { id: 'users', label: 'Users', icon: '👥', section: 'Platform' },
+  { id: 'permissions', label: 'Permissions', icon: '🔐' },
   { id: 'builds', label: 'Builds', icon: '🔧' },
   { id: 'billing', label: 'Billing', icon: '💳' },
   { id: 'pages', label: 'Page Manager', icon: '🖼️' },
@@ -861,6 +862,232 @@ const BRAND: BrandConfig = {
               <div style={{ fontSize: 13, color: '#a1a1aa' }}>{editBrand.tagline}</div>
             </div>
           </div>
+        )}
+      </div>
+    </>
+  )
+}
+
+// =====================================================
+// PERMISSIONS TAB — Feature gating management
+// =====================================================
+
+const ALL_FEATURES = [
+  { id: 'deploy_vercel', label: 'Deploy to Vercel', cat: 'Deploy' },
+  { id: 'deploy_github', label: 'Push to GitHub', cat: 'Deploy' },
+  { id: 'preview_panel', label: 'Live Preview', cat: 'Build' },
+  { id: 'build_verify', label: 'Build Verification', cat: 'Build' },
+  { id: 'auto_fix', label: 'Auto-Fix Errors', cat: 'Build' },
+  { id: 'user_fix', label: 'User Fix', cat: 'Build' },
+  { id: 'generate_validated', label: 'Validated Generation', cat: 'Build' },
+  { id: 'code_execution', label: 'Code Execution', cat: 'Agent' },
+  { id: 'extended_thinking', label: 'Extended Thinking', cat: 'Agent' },
+  { id: 'media_generation', label: 'Media Generation', cat: 'Agent' },
+  { id: 'vision_analysis', label: 'Vision Analysis', cat: 'Agent' },
+  { id: 'image_search', label: 'Image Search', cat: 'Agent' },
+  { id: 'memory_persistent', label: 'Persistent Memory', cat: 'Data' },
+  { id: 'advanced_models', label: 'Advanced Models', cat: 'Data' },
+  { id: 'team_features', label: 'Team Features', cat: 'Data' },
+  { id: 'byok', label: 'Bring Your Own Key', cat: 'Data' },
+  { id: 'export_zip', label: 'ZIP Export', cat: 'Data' },
+  { id: 'url_import', label: 'URL Import', cat: 'Data' },
+  { id: 'batch_operations', label: 'Batch Operations', cat: 'Data' },
+]
+
+const PLAN_TIERS = ['free', 'pro', 'enterprise']
+
+function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | 'info', title: string, message: string) => void }) {
+  const [permissions, setPermissions] = useState<any[]>([])
+  const [groups, setGroups] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [grantMode, setGrantMode] = useState<'plan' | 'user'>('plan')
+  const [grantPlan, setGrantPlan] = useState('free')
+  const [grantUserId, setGrantUserId] = useState('')
+  const [grantFeature, setGrantFeature] = useState('')
+
+  const fetchPerms = useCallback(async () => {
+    setLoading(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) throw new Error('Not authenticated')
+      const r = await fetch('/api/admin/permissions', { headers: { 'x-user-token': token } })
+      if (!r.ok) throw new Error('Failed to fetch')
+      const d = await r.json()
+      setPermissions(d.permissions || [])
+      setGroups(d.groups || [])
+    } catch (e: any) {
+      addToast('error', 'Load Failed', e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [addToast])
+
+  useEffect(() => { fetchPerms() }, [fetchPerms])
+
+  const grantPermission = async (feature: string, opts: { plan?: string; user_id?: string; enabled?: boolean }) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const r = await fetch('/api/admin/permissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-token': session?.access_token || '' },
+        body: JSON.stringify({ feature, ...opts, enabled: opts.enabled ?? true })
+      })
+      if (!r.ok) { const e = await r.json(); throw new Error(e.error) }
+      addToast('success', 'Permission Updated', `${feature} → ${opts.plan || opts.user_id}`)
+      fetchPerms()
+    } catch (e: any) {
+      addToast('error', 'Failed', e.message)
+    }
+  }
+
+  const revokePermission = async (id: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const r = await fetch(`/api/admin/permissions?id=${id}`, {
+        method: 'DELETE',
+        headers: { 'x-user-token': session?.access_token || '' }
+      })
+      if (!r.ok) throw new Error('Revoke failed')
+      addToast('success', 'Revoked', 'Permission removed')
+      fetchPerms()
+    } catch (e: any) {
+      addToast('error', 'Failed', e.message)
+    }
+  }
+
+  // Build plan→feature matrix from current permissions
+  const planMatrix: Record<string, Set<string>> = { free: new Set(), pro: new Set(), enterprise: new Set() }
+  for (const p of permissions) {
+    if (p.plan && p.enabled && planMatrix[p.plan]) planMatrix[p.plan].add(p.feature)
+  }
+
+  const categories = [...new Set(ALL_FEATURES.map(f => f.cat))]
+
+  return (
+    <>
+      <div className="admin-hdr">
+        <div><div className="admin-hdr-title">Feature Permissions</div><div className="admin-hdr-sub">Control which features each plan tier can access</div></div>
+        <button className="btn btn-g" onClick={fetchPerms}>⟳ Refresh</button>
+      </div>
+      <div className="admin-body">
+        {loading ? (
+          <div>{[1,2,3,4,5].map(i => <div key={i} className="skel" style={{ height: 40, marginBottom: 8 }} />)}</div>
+        ) : (
+          <>
+            {/* Plan Matrix */}
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a1a1aa', marginBottom: 12 }}>Plan Feature Matrix</div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <th style={{ textAlign: 'left', padding: '8px 12px', color: '#71717a', fontWeight: 500 }}>Feature</th>
+                    {PLAN_TIERS.map(p => (
+                      <th key={p} style={{ textAlign: 'center', padding: '8px 12px', color: p === 'enterprise' ? '#a78bfa' : p === 'pro' ? '#34d399' : '#71717a', fontWeight: 600, textTransform: 'capitalize' }}>{p}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.map(cat => (
+                    <>
+                      <tr key={`cat-${cat}`}><td colSpan={4} style={{ padding: '12px 12px 4px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#52525b' }}>{cat}</td></tr>
+                      {ALL_FEATURES.filter(f => f.cat === cat).map(feat => (
+                        <tr key={feat.id} style={{ borderBottom: '1px solid #18181b' }}>
+                          <td style={{ padding: '6px 12px', color: '#d4d4d8' }}>{feat.label}</td>
+                          {PLAN_TIERS.map(plan => {
+                            const enabled = planMatrix[plan]?.has(feat.id)
+                            return (
+                              <td key={plan} style={{ textAlign: 'center', padding: '6px 12px' }}>
+                                <button
+                                  onClick={() => grantPermission(feat.id, { plan, enabled: !enabled })}
+                                  style={{
+                                    width: 28, height: 28, borderRadius: 6, border: 'none', cursor: 'pointer',
+                                    background: enabled ? 'rgba(34,197,94,.15)' : 'rgba(113,113,122,.1)',
+                                    color: enabled ? '#34d399' : '#52525b',
+                                    fontSize: 14, fontWeight: 700,
+                                  }}
+                                >{enabled ? '✓' : '—'}</button>
+                              </td>
+                            )
+                          })}
+                        </tr>
+                      ))}
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Quick Grant */}
+            <div style={{ marginTop: 24, padding: 16, background: '#0a0a0f', borderRadius: 8, border: '1px solid #27272a' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a1a1aa', marginBottom: 12 }}>Quick Grant / Override</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div>
+                  <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>Target</div>
+                  <select value={grantMode} onChange={e => setGrantMode(e.target.value as any)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12 }}>
+                    <option value="plan">Plan Tier</option>
+                    <option value="user">Specific User</option>
+                  </select>
+                </div>
+                {grantMode === 'plan' ? (
+                  <div>
+                    <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>Plan</div>
+                    <select value={grantPlan} onChange={e => setGrantPlan(e.target.value)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12 }}>
+                      {PLAN_TIERS.map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>User ID</div>
+                    <input value={grantUserId} onChange={e => setGrantUserId(e.target.value)} placeholder="UUID" style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12, width: 240 }} />
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>Feature</div>
+                  <select value={grantFeature} onChange={e => setGrantFeature(e.target.value)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12 }}>
+                    <option value="">Select...</option>
+                    {ALL_FEATURES.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+                  </select>
+                </div>
+                <button className="btn btn-g" disabled={!grantFeature} onClick={() => {
+                  if (!grantFeature) return
+                  const opts = grantMode === 'plan' ? { plan: grantPlan } : { user_id: grantUserId }
+                  grantPermission(grantFeature, opts)
+                  setGrantFeature('')
+                  setGrantUserId('')
+                }}>Grant</button>
+              </div>
+            </div>
+
+            {/* Active Overrides */}
+            {permissions.filter(p => p.user_id).length > 0 && (
+              <div style={{ marginTop: 24 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a1a1aa', marginBottom: 12 }}>User Overrides</div>
+                {permissions.filter(p => p.user_id).map(p => (
+                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#0a0a0f', borderRadius: 6, marginBottom: 4, border: '1px solid #18181b' }}>
+                    <div>
+                      <span style={{ color: p.enabled ? '#34d399' : '#ef4444', fontWeight: 600, fontSize: 12 }}>{p.enabled ? '✓' : '✕'} {p.feature}</span>
+                      <span style={{ color: '#52525b', fontSize: 11, marginLeft: 8 }}>→ {p.user_id?.slice(0, 8)}...</span>
+                    </div>
+                    <button onClick={() => revokePermission(p.id)} style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.2)', borderRadius: 4, color: '#ef4444', fontSize: 11, padding: '4px 8px', cursor: 'pointer' }}>Revoke</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Groups */}
+            {groups.length > 0 && (
+              <div style={{ marginTop: 24 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a1a1aa', marginBottom: 12 }}>Permission Groups</div>
+                {groups.map(g => (
+                  <div key={g.id} style={{ padding: '10px 12px', background: '#0a0a0f', borderRadius: 6, marginBottom: 4, border: '1px solid #18181b' }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: '#d4d4d8' }}>{g.name}</div>
+                    <div style={{ fontSize: 11, color: '#71717a' }}>{g.description}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </>
@@ -1577,6 +1804,9 @@ export default function AdminDashboard() {
               </div>
             </>
           )}
+
+          {/* ─── PERMISSIONS ─── */}
+          {activeTab === 'permissions' && <PermissionsTab addToast={addToast} />}
 
           {/* ─── BUILDS ─── */}
           {activeTab === 'builds' && (
