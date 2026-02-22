@@ -219,6 +219,59 @@ const CSS = `
   .toast-content { flex: 1; }
   .toast-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
   .toast-message { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  /* ── Hamburger menu button (mobile only) ── */
+  .hamburger { display: none; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; font-size: 20px; line-height: 1; }
+
+  /* ── Mobile sidebar overlay ── */
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 998; backdrop-filter: blur(4px); }
+
+  /* ── TABLET: ≤1024px — hide preview panel ── */
+  @media (max-width: 1024px) {
+    .app-container { grid-template-columns: 240px 1fr; }
+    .preview-panel { display: none; }
+    .status-bar { grid-column: 1/-1; }
+    .header-stats { display: none; }
+  }
+
+  /* ── MOBILE: ≤768px — overlay sidebar, single column ── */
+  @media (max-width: 768px) {
+    .app-container { grid-template-columns: 1fr; grid-template-rows: 56px 1fr auto; }
+    .hamburger { display: block; }
+    .sidebar { position: fixed; top: 56px; left: 0; bottom: 0; width: 280px; z-index: 999; transform: translateX(-100%); transition: transform 0.25s ease; padding: 12px; }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-overlay.visible { display: block; }
+    .preview-panel { display: none; }
+    .main-area { grid-column: 1; grid-row: 2; }
+    .status-bar { grid-column: 1; grid-row: 3; }
+    .header { padding: 0 12px; }
+    .header-left { gap: 8px; }
+    .header-right { gap: 4px; }
+    .header-divider { display: none; }
+    .header-stats { display: none; }
+    .view-toggle { display: none; }
+    .project-badge { display: none; }
+    .btn.btn-ghost, .btn.btn-secondary { display: none; }
+    .toolbar-btn { display: none; }
+    .logo { font-size: 15px; gap: 8px; }
+    .logo-mark { width: 28px; height: 28px; font-size: 11px; }
+    .chat-messages { padding: 12px; }
+    .chat-message { gap: 10px; }
+    .chat-avatar { width: 28px; height: 28px; font-size: 12px; }
+    .input-area { padding: 8px 12px; }
+    .input-field { font-size: 16px; }
+    .action-bar { flex-wrap: wrap; gap: 6px; padding: 8px 12px; }
+    .tool-card { padding: 8px; }
+    .settings-card { display: none; }
+  }
+
+  /* ── SMALL MOBILE: ≤480px ── */
+  @media (max-width: 480px) {
+    .sidebar { width: 100%; }
+    .btn.btn-primary { font-size: 12px; padding: 6px 12px; }
+    .user-avatar { width: 30px; height: 30px; }
+    .dropdown-btn { display: none; }
+  }
 `
 
 const TOOLS = [
@@ -318,6 +371,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   // Profile & Settings State
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profileFormName, setProfileFormName] = useState('')
   const [apiKeySlot1, setApiKeySlot1] = useState('')
   const [apiKeySlot2, setApiKeySlot2] = useState('')
@@ -377,6 +431,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   }
   
   const handleNewChat = () => {
+    setSidebarOpen(false)
     setCurrentChatId(undefined)
     clearMessages()
     preview.reset()
@@ -385,9 +440,10 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     window.history.pushState({}, '', '/dashboard')
   }
   
-  const handleSelectProject = (p:{id:string;name:string})=>{setCurrentProjectId(p.id);setCurrentProjectName(p.name);clearMessages();preview.reset();setDeployResult(null);getProjectFiles(p.id);toast('info','Loading',p.name)}
+  const handleSelectProject = (p:{id:string;name:string})=>{setSidebarOpen(false);setCurrentProjectId(p.id);setCurrentProjectName(p.name);clearMessages();preview.reset();setDeployResult(null);getProjectFiles(p.id);toast('info','Loading',p.name)}
   
   const handleLoadChat = async (chat: any) => {
+    setSidebarOpen(false)
     try {
       setCurrentChatId(chat.id)
       
@@ -500,6 +556,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     <div className="app-container">
       <header className="header">
         <div className="header-left">
+          <button className="hamburger" onClick={()=>setSidebarOpen(v=>!v)}>☰</button>
           <div className="logo"><div className="logo-mark">{BRAND_SHORT}</div>{BRAND_NAME}</div>
           <div className="header-divider"/>
           <div className="header-stats"><span><span className="stat-dot"/>Active: <span className="stat-value">{activeBuilds}/20</span></span><span>Queue: <span className="stat-value" style={{color:queuedBuilds>0?'var(--accent-yellow)':undefined}}>{queuedBuilds}</span></span></div>
@@ -544,7 +601,8 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
           </div>
         </div>
       </header>
-      <aside className="sidebar">
+      {sidebarOpen&&<div className="sidebar-overlay visible" onClick={()=>setSidebarOpen(false)}/>}
+      <aside className={`sidebar${sidebarOpen?' open':''}`}>
         <button className="new-project-btn" onClick={handleNewChat}>+ New Chat</button>
         <div className="sidebar-section">
           <div className="nav-item" onClick={() => setShowChatsDialog(true)}><span className="nav-icon">💬</span><span>All Chats</span></div>

@@ -5,6 +5,7 @@ import { brand, BRAND_NAME } from '@/lib/brand'
 export const metadata = {
   title: `${BRAND_NAME} — ${brand.tagline}`,
   description: brand.description,
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
