@@ -565,33 +565,42 @@ export async function POST(request: NextRequest) {
     }
 
     // ── PREMIUM MODEL CAP ENFORCEMENT ──
-    // Check if this resolves to a premium model and enforce daily caps
     const isPremiumModel = resolvedModel.includes('opus') || resolvedModel === 'o1'
-    if (isPremiumModel && userId !== 'anonymous') {
+    const isProModel = resolvedModel.includes('sonnet') || resolvedModel === 'gpt-4o'
+    if ((isPremiumModel || isProModel) && userId !== 'anonymous') {
       try {
-        // Get user plan
         const { data: prof } = await supabase.from('profiles').select('plan').eq('id', userId).single()
         const plan = prof?.plan || 'free'
-        const premiumCaps: Record<string, number> = { free: 0, starter: 5, pro: 25, max: 100, enterprise: 500 }
-        const cap = premiumCaps[plan] ?? 0
+        const premiumCaps: Record<string, number> = { free: 0, starter: 2, pro: 5, max: 15, enterprise: 25 }
+        const proCaps: Record<string, number> = { free: 5, starter: 20, pro: 60, max: 100, enterprise: 150 }
+        const today = new Date().toISOString().split('T')[0]
 
-        if (cap === 0) {
-          // Free users can't use premium — downgrade silently to pro
-          resolvedModel = modelTiers.pro[provider]
-        } else {
-          // Count today's premium usage
-          const today = new Date().toISOString().split('T')[0]
+        if (isPremiumModel) {
+          const cap = premiumCaps[plan] ?? 0
+          if (cap === 0) {
+            resolvedModel = modelTiers.pro[provider]
+          } else {
+            const { count } = await supabase
+              .from('usage_logs')
+              .select('id', { count: 'exact', head: true })
+              .eq('user_id', userId)
+              .eq('model_tier', 'premium')
+              .gte('created_at', `${today}T00:00:00Z`)
+            if ((count || 0) >= cap) resolvedModel = modelTiers.pro[provider]
+          }
+        }
+
+        // Re-check if model is now pro (could have been downgraded from premium)
+        const isNowPro = resolvedModel.includes('sonnet') || resolvedModel === 'gpt-4o'
+        if (isNowPro) {
+          const proCap = proCaps[plan] ?? 5
           const { count } = await supabase
             .from('usage_logs')
             .select('id', { count: 'exact', head: true })
             .eq('user_id', userId)
-            .eq('model_tier', 'premium')
+            .eq('model_tier', 'pro')
             .gte('created_at', `${today}T00:00:00Z`)
-          
-          if ((count || 0) >= cap) {
-            // Over premium cap — downgrade to pro tier
-            resolvedModel = modelTiers.pro[provider]
-          }
+          if ((count || 0) >= proCap) resolvedModel = modelTiers.fast[provider]
         }
       } catch { /* non-fatal — allow request on cap check failure */ }
     }

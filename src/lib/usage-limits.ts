@@ -13,6 +13,7 @@ export interface PlanLimits {
   generationsPerDay: number
   generationsPerMonth: number
   premiumPerDay: number          // Max Premium (Opus/o1) requests per day
+  proPerDay: number              // Max Pro (Sonnet/GPT-4o) requests per day — overflow goes to fast
   maxTokensPerRequest: number
   maxFilesPerGeneration: number
   validationLevel: 'basic' | 'standard' | 'full'
@@ -28,6 +29,7 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
     generationsPerDay: 10,
     generationsPerMonth: 100,
     premiumPerDay: 0,
+    proPerDay: 5,
     maxTokensPerRequest: 4000,
     maxFilesPerGeneration: 3,
     validationLevel: 'basic',
@@ -40,7 +42,8 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
   starter: {
     generationsPerDay: 50,
     generationsPerMonth: 500,
-    premiumPerDay: 5,
+    premiumPerDay: 2,
+    proPerDay: 20,
     maxTokensPerRequest: 4000,
     maxFilesPerGeneration: 5,
     validationLevel: 'standard',
@@ -53,7 +56,8 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
   pro: {
     generationsPerDay: 200,
     generationsPerMonth: 4000,
-    premiumPerDay: 25,
+    premiumPerDay: 5,
+    proPerDay: 60,
     maxTokensPerRequest: 8000,
     maxFilesPerGeneration: 10,
     validationLevel: 'full',
@@ -64,9 +68,10 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
     customModels: false
   },
   max: {
-    generationsPerDay: 1000,
-    generationsPerMonth: 20000,
-    premiumPerDay: 100,
+    generationsPerDay: 500,
+    generationsPerMonth: 10000,
+    premiumPerDay: 15,
+    proPerDay: 100,
     maxTokensPerRequest: 16000,
     maxFilesPerGeneration: 25,
     validationLevel: 'full',
@@ -77,9 +82,10 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
     customModels: true
   },
   enterprise: {
-    generationsPerDay: Infinity,
-    generationsPerMonth: Infinity,
-    premiumPerDay: 500,
+    generationsPerDay: 1000,
+    generationsPerMonth: 20000,
+    premiumPerDay: 25,
+    proPerDay: 150,
     maxTokensPerRequest: 16000,
     maxFilesPerGeneration: 50,
     validationLevel: 'full',

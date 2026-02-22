@@ -107,11 +107,11 @@ export interface UrlImport {
 
 // Plan limits
 export const PLAN_LIMITS = {
-  free: { concurrent: 3, daily: 10, generations_per_day: 10, premium_per_day: 0 },
-  starter: { concurrent: 5, daily: 50, generations_per_day: 50, premium_per_day: 5 },
-  pro: { concurrent: 10, daily: 200, generations_per_day: 200, premium_per_day: 25 },
-  max: { concurrent: 15, daily: 1000, generations_per_day: 1000, premium_per_day: 100 },
-  enterprise: { concurrent: 20, daily: 999999, generations_per_day: 999999, premium_per_day: 500 }
+  free: { concurrent: 3, daily: 10, generations_per_day: 10, premium_per_day: 0, pro_per_day: 5 },
+  starter: { concurrent: 5, daily: 50, generations_per_day: 50, premium_per_day: 2, pro_per_day: 20 },
+  pro: { concurrent: 10, daily: 200, generations_per_day: 200, premium_per_day: 5, pro_per_day: 60 },
+  max: { concurrent: 15, daily: 500, generations_per_day: 500, premium_per_day: 15, pro_per_day: 100 },
+  enterprise: { concurrent: 20, daily: 1000, generations_per_day: 1000, premium_per_day: 25, pro_per_day: 150 }
 } as const
 
 // AI Models

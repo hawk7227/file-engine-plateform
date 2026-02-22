@@ -33,7 +33,8 @@ const PLANS = [
     features: [
       '50 generations per day',
       'Fast + Pro models',
-      '5 Premium requests/day (💎)',
+      '20 Pro requests/day (🚀)',
+      '2 Premium requests/day (💎)',
       '5 concurrent builds',
       'Standard validation',
       'Private projects'
@@ -50,7 +51,8 @@ const PLANS = [
     features: [
       '200 generations per day',
       'All models included',
-      '25 Premium requests/day (💎)',
+      '60 Pro requests/day (🚀)',
+      '5 Premium requests/day (💎)',
       '10 concurrent builds',
       'Full validation + AI fixing',
       'Priority queue',
@@ -68,9 +70,10 @@ const PLANS = [
     period: '/month',
     description: 'For power users and teams',
     features: [
-      '1,000 generations per day',
+      '500 generations per day',
       'All models included',
-      '100 Premium requests/day (💎)',
+      '100 Pro requests/day (🚀)',
+      '15 Premium requests/day (💎)',
       '15 concurrent builds',
       'Full validation + AI fixing',
       'Priority queue',
@@ -85,13 +88,14 @@ const PLANS = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: '$99',
+    price: '$149',
     period: '/month',
     description: 'For organizations at scale',
     features: [
-      'Unlimited generations',
+      '1,000 generations per day',
       'All models included',
-      '500 Premium requests/day (💎)',
+      '25 Premium requests/day (💎)',
+      '150 Pro requests/day (🚀)',
       '20 concurrent builds',
       'All Max features',
       'Unlimited team members',
