@@ -7,6 +7,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 // =====================================================
 // TYPES
@@ -145,6 +146,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
   const currentThinkingRef = useRef<string>('')
   const currentToolCallsRef = useRef<ToolCallEvent[]>([])
   const agentFilesRef = useRef<GeneratedFile[]>([])
+  const chatIdRef = useRef<string | undefined>(options.chatId)
 
   // Send a message
   const sendMessage = useCallback(async (content: string, attachments?: Attachment[]) => {
@@ -373,6 +375,47 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
       onComplete?.()
 
+      // ── Auto-save chat to DB ──
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const allMessages = [...messages, userMessage, {
+            ...assistantMessage,
+            content: finalContent,
+            status: 'complete' as const,
+            files: finalFiles.length > 0 ? finalFiles : undefined,
+            thinking: finalThinking || undefined,
+            toolCalls: finalToolCalls.length > 0 ? finalToolCalls : undefined
+          }]
+
+          if (chatIdRef.current) {
+            // Update existing chat
+            await supabase.from('chats').update({
+              messages: allMessages,
+              updated_at: new Date().toISOString()
+            }).eq('id', chatIdRef.current)
+          } else {
+            // Create new chat
+            const title = content.trim().split('\n')[0].slice(0, 40) || 'New Chat'
+            const { data: newChat } = await supabase.from('chats').insert({
+              user_id: user.id,
+              project_id: projectId || null,
+              title,
+              messages: allMessages,
+              updated_at: new Date().toISOString()
+            }).select('id, title').single()
+
+            if (newChat) {
+              chatIdRef.current = newChat.id
+              options.onChatCreated?.(newChat.id, newChat.title)
+            }
+          }
+        }
+      } catch (saveErr: any) {
+        console.error('[useChat] Auto-save failed:', saveErr.message)
+        // Non-fatal — chat still works, just not persisted
+      }
+
     } catch (err: any) {
       if (err.name === 'AbortError') {
         setMessages(prev => {
@@ -428,6 +471,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
   const clearMessages = useCallback(() => {
     setMessages([])
     setError(null)
+    chatIdRef.current = undefined
   }, [])
 
   // Stop ongoing generation

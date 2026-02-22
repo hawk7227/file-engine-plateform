@@ -10,6 +10,7 @@ import { useFileEnginePreview } from '@/hooks/useFileEnginePreview'
 import { supabase } from '@/lib/supabase'
 import { ChatsDialog } from '@/components/chat/ChatsDialog'
 import { ProjectsDialog } from '@/components/project/ProjectsDialog'
+import { usePermissions, FEATURES } from '@/hooks/usePermissions'
 
 const CSS = `
   :root {
@@ -269,6 +270,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const { user, profile, subscription, usageToday, planLimits } = useAuth()
   const { projects, projectFiles, loadingFiles, loading: projectsLoading, createProject, getProjectFiles } = useProjects()
   const { activeBuilds, queuedBuilds } = useQueueStats()
+  const { has: hasFeature, getUpsell } = usePermissions()
   
   const [currentProjectId, setCurrentProjectId] = useState<string|null>(null)
   const [currentProjectName, setCurrentProjectName] = useState('New Project')
