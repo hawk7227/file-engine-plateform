@@ -12,7 +12,7 @@ import { BRAND_NAME } from '@/lib/brand'
  * 3. First prompt assistance
  * 4. Feature discovery
  * 
- * Better than Claude because:
+ * Better because:
  * - Contextual, not just a tour
  * - Adapts to user skill level
  * - Shows real examples they can use

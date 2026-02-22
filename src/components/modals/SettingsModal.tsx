@@ -2,28 +2,24 @@
 import { useState, useEffect } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { supabase, getUser, updateProfile } from '@/lib/supabase'
+import { BRAND_NAME } from '@/lib/brand'
 
 interface SettingsModalProps {
   open: boolean
   onClose: () => void
 }
 
-const MODELS = {
-  claude: [
-    { id: 'claude-sonnet-4', name: 'Claude Sonnet 4', desc: 'Fast & Capable' },
-    { id: 'claude-opus-4', name: 'Claude Opus 4', desc: 'Most Intelligent' }
-  ],
-  openai: [
-    { id: 'gpt-4o', name: 'GPT-4o', desc: 'Fast & Smart' },
-    { id: 'o1', name: 'o1', desc: 'Reasoning' }
-  ]
-}
+const MODEL_TIERS = [
+  { id: 'auto', name: 'Auto', desc: 'Best model for your task', icon: '✨' },
+  { id: 'fast', name: 'Fast', desc: 'Quick responses for rapid iteration', icon: '⚡' },
+  { id: 'pro', name: 'Pro', desc: 'Best balance of speed & quality', icon: '🚀' },
+  { id: 'premium', name: 'Premium', desc: 'Highest quality for complex projects', icon: '💎' }
+]
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const [provider, setProvider] = useState<'claude' | 'openai'>('claude')
-  const [model, setModel] = useState('claude-sonnet-4')
-  const [claudeKey, setClaudeKey] = useState('')
-  const [openaiKey, setOpenaiKey] = useState('')
+  const [model, setModel] = useState('auto')
+  const [primaryKey, setPrimaryKey] = useState('')
+  const [secondaryKey, setSecondaryKey] = useState('')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -41,10 +37,9 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       .single()
 
     if (data) {
-      setModel(data.preferred_model || 'claude-sonnet-4')
-      setProvider(data.preferred_model?.startsWith('gpt') || data.preferred_model === 'o1' ? 'openai' : 'claude')
-      setClaudeKey(data.claude_api_key || '')
-      setOpenaiKey(data.openai_api_key || '')
+      setModel(data.preferred_model || 'auto')
+      setPrimaryKey(data.claude_api_key || '')
+      setSecondaryKey(data.openai_api_key || '')
     }
   }
 
@@ -54,17 +49,12 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     if (user) {
       await updateProfile(user.id, {
         preferred_model: model,
-        claude_api_key: claudeKey || null,
-        openai_api_key: openaiKey || null
+        claude_api_key: primaryKey || null,
+        openai_api_key: secondaryKey || null
       })
     }
     setSaving(false)
     onClose()
-  }
-
-  function handleProviderChange(p: 'claude' | 'openai') {
-    setProvider(p)
-    setModel(MODELS[p][0].id)
   }
 
   if (!open) return null
@@ -77,37 +67,15 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       </div>
       <div className="modal-body">
         <div className="ai-provider-section">
-          <div className="ai-provider-title">AI Provider</div>
-          <div className="ai-provider-grid">
-            <div 
-              className={`ai-provider-card ${provider === 'claude' ? 'active' : ''}`}
-              onClick={() => handleProviderChange('claude')}
-            >
-              <div className="ai-provider-icon">🟠</div>
-              <div className="ai-provider-name">Claude API</div>
-              <div className="ai-provider-model">Sonnet 4 / Opus 4</div>
-            </div>
-            <div 
-              className={`ai-provider-card ${provider === 'openai' ? 'active' : ''}`}
-              onClick={() => handleProviderChange('openai')}
-            >
-              <div className="ai-provider-icon">🟢</div>
-              <div className="ai-provider-name">OpenAI</div>
-              <div className="ai-provider-model">GPT-4o / o1</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="ai-provider-section">
           <div className="ai-provider-title">Model Selection</div>
           <div className="ai-provider-grid">
-            {(MODELS as Record<string, any[]>)[provider].map((m: any) => (
-              <div 
+            {MODEL_TIERS.map(m => (
+              <div
                 key={m.id}
                 className={`ai-provider-card ${model === m.id ? 'active' : ''}`}
                 onClick={() => setModel(m.id)}
               >
-                <div className="ai-provider-icon">{model === m.id ? '⚡' : '○'}</div>
+                <div className="ai-provider-icon">{m.icon}</div>
                 <div className="ai-provider-name">{m.name}</div>
                 <div className="ai-provider-model">{m.desc}</div>
               </div>
@@ -116,28 +84,31 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
         </div>
 
         <div className="ai-provider-section">
-          <div className="ai-provider-title">API Keys (Optional)</div>
+          <div className="ai-provider-title">API Keys (Optional — Bring Your Own)</div>
           <div className="form-group" style={{ marginBottom: 12 }}>
-            <label className="form-label">Claude API Key</label>
+            <label className="form-label">Primary API Key</label>
             <input
               type="password"
               className="form-input"
-              value={claudeKey}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setClaudeKey(e.target.value)}
-              placeholder="sk-ant-..."
+              value={primaryKey}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrimaryKey(e.target.value)}
+              placeholder="sk-..."
               style={{ fontSize: 13 }}
             />
           </div>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">OpenAI API Key</label>
+            <label className="form-label">Secondary API Key</label>
             <input
               type="password"
               className="form-input"
-              value={openaiKey}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpenaiKey(e.target.value)}
+              value={secondaryKey}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSecondaryKey(e.target.value)}
               placeholder="sk-..."
               style={{ fontSize: 13 }}
             />
+          </div>
+          <div style={{ fontSize: 11, color: '#71717a', marginTop: 8 }}>
+            Add your own keys to increase rate limits. {BRAND_NAME} routes to the best available provider automatically.
           </div>
         </div>
 

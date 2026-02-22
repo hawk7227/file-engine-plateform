@@ -14,7 +14,7 @@ import { useState, useEffect, useRef } from 'react'
  * - Thinking
  * etc.
  * 
- * Similar to Claude's tool use visualization
+ * Similar to AI tool use visualization
  */
 
 // ============================================
@@ -533,7 +533,7 @@ export function InlineActivity({
 }
 
 // ============================================
-// THINKING INDICATOR (Claude-style)
+// THINKING INDICATOR (AI-style)
 // ============================================
 
 export function ThinkingIndicator({ 

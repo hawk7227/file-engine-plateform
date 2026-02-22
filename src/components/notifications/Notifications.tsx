@@ -10,7 +10,7 @@ import { createContext, useContext, useState, useCallback, ReactNode } from 'rea
  * - Progress updates
  * - Confirmations
  * 
- * Better than Claude because:
+ * Better because:
  * - Non-blocking
  * - Actionable (undo, retry)
  * - Progress tracking

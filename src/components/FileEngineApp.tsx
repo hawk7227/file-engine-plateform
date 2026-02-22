@@ -756,7 +756,7 @@ export function FileEngineApp() {
     }
     
     // Average cost per request WITHOUT optimizations (all pro tier, full context, 8192 tokens)
-    const avgCostWithout = 0.0035; // ~$0.0035 per request (Sonnet/GPT-4o with full context)
+    const avgCostWithout = 0.0035; // ~$0.0035 per request (pro tier with full context)
     const withoutOpt = monthlyRequests * avgCostWithout;
     
     // Breakdown of savings by feature

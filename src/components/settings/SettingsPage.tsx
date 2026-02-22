@@ -2,7 +2,7 @@
 import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
-// FILE ENGINE - SETTINGS PAGE (Claude/ChatGPT Style)
+// FILE ENGINE - SETTINGS PAGE (Modern Style)
 // Complete settings with all tabs
 // =====================================================
 
@@ -620,7 +620,7 @@ function APISettings() {
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-zinc-400 mb-2">Anthropic API Key</label>
+            <label className="block text-sm text-zinc-400 mb-2">Primary API Key</label>
             <input
               type="password"
               placeholder="sk-ant-xxxxxxxx"
@@ -629,7 +629,7 @@ function APISettings() {
           </div>
           
           <div>
-            <label className="block text-sm text-zinc-400 mb-2">OpenAI API Key</label>
+            <label className="block text-sm text-zinc-400 mb-2">Secondary API Key</label>
             <input
               type="password"
               placeholder="sk-xxxxxxxx"

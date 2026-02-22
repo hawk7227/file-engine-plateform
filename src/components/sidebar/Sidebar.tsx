@@ -2,7 +2,7 @@
 import { BRAND_NAME } from '@/lib/brand'
 
 // =====================================================
-// FILE ENGINE - SIDEBAR (Claude/ChatGPT Style)
+// FILE ENGINE - SIDEBAR (Modern Style)
 // Complete navigation with all features
 // =====================================================
 

@@ -10,7 +10,7 @@ const MODELS = [
 ]
 
 export function ModelSelector() {
-  const [selected, setSelected] = useState('claude-sonnet-4')
+  const [selected, setSelected] = useState('auto')
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
