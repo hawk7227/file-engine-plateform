@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useProjects } from '@/hooks/useProjects'
 import { useQueueStats } from '@/hooks/useQueueStats'
 import { useChat, type Message, type GeneratedFile } from '@/hooks/useChat'
+import { useSavedChats, type SavedChat } from '@/hooks/useSavedChats'
 import { useFileEnginePreview } from '@/hooks/useFileEnginePreview'
 import { supabase } from '@/lib/supabase'
 import { ChatsDialog } from '@/components/chat/ChatsDialog'
@@ -272,6 +273,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const { projects, projectFiles, loadingFiles, loading: projectsLoading, createProject, getProjectFiles } = useProjects()
   const { activeBuilds, queuedBuilds } = useQueueStats()
   const { has: hasFeature, getUpsell } = usePermissions()
+  const { chats: savedChats, loading: chatsLoading, refresh: refreshChats, deleteChat } = useSavedChats()
   
   const [currentProjectId, setCurrentProjectId] = useState<string|null>(null)
   const [currentProjectName, setCurrentProjectName] = useState('New Project')
@@ -290,10 +292,9 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     onComplete: () => { const m = messages[messages.length-1]; if(m?.files?.length) handleFilesGenerated(m.files) },
     onChatCreated: (newChatId, title) => {
         setCurrentChatId(newChatId)
-        // Update URL without full reload if possible, or use router
-        // Since we are inside the dashboard, we want to go to /dashboard/[id]
         window.history.pushState({}, '', `/dashboard/${newChatId}`)
         toast('success', 'Chat Saved', title || 'New Chat')
+        refreshChats()
     }
   })
   
@@ -546,11 +547,11 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       <aside className="sidebar">
         <button className="new-project-btn" onClick={handleNewChat}>+ New Chat</button>
         <div className="sidebar-section">
-          <div className="nav-item"><span className="nav-icon">🔍</span><span>Search</span></div>
-          <div className="nav-item" onClick={() => setShowChatsDialog(true)}><span className="nav-icon">💬</span><span>Chats</span></div>
+          <div className="nav-item" onClick={() => setShowChatsDialog(true)}><span className="nav-icon">💬</span><span>All Chats</span></div>
           <div className="nav-item" onClick={() => setShowProjectsDialog(true)}><span className="nav-icon">📁</span><span>Projects</span></div>
         </div>
-        <div className="sidebar-section"><div className="sidebar-label">Recents</div><div className="recent-list">{projectsLoading?<div className="skeleton" style={{height:'72px'}}/>:projects.slice(0,6).map(p=><div key={p.id} className={'recent-item '+(currentProjectId===p.id?'active':'')} onClick={()=>handleSelectProject(p)}>{p.name}</div>)}</div></div>
+        <div className="sidebar-section"><div className="sidebar-label">Recent Chats</div><div className="recent-list">{chatsLoading?<div className="skeleton" style={{height:'72px'}}/>:savedChats.length===0?<div style={{fontSize:12,color:'var(--text-muted)',padding:'8px 12px'}}>No chats yet</div>:savedChats.slice(0,12).map(c=>{const isActive=currentChatId===c.id;const age=Date.now()-new Date(c.updated_at).getTime();const timeLabel=age<86400000?'today':age<172800000?'yesterday':new Date(c.updated_at).toLocaleDateString(undefined,{month:'short',day:'numeric'});return<div key={c.id} className={'recent-item '+(isActive?'active':'')} onClick={()=>handleLoadChat(c)} style={{display:'flex',justifyContent:'space-between',alignItems:'center'}} title={c.title}><div style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.title||'Untitled'}</div><div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}><span style={{fontSize:10,color:'var(--text-muted)'}}>{timeLabel}</span><button onClick={e=>{e.stopPropagation();if(confirm('Delete this chat?'))deleteChat(c.id)}} style={{background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:12,padding:'0 2px',opacity:0.4}} onMouseEnter={e=>(e.currentTarget.style.opacity='1')} onMouseLeave={e=>(e.currentTarget.style.opacity='0.4')}>×</button></div></div>})}</div></div>
+        {projects.length>0&&<div className="sidebar-section"><div className="sidebar-label">Projects</div><div className="recent-list">{projects.slice(0,6).map(p=><div key={p.id} className={'recent-item '+(currentProjectId===p.id?'active':'')} onClick={()=>handleSelectProject(p)}>{p.name}</div>)}</div></div>}
         <div className="sidebar-section">{TOOLS.map(t=><div key={t.id} className="tool-card" onClick={()=>toast('info',t.name,t.desc)}><div className="tool-icon" style={{background:t.gradient}}>{t.icon}</div><div className="tool-info"><div className="tool-name">{t.name}</div><div className="tool-desc">{t.desc}</div></div></div>)}</div>
         <div className="sidebar-section"><div className="sidebar-label">VIDEO OVERLAYS</div>{VIDEO_TOOLS.map(t=><div key={t.id} className="tool-card" onClick={()=>toast('info',t.name,t.desc)}><div className="tool-icon" style={{background:t.gradient}}>{t.icon}</div><div className="tool-info"><div className="tool-name">{t.name}</div><div className="tool-desc">{t.desc}</div></div></div>)}</div>
         <div className="settings-card"><div className="settings-card-title">⚡ Preview Settings</div><div className="setting-row"><span className="setting-label">Vercel Preview</span><div className={'toggle '+(useVercel?'active':'')} onClick={()=>{setUseVercel(!useVercel);if(!useVercel)setUseLocal(false)}}/></div><div className="setting-row"><span className="setting-label">Local Preview</span><div className={'toggle '+(useLocal?'active':'')} onClick={()=>{setUseLocal(!useLocal);if(!useLocal)setUseVercel(false)}}/></div><div className="setting-row"><span className="setting-label">Auto-fix Errors</span><div className={'toggle '+(autoFix?'active':'')} onClick={()=>setAutoFix(!autoFix)}/></div></div>
