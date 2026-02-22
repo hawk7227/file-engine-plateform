@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase'
 import { ChatsDialog } from '@/components/chat/ChatsDialog'
 import { ProjectsDialog } from '@/components/project/ProjectsDialog'
 import { usePermissions, FEATURES } from '@/hooks/usePermissions'
+import { ChatMarkdown } from '@/components/chat/ChatMarkdown'
 
 const CSS = `
   :root {
@@ -142,9 +143,9 @@ const CSS = `
   .chat-avatar { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
   .chat-message.user .chat-avatar { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
   .chat-message.assistant .chat-avatar { background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); }
-  .chat-content { flex: 1; font-size: 15px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; padding-top: 4px; }
+  .chat-content { flex: 1; font-size: 15px; line-height: 1.6; color: var(--text-secondary); padding-top: 4px; }
   .chat-message.user .chat-content { color: var(--text-primary); text-align: right; background: var(--bg-tertiary); padding: 12px 16px; border-radius: 16px 16px 4px 16px; border: 1px solid var(--border-subtle); }
-  .chat-content.streaming::after { content: '▋'; display: inline-block; width: 8px; height: 16px; background: var(--accent-primary); animation: blink 1s infinite; vertical-align: middle; margin-left: 4px; }
+  .chat-content.streaming { /* streaming state handled by ChatMarkdown */ }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
   .activity-feed { margin-top: 16px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; }
@@ -556,7 +557,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
         <div className="settings-card" style={{background:'linear-gradient(135deg,rgba(34,197,94,.08),rgba(59,130,246,.06))',borderColor:'rgba(34,197,94,.2)'}}><div className="settings-card-title" style={{color:'var(--accent-green)'}}>💰 Token Savings</div><div style={{fontSize:'28px',fontWeight:800,color:'var(--accent-green)'}}>$47.20</div><div style={{fontSize:'11px',color:'var(--text-muted)',marginBottom:'8px'}}>saved this month</div><div style={{height:'6px',background:'var(--bg-elevated)',borderRadius:'3px',overflow:'hidden'}}><div style={{width:'65%',height:'100%',background:'linear-gradient(90deg,var(--accent-green),var(--accent-blue))',borderRadius:'3px'}}/></div></div>
       </aside>
       <main className="main-area">
-        <div className="chat-area" ref={chatAreaRef}><div className="chat-messages">{messages.length===0?<div className="state-container" style={{flex:'none',padding:'40px 20px'}}><div className="state-icon">💬</div><div className="state-title">Start building</div><div className="state-desc">Describe what you want to create</div></div>:messages.map((m,i)=><div key={m.id||i} className={'chat-message '+m.role}><div className="chat-avatar">{m.role==='user'?userInitial:'FE'}</div><div className={'chat-content '+(m.status==='streaming'?'streaming':'')}>{m.content}{m.files&&m.files.length>0&&<div className="activity-feed"><div className="activity-header"><div className="activity-title">⚡ Generated Files <span className="activity-badge">{m.files.length}</span></div></div><div className="activity-list">{m.files.map((f,fi)=><div key={fi} className="activity-item"><div className="activity-icon" style={{background:'rgba(34,197,94,.15)'}}>📄</div><div className="activity-content"><div className="activity-label">{f.path}</div><div className="activity-detail">{f.language}</div></div><span className="activity-status done">Ready</span></div>)}</div></div>}</div></div>)}</div></div>
+        <div className="chat-area" ref={chatAreaRef}><div className="chat-messages">{messages.length===0?<div className="state-container" style={{flex:'none',padding:'40px 20px'}}><div className="state-icon">💬</div><div className="state-title">Start building</div><div className="state-desc">Describe what you want to create</div></div>:messages.map((m,i)=><div key={m.id||i} className={'chat-message '+m.role}><div className="chat-avatar">{m.role==='user'?userInitial:'FE'}</div><div className={'chat-content '+(m.status==='streaming'?'streaming':'')}><ChatMarkdown content={m.content} isStreaming={m.status==='streaming'} />{m.files&&m.files.length>0&&<div className="activity-feed"><div className="activity-header"><div className="activity-title">⚡ Generated Files <span className="activity-badge">{m.files.length}</span></div></div><div className="activity-list">{m.files.map((f,fi)=><div key={fi} className="activity-item"><div className="activity-icon" style={{background:'rgba(34,197,94,.15)'}}>📄</div><div className="activity-content"><div className="activity-label">{f.path}</div><div className="activity-detail">{f.language}</div></div><span className="activity-status done">Ready</span></div>)}</div></div>}</div></div>)}</div></div>
         <div className="input-area">
           <div className="input-box" style={{display:'flex', flexDirection:'column', gap:'8px'}}>
              {attachedFiles.length > 0 && (
