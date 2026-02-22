@@ -71,6 +71,22 @@ export async function POST(request: NextRequest) {
                        process.env.GITHUB_TOKEN || 
                        process.env.ADMIN_GITHUB_TOKEN;
 
+    // Permission gate: require deploy_github feature
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (userId) {
+        const { hasFeature } = await import('@/lib/permissions')
+        const allowed = await hasFeature(userId, 'deploy_github')
+        if (!allowed) {
+          return NextResponse.json(
+            { success: false, error: 'Upgrade to Pro to push to GitHub', upsell: true },
+            { status: 403 }
+          )
+        }
+      }
+    } catch { /* permission check non-fatal in dev */ }
+
     if (!githubToken) {
       return NextResponse.json(
         { success: false, error: 'GitHub token not configured' },

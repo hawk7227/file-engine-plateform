@@ -112,6 +112,14 @@ const TOOLS: ToolDef[] = [
     }
   },
   {
+    name: 'search_github',
+    description: 'Search GitHub for code examples, repositories, or implementations.',
+    params: {
+      query: { type: 'string', description: 'GitHub search query', required: true },
+      max_results: { type: 'number', description: 'Max results (default 5)' }
+    }
+  },
+  {
     name: 'search_npm',
     description: 'Search npm packages.',
     params: {
@@ -188,7 +196,7 @@ IDENTITY:
 - If asked who you are: "I'm ${BRAND_AI_NAME}, your AI coding assistant."
 
 ## CRITICAL: YOU MUST USE TOOLS
-You have tools: create_file, edit_file, view_file, run_command, search_web, think, generate_media.
+You have tools: create_file, edit_file, view_file, run_command, search_web, search_github, think, generate_media.
 You are an AGENTIC assistant. When the user asks you to build, create, generate, fix, or edit code, you MUST call the appropriate tools. DO NOT write code inside your text response. DO NOT describe what you would build. Actually BUILD it by calling create_file.
 
 WRONG (never do this):
@@ -266,12 +274,63 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
         return await runSandbox(input.command, Object.entries(ctx.files).map(([p, c]) => ({ path: p, content: c })))
       case 'search_web':
         return await runWebSearch(input.query, input.max_results || 5)
+      case 'search_github':
+        return await runGitHubSearch(input.query, input.max_results || 5)
       case 'search_npm':
         return await runNpmSearch(input.query)
       case 'analyze_image': {
         const att = ctx.attachments?.[input.image_index || 0]
-        if (!att || att.type !== 'image') return { success: false, result: 'No image found' }
-        return { success: true, result: `Image analyzed (${input.task || 'full'}). Use visual context to generate matching code.` }
+        if (!att || att.type !== 'image') return { success: false, result: 'No image found at that index' }
+        try {
+          const { selectProvider } = await import('@/lib/ai-config')
+          const { getKeyWithFailover } = await import('@/lib/key-pool')
+          const keyResult = getKeyWithFailover()
+          if (!keyResult) return { success: false, result: 'No API key available for vision' }
+          const task = input.task || 'full'
+          const visionPrompt = task === 'layout' ? 'Analyze the layout structure, sections, and component hierarchy of this UI.'
+            : task === 'colors' ? 'Extract the color palette: primary, secondary, accent, background, and text colors with hex codes.'
+            : task === 'components' ? 'List all UI components visible: buttons, inputs, cards, navigation, modals, etc.'
+            : task === 'text' ? 'Extract all visible text content from this image.'
+            : 'Analyze this UI completely: layout, colors, components, typography, spacing, and interactions. Provide details needed to recreate it in code.'
+
+          let analysisResult: string
+          if (keyResult.provider === 'anthropic') {
+            const resp = await fetch('https://api.anthropic.com/v1/messages', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-api-key': keyResult.key, 'anthropic-version': '2023-06-01' },
+              body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 2048,
+                messages: [{ role: 'user', content: [
+                  { type: 'image', source: { type: 'base64', media_type: att.mimeType || 'image/png', data: att.content } },
+                  { type: 'text', text: visionPrompt }
+                ]}]
+              })
+            })
+            if (!resp.ok) throw new Error(`Vision API ${resp.status}`)
+            const data = await resp.json()
+            analysisResult = data.content?.[0]?.text || 'No analysis returned'
+          } else {
+            const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keyResult.key}` },
+              body: JSON.stringify({
+                model: 'gpt-4o',
+                max_tokens: 2048,
+                messages: [{ role: 'user', content: [
+                  { type: 'image_url', image_url: { url: `data:${att.mimeType || 'image/png'};base64,${att.content}` } },
+                  { type: 'text', text: visionPrompt }
+                ]}]
+              })
+            })
+            if (!resp.ok) throw new Error(`Vision API ${resp.status}`)
+            const data = await resp.json()
+            analysisResult = data.choices?.[0]?.message?.content || 'No analysis returned'
+          }
+          return { success: true, result: analysisResult }
+        } catch (visionErr: any) {
+          return { success: false, result: `Vision analysis failed: ${visionErr.message}` }
+        }
       }
       case 'think':
         return { success: true, result: input.reasoning }
@@ -362,6 +421,32 @@ async function runNpmSearch(query: string): Promise<{ success: boolean; result: 
     return { success: true, result: d.objects.map((o: any, i: number) => `${i + 1}. ${o.package.name} v${o.package.version}\n   ${o.package.description || ''}`).join('\n\n') || 'No packages found' }
   } catch (e: any) {
     return { success: false, result: `NPM error: ${e.message}` }
+  }
+}
+
+async function runGitHubSearch(query: string, max: number): Promise<{ success: boolean; result: string }> {
+  try {
+    const ghToken = process.env.GITHUB_TOKEN
+    const headers: Record<string, string> = { 'Accept': 'application/vnd.github.v3+json' }
+    if (ghToken) headers['Authorization'] = `token ${ghToken}`
+    
+    // Search repos
+    const r = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&per_page=${max}`, { headers })
+    if (!r.ok) {
+      // Fallback: search code
+      const cr = await fetch(`https://api.github.com/search/code?q=${encodeURIComponent(query)}&per_page=${max}`, { headers })
+      if (!cr.ok) return { success: false, result: 'GitHub search failed (rate limited?)' }
+      const cd = await cr.json()
+      return { success: true, result: (cd.items || []).slice(0, max).map((i: any, idx: number) =>
+        `${idx + 1}. ${i.repository?.full_name}: ${i.path}\n   ${i.html_url}`
+      ).join('\n\n') || 'No code found' }
+    }
+    const d = await r.json()
+    return { success: true, result: (d.items || []).slice(0, max).map((i: any, idx: number) =>
+      `${idx + 1}. ${i.full_name} ⭐${i.stargazers_count}\n   ${i.description || '(no description)'}\n   ${i.html_url}`
+    ).join('\n\n') || 'No repos found' }
+  } catch (e: any) {
+    return { success: false, result: `GitHub search error: ${e.message}` }
   }
 }
 
@@ -465,9 +550,38 @@ export async function POST(request: NextRequest) {
     const optMsgs = smartCtx.trimmedMessages.length > 0 ? smartCtx.trimmedMessages : messages
     const maxTokens = smartCtx.maxTokens
     const ctx = smartCtx.injectedContext
+
+    // ── Load user memory (coding style, preferences) ──
+    let memoryContext = ''
+    if (userId !== 'anonymous') {
+      try {
+        const { data: memories } = await supabase
+          .from('user_memories')
+          .select('type, key, value, confidence')
+          .eq('user_id', userId)
+          .in('type', ['style', 'preference'])
+          .gte('confidence', 0.5)
+          .limit(10)
+        if (memories && memories.length > 0) {
+          const styleMemory = memories.find(m => m.type === 'style' && m.key === 'default')
+          const prefMemory = memories.find(m => m.type === 'preference' && m.key === 'default')
+          const parts: string[] = []
+          if (styleMemory?.value) {
+            const s = styleMemory.value as Record<string, any>
+            parts.push(`USER CODING STYLE: ${s.preferredFramework || 'react'} + ${s.preferredStyling || 'tailwind'}, ${s.quotes || 'single'} quotes, ${s.indentation || 'spaces'}(${s.indentSize || 2}), ${s.componentStyle || 'functional'} components, ${s.semicolons ? 'with' : 'no'} semicolons`)
+          }
+          if (prefMemory?.value) {
+            const p = prefMemory.value as Record<string, any>
+            if (p.codeCommenting) parts.push(`Code comments: ${p.codeCommenting}`)
+          }
+          if (parts.length > 0) memoryContext = '\n\n' + parts.join('\n')
+        }
+      } catch { /* memory load non-fatal */ }
+    }
+
     const sysProm = needsAgent
-      ? (ctx ? `${AGENT_SYSTEM_PROMPT}\n\n${ctx}` : AGENT_SYSTEM_PROMPT)
-      : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n\n${ctx}` : SYSTEM_PROMPT_COMPACT)
+      ? (ctx ? `${AGENT_SYSTEM_PROMPT}\n\n${ctx}${memoryContext}` : `${AGENT_SYSTEM_PROMPT}${memoryContext}`)
+      : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n\n${ctx}${memoryContext}` : `${SYSTEM_PROMPT_COMPACT}${memoryContext}`)
     const toolCtx: ToolContext = { files: { ...files }, projectId, attachments }
 
     if (stream && needsAgent) {

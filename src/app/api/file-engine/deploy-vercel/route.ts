@@ -67,6 +67,20 @@ export async function POST(request: NextRequest) {
       userId = session?.user?.id;
     }
 
+    // Permission gate: require deploy_vercel feature
+    if (userId) {
+      try {
+        const { hasFeature } = await import('@/lib/permissions')
+        const allowed = await hasFeature(userId, 'deploy_vercel')
+        if (!allowed) {
+          return NextResponse.json(
+            { success: false, error: 'Upgrade to Pro to deploy to Vercel', upsell: true },
+            { status: 403 }
+          )
+        }
+      } catch { /* permission check non-fatal in dev */ }
+    }
+
     // Use user's token if provided, otherwise admin token
     const vercelToken = body.vercelToken || 
                        process.env.VERCEL_TOKEN || 
