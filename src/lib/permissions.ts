@@ -55,7 +55,7 @@ export const FEATURE_META: Record<FeatureKey, {
   label: string
   description: string
   category: 'deployment' | 'ai' | 'media' | 'memory' | 'collaboration' | 'utility'
-  suggestedPlan: 'pro' | 'enterprise'
+  suggestedPlan: 'starter' | 'pro' | 'max' | 'enterprise'
   upsellMessage: string
 }> = {
   deploy_vercel: {

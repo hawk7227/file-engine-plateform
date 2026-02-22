@@ -16,17 +16,31 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 // =====================================================
 
 export const STRIPE_PRICES = {
+  starter_monthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || 'price_starter_monthly',
+  starter_yearly: process.env.STRIPE_PRICE_STARTER_YEARLY || 'price_starter_yearly',
   pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly',
   pro_yearly: process.env.STRIPE_PRICE_PRO_YEARLY || 'price_pro_yearly',
+  max_monthly: process.env.STRIPE_PRICE_MAX_MONTHLY || 'price_max_monthly',
+  max_yearly: process.env.STRIPE_PRICE_MAX_YEARLY || 'price_max_yearly',
   enterprise_monthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || 'price_enterprise_monthly',
   enterprise_yearly: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY || 'price_enterprise_yearly'
 }
 
 export const PLAN_PRICE_MAP: Record<string, { monthly: string; yearly: string; name: string }> = {
+  starter: {
+    monthly: STRIPE_PRICES.starter_monthly,
+    yearly: STRIPE_PRICES.starter_yearly,
+    name: 'Starter'
+  },
   pro: {
     monthly: STRIPE_PRICES.pro_monthly,
     yearly: STRIPE_PRICES.pro_yearly,
     name: 'Pro'
+  },
+  max: {
+    monthly: STRIPE_PRICES.max_monthly,
+    yearly: STRIPE_PRICES.max_yearly,
+    name: 'Max'
   },
   enterprise: {
     monthly: STRIPE_PRICES.enterprise_monthly,
@@ -174,8 +188,12 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
   let plan = 'free'
   const priceId = subscription.items.data[0]?.price.id
   
-  if (priceId === STRIPE_PRICES.pro_monthly || priceId === STRIPE_PRICES.pro_yearly) {
+  if (priceId === STRIPE_PRICES.starter_monthly || priceId === STRIPE_PRICES.starter_yearly) {
+    plan = 'starter'
+  } else if (priceId === STRIPE_PRICES.pro_monthly || priceId === STRIPE_PRICES.pro_yearly) {
     plan = 'pro'
+  } else if (priceId === STRIPE_PRICES.max_monthly || priceId === STRIPE_PRICES.max_yearly) {
+    plan = 'max'
   } else if (priceId === STRIPE_PRICES.enterprise_monthly || priceId === STRIPE_PRICES.enterprise_yearly) {
     plan = 'enterprise'
   }

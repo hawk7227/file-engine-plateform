@@ -551,15 +551,49 @@ export async function POST(request: NextRequest) {
     const { key: apiKey, provider } = keyResult
 
     let resolvedModel: string
+    const isPremiumRequest = model === 'premium'
+    const modelTiers: Record<string, Record<string, string>> = {
+      fast: { anthropic: 'claude-haiku-4-5-20251001', openai: 'gpt-4o-mini' },
+      pro: { anthropic: 'claude-sonnet-4-20250514', openai: 'gpt-4o' },
+      premium: { anthropic: 'claude-opus-4-0-20250115', openai: 'o1' },
+    }
+
     if (model === 'auto') {
-      const tiers: Record<string, Record<string, string>> = {
-        fast: { anthropic: 'claude-haiku-4-5-20251001', openai: 'gpt-4o-mini' },
-        pro: { anthropic: 'claude-sonnet-4-20250514', openai: 'gpt-4o' },
-        premium: { anthropic: 'claude-opus-4-0-20250115', openai: 'o1' },
-      }
-      resolvedModel = tiers[smartCtx.modelTier]?.[provider] || getActualModelId(model, provider)
+      resolvedModel = modelTiers[smartCtx.modelTier]?.[provider] || getActualModelId(model, provider)
     } else {
       resolvedModel = getActualModelId(model, provider)
+    }
+
+    // ── PREMIUM MODEL CAP ENFORCEMENT ──
+    // Check if this resolves to a premium model and enforce daily caps
+    const isPremiumModel = resolvedModel.includes('opus') || resolvedModel === 'o1'
+    if (isPremiumModel && userId !== 'anonymous') {
+      try {
+        // Get user plan
+        const { data: prof } = await supabase.from('profiles').select('plan').eq('id', userId).single()
+        const plan = prof?.plan || 'free'
+        const premiumCaps: Record<string, number> = { free: 0, starter: 5, pro: 25, max: 100, enterprise: 500 }
+        const cap = premiumCaps[plan] ?? 0
+
+        if (cap === 0) {
+          // Free users can't use premium — downgrade silently to pro
+          resolvedModel = modelTiers.pro[provider]
+        } else {
+          // Count today's premium usage
+          const today = new Date().toISOString().split('T')[0]
+          const { count } = await supabase
+            .from('usage_logs')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .eq('model_tier', 'premium')
+            .gte('created_at', `${today}T00:00:00Z`)
+          
+          if ((count || 0) >= cap) {
+            // Over premium cap — downgrade to pro tier
+            resolvedModel = modelTiers.pro[provider]
+          }
+        }
+      } catch { /* non-fatal — allow request on cap check failure */ }
     }
 
     const optMsgs = smartCtx.trimmedMessages.length > 0 ? smartCtx.trimmedMessages : messages

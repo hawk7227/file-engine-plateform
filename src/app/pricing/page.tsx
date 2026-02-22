@@ -12,52 +12,92 @@ const PLANS = [
     name: 'Free',
     price: '$0',
     period: 'forever',
-    description: `Perfect for trying out ${BRAND_NAME}`,
+    description: `Try ${BRAND_NAME} with no commitment`,
     features: [
+      '10 generations per day',
+      'Fast model (⚡)',
+      'Pro model (🚀)',
       '3 concurrent builds',
-      '10 builds per day',
       'Basic validation',
-      'Community support',
       '1 project'
     ],
     cta: 'Get Started',
     popular: false
   },
   {
+    id: 'starter',
+    name: 'Starter',
+    price: '$9',
+    period: '/month',
+    description: 'For personal projects',
+    features: [
+      '50 generations per day',
+      'Fast + Pro models',
+      '5 Premium requests/day (💎)',
+      '5 concurrent builds',
+      'Standard validation',
+      'Private projects'
+    ],
+    cta: 'Start Building',
+    popular: false
+  },
+  {
     id: 'pro',
     name: 'Pro',
-    price: '$29',
+    price: '$19',
     period: '/month',
     description: 'For professional developers',
     features: [
+      '200 generations per day',
+      'All models included',
+      '25 Premium requests/day (💎)',
       '10 concurrent builds',
-      '100 builds per day',
-      'Advanced validation + AI fixing',
-      'Priority support',
-      'Unlimited projects',
+      'Full validation + AI fixing',
+      'Priority queue',
       'Vercel deployment',
-      'Custom API keys',
-      'Activity history'
+      'API access',
+      '5 team members'
     ],
     cta: 'Start Pro Trial',
     popular: true
+  },
+  {
+    id: 'max',
+    name: 'Max',
+    price: '$49',
+    period: '/month',
+    description: 'For power users and teams',
+    features: [
+      '1,000 generations per day',
+      'All models included',
+      '100 Premium requests/day (💎)',
+      '15 concurrent builds',
+      'Full validation + AI fixing',
+      'Priority queue',
+      'All deployments',
+      'API access',
+      '10 team members',
+      'Custom model config'
+    ],
+    cta: 'Go Max',
+    popular: false
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     price: '$99',
     period: '/month',
-    description: 'For teams and organizations',
+    description: 'For organizations at scale',
     features: [
+      'Unlimited generations',
+      'All models included',
+      '500 Premium requests/day (💎)',
       '20 concurrent builds',
-      'Unlimited builds',
-      'All Pro features',
-      'Team collaboration',
+      'All Max features',
+      'Unlimited team members',
       'SSO/SAML',
       'Dedicated support',
-      'Custom integrations',
-      'SLA guarantee',
-      'On-premise option'
+      'SLA guarantee'
     ],
     cta: 'Contact Sales',
     popular: false

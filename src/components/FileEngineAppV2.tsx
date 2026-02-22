@@ -554,7 +554,8 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const statusText=preview.phase==='previewing'?'✓ Preview ready':preview.phase==='verifying'?'⚡ Building...':preview.phase==='deploying'?'🚀 Deploying...':preview.phase==='complete'?'✓ Deployed!':preview.phase==='error'?'❌ Build failed':''
   const userInitial=(profile?.full_name?.[0]||user?.email?.[0])?.toUpperCase()||'U'
   const planLabel=(subscription?.plan||'free').charAt(0).toUpperCase()+(subscription?.plan||'free').slice(1)
-  const planColor=subscription?.plan==='enterprise'?'#8b5cf6':subscription?.plan==='pro'?'#3b82f6':'#71717a'
+  const planColorMap: Record<string,string>={free:'#71717a',starter:'#f59e0b',pro:'#3b82f6',max:'#8b5cf6',enterprise:'#ec4899'}
+  const planColor=planColorMap[subscription?.plan||'free']||'#71717a'
   return (
     <><style>{CSS}</style><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
     <div className="app-container">

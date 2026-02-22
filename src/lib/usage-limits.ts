@@ -12,6 +12,7 @@ import { supabase } from './supabase'
 export interface PlanLimits {
   generationsPerDay: number
   generationsPerMonth: number
+  premiumPerDay: number          // Max Premium (Opus/o1) requests per day
   maxTokensPerRequest: number
   maxFilesPerGeneration: number
   validationLevel: 'basic' | 'standard' | 'full'
@@ -26,6 +27,7 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
   free: {
     generationsPerDay: 10,
     generationsPerMonth: 100,
+    premiumPerDay: 0,
     maxTokensPerRequest: 4000,
     maxFilesPerGeneration: 3,
     validationLevel: 'basic',
@@ -35,9 +37,23 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
     apiAccess: false,
     customModels: false
   },
+  starter: {
+    generationsPerDay: 50,
+    generationsPerMonth: 500,
+    premiumPerDay: 5,
+    maxTokensPerRequest: 4000,
+    maxFilesPerGeneration: 5,
+    validationLevel: 'standard',
+    priorityQueue: false,
+    privateProjects: true,
+    teamMembers: 1,
+    apiAccess: false,
+    customModels: false
+  },
   pro: {
-    generationsPerDay: 100,
-    generationsPerMonth: 2000,
+    generationsPerDay: 200,
+    generationsPerMonth: 4000,
+    premiumPerDay: 25,
     maxTokensPerRequest: 8000,
     maxFilesPerGeneration: 10,
     validationLevel: 'full',
@@ -47,9 +63,23 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
     apiAccess: true,
     customModels: false
   },
+  max: {
+    generationsPerDay: 1000,
+    generationsPerMonth: 20000,
+    premiumPerDay: 100,
+    maxTokensPerRequest: 16000,
+    maxFilesPerGeneration: 25,
+    validationLevel: 'full',
+    priorityQueue: true,
+    privateProjects: true,
+    teamMembers: 10,
+    apiAccess: true,
+    customModels: true
+  },
   enterprise: {
     generationsPerDay: Infinity,
     generationsPerMonth: Infinity,
+    premiumPerDay: 500,
     maxTokensPerRequest: 16000,
     maxFilesPerGeneration: 50,
     validationLevel: 'full',
