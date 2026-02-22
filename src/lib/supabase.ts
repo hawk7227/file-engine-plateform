@@ -1,8 +1,15 @@
 import { createClient } from './supabase/client'
 import { PLAN_LIMITS } from './types'
 
-// Browser-side Supabase client (singleton via createBrowserClient)
-export const supabase = createClient()
+// Browser-side Supabase client — lazy singleton
+// Deferred init prevents build crash when env vars aren't available during static generation
+let _supabase: ReturnType<typeof createClient> | null = null
+export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(_target, prop) {
+    if (!_supabase) _supabase = createClient()
+    return (_supabase as any)[prop]
+  }
+})
 
 // ─── Auth: Sign Up (sends OTP confirmation email) ───────────────────────────
 // Profile & subscription are auto-created by the DB trigger on auth.users INSERT
