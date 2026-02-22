@@ -236,6 +236,20 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
           try {
             const parsed = JSON.parse(data)
 
+            // ── Status events (instant response feedback) ──
+            if (parsed.type === 'status') {
+              // The assistant placeholder was already added — just ensure it's visible
+              setMessages(prev => {
+                const updated = [...prev]
+                const last = updated.length - 1
+                if (updated[last]?.role === 'assistant') {
+                  updated[last] = { ...updated[last], status: 'streaming' }
+                }
+                return updated
+              })
+              continue
+            }
+
             // ── Text content ──
             if (parsed.text && !parsed.type) {
               currentMessageRef.current += parsed.text
