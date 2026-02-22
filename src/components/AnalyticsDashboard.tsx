@@ -47,9 +47,9 @@ export function AnalyticsDashboard({ analytics }: AnalyticsDashboardProps) {
   }
   
   const costByModel = [
-    { model: 'claude-3-haiku', cost: 4.23, tokens: 423000, percentage: 34 },
-    { model: 'claude-3-sonnet', cost: 6.89, tokens: 312000, percentage: 55 },
-    { model: 'claude-3-opus', cost: 1.35, tokens: 112392, percentage: 11 }
+    { model: 'Fast', cost: 4.23, tokens: 423000, percentage: 34 },
+    { model: 'Pro', cost: 6.89, tokens: 312000, percentage: 55 },
+    { model: 'Premium', cost: 1.35, tokens: 112392, percentage: 11 }
   ]
   
   const qualityTrend = [

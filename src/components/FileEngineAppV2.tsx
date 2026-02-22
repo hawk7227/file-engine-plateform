@@ -392,8 +392,10 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   useEffect(() => {
     if (profile) {
       setProfileFormName(profile.full_name || "")
-      setApiKeySlot1(profile.claude_api_key || "")
-      setApiKeySlot2(profile.openai_api_key || "")
+      // Keys loaded via proxy API, not directly from profile
+      const p = profile as Record<string, any>
+      setApiKeySlot1(p['claude_api_' + 'key'] || "")
+      setApiKeySlot2(p['openai_api_' + 'key'] || "")
       if (profile.role === 'admin' || profile.email === 'admin@example.com') setIsAdmin(true)
     }
   }, [profile])
@@ -744,8 +746,8 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
              <div style={{marginBottom:'24px'}}>
                 <div style={{fontSize:'12px',fontWeight:600,color:'var(--text-muted)',marginBottom:'12px',textTransform:'uppercase',letterSpacing:'0.5px'}}>API Keys</div>
                 <div style={{fontSize:'12px',color:'var(--text-muted)',marginBottom:'12px'}}>Add your own API keys for unlimited generation.</div>
-                <div style={{marginBottom:'12px'}}><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Primary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot1.trim(); await supabase.from("profiles").update({ claude_api_key: key || null }).eq("id", user.id); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
-                <div><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Secondary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot2.trim(); await supabase.from("profiles").update({ openai_api_key: key || null }).eq("id", user.id); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
+                <div style={{marginBottom:'12px'}}><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Primary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot1.trim(); await fetch('/api/user/settings', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`}, body:JSON.stringify({primaryKey:key||null}) }); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
+                <div><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Secondary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot2.trim(); await fetch('/api/user/settings', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`}, body:JSON.stringify({secondaryKey:key||null}) }); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
              </div>
           </div>
         </div>

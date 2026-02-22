@@ -1,3 +1,4 @@
+import { DB } from '@/lib/db-fields'
 'use client'
 import { BRAND_NAME } from '@/lib/brand'
 

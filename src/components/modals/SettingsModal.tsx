@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Modal } from '@/components/ui/Modal'
-import { supabase, getUser, updateProfile } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { BRAND_NAME } from '@/lib/brand'
 
 interface SettingsModalProps {
@@ -20,6 +20,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   const [model, setModel] = useState('auto')
   const [primaryKey, setPrimaryKey] = useState('')
   const [secondaryKey, setSecondaryKey] = useState('')
+  const [hasPrimaryKey, setHasPrimaryKey] = useState(false)
+  const [hasSecondaryKey, setHasSecondaryKey] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -27,32 +29,33 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   }, [open])
 
   async function loadSettings() {
-    const user = await getUser()
-    if (!user) return
-
-    const { data } = await supabase
-      .from('profiles')
-      .select('preferred_model, claude_api_key, openai_api_key')
-      .eq('id', user.id)
-      .single()
-
-    if (data) {
-      setModel(data.preferred_model || 'auto')
-      setPrimaryKey(data.claude_api_key || '')
-      setSecondaryKey(data.openai_api_key || '')
-    }
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+      const r = await fetch('/api/user/settings', {
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      })
+      if (!r.ok) return
+      const d = await r.json()
+      setModel(d.model || 'auto')
+      setHasPrimaryKey(d.hasPrimaryKey)
+      setHasSecondaryKey(d.hasSecondaryKey)
+    } catch { /* non-fatal */ }
   }
 
   async function handleSave() {
     setSaving(true)
-    const user = await getUser()
-    if (user) {
-      await updateProfile(user.id, {
-        preferred_model: model,
-        claude_api_key: primaryKey || null,
-        openai_api_key: secondaryKey || null
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const body: Record<string, any> = { model }
+      if (primaryKey) body.primaryKey = primaryKey
+      if (secondaryKey) body.secondaryKey = secondaryKey
+      await fetch('/api/user/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+        body: JSON.stringify(body)
       })
-    }
+    } catch { /* non-fatal */ }
     setSaving(false)
     onClose()
   }
@@ -86,29 +89,29 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
         <div className="ai-provider-section">
           <div className="ai-provider-title">API Keys (Optional — Bring Your Own)</div>
           <div className="form-group" style={{ marginBottom: 12 }}>
-            <label className="form-label">Primary API Key</label>
+            <label className="form-label">Primary API Key {hasPrimaryKey && <span style={{color:'var(--accent-primary,#00ff88)',fontSize:11}}>✓ Set</span>}</label>
             <input
               type="password"
               className="form-input"
               value={primaryKey}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrimaryKey(e.target.value)}
-              placeholder="sk-..."
+              placeholder={hasPrimaryKey ? '••••••••' : 'sk-...'}
               style={{ fontSize: 13 }}
             />
           </div>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">Secondary API Key</label>
+            <label className="form-label">Secondary API Key {hasSecondaryKey && <span style={{color:'var(--accent-primary,#00ff88)',fontSize:11}}>✓ Set</span>}</label>
             <input
               type="password"
               className="form-input"
               value={secondaryKey}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSecondaryKey(e.target.value)}
-              placeholder="sk-..."
+              placeholder={hasSecondaryKey ? '••••••••' : 'sk-...'}
               style={{ fontSize: 13 }}
             />
           </div>
           <div style={{ fontSize: 11, color: '#71717a', marginTop: 8 }}>
-            Add your own keys to increase rate limits. {BRAND_NAME} routes to the best available provider automatically.
+            Add your own keys for increased rate limits. {BRAND_NAME} routes to the best available provider automatically.
           </div>
         </div>
 
