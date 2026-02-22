@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error('[Vision API Error]', err)
     return NextResponse.json(
-      { error: `${BRAND_NAME} vision analysis failed: ` + + err.message },
+      { error: `${BRAND_NAME} vision analysis failed` },
       { status: 500 }
     )
   }

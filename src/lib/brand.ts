@@ -197,6 +197,36 @@ export function sanitizeBrandOutput(text: string): string {
   return result
 }
 
+/**
+ * Deep-sanitize any value destined for the client.
+ * Recursively walks objects/arrays and strips all provider names from strings.
+ * Use this on API JSON responses as a last line of defense.
+ */
+export function sanitizeForClient<T>(value: T): T {
+  if (typeof value === 'string') return sanitizeBrandOutput(value) as T
+  if (Array.isArray(value)) return value.map(v => sanitizeForClient(v)) as T
+  if (value && typeof value === 'object') {
+    const out: Record<string, any> = {}
+    for (const [k, v] of Object.entries(value)) {
+      // Never sanitize keys, only values
+      out[k] = sanitizeForClient(v)
+    }
+    return out as T
+  }
+  return value
+}
+
+/**
+ * Check if a string contains any provider name that should never be exposed.
+ * Use for runtime assertions in tests and debug builds.
+ */
+export function containsProviderName(text: string): boolean {
+  for (const name of BRAND.ai.neverMention) {
+    if (new RegExp(`\\b${name}\\b`, 'i').test(text)) return true
+  }
+  return false
+}
+
 // =====================================================
 // METADATA HELPERS
 // =====================================================

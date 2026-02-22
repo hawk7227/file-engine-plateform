@@ -329,7 +329,7 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
           }
           return { success: true, result: analysisResult }
         } catch (visionErr: any) {
-          return { success: false, result: `Vision analysis failed: ${visionErr.message}` }
+          return { success: false, result: `Vision analysis failed: ${sanitizeResponse(visionErr.message)}` }
         }
       }
       case 'think':
@@ -590,7 +590,7 @@ export async function POST(request: NextRequest) {
     return simpleStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, attachments)
   } catch (error: any) {
     console.error('[Chat API Error]', error)
-    return new Response(JSON.stringify({ error: `${BRAND_NAME} encountered an error`, details: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: `${BRAND_NAME} encountered an error`, details: sanitizeResponse(error.message || 'Unknown error') }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 

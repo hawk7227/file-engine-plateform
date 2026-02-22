@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react'
 import { supabase, getUser, updateProfile } from '@/lib/supabase'
 
 const MODELS = [
-  { id: 'claude-sonnet-4', name: 'Claude Sonnet 4', provider: 'claude' },
-  { id: 'claude-opus-4', name: 'Claude Opus 4', provider: 'claude' },
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai' },
-  { id: 'o1', name: 'o1', provider: 'openai' }
+  { id: 'auto', name: 'Auto', provider: 'auto' },
+  { id: 'fast', name: 'Fast', provider: 'auto' },
+  { id: 'pro', name: 'Pro', provider: 'auto' },
+  { id: 'premium', name: 'Premium', provider: 'auto' }
 ]
 
 export function ModelSelector() {

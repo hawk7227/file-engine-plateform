@@ -87,7 +87,7 @@ export function useGenerate() {
     const { 
       projectId, 
       buildId, 
-      model = 'claude-sonnet-4',
+      model = 'pro',
       strictMode = false,
       maxFixIterations = 3,
       onChunk, 
