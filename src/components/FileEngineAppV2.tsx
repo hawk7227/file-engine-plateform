@@ -342,6 +342,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const { messages, isLoading: chatLoading, sendMessage, clearMessages, stopGeneration, setMessages } = useChat({
     projectId: currentProjectId || undefined,
     chatId: currentChatId || undefined,
+    model: selectedModel,
     onComplete: () => { const m = messages[messages.length-1]; if(m?.files?.length) handleFilesGenerated(m.files) },
     onChatCreated: (newChatId, title) => {
         setCurrentChatId(newChatId)
@@ -357,6 +358,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const [useLocal, setUseLocal] = useState(false)
   const [autoFix, setAutoFix] = useState(true)
   const [inputValue, setInputValue] = useState('')
+  const [selectedModel, setSelectedModel] = useState('auto')
   const [domainInput, setDomainInput] = useState('')
   const [toasts, setToasts] = useState<Toast[]>([])
   const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set())
@@ -647,6 +649,12 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
               </div>
               <textarea className="input-field" placeholder="Describe what you want to build..." rows={1} value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={handleKeyDown} disabled={chatLoading} style={{minHeight:'24px', maxHeight:'200px', paddingTop:'8px'}}/>
               <button className="send-btn" onClick={chatLoading?stopGeneration:handleSend} disabled={(!inputValue.trim() && attachedFiles.length === 0) && !chatLoading}>{chatLoading?'⏹':'➤'}</button>
+            </div>
+            <div style={{display:'flex',gap:'6px',alignItems:'center',flexWrap:'wrap'}}>
+              <span style={{fontSize:10,color:'var(--text-muted)',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.5px'}}>Model</span>
+              {[{id:'auto',icon:'✨',label:'Auto'},{id:'fast',icon:'⚡',label:'Fast'},{id:'pro',icon:'🚀',label:'Pro'},{id:'premium',icon:'💎',label:'Premium'}].map(m=>(
+                <button key={m.id} onClick={()=>setSelectedModel(m.id)} style={{padding:'3px 10px',fontSize:11,fontWeight:selectedModel===m.id?600:400,background:selectedModel===m.id?'rgba(0,255,136,.1)':'transparent',border:`1px solid ${selectedModel===m.id?'var(--accent-primary)':'var(--border-subtle)'}`,borderRadius:20,color:selectedModel===m.id?'var(--accent-primary)':'var(--text-muted)',cursor:'pointer',transition:'all .15s',display:'flex',alignItems:'center',gap:'4px'}}><span style={{fontSize:12}}>{m.icon}</span>{m.label}</button>
+              ))}
             </div>
           </div>
         </div>
