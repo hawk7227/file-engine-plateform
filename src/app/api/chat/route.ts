@@ -548,6 +548,8 @@ export async function POST(request: NextRequest) {
       /\b(search|fix|edit|run|build|test|deploy|create|make|generate)\b/i.test(msgText)
     )
 
+    console.log(`[Chat API] intent=${intent} enableAgent=${enableAgent} needsAgent=${needsAgent} model=${model} stream=${stream} msgText="${msgText.slice(0, 100)}"`)
+
     const keyResult = getKeyWithFailover()
     if (!keyResult) return new Response(JSON.stringify({ error: `${BRAND_NAME} API keys not available` }), { status: 503, headers: { 'Content-Type': 'application/json' } })
     const { key: apiKey, provider } = keyResult
@@ -753,9 +755,12 @@ async function agentStream(
 
         for (let i = 0; i < MAX_ITER; i++) {
           // ── STREAM AI RESPONSE (text flows immediately, tools accumulate) ──
-          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc)
+          // Force tool use on first iteration (i=0) to ensure agent actually calls create_file
+          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc, i === 0)
 
           if (!parsed) break // stream error already sent to client
+
+          console.log(`[Agent Loop] iter=${i} stopReason=${parsed.stopReason} toolCalls=${parsed.toolCalls.length} textLen=${parsed.text.length} tools=[${parsed.toolCalls.map(t=>t.name).join(',')}]`)
 
           // ── NO TOOLS = DONE ──
           if (parsed.toolCalls.length === 0) break
@@ -828,9 +833,10 @@ async function agentStream(
 async function streamAgentTurn(
   provider: 'anthropic' | 'openai', model: string, sys: string,
   msgs: any[], key: string, max: number, think: boolean,
-  ctrl: ReadableStreamDefaultController, enc: TextEncoder
+  ctrl: ReadableStreamDefaultController, enc: TextEncoder,
+  forceToolUse: boolean = false
 ): Promise<ParsedResponse | null> {
-  const resp = await callAIStreaming(provider, model, sys, msgs, key, max, think)
+  const resp = await callAIStreaming(provider, model, sys, msgs, key, max, think, forceToolUse)
 
   if (!resp.ok) {
     const e = await resp.json().catch(() => ({}))
@@ -954,10 +960,13 @@ async function streamAgentTurn(
 // Streaming API call WITH tools (agent mode) — both providers
 async function callAIStreaming(
   provider: 'anthropic' | 'openai', model: string, sys: string,
-  msgs: any[], key: string, max: number, think: boolean
+  msgs: any[], key: string, max: number, think: boolean,
+  forceToolUse: boolean = false
 ): Promise<Response> {
   if (provider === 'anthropic') {
-    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: { type: 'auto' }, stream: true }
+    const toolChoice = forceToolUse ? { type: 'any' } : { type: 'auto' }
+    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: toolChoice, stream: true }
+    console.log(`[callAIStreaming] provider=anthropic model=${model} max=${max} forceToolUse=${forceToolUse} toolChoice=${JSON.stringify(toolChoice)} toolCount=${toAnthropicTools().length}`)
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
       body.thinking = { type: 'enabled', budget_tokens: Math.min(4096, Math.floor(max * 0.3)) }
     }
@@ -968,7 +977,7 @@ async function callAIStreaming(
     })
   } else {
     const oai = convertToOpenAIMessages(sys, msgs)
-    const body: any = { model, messages: oai, tools: toOpenAITools(), tool_choice: 'auto', stream: true }
+    const body: any = { model, messages: oai, tools: toOpenAITools(), tool_choice: forceToolUse ? 'required' : 'auto', stream: true }
     if (model.startsWith('o1') || model.startsWith('o3')) {
       body.max_completion_tokens = max
       if (think) body.reasoning_effort = 'high'
