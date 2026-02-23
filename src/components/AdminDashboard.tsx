@@ -1843,6 +1843,7 @@ export default function AdminDashboard() {
           </nav>
 
           <div className="admin-side-back">
+            <a href="/admin/workplace" style={{ color: '#34d399', fontWeight: 600 }}>🖥 Workplace IDE</a>
             <a href="/dashboard">← Back to {BRAND_NAME}</a>
           </div>
         </div>
