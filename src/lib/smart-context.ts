@@ -87,14 +87,14 @@ export function classifyIntent(message: string): MessageIntent {
 // =====================================================
 
 const INTENT_MODEL_TIER: Record<MessageIntent, 'fast' | 'pro' | 'premium'> = {
-  general_chat: 'fast',      // Haiku / GPT-4o-mini — trivial
-  explain: 'fast',      // Models explain equally well at all tiers
-  deploy_action: 'fast',      // Just orchestration, no reasoning needed
-  style_question: 'fast',      // Simple design advice
-  project_question: 'fast',      // Just listing files
-  generate_code: 'pro',       // Needs quality code output
-  refactor: 'pro',       // Needs understanding of patterns
-  fix_code: 'pro',       // Needs debugging reasoning
+  general_chat: 'fast',      // Haiku — trivial responses
+  explain: 'fast',           // Haiku — explanations don't need quality code
+  deploy_action: 'fast',     // Haiku — just orchestration
+  style_question: 'pro',     // Sonnet — needs design reasoning
+  project_question: 'fast',  // Haiku — just listing files
+  generate_code: 'pro',      // Sonnet MINIMUM — must produce quality code
+  refactor: 'pro',           // Sonnet — needs pattern understanding
+  fix_code: 'pro',           // Sonnet — needs debugging reasoning
 }
 
 // =====================================================
@@ -564,5 +564,71 @@ export default function Hero() { ... }
 
 NEVER output code blocks without the filepath after the language tag.
 This format is required for the preview system to work.`
+
+// Intent-specific prompt additions that get appended
+export const INTENT_PROMPT_ADDITIONS: Record<MessageIntent, string> = {
+  generate_code: `
+GENERATION MODE:
+- Create complete, working files — no placeholders or "add more here"
+- For landing pages/demos: ONE complete HTML file with embedded CSS+JS
+- For React apps: create all needed components, each in its own file
+- For multi-file projects: create each file separately with proper imports
+- Use modern design: gradients, animations, proper spacing, Google Fonts
+- Mobile responsive with proper meta viewport
+- Always include full content — never truncate`,
+
+  fix_code: `
+FIX MODE:
+- Identify the root cause before fixing
+- Show the MINIMAL change needed — don't rewrite the whole file
+- Use edit_file tool to make targeted changes to existing files
+- If you need to see the current code first, use view_file
+- After fixing, explain what was wrong and why your fix works
+- If the error message is provided, address it directly
+- Check for related issues that might cause similar errors`,
+
+  refactor: `
+REFACTOR MODE:
+- Understand the existing code's purpose before changing it
+- Preserve all existing functionality
+- Make incremental improvements, not complete rewrites
+- Use edit_file for targeted changes
+- Explain each refactoring decision
+- Consider: readability, performance, maintainability, DRY`,
+
+  explain: `
+EXPLAIN MODE:
+- Give clear, concise explanations
+- Use examples and analogies
+- If explaining code, walk through it step by step
+- Don't generate new code unless asked
+- Keep responses focused and not overly long`,
+
+  style_question: `
+STYLE MODE:
+- Provide specific CSS/design recommendations
+- Include hex color codes, font names, spacing values
+- Consider accessibility and contrast
+- Show before/after when possible
+- Reference modern design trends`,
+
+  project_question: `
+PROJECT MODE:
+- List files and their purposes clearly
+- Describe the project structure
+- Identify key components and their relationships
+- Note any issues or improvements needed`,
+
+  deploy_action: `
+DEPLOY MODE:
+- Guide through deployment steps
+- Verify build passes before deploying
+- Check for environment variables needed
+- Provide deployment URLs when complete`,
+
+  general_chat: `
+Be helpful, concise, and friendly. Answer questions directly.`
+}
+
 
 export { CONTEXT_BUDGETS, INTENT_MODEL_TIER, INTENT_MAX_TOKENS, trimConversation }

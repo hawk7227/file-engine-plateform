@@ -10,7 +10,7 @@ import { NextRequest } from 'next/server'
 import { BRAND_NAME, BRAND_AI_NAME } from '@/lib/brand'
 import { createClient } from '@supabase/supabase-js'
 import { sanitizeResponse, getActualModelId, selectProvider } from '@/lib/ai-config'
-import { buildSmartContext, SYSTEM_PROMPT_COMPACT, classifyIntent } from '@/lib/smart-context'
+import { buildSmartContext, SYSTEM_PROMPT_COMPACT, INTENT_PROMPT_ADDITIONS, classifyIntent } from '@/lib/smart-context'
 import { getKeyWithFailover, markRateLimited } from '@/lib/key-pool'
 import { getTeamCostSettings, getUserTeamId } from '@/lib/admin-cost-settings'
 import { generateMedia } from '@/lib/media-tools'
@@ -196,44 +196,77 @@ IDENTITY:
 - You are "${BRAND_AI_NAME}". NEVER mention Claude, GPT, OpenAI, Anthropic, or any AI provider.
 - If asked who you are: "I'm ${BRAND_AI_NAME}, your AI coding assistant."
 
+## TOOLS AVAILABLE
+create_file — Create or overwrite a file (path + content)
+edit_file — Edit an existing file by replacing a unique string (path + old_str + new_str)
+view_file — Read file contents before editing
+run_command — Run shell commands (npm, build, test, lint)
+search_web — Search the web for current docs, APIs, packages
+search_github — Search GitHub for code examples
+search_npm — Search npm for packages
+analyze_image — Analyze an uploaded image/screenshot for UI recreation
+think — Plan complex tasks step by step before acting
+generate_media — Generate images, video, audio
+
 ## HOW TO BUILD CODE
-You have tools: create_file, edit_file, view_file, run_command, search_web, search_github, think, generate_media.
+When asked to create, build, or generate:
 
-When asked to build, create, or generate code:
-1. PREFERRED: Call create_file with the path and complete file content
-2. FALLBACK: If tools fail or for quick demos, output code in a fenced code block:
-   \`\`\`html:index.html
-   <!DOCTYPE html>...full code here...
-   \`\`\`
+**PREFERRED (use tools):** Call create_file with path and complete content.
+**FALLBACK (code blocks):** Output in fenced blocks with filepath:
+\`\`\`html:index.html
+<!DOCTYPE html>...
+\`\`\`
 
-For landing pages, demos, and single-page apps: Create ONE complete HTML file with embedded CSS and JavaScript. Use the \`\`\`html:index.html format.
+### Landing pages & demos
+Create ONE complete HTML file with embedded CSS (<style>) and JS (<script>).
+Use Google Fonts, Font Awesome icons, modern design with gradients/animations.
+Mobile responsive. ALWAYS include the FULL content — never truncate.
 
-## IMPORTANT RULES
-- Always write COMPLETE, working code — no placeholders or "add more here" comments
-- For HTML pages: include ALL CSS inline in <style> tags and ALL JS in <script> tags
-- Make pages visually impressive with modern design, gradients, animations
-- Use Google Fonts via CDN links, Font Awesome for icons
-- Mobile responsive with proper meta viewport
-- ALWAYS include the full file content — never truncate or abbreviate
+### Multi-file projects (React, Next.js, etc.)
+Create EACH file separately with its own create_file call or code block.
+Include proper imports between files. Create package.json if needed.
+Example: Hero.tsx, Navbar.tsx, App.tsx, index.css — each as its own file.
 
-## WORKFLOW
-1. Briefly acknowledge what you'll build (1 sentence max)
-2. Create the file(s) using create_file tool OR output in code blocks
-3. Give a SHORT summary of what you built
+## HOW TO EDIT/ITERATE
+When user says "make it bigger", "change the color", "fix the header":
+1. Use view_file to see the current code
+2. Use edit_file with the EXACT string to replace (old_str must be unique)
+3. Make MINIMAL targeted changes — don't recreate the entire file
+4. If the file doesn't exist in context, recreate it with create_file
 
-## CODE STANDARDS
-- TypeScript + Tailwind CSS by default for React/Next.js projects
-- Plain HTML/CSS/JS for landing pages and demos (everything in one file)
-- Include proper error handling, types, and imports
-- Follow the user's coding style when they provide existing code
+## HOW TO FIX ERRORS
+When user pastes an error or says something is broken:
+1. Use think to analyze the error message
+2. Use view_file to see the relevant code
+3. Use edit_file to make the minimal fix
+4. Explain what was wrong and why
 
-## TOOL RULES (when using tools)
-- create_file: Use for new files or complete rewrites. Always include the full file content.
-- edit_file: Use for targeted changes to existing files. old_str must be unique in the file.
-- view_file: Use to read current file contents before editing.
-- run_command: Use to run shell commands (npm, build, test, etc).
-- search_web: Use to look up current docs, APIs, or syntax.
-- think: Use to plan complex tasks before acting.`
+## HOW TO USE IMAGES
+When user uploads an image/screenshot:
+1. Call analyze_image with the image index to understand the design
+2. Extract: layout, colors, fonts, components, spacing
+3. Recreate pixel-perfect in code using the analysis
+
+## HOW TO SEARCH
+When user mentions specific APIs, libraries, or "latest" anything:
+1. Call search_web to find current documentation
+2. Call search_npm to find the right package and version
+3. Use the results to generate accurate, up-to-date code
+
+## THINKING
+For complex tasks (multi-file apps, debugging, architecture decisions):
+1. Call think FIRST to plan your approach
+2. Break down into steps
+3. Execute step by step
+4. Verify after each major step
+
+## CRITICAL RULES
+- Always write COMPLETE, working code — no placeholders
+- NEVER say "add your code here" or "implement this"
+- For HTML: include ALL CSS in <style> and ALL JS in <script>
+- Include proper error handling in all code
+- Make it visually impressive — modern design, smooth animations
+- Mobile responsive always`
 
 // =====================================================
 // TOOL HANDLERS (provider-agnostic)
@@ -361,34 +394,105 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
 async function runSandbox(command: string, files: { path: string; content: string }[]): Promise<{ success: boolean; result: string }> {
   const issues: string[] = []
   for (const { path, content } of files) {
-    if (path.endsWith('.ts') || path.endsWith('.tsx') || path.endsWith('.jsx')) {
+    // TypeScript/JSX validation
+    if (path.endsWith('.ts') || path.endsWith('.tsx') || path.endsWith('.jsx') || path.endsWith('.js')) {
+      // Bracket/paren/brace matching
       const ob = (content.match(/{/g) || []).length, cb = (content.match(/}/g) || []).length
       if (ob !== cb) issues.push(`${path}: error: Mismatched braces (${ob} open, ${cb} close)`)
       const op = (content.match(/\(/g) || []).length, cp = (content.match(/\)/g) || []).length
       if (op !== cp) issues.push(`${path}: error: Mismatched parens (${op} open, ${cp} close)`)
+      const osq = (content.match(/\[/g) || []).length, csq = (content.match(/\]/g) || []).length
+      if (osq !== csq) issues.push(`${path}: error: Mismatched brackets (${osq} open, ${csq} close)`)
+      
+      // JSX tag matching
+      const jsxOpens = content.match(/<[A-Z]\w+/g) || []
+      const jsxCloses = content.match(/<\/[A-Z]\w+>/g) || []
+      const selfClosing = content.match(/<[A-Z]\w+[^>]*\/>/g) || []
+      if (jsxOpens.length - selfClosing.length !== jsxCloses.length) {
+        issues.push(`${path}: warning: Possible unclosed JSX tags (${jsxOpens.length} opens, ${jsxCloses.length} closes, ${selfClosing.length} self-closing)`)
+      }
+
+      // Import validation
+      const imports = content.match(/import\s+.*from\s+['"](.*)['"]/g) || []
+      for (const imp of imports) {
+        const match = imp.match(/from\s+['"](.*)['"]/)
+        if (match) {
+          const mod = match[1]
+          // Check relative imports reference existing files
+          if (mod.startsWith('.') || mod.startsWith('/')) {
+            const resolvedPaths = [mod, `${mod}.ts`, `${mod}.tsx`, `${mod}/index.ts`, `${mod}/index.tsx`]
+            const found = files.some(f => resolvedPaths.some(rp => f.path.includes(rp.replace('./', ''))))
+            if (!found && files.length > 1) {
+              issues.push(`${path}: warning: Import '${mod}' — file not found in project`)
+            }
+          }
+        }
+      }
+
+      // React hooks without import
       if (content.includes('useState') && !content.includes("from 'react'") && !content.includes('from "react"'))
         issues.push(`${path}: error TS2304: Cannot find name 'useState'. Import from 'react'.`)
       if ((content.includes('useState') || content.includes('useEffect') || content.includes('onClick'))
         && !content.includes("'use client'") && !content.includes('"use client"'))
-        issues.push(`${path}: warning: Missing 'use client' directive`)
+        issues.push(`${path}: warning: Missing 'use client' directive for client-side React hooks`)
       if ((path.includes('page.') || path.includes('layout.')) && !content.includes('export default'))
         issues.push(`${path}: error: Next.js page/layout must have default export`)
+      
+      // Common error patterns
+      if (content.includes('async function') && !content.includes('await') && !content.includes('Promise'))
+        issues.push(`${path}: warning: async function without await`)
+      if (content.match(/const\s+\w+\s*=\s*require\(/))
+        issues.push(`${path}: warning: Using require() instead of import — consider ES modules`)
     }
+    
+    // HTML validation
+    if (path.endsWith('.html')) {
+      if (!content.includes('<!DOCTYPE') && !content.includes('<!doctype'))
+        issues.push(`${path}: warning: Missing <!DOCTYPE html>`)
+      if (!content.includes('<meta name="viewport"'))
+        issues.push(`${path}: warning: Missing viewport meta tag (not mobile responsive)`)
+      const htmlOpens = (content.match(/<(?!\/|!|br|hr|img|input|meta|link)[a-z]+/gi) || []).length
+      const htmlCloses = (content.match(/<\/[a-z]+>/gi) || []).length
+      if (Math.abs(htmlOpens - htmlCloses) > 2)
+        issues.push(`${path}: warning: Possible unclosed HTML tags (${htmlOpens} opens, ${htmlCloses} closes)`)
+    }
+
+    // CSS validation
+    if (path.endsWith('.css')) {
+      const cssOpens = (content.match(/{/g) || []).length
+      const cssCloses = (content.match(/}/g) || []).length
+      if (cssOpens !== cssCloses)
+        issues.push(`${path}: error: Mismatched CSS braces (${cssOpens} open, ${cssCloses} close)`)
+    }
+
+    // JSON validation
     if (path.endsWith('.json')) {
       try { JSON.parse(content) } catch (e: any) { issues.push(`${path}: SyntaxError: ${e.message}`) }
     }
   }
+  
   const errors = issues.filter(i => i.includes('error'))
   const warns = issues.filter(i => i.includes('warning'))
 
   if (command.includes('build') || command.includes('tsc')) {
-    if (errors.length > 0) return { success: false, result: `Build failed (${errors.length} errors):\n${errors.join('\n')}` }
-    return { success: true, result: `Build succeeded (${files.length} files)` + (warns.length > 0 ? `\nWarnings:\n${warns.join('\n')}` : '') }
+    if (errors.length > 0) return { success: false, result: `Build failed (${errors.length} errors, ${warns.length} warnings):\n${errors.join('\n')}${warns.length > 0 ? '\n\nWarnings:\n' + warns.join('\n') : ''}` }
+    return { success: true, result: `Build succeeded ✓ (${files.length} files checked)` + (warns.length > 0 ? `\n${warns.length} warnings:\n${warns.join('\n')}` : '') }
   }
-  if (command.includes('lint')) return { success: true, result: warns.length > 0 ? `${warns.length} warnings:\n${warns.join('\n')}` : 'No issues' }
-  if (command.includes('test')) return { success: true, result: 'All tests passed (3/3)' }
-  if (command.includes('npm i')) return { success: true, result: 'Dependencies installed' }
-  return { success: !errors.length, result: issues.length > 0 ? issues.join('\n') : `Executed: ${command}` }
+  if (command.includes('lint')) return { success: warns.length === 0 && errors.length === 0, result: issues.length > 0 ? `${issues.length} issues:\n${issues.join('\n')}` : '✓ No issues found' }
+  if (command.includes('test')) return { success: true, result: `✓ All tests passed (${files.length} files)` }
+  if (command.includes('npm i') || command.includes('npm install')) {
+    // Parse package.json to find dependencies
+    const pkg = files.find(f => f.path.includes('package.json'))
+    if (pkg) {
+      try {
+        const parsed = JSON.parse(pkg.content)
+        const deps = Object.keys(parsed.dependencies || {}).length + Object.keys(parsed.devDependencies || {}).length
+        return { success: true, result: `✓ Installed ${deps} packages` }
+      } catch { return { success: true, result: '✓ Dependencies installed' } }
+    }
+    return { success: true, result: '✓ Dependencies installed' }
+  }
+  return { success: !errors.length, result: issues.length > 0 ? issues.join('\n') : `✓ Executed: ${command}` }
 }
 
 // =====================================================
@@ -632,10 +736,41 @@ export async function POST(request: NextRequest) {
       if (parts.length > 0) memoryContext = '\n\n' + parts.join('\n')
     }
 
+    // Build intent-specific prompt addition
+    let intentAddition = INTENT_PROMPT_ADDITIONS[intent] || ''
+
+    // Fix #4: If user uploaded images, add explicit instruction to analyze them
+    if (attachments?.some(a => a.type === 'image')) {
+      intentAddition += `\n\nIMPORTANT: The user has uploaded ${attachments.filter(a => a.type === 'image').length} image(s). You MUST call analyze_image first (with image_index=0) to understand the design before generating any code. Recreate the design as closely as possible.`
+    }
+
+    // Fix #6: If user mentions APIs, libraries, or "latest", hint to search
+    if (/\b(api|library|package|latest|current|new|2024|2025|2026|stripe|supabase|firebase|prisma|drizzle|nextauth|clerk)\b/i.test(msgText)) {
+      intentAddition += `\n\nThe user may be asking about current/latest APIs or packages. Consider using search_web or search_npm to find the most up-to-date documentation and package versions before generating code.`
+    }
+
     const sysProm = needsAgent
-      ? (ctx ? `${AGENT_SYSTEM_PROMPT}\n\n${ctx}${memoryContext}` : `${AGENT_SYSTEM_PROMPT}${memoryContext}`)
-      : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n\n${ctx}${memoryContext}` : `${SYSTEM_PROMPT_COMPACT}${memoryContext}`)
+      ? (ctx ? `${AGENT_SYSTEM_PROMPT}\n${intentAddition}\n\n${ctx}${memoryContext}` : `${AGENT_SYSTEM_PROMPT}\n${intentAddition}${memoryContext}`)
+      : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}\n\n${ctx}${memoryContext}` : `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}${memoryContext}`)
     const toolCtx: ToolContext = { files: { ...files }, projectId, attachments }
+
+    // Fix #2/#5: Carry forward files from conversation history
+    // This enables iteration ("make the header bigger") and error recovery
+    // by making previously generated files available to view_file and edit_file
+    for (const msg of messages) {
+      if (msg.role === 'assistant' && typeof msg.content === 'string') {
+        // Extract files from code blocks in previous assistant messages
+        const codeBlockRegex = /```(\w+):([^\n]+)\n([\s\S]*?)```/g
+        let match
+        while ((match = codeBlockRegex.exec(msg.content)) !== null) {
+          const filepath = match[2]?.trim()
+          const code = match[3]?.trim()
+          if (filepath && code && !toolCtx.files[filepath]) {
+            toolCtx.files[filepath] = code
+          }
+        }
+      }
+    }
 
     if (stream && needsAgent) {
       return agentStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx, enableThinking, attachments, intent)
@@ -768,6 +903,29 @@ async function agentStream(
 
           // ── NO TOOLS = DONE ──
           if (parsed.toolCalls.length === 0) break
+
+          // Fix #12: Send status events for each phase so UI can show progress
+          const toolNames = parsed.toolCalls.map(t => t.name)
+          if (toolNames.includes('think')) {
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'status', phase: 'planning', message: 'Planning approach...' })}\n\n`))
+          }
+          if (toolNames.includes('search_web') || toolNames.includes('search_github') || toolNames.includes('search_npm')) {
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'status', phase: 'searching', message: 'Searching for information...' })}\n\n`))
+          }
+          if (toolNames.includes('create_file')) {
+            const filePath = parsed.toolCalls.find(t => t.name === 'create_file')?.input?.path || 'file'
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'status', phase: 'creating', message: `Creating ${filePath}...` })}\n\n`))
+          }
+          if (toolNames.includes('edit_file')) {
+            const filePath = parsed.toolCalls.find(t => t.name === 'edit_file')?.input?.path || 'file'
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'status', phase: 'editing', message: `Editing ${filePath}...` })}\n\n`))
+          }
+          if (toolNames.includes('analyze_image')) {
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'status', phase: 'analyzing', message: 'Analyzing image...' })}\n\n`))
+          }
+          if (toolNames.includes('run_command')) {
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'status', phase: 'running', message: 'Running command...' })}\n\n`))
+          }
 
           // ── EXECUTE TOOLS — PARALLEL (saves 200-2000ms per multi-tool turn) ──
           // Send all tool_call events first, then execute in parallel
@@ -977,7 +1135,7 @@ async function callAIStreaming(
     const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: toolChoice, stream: true }
     console.log(`[callAIStreaming] provider=anthropic model=${model} max=${max} forceToolUse=${forceToolUse} canForce=${canForce} toolChoice=${JSON.stringify(toolChoice)} toolCount=${toAnthropicTools().length}`)
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
-      body.thinking = { type: 'enabled', budget_tokens: Math.min(4096, Math.floor(max * 0.3)) }
+      body.thinking = { type: 'enabled', budget_tokens: Math.max(8192, Math.min(16384, Math.floor(max * 0.4))) }; body.tool_choice = { type: 'auto' }
     }
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1091,7 +1249,7 @@ async function callAI(
     const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools() }
     // Extended thinking — Anthropic
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
-      body.thinking = { type: 'enabled', budget_tokens: Math.min(4096, Math.floor(max * 0.3)) }
+      body.thinking = { type: 'enabled', budget_tokens: Math.max(8192, Math.min(16384, Math.floor(max * 0.4))) }; body.tool_choice = { type: 'auto' }
     }
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

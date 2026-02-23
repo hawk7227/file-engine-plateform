@@ -19,6 +19,8 @@ export interface Message {
   content: string
   timestamp: string
   status?: 'sending' | 'streaming' | 'complete' | 'error'
+  statusPhase?: string
+  statusMessage?: string
   attachments?: Attachment[]
   files?: GeneratedFile[]
   toolCalls?: ToolCallEvent[]
@@ -194,9 +196,18 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
         mimeType: a.mimeType
       }))
 
+      // Get auth token for user identification
+      let authHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) {
+          authHeaders['Authorization'] = `Bearer ${session.access_token}`
+        }
+      } catch { /* non-fatal */ }
+
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({
           messages: apiMessages,
           model,
@@ -238,12 +249,17 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
             // ── Status events (instant response feedback) ──
             if (parsed.type === 'status') {
-              // The assistant placeholder was already added — just ensure it's visible
+              // Fix #12: Pass phase and message to UI for streaming progress indicators
               setMessages(prev => {
                 const updated = [...prev]
                 const last = updated.length - 1
                 if (updated[last]?.role === 'assistant') {
-                  updated[last] = { ...updated[last], status: 'streaming' }
+                  updated[last] = { 
+                    ...updated[last], 
+                    status: 'streaming',
+                    statusPhase: parsed.phase || 'thinking',
+                    statusMessage: parsed.message || ''
+                  }
                 }
                 return updated
               })
