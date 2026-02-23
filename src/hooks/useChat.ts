@@ -231,18 +231,22 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
       if (!reader) throw new Error('No response body')
 
       const decoder = new TextDecoder()
+      let sseBuffer = '' // Buffer for incomplete SSE lines across chunks
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
+        sseBuffer += decoder.decode(value, { stream: true })
+        const lines = sseBuffer.split('\n')
+        // Keep the last line in the buffer (it might be incomplete)
+        sseBuffer = lines.pop() || ''
 
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue
-          const data = line.slice(6)
+          const data = line.slice(6).trim()
           if (data === '[DONE]') continue
+          if (!data) continue
 
           try {
             const parsed = JSON.parse(data)
@@ -303,6 +307,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
             // ── Tool call started ──
             if (parsed.type === 'tool_call') {
+              console.log(`[useChat] tool_call received: tool=${parsed.tool}`)
               const toolEvent: ToolCallEvent = {
                 tool: parsed.tool,
                 input: parsed.input || {},
@@ -325,15 +330,20 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
             // ── Tool result ──
             if (parsed.type === 'tool_result') {
+              console.log(`[useChat] tool_result received: tool=${parsed.tool} success=${parsed.success}`)
               // Update the last tool call with its result
               const calls = currentToolCallsRef.current
+              let matched = false
               for (let i = calls.length - 1; i >= 0; i--) {
                 if (calls[i].tool === parsed.tool && calls[i].success === undefined) {
                   calls[i].success = parsed.success
                   calls[i].result = parsed.result
+                  matched = true
+                  console.log(`[useChat] tool_result matched call index=${i}`)
                   break
                 }
               }
+              if (!matched) console.warn(`[useChat] tool_result NOT MATCHED! tool=${parsed.tool}, calls=`, calls.map(c => ({ tool: c.tool, success: c.success })))
               setMessages(prev => {
                 const updated = [...prev]
                 const last = updated.length - 1
@@ -349,6 +359,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
             // ── Files updated (from agent tool use) ──
             if (parsed.type === 'files_updated') {
+              console.log(`[useChat] files_updated received: ${(parsed.files || []).length} files`, (parsed.files || []).map((f: any) => f.path))
               agentFilesRef.current = parsed.files || []
               onFilesUpdated?.(agentFilesRef.current)
               // Also attach to the message
@@ -371,7 +382,9 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
             }
           } catch (e: any) {
             if (e.message && !e.message.includes('JSON')) {
-              throw e // Re-throw real errors, skip parse errors
+              throw e // Re-throw real errors
+            } else {
+              console.warn('[useChat] SSE parse error:', e.message, 'data:', data?.slice(0, 100))
             }
           }
         }
