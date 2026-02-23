@@ -250,6 +250,7 @@ function escapeRegex(s: string): string {
 }
 
 async function execTool(name: string, input: Record<string, any>, ctx: ToolContext): Promise<{ success: boolean; result: string }> {
+  console.log(`[execTool] name=${name} inputKeys=[${Object.keys(input || {}).join(',')}] inputSize=${JSON.stringify(input || {}).length}`)
   try {
     switch (name) {
       case 'create_file': {
@@ -348,6 +349,7 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
         return { success: false, result: `Unknown tool: ${name}` }
     }
   } catch (err: any) {
+    console.error(`[execTool ERROR] name=${name} error=${err.message} stack=${err.stack?.slice(0, 300)}`)
     return { success: false, result: `Tool error: ${err.message}` }
   }
 }
@@ -789,10 +791,11 @@ async function agentStream(
           for (let i = 0; i < toolMetas.length; i++) {
             const tc = toolMetas[i]
             const r = settled[i].status === 'fulfilled'
-              ? settled[i].value
+              ? (settled[i] as PromiseFulfilledResult<any>).value
               : { success: false, result: `Tool error: ${(settled[i] as PromiseRejectedResult).reason?.message || 'Unknown'}` }
-            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_result', tool: tc.name, success: r.success, result: sanitizeResponse(r.result.slice(0, 2000)) })}\n\n`))
-            results.push({ tool_use_id: tc.id, content: r.result.slice(0, 4000) })
+            const resultStr = r?.result || r?.error || 'No result'
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_result', tool: tc.name, success: !!r?.success, result: sanitizeResponse(String(resultStr).slice(0, 2000)) })}\n\n`))
+            results.push({ tool_use_id: tc.id, content: String(resultStr).slice(0, 4000) })
           }
 
           // ── APPEND TO CONVERSATION ──
@@ -969,9 +972,11 @@ async function callAIStreaming(
   forceToolUse: boolean = false
 ): Promise<Response> {
   if (provider === 'anthropic') {
-    const toolChoice = forceToolUse ? { type: 'any' } : { type: 'auto' }
+    // Note: tool_choice 'any' is incompatible with thinking mode
+    const canForce = forceToolUse && !think
+    const toolChoice = canForce ? { type: 'any' } : { type: 'auto' }
     const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: toolChoice, stream: true }
-    console.log(`[callAIStreaming] provider=anthropic model=${model} max=${max} forceToolUse=${forceToolUse} toolChoice=${JSON.stringify(toolChoice)} toolCount=${toAnthropicTools().length}`)
+    console.log(`[callAIStreaming] provider=anthropic model=${model} max=${max} forceToolUse=${forceToolUse} canForce=${canForce} toolChoice=${JSON.stringify(toolChoice)} toolCount=${toAnthropicTools().length}`)
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
       body.thinking = { type: 'enabled', budget_tokens: Math.min(4096, Math.floor(max * 0.3)) }
     }
