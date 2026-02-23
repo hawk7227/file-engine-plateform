@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "name": "reasoning-patterns",
+    "description": "Mental models for approaching ANY technical problem — the thinking behind the thinking",
+    "version": "1.0.0"
+  },
+  "first_principles": {
+    "description": "Break complex problems into fundamental truths, then build up from there.",
+    "example": {
+      "problem": "User wants a real-time collaborative editor",
+      "wrong_approach": "Let me install a library for that",
+      "first_principles": [
+        "What IS real-time collaboration? → Multiple clients seeing each other's changes with low latency",
+        "What does that require? → A server that broadcasts changes, a conflict resolution strategy, and a diff/patch mechanism",
+        "What's the simplest version? → WebSocket server that broadcasts text changes to all connected clients",
+        "What can go wrong? → Conflicts when two people edit the same section simultaneously",
+        "What's the industry solution? → Operational Transform (Google Docs) or CRDTs (Yjs, Automerge)",
+        "What's the pragmatic choice? → Use Yjs library for CRDT-based sync, it handles conflicts automatically"
+      ]
+    }
+  },
+  "divide_and_conquer": {
+    "description": "Break large problems into small, independently solvable pieces.",
+    "process": [
+      "1. What is the full scope of the task?",
+      "2. What are the independent sub-tasks?",
+      "3. What is the dependency order? (Which sub-tasks need others to be done first?)",
+      "4. What is the smallest useful unit I can build and verify?",
+      "5. Build that unit, verify it works, then build the next."
+    ],
+    "example": {
+      "task": "Build a dashboard with auth, data visualization, and settings",
+      "breakdown": [
+        "Step 1: Static HTML layout with placeholder data → verify it renders",
+        "Step 2: Add interactivity (charts, filters) with hardcoded data → verify interactions work",
+        "Step 3: Connect to API for real data → verify data flows correctly",
+        "Step 4: Add auth layer → verify protected routes work",
+        "Step 5: Add settings page → verify persistence"
+      ]
+    }
+  },
+  "inversion": {
+    "description": "Instead of asking 'how do I make this work?', ask 'what would make this fail?'",
+    "applications": [
+      {
+        "question": "How do I make a form that works well?",
+        "inverted": "What would make a form frustrating?",
+        "answers": ["No validation feedback until submit", "Clearing all fields on error", "No loading state on submit", "Tab order that jumps around", "Submit button with no disabled state during loading"],
+        "solution": "Avoid all of those: real-time validation, preserve input on error, loading spinner on submit, logical tab order, disabled button while submitting"
+      },
+      {
+        "question": "How do I make a fast website?",
+        "inverted": "What would make a website slow?",
+        "answers": ["Loading 5MB of JavaScript upfront", "Fetching data sequentially instead of parallel", "Not caching anything", "Rendering 10,000 DOM nodes at once", "Synchronous layout recalculation in scroll handlers"],
+        "solution": "Code split, parallel fetch, cache aggressively, virtualize long lists, debounce/throttle scroll handlers"
+      }
+    ]
+  },
+  "steel_thread": {
+    "description": "Build the thinnest possible end-to-end path first, then widen.",
+    "principle": "A system that works for one user with one feature is infinitely more valuable than a system with 50 features that doesn't work at all.",
+    "process": [
+      "1. Identify the critical path: what's the minimum user flow?",
+      "2. Build just that: UI → Action → API → DB → Response → Display",
+      "3. Verify it works END TO END in the real environment",
+      "4. Then add the next feature/improvement",
+      "5. Verify again after each addition"
+    ],
+    "example": {
+      "project": "E-commerce checkout",
+      "steel_thread": "Product list → Add to cart → Cart page → Checkout form → Payment → Success page",
+      "NOT_first": "User accounts, wishlists, reviews, search, recommendations, admin panel"
+    }
+  },
+  "rubber_duck_debugging": {
+    "description": "Explain the problem out loud, step by step. The act of explanation often reveals the bug.",
+    "process": [
+      "1. What is this code supposed to do?",
+      "2. Walk through it line by line: 'First, we declare X. Then we call Y. Y returns Z.'",
+      "3. At each step: 'Is this value what I expect? How do I know?'",
+      "4. Where does reality diverge from expectation? THAT'S the bug.",
+      "5. The 'think' tool serves this purpose in File Engine — use it."
+    ]
+  },
+  "occams_razor": {
+    "description": "The simplest explanation is usually correct. Don't look for complex causes when a simple one fits.",
+    "applications": [
+      "Button doesn't work → Check: is the onClick handler spelled correctly? Before: is there a race condition in the event system?",
+      "API returns 404 → Check: is the URL right? Before: is the server routing broken?",
+      "CSS not applying → Check: is the class name spelled correctly? Before: is the CSS specificity algorithm broken?",
+      "State not updating → Check: are you mutating instead of creating new? Before: is React's reconciliation broken?"
+    ]
+  },
+  "working_backwards": {
+    "description": "Start from the desired end state and work backwards to figure out what needs to happen.",
+    "example": {
+      "goal": "User sees their dashboard with personalized data",
+      "backwards": [
+        "For user to see data → Dashboard component must receive data as props/state",
+        "For component to have data → useEffect must fetch from API on mount",
+        "For API to return data → Backend route must query DB with user ID",
+        "For backend to know user → Auth token must be sent in request header",
+        "For token to exist → User must have logged in",
+        "For login to work → Auth system must be implemented"
+      ],
+      "build_order": "Auth → API route → Data fetch hook → Dashboard component → Styling"
+    }
+  },
+  "constraint_analysis": {
+    "description": "Identify ALL constraints before designing a solution. Constraints are features, not bugs.",
+    "categories": {
+      "platform": "File Engine: HTML via srcdoc, React via Babel standalone, token limit, no build step, CDN-only dependencies",
+      "browser": "No filesystem access, same-origin policy, limited localStorage (5MB), no native modules",
+      "mobile": "Small screen (375px), touch input (44px targets), slow network, limited memory",
+      "accessibility": "Screen readers, keyboard navigation, color blindness, motor impairment, cognitive load",
+      "performance": "Time to first byte, time to interactive, largest contentful paint, cumulative layout shift",
+      "security": "XSS prevention, CSRF protection, auth token handling, input sanitization"
+    }
+  },
+  "abstraction_levels": {
+    "description": "Think at the right level of abstraction for the task at hand.",
+    "levels": {
+      "user_story": "As a user, I want to see my recent orders so I can track deliveries.",
+      "feature": "Order history page with list, filters, and status tracking.",
+      "architecture": "Client fetches from /api/orders, renders OrderList component, each OrderCard shows status.",
+      "implementation": "useQuery hook, OrderCard component with status badge, date formatting, pagination.",
+      "code": "The actual TypeScript/JSX/CSS that implements it."
+    },
+    "rule": "Start at the highest level. Only drop down when you need to. Don't write code until the architecture is clear. Don't design architecture until the feature is understood. Don't define features until the user story is clear."
+  }
+}

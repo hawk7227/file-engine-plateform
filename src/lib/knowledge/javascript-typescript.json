@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "name": "javascript-typescript-mastery",
+    "description": "Every JS/TS pattern Claude uses — the complete language knowledge",
+    "version": "1.0.0"
+  },
+  "core_language": {
+    "variables": {
+      "const": "Default choice. Immutable binding (not immutable value — objects/arrays can still be mutated).",
+      "let": "Only when reassignment is needed (loop counters, accumulators, conditional assignments).",
+      "var": "NEVER. Hoisting and function-scoping cause bugs. Always const/let."
+    },
+    "functions": {
+      "arrow": "const handler = (e) => { ... } — for callbacks, event handlers, map/filter/reduce",
+      "regular": "function processData() { ... } — for top-level functions, methods, when you need hoisting",
+      "async_arrow": "const fetchData = async () => { ... } — for async callbacks",
+      "iife": "(() => { ... })() — for one-time initialization in scripts",
+      "generator": "function* paginate() { yield ... } — for lazy sequences, pagination"
+    },
+    "destructuring": {
+      "object": "const { name, age, address: { city } } = user",
+      "array": "const [first, second, ...rest] = items",
+      "params": "function greet({ name, role = 'user' }: Props) { ... }",
+      "rename": "const { name: userName, id: uniqueId } = response",
+      "default": "const { theme = 'light', lang = 'en' } = settings",
+      "nested": "const { data: { users, total }, status } = response",
+      "swap": "[a, b] = [b, a]"
+    },
+    "template_literals": {
+      "basic": "`Hello ${name}, you are ${age} years old`",
+      "multiline": "`\n  <div class=\"card\">\n    <h2>${title}</h2>\n  </div>\n`",
+      "tagged": "css`color: ${theme.primary};` — for CSS-in-JS, GraphQL queries",
+      "expression": "`${isActive ? 'active' : 'inactive'}`",
+      "nested": "`${items.map(i => `<li>${i.name}</li>`).join('')}`"
+    },
+    "operators": {
+      "optional_chaining": "user?.address?.city — returns undefined if any part is null/undefined. NEVER use for writing (user?.name = 'x' is invalid)",
+      "nullish_coalescing": "value ?? defaultValue — returns right side ONLY for null/undefined (not for 0, '', false like || does)",
+      "logical_assignment": "user.name ??= 'Anonymous' — assign if null/undefined. user.items ||= [] — assign if falsy",
+      "spread_object": "{ ...defaults, ...overrides } — shallow merge, later properties win",
+      "spread_array": "[...existing, newItem] — creates new array with item appended",
+      "rest": "function sum(...numbers: number[]) { return numbers.reduce((a, b) => a + b, 0); }"
+    }
+  },
+  "async_patterns": {
+    "basic_async_await": {
+      "pattern": "async function fetchUser(id) { try { const res = await fetch(`/api/users/${id}`); if (!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json(); } catch (err) { console.error('Fetch failed:', err); throw err; } }",
+      "rules": [
+        "ALWAYS wrap await in try/catch — unhandled rejections crash the app",
+        "Check res.ok — fetch doesn't throw on 4xx/5xx",
+        "Throw specific error types, not just Error('something went wrong')",
+        "NEVER async function without await — it's a sign of a mistake"
+      ]
+    },
+    "parallel": {
+      "all": "const [users, posts] = await Promise.all([fetchUsers(), fetchPosts()]) — fails fast if any rejects",
+      "allSettled": "const results = await Promise.allSettled([...]) — returns all results, even failures. Check result.status === 'fulfilled'",
+      "race": "const fastest = await Promise.race([fetch(url), timeout(5000)]) — first to resolve/reject wins"
+    },
+    "abort": {
+      "pattern": "const controller = new AbortController(); fetch(url, { signal: controller.signal }); controller.abort() — cancels the request",
+      "react_cleanup": "useEffect(() => { const ac = new AbortController(); fetch(url, { signal: ac.signal }).then(...); return () => ac.abort(); }, [url])"
+    },
+    "debounce": "function debounce(fn, ms) { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); }; }",
+    "throttle": "function throttle(fn, ms) { let last = 0; return (...args) => { const now = Date.now(); if (now - last >= ms) { last = now; fn(...args); } }; }",
+    "retry": "async function retry(fn, attempts = 3, delay = 1000) { for (let i = 0; i < attempts; i++) { try { return await fn(); } catch (e) { if (i === attempts - 1) throw e; await new Promise(r => setTimeout(r, delay * (i + 1))); } } }"
+  },
+  "array_methods": {
+    "transform": {
+      "map": ".map(item => item.name) — transform each element, returns new array of same length",
+      "flatMap": ".flatMap(item => item.tags) — map + flatten one level. Great for expanding arrays.",
+      "flat": ".flat(2) — flatten nested arrays to specified depth"
+    },
+    "filter": {
+      "filter": ".filter(item => item.active) — returns subset matching predicate",
+      "find": ".find(item => item.id === targetId) — returns first match or undefined",
+      "findIndex": ".findIndex(item => item.id === targetId) — returns index of first match or -1",
+      "some": ".some(item => item.error) — returns true if ANY match",
+      "every": ".every(item => item.valid) — returns true if ALL match",
+      "includes": ".includes(value) — exact match check"
+    },
+    "accumulate": {
+      "reduce": ".reduce((acc, item) => ({ ...acc, [item.id]: item }), {}) — transform array into any shape",
+      "group": "Object.groupBy(items, item => item.category) — group by key (ES2024)",
+      "count": ".reduce((acc, item) => acc + item.quantity, 0) — sum values"
+    },
+    "sort": {
+      "strings": ".sort((a, b) => a.name.localeCompare(b.name))",
+      "numbers": ".sort((a, b) => a.price - b.price)",
+      "dates": ".sort((a, b) => new Date(b.date) - new Date(a.date)) — newest first",
+      "immutable": "[...arr].sort(...) — sort creates new array to avoid mutating original"
+    },
+    "chain": ".filter(u => u.active).sort((a,b) => a.name.localeCompare(b.name)).map(u => u.email).slice(0, 10)"
+  },
+  "dom_patterns": {
+    "selection": {
+      "single": "document.querySelector('.class') or document.querySelector('#id')",
+      "multiple": "document.querySelectorAll('.items') — returns NodeList, use forEach or [...nodeList]",
+      "closest": "event.target.closest('.card') — finds nearest ancestor matching selector"
+    },
+    "manipulation": {
+      "classes": "el.classList.add('active'); el.classList.remove('hidden'); el.classList.toggle('open');",
+      "text": "el.textContent = 'safe text' — NEVER innerHTML with user input (XSS)",
+      "attributes": "el.setAttribute('aria-expanded', 'true'); el.dataset.id = '123';",
+      "styles": "el.style.setProperty('--color', '#ff0000'); — prefer CSS variables over direct style manipulation",
+      "create": "const div = document.createElement('div'); div.className = 'card'; div.textContent = title; parent.appendChild(div);"
+    },
+    "events": {
+      "listen": "el.addEventListener('click', handler) — always use this over onclick attribute",
+      "delegate": "parent.addEventListener('click', (e) => { const card = e.target.closest('.card'); if (card) handleCardClick(card); }) — one listener for many children",
+      "remove": "el.removeEventListener('click', handler) — must pass same function reference",
+      "once": "el.addEventListener('click', handler, { once: true }) — auto-removes after first fire",
+      "passive": "el.addEventListener('scroll', handler, { passive: true }) — tells browser handler won't preventDefault, enables smooth scrolling",
+      "prevent": "form.addEventListener('submit', (e) => { e.preventDefault(); ... })",
+      "custom": "el.dispatchEvent(new CustomEvent('my-event', { detail: { data }, bubbles: true }))"
+    },
+    "observers": {
+      "intersection": "new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1 }) — scroll-triggered animations",
+      "resize": "new ResizeObserver((entries) => { ... }) — respond to element size changes",
+      "mutation": "new MutationObserver((mutations) => { ... }) — watch DOM changes"
+    }
+  },
+  "modern_apis": {
+    "structured_clone": "structuredClone(obj) — deep copy without JSON.parse(JSON.stringify()) limitations. Handles Date, Map, Set, etc.",
+    "intl_number": "new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(1234.5) → '$1,234.50'",
+    "intl_date": "new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(new Date()) → 'February 23, 2026'",
+    "intl_relative": "new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(-1, 'day') → 'yesterday'",
+    "crypto_uuid": "crypto.randomUUID() → 'a1b2c3d4-...' — proper UUID v4 generation",
+    "url_search_params": "new URLSearchParams(window.location.search).get('page') — parse query strings",
+    "abort_controller": "const ac = new AbortController(); fetch(url, { signal: ac.signal }); setTimeout(() => ac.abort(), 5000);",
+    "broadcast_channel": "new BroadcastChannel('my-channel') — cross-tab communication",
+    "clipboard": "await navigator.clipboard.writeText(text) — async clipboard API"
+  },
+  "typescript": {
+    "utility_types": {
+      "Partial<T>": "All properties optional — Partial<User> for update payloads",
+      "Required<T>": "All properties required — Required<Config> for validated config",
+      "Pick<T, K>": "Subset of properties — Pick<User, 'name' | 'email'>",
+      "Omit<T, K>": "All except specified — Omit<User, 'password'>",
+      "Record<K, V>": "Key-value map — Record<string, number> for scores",
+      "Readonly<T>": "All properties readonly — Readonly<State> for immutable state",
+      "ReturnType<T>": "Extract return type from function — ReturnType<typeof fetchUser>",
+      "Parameters<T>": "Extract parameter types — Parameters<typeof handler>",
+      "NonNullable<T>": "Remove null/undefined — NonNullable<string | null>"
+    },
+    "patterns": {
+      "discriminated_unions": "type Result = { status: 'success'; data: T } | { status: 'error'; error: Error } — switch on status for type-safe handling",
+      "generic_functions": "function first<T>(arr: T[]): T | undefined { return arr[0]; }",
+      "type_guards": "function isUser(val: unknown): val is User { return typeof val === 'object' && val !== null && 'name' in val; }",
+      "satisfies": "const config = { theme: 'dark', lang: 'en' } satisfies Config — validates type without widening",
+      "const_assertion": "const ROLES = ['admin', 'user', 'guest'] as const; type Role = typeof ROLES[number]; — derives union from array",
+      "mapped_types": "type Flags<T> = { [K in keyof T]: boolean } — transform object type shape",
+      "template_literals": "type EventName = `on${Capitalize<string>}` — type-level string manipulation"
+    },
+    "strict_mode_rules": [
+      "noImplicitAny: true — always provide types, never rely on implicit any",
+      "strictNullChecks: true — null and undefined are separate types, must handle explicitly",
+      "noUncheckedIndexedAccess: true — array[0] returns T | undefined, not T"
+    ]
+  },
+  "error_handling": {
+    "patterns": {
+      "specific_catch": "try { ... } catch (err) { if (err instanceof NetworkError) { retry(); } else if (err instanceof ValidationError) { showFieldErrors(err.fields); } else { throw err; } }",
+      "custom_errors": "class ApiError extends Error { constructor(public status: number, message: string) { super(message); this.name = 'ApiError'; } }",
+      "error_boundary_react": "class ErrorBoundary extends React.Component { state = { error: null }; static getDerivedStateFromError(error) { return { error }; } render() { return this.state.error ? <ErrorFallback error={this.state.error} /> : this.props.children; } }",
+      "result_type": "type Result<T, E = Error> = { ok: true; value: T } | { ok: false; error: E } — Go/Rust style error handling without exceptions"
+    },
+    "anti_patterns": [
+      "NEVER: catch (err) {} — empty catch block silently swallows errors",
+      "NEVER: catch (err) { console.log(err) } — in production, show error UI to user",
+      "NEVER: throw 'something went wrong' — always throw Error objects with useful messages",
+      "NEVER: catch and re-throw without adding context — catch (err) { throw new Error(`Failed to load user: ${err.message}`) }"
+    ]
+  }
+}

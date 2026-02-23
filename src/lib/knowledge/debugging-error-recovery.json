@@ -1,0 +1,308 @@
+{
+  "meta": {
+    "name": "debugging-and-error-recovery",
+    "description": "The complete systematic debugging methodology and every error pattern with solutions",
+    "version": "1.0.0"
+  },
+  "methodology": {
+    "principle": "Never guess. Never retry blindly. Follow the evidence systematically.",
+    "steps": {
+      "1_observe": {
+        "description": "Gather ALL the facts before forming any opinion.",
+        "actions": [
+          "What EXACTLY happens? Not 'it doesn't work' — what specific behavior?",
+          "What was EXPECTED to happen?",
+          "When did it start? What changed? (last code edit, new dependency, config change)",
+          "Is it reproducible? Every time or intermittent?",
+          "What environment? (browser, Node version, OS, screen size)",
+          "Are there error messages? Read them LITERALLY — they usually say exactly what's wrong.",
+          "Check browser console, network tab, terminal output"
+        ]
+      },
+      "2_hypothesize": {
+        "description": "Based on observations, rank the most likely causes.",
+        "actions": [
+          "What are the 2-3 most probable causes based on the error message?",
+          "Which hypothesis is easiest to test? Start there.",
+          "Consider: is this a code error, config error, environment error, or data error?",
+          "Consider: did this EVER work? If yes, what changed? If no, what's missing?"
+        ]
+      },
+      "3_investigate": {
+        "description": "Test your highest-probability hypothesis first.",
+        "actions": [
+          "Use view_file to see the actual code (don't rely on memory)",
+          "Use run_command to check build/lint for syntax errors",
+          "Read the exact line the error points to + 10 lines above and below",
+          "Check imports — are they pointing to real files?",
+          "Check the data — is it the shape you expect? Add console.log to verify.",
+          "Check the network — is the API returning what you expect?"
+        ]
+      },
+      "4_root_cause": {
+        "description": "Don't stop at the symptom. Trace to the SOURCE.",
+        "example": {
+          "symptom": "Button doesn't submit the form",
+          "surface_cause": "onClick handler isn't firing",
+          "deeper": "onClick is bound to the wrong function name",
+          "root_cause": "The function was renamed during refactoring but the JSX wasn't updated",
+          "real_fix": "Update the onClick to reference the correct function name",
+          "band_aid_fix": "Creating a new function that wraps the old one — DON'T do this"
+        }
+      },
+      "5_minimal_fix": {
+        "description": "Change the FEWEST lines that fully resolve the issue.",
+        "rules": [
+          "Use edit_file for targeted changes, not create_file for full rewrites",
+          "Don't fix things that aren't broken while you're in there",
+          "Don't refactor during a bugfix — that's a separate task",
+          "The fix should be obvious to a reader: 'ah, this was the problem'"
+        ]
+      },
+      "6_verify": {
+        "description": "Confirm the fix works for ALL cases, not just the reported one.",
+        "actions": [
+          "Trace the execution path with the fix applied",
+          "Check edge cases: what about empty data? null? very long strings?",
+          "Does the fix break anything else? Check nearby code.",
+          "Would this fix survive a page refresh? A different browser? Mobile?"
+        ]
+      },
+      "7_explain": {
+        "description": "Tell the user what happened so they can prevent it.",
+        "template": "The issue was [specific problem] in [specific file/line]. This happened because [root cause]. I fixed it by [specific change]. To prevent this in the future, [actionable advice]."
+      }
+    }
+  },
+  "error_patterns": {
+    "javascript_runtime": {
+      "cannot_read_property_of_undefined": {
+        "error": "TypeError: Cannot read properties of undefined (reading 'name')",
+        "meaning": "You're accessing .name on a variable that is undefined",
+        "common_causes": [
+          "API response hasn't loaded yet (async timing issue)",
+          "Object doesn't have the expected property",
+          "Array index out of bounds",
+          "Destructuring a value that doesn't exist",
+          "Wrong variable name or typo"
+        ],
+        "fix": "Add optional chaining: user?.name, or add a null check: if (user) { ... }, or check the data source upstream"
+      },
+      "not_a_function": {
+        "error": "TypeError: X is not a function",
+        "meaning": "You're calling something that exists but isn't a function",
+        "common_causes": [
+          "Wrong import (imported a type instead of a function)",
+          "Variable shadowed by a local declaration",
+          "Calling a property instead of a method (obj.name() vs obj.name)",
+          "Module default export vs named export mismatch",
+          "Circular dependency causing undefined import"
+        ],
+        "fix": "Check the import statement. console.log(typeof X) to see what it actually is. Check for name collisions."
+      },
+      "not_defined": {
+        "error": "ReferenceError: X is not defined",
+        "meaning": "The variable doesn't exist in the current scope at all",
+        "common_causes": [
+          "Typo in variable name",
+          "Variable declared in a different scope (inside an if/for block)",
+          "Missing import statement",
+          "Script order issue (using before declaration without hoisting)"
+        ],
+        "fix": "Check spelling. Check if the import exists. Check scope boundaries."
+      },
+      "maximum_call_stack": {
+        "error": "RangeError: Maximum call stack size exceeded",
+        "meaning": "Infinite recursion",
+        "common_causes": [
+          "Function calls itself without a base case",
+          "Two components rendering each other",
+          "useEffect triggering its own dependency update",
+          "Circular data structure passed to JSON.stringify"
+        ],
+        "fix": "Find the recursive call. Add a base case. For React, check useEffect dependencies."
+      }
+    },
+    "react_specific": {
+      "max_update_depth": {
+        "error": "Error: Maximum update depth exceeded",
+        "meaning": "setState is being called in a way that triggers infinite re-renders",
+        "common_causes": [
+          "Setting state directly in the render body (not in useEffect or handler)",
+          "useEffect dependency includes the state it sets",
+          "useEffect without dependency array calling setState",
+          "Object/array dependency that's recreated every render (reference equality)"
+        ],
+        "fix": "Move setState into useEffect with correct deps. For objects, use useMemo or move outside component. For effects that set state, add proper dependencies."
+      },
+      "hydration_mismatch": {
+        "error": "Hydration failed because the initial UI does not match what was rendered on the server",
+        "meaning": "Server-rendered HTML differs from client-rendered HTML",
+        "common_causes": [
+          "Using browser APIs (window, document, localStorage) during render",
+          "Date/time rendering (server time ≠ client time)",
+          "Math.random() or crypto.randomUUID() in render",
+          "Third-party scripts modifying DOM"
+        ],
+        "fix": "Wrap client-only code in useEffect or use dynamic import with { ssr: false }. For dates, render a placeholder on server."
+      },
+      "invalid_hook_call": {
+        "error": "Invalid hook call. Hooks can only be called inside the body of a function component",
+        "common_causes": [
+          "Calling hook inside a condition, loop, or nested function",
+          "Calling hook in a regular function, not a component",
+          "Multiple versions of React in the bundle",
+          "Missing 'use client' in Next.js app router"
+        ],
+        "fix": "Move hook to top level of component. Check for duplicate React versions. Add 'use client' directive."
+      },
+      "missing_key": {
+        "error": "Warning: Each child in a list should have a unique 'key' prop",
+        "meaning": "React needs keys to track list items for efficient updates",
+        "fix": "Add key prop using stable unique identifier: items.map(item => <div key={item.id}>). NEVER use array index as key if items can reorder."
+      },
+      "stale_closure": {
+        "symptom": "State value is always the initial value inside a callback or effect",
+        "meaning": "The callback captured an old version of the state variable",
+        "common_causes": [
+          "useEffect closure over stale state without including it in deps",
+          "setInterval callback referencing state without functional updater",
+          "Event handler defined with old state"
+        ],
+        "fix": "Use functional updater: setState(prev => prev + 1). Add the state to useEffect deps. Use useRef for values that shouldn't trigger re-render."
+      }
+    },
+    "css_visual": {
+      "styles_not_applying": {
+        "symptom": "CSS rule exists but element doesn't reflect it",
+        "common_causes": [
+          "Specificity: a more specific selector is overriding yours",
+          "Cascade: a later rule overwrites an earlier one",
+          "Typo in class name or selector",
+          "Element not matching (wrong nesting, missing parent class)",
+          "!important somewhere else overriding",
+          "Scoped styles (CSS modules, Shadow DOM) blocking global styles"
+        ],
+        "fix": "Inspect element in DevTools → Computed tab. See which rule wins. Increase specificity or reorder rules."
+      },
+      "layout_broken": {
+        "symptom": "Elements overlapping, overflowing, or not positioned correctly",
+        "common_causes": [
+          "Missing box-sizing: border-box (padding adds to width)",
+          "Float without clearfix",
+          "Absolute positioned element without relative parent",
+          "Flexbox child not shrinking (needs min-width: 0)",
+          "Grid item overflowing (needs minmax(0, 1fr))",
+          "Fixed width on a responsive container"
+        ],
+        "fix": "Add *, *::before, *::after { box-sizing: border-box; } at top. Use flex/grid instead of floats. Check for fixed widths."
+      },
+      "mobile_broken": {
+        "symptom": "Layout works on desktop but breaks on mobile",
+        "common_causes": [
+          "Missing <meta name='viewport' content='width=device-width, initial-scale=1.0'>",
+          "Fixed pixel widths instead of percentages or fr units",
+          "Horizontal overflow from elements wider than viewport",
+          "Font too small (below 16px causes zoom on iOS)",
+          "No media queries for smaller screens"
+        ],
+        "fix": "Add viewport meta. Replace fixed widths with max-width + percentage. Add overflow-x: hidden to body as last resort (but fix the real overflow). Add media queries."
+      }
+    },
+    "api_network": {
+      "cors": {
+        "error": "Access to fetch at 'URL' from origin 'URL' has been blocked by CORS policy",
+        "meaning": "The server doesn't allow requests from your domain",
+        "fix": "Server must send Access-Control-Allow-Origin header. For development, use a proxy. NEVER disable CORS in production."
+      },
+      "404": {
+        "error": "GET /api/endpoint 404 Not Found",
+        "common_causes": ["Wrong URL path", "API route not created/deployed", "Missing trailing slash or extra slash", "Case sensitivity in URL"],
+        "fix": "Verify the exact URL. Check server routes. Check for typos."
+      },
+      "401_403": {
+        "error": "401 Unauthorized or 403 Forbidden",
+        "meaning": "401 = no auth token or invalid. 403 = valid token but insufficient permissions.",
+        "fix": "Check Authorization header is sent. Check token isn't expired. Check user has the required role."
+      },
+      "500": {
+        "error": "500 Internal Server Error",
+        "meaning": "Server-side exception",
+        "fix": "Check server logs for the actual error. The client can't diagnose this — need server-side info."
+      },
+      "network_error": {
+        "error": "TypeError: Failed to fetch",
+        "common_causes": ["Server is down", "URL is wrong", "CORS blocking", "No internet connection", "HTTPS mixed content (HTTP request from HTTPS page)"],
+        "fix": "Check if the URL is reachable directly. Check browser network tab for the actual error."
+      }
+    },
+    "platform_specific": {
+      "creating_file_failed": {
+        "symptom": "Agent Activity shows 'Creating file ✕ Failed'",
+        "root_cause": "Token limit caused the create_file tool call JSON to be truncated. The AI ran out of tokens while writing the file content, resulting in invalid JSON that couldn't be parsed.",
+        "evidence": "Look for: stopReason=max_tokens in server logs, or [Tool Parse Error] in logs",
+        "fix": "Reduce explanation text before the code. Strategy: 1 sentence intro → full code. Or split into smaller files. Or use code block fallback instead of create_file tool.",
+        "prevention": "System should use generate_code intent (16384 tokens) not style_question (1024 tokens) for building requests."
+      },
+      "preview_blank": {
+        "symptom": "Preview panel shows 'Preview will appear here' even after code generates",
+        "root_cause": "HTML detection failed — the file doesn't match any detection pattern",
+        "evidence": "Check: does the file have .html extension? Does content include <!DOCTYPE or <html? Is the code block tagged ```html:filename.html?",
+        "fix": "Ensure file starts with <!DOCTYPE html>. Ensure code block uses ```html:index.html format. The :filepath is required."
+      },
+      "preview_shows_old_code": {
+        "symptom": "Preview doesn't update after edits",
+        "root_cause": "The preview iframe caches the previous srcdoc. Or edit_file didn't trigger a new files_updated event.",
+        "fix": "Use create_file to overwrite the entire file. This triggers a new files_updated SSE event."
+      },
+      "tool_shows_failed_but_code_exists": {
+        "symptom": "UI shows 'Failed' on tool call, but the code appears in the chat",
+        "root_cause": "The tool_result SSE event had success:false, OR the event never arrived (stream ended before tool_result)",
+        "fix": "Check server logs for [Tool Result] line — did it show success=true or false? If false, check what execTool returned."
+      },
+      "agent_loops_forever": {
+        "symptom": "Agent Activity keeps adding tool calls without finishing",
+        "root_cause": "The agent loop has max 6 iterations, but each iteration makes an API call. If the AI keeps calling tools without producing final text, it loops.",
+        "fix": "The stopReason check should break the loop. If it doesn't, the AI model might be confused about when to stop. Check the system prompt for conflicting instructions."
+      },
+      "intent_misclassified": {
+        "symptom": "Request gets wrong model/tokens (e.g., build request gets 1024 tokens)",
+        "root_cause": "Intent classifier regex matched the wrong pattern before the correct one. Order-dependent first-match-wins.",
+        "evidence": "Check server logs: intent=X — is X correct for the request?",
+        "fix": "Reorder classifyIntent patterns. generate_code must come before style_question. More specific patterns first.",
+        "prevention": "Agent mode safety floor: maxTokens never below 8192 when agent is enabled."
+      }
+    }
+  },
+  "error_recovery_patterns": {
+    "graceful_degradation": {
+      "principle": "If feature X fails, the app should still work without X",
+      "patterns": [
+        "API fails → Show cached data or empty state with retry button",
+        "Image fails → Show placeholder or alt text",
+        "Font fails → System font fallback in font-family stack",
+        "Animation fails → Content still visible without animation",
+        "JavaScript fails → Core content accessible via HTML/CSS"
+      ]
+    },
+    "progressive_enhancement": {
+      "principle": "Start with basic working version, enhance if capabilities exist",
+      "patterns": [
+        "Basic HTML form → Enhanced with JS validation → Enhanced with real-time API validation",
+        "Static list → Enhanced with search/filter → Enhanced with infinite scroll",
+        "@supports (backdrop-filter: blur(1px)) { /* glass effect */ } → Fallback: solid background"
+      ]
+    },
+    "retry_strategies": {
+      "immediate_retry": "For transient failures (network blip). Retry once immediately.",
+      "exponential_backoff": "For rate limiting. Wait 1s, 2s, 4s, 8s between retries. Cap at 3-5 attempts.",
+      "circuit_breaker": "After N consecutive failures, stop trying for M seconds. Prevents hammering a dead server."
+    },
+    "user_communication": {
+      "loading": "Show spinner or skeleton. NEVER blank screen. User should always know something is happening.",
+      "error": "Show what went wrong (in human terms, not stack traces) + what they can do (retry, go back, contact support).",
+      "empty": "Show friendly message + call to action. 'No results found' → 'No results for X. Try a broader search or browse categories.'",
+      "timeout": "Show message after 5s of loading. 'This is taking longer than expected. Still working...' After 15s: 'Something might be wrong. Try refreshing.'"
+    }
+  }
+}

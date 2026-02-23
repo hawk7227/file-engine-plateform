@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "name": "knowledge-base-index",
+    "description": "Complete knowledge base for File Engine AI — transferred from Claude's actual capabilities",
+    "version": "1.0.0",
+    "total_files": 7,
+    "total_bytes": 82533,
+    "created": "2026-02-23"
+  },
+  "files": {
+    "cognitive-patterns.json": {
+      "description": "How to THINK about problems — understanding requests, planning, mental execution tracing, verification, decision-making, token budget awareness",
+      "key_sections": ["understanding_requests", "planning_before_coding", "mental_execution_tracing", "verification_after_coding", "decision_making", "token_budget_awareness"]
+    },
+    "design-philosophy.json": {
+      "description": "Complete design methodology — aesthetic directions, typography mastery (20+ fonts with pairings), color systems, spacing scales, shadows, animations, glass morphism, responsive patterns, icons",
+      "key_sections": ["core_philosophy", "design_thinking_process", "typography", "color", "spacing", "shadows", "animation", "glass_morphism", "responsive_design", "icons"]
+    },
+    "javascript-typescript.json": {
+      "description": "Every JS/TS pattern — core language, async patterns (debounce/throttle/retry/abort), array methods, DOM manipulation, observers, modern APIs, TypeScript utility types and patterns, error handling",
+      "key_sections": ["core_language", "async_patterns", "array_methods", "dom_patterns", "modern_apis", "typescript", "error_handling"]
+    },
+    "css-mastery.json": {
+      "description": "Every CSS feature and technique — custom properties, Grid/Flexbox, positioning, container queries, typography, modern selectors (:has, :is), animations, responsive units, forms, performance, accessibility",
+      "key_sections": ["architecture", "layout", "typography_css", "selectors", "modern_features", "animations_css", "responsive", "forms", "performance", "accessibility"]
+    },
+    "debugging-error-recovery.json": {
+      "description": "Complete 7-step debugging methodology, every error pattern with root causes and fixes (JS runtime, React, CSS visual, API/network, platform-specific), error recovery patterns, user communication strategies",
+      "key_sections": ["methodology", "error_patterns", "error_recovery_patterns"]
+    },
+    "technology-knowledge.json": {
+      "description": "Deep knowledge of React 18 (every hook), Next.js 14 App Router, Tailwind CSS, common libraries (shadcn, framer-motion, tanstack-query, zod, zustand), HTML APIs, security, performance patterns",
+      "key_sections": ["react_18", "nextjs_14_app_router", "tailwind_css", "common_libraries", "html_apis", "security", "performance_patterns"]
+    },
+    "reasoning-patterns.json": {
+      "description": "Mental models for approaching ANY problem — first principles, divide and conquer, inversion, steel thread, rubber duck debugging, Occam's razor, working backwards, constraint analysis, abstraction levels",
+      "key_sections": ["first_principles", "divide_and_conquer", "inversion", "steel_thread", "rubber_duck_debugging", "occams_razor", "working_backwards", "constraint_analysis", "abstraction_levels"]
+    }
+  },
+  "usage": {
+    "in_system_prompt": "The agent system prompt in route.ts contains a condensed version of this knowledge (~4200 tokens). The full knowledge base here serves as reference documentation.",
+    "for_skill_injection": "The smart-context system can inject specific knowledge sections based on intent classification. E.g., fix_code intent gets debugging methodology, generate_code gets design philosophy.",
+    "for_fine_tuning": "This structured knowledge can be used to create training examples for fine-tuning smaller models to match Claude's behavior."
+  }
+}

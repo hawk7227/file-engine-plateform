@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "name": "css-mastery",
+    "description": "Every CSS feature, technique, and pattern Claude uses",
+    "version": "1.0.0"
+  },
+  "architecture": {
+    "custom_properties": {
+      "definition": ":root { --primary: #3b82f6; --bg: #0a0a0f; --text: #f5f5f5; --space-md: 16px; --radius-md: 8px; --font-display: 'Playfair Display', serif; --font-body: 'DM Sans', sans-serif; --shadow-md: 0 4px 12px rgba(0,0,0,0.1); --transition: 0.2s ease; }",
+      "usage": "color: var(--primary); background: var(--bg); font-family: var(--font-body);",
+      "scoping": ".dark { --bg: #0a0a0f; --text: #f5f5f5; } .light { --bg: #fafafa; --text: #1a1a1a; }",
+      "dynamic": "element.style.setProperty('--progress', `${percent}%`); — update via JS for animations"
+    },
+    "organization": [
+      "1. CSS variables (design tokens)",
+      "2. Reset/normalize",
+      "3. Base typography",
+      "4. Layout (grid, flex containers)",
+      "5. Components (cards, buttons, forms)",
+      "6. Utilities (spacing, display helpers)",
+      "7. Responsive overrides",
+      "8. Animations/keyframes",
+      "9. Print styles (if needed)"
+    ]
+  },
+  "layout": {
+    "grid": {
+      "auto_responsive": "display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;",
+      "holy_grail": "grid-template: 'header header header' auto 'sidebar main aside' 1fr 'footer footer footer' auto / 250px 1fr 200px;",
+      "named_areas": "grid-template-areas: 'logo nav nav' 'sidebar content content' 'footer footer footer';",
+      "subgrid": "grid-template-columns: subgrid; — child uses parent's column tracks for alignment",
+      "masonry": "grid-template-rows: masonry; — experimental but powerful for Pinterest-style layouts",
+      "centering": "display: grid; place-items: center; — simplest center technique"
+    },
+    "flexbox": {
+      "row_center": "display: flex; align-items: center; gap: 16px;",
+      "space_between": "display: flex; justify-content: space-between; align-items: center;",
+      "column_center": "display: flex; flex-direction: column; align-items: center; gap: 24px;",
+      "wrap": "display: flex; flex-wrap: wrap; gap: 16px;",
+      "grow": "flex: 1; — fill available space. flex: 0 0 300px; — fixed width, no grow/shrink",
+      "order": "order: -1; — move item before others without changing HTML"
+    },
+    "positioning": {
+      "sticky_header": "position: sticky; top: 0; z-index: 100; background: var(--bg); backdrop-filter: blur(20px);",
+      "absolute_overlay": "position: absolute; inset: 0; — covers parent entirely (parent needs position: relative)",
+      "fixed_modal": "position: fixed; inset: 0; display: grid; place-items: center; z-index: 1000;",
+      "z_index_scale": "base: 1, dropdown: 10, sticky: 20, modal-backdrop: 50, modal: 100, toast: 200, tooltip: 300"
+    },
+    "container": {
+      "max_width": "max-width: 1200px; margin: 0 auto; padding: 0 24px;",
+      "fluid": "width: min(100% - 48px, 1200px); margin: 0 auto;",
+      "container_queries": "@container (min-width: 400px) { .card { grid-template-columns: 1fr 1fr; } } — responsive at component level, not viewport"
+    }
+  },
+  "typography_css": {
+    "fluid": "font-size: clamp(1rem, 2.5vw, 2rem); — responsive without media queries",
+    "truncate_single": "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
+    "truncate_multi": "display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;",
+    "balance": "text-wrap: balance; — prevents orphan words in headings",
+    "pretty": "text-wrap: pretty; — better line breaks in paragraphs",
+    "hyphenation": "hyphens: auto; overflow-wrap: break-word; — prevents overflow in narrow containers",
+    "columns": "column-count: 2; column-gap: 32px; — magazine-style multi-column text"
+  },
+  "selectors": {
+    "has": ".card:has(.image) { grid-template-columns: 200px 1fr; } — parent selector (finally!)",
+    "is_where": ":is(h1, h2, h3) { font-family: var(--font-display); } — group selectors. :where() for zero specificity version",
+    "not": ".item:not(:last-child) { border-bottom: 1px solid var(--border); }",
+    "nth": ":nth-child(3n) { margin-right: 0; } :nth-child(even) { background: var(--bg-alt); }",
+    "focus_visible": ":focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } — only shows for keyboard nav, not mouse clicks",
+    "placeholder": "::placeholder { color: var(--text-muted); opacity: 0.7; }",
+    "selection": "::selection { background: var(--primary); color: white; }",
+    "first_letter": "p::first-letter { font-size: 3em; float: left; line-height: 1; } — editorial drop cap"
+  },
+  "modern_features": {
+    "nesting": ".card { padding: 24px; & .title { font-size: 1.5rem; } &:hover { transform: translateY(-2px); } &.featured { border: 2px solid var(--primary); } } — native CSS nesting",
+    "color_mix": "color-mix(in srgb, var(--primary), transparent 80%) — create tints without rgba",
+    "oklch": "color: oklch(70% 0.15 250); — perceptually uniform color space, better for palettes",
+    "scroll_snap": "scroll-snap-type: x mandatory; — on container. scroll-snap-align: start; — on children. Creates swipeable carousels.",
+    "view_transitions": "document.startViewTransition(() => { updateDOM(); }); — smooth page transitions",
+    "aspect_ratio": "aspect-ratio: 16/9; — replaces padding-top percentage hack",
+    "accent_color": "accent-color: var(--primary); — styles native checkboxes, radio buttons, range inputs",
+    "color_scheme": "color-scheme: light dark; — tells browser about supported themes for native elements",
+    "logical_properties": "padding-inline: 24px; margin-block: 16px; — RTL-compatible spacing",
+    "layer": "@layer base, components, utilities; — explicit cascade control"
+  },
+  "animations_css": {
+    "transitions": {
+      "rule": "NEVER use transition: all. Always specify: transition: transform 0.2s ease, box-shadow 0.2s ease;",
+      "performance": "Only animate transform and opacity — they use GPU compositing. Avoid animating: width, height, margin, padding, top, left (causes reflow).",
+      "will_change": "will-change: transform; — hint to browser for GPU optimization. Remove after animation."
+    },
+    "keyframes": {
+      "fade_in_up": "@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }",
+      "pulse": "@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }",
+      "spin": "@keyframes spin { to { transform: rotate(360deg); } }",
+      "shimmer": "@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } } — loading skeleton effect",
+      "slide_in_right": "@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }",
+      "bounce_in": "@keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); opacity: 1; } }"
+    },
+    "scroll_driven": "@keyframes reveal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } } .card { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; } — no JS needed for scroll animations (2024)"
+  },
+  "responsive": {
+    "media_queries": {
+      "mobile_first": "@media (min-width: 768px) { ... } @media (min-width: 1024px) { ... }",
+      "hover": "@media (hover: hover) { .card:hover { ... } } — only apply hover on devices that support it",
+      "reduced_motion": "@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: 0.01ms !important; } }",
+      "dark_mode": "@media (prefers-color-scheme: dark) { :root { --bg: #0a0a0f; } }",
+      "print": "@media print { nav, footer, .no-print { display: none; } body { color: #000; background: #fff; } }",
+      "high_contrast": "@media (forced-colors: active) { ... } — Windows high contrast mode"
+    },
+    "units": {
+      "rem": "Relative to root font-size (16px default). Use for: font-size, padding, margin, max-width.",
+      "em": "Relative to parent font-size. Use for: media queries (em-based media queries are zoom-safe).",
+      "px": "Use for: borders, shadows, very small fixed values (1px, 2px).",
+      "vw_vh": "Viewport units. Use for: hero heights (min-height: 100vh), fluid font-size (clamp with vw).",
+      "dvh": "Dynamic viewport height — accounts for mobile browser chrome. Use: min-height: 100dvh;",
+      "ch": "Width of '0' character. Use for: max-width on text containers (max-width: 65ch for readability).",
+      "cqi": "Container query inline size. Use with container queries for component-level responsiveness."
+    }
+  },
+  "forms": {
+    "reset": "input, textarea, select, button { font: inherit; color: inherit; } — removes browser defaults",
+    "focus": "input:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-color: var(--primary); }",
+    "validation": "input:invalid:not(:placeholder-shown) { border-color: var(--error); } — only show errors after user interaction",
+    "custom_checkbox": "appearance: none; width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 4px; &:checked { background: var(--primary); border-color: var(--primary); background-image: url('data:image/svg+xml,...checkmark'); }",
+    "disabled": "opacity: 0.5; cursor: not-allowed; pointer-events: none;"
+  },
+  "performance": {
+    "contain": "contain: layout style paint; — tells browser this element's internals don't affect outside layout",
+    "content_visibility": "content-visibility: auto; — skips rendering of off-screen content",
+    "font_display": "font-display: swap; — show fallback font immediately, swap when loaded",
+    "preload_font": "<link rel='preload' href='font.woff2' as='font' type='font/woff2' crossorigin>",
+    "critical_css": "Inline critical above-the-fold CSS in <style>, defer the rest"
+  },
+  "accessibility": {
+    "focus_management": ":focus-visible for keyboard-only focus styles. tabindex='0' for custom interactive elements. tabindex='-1' for programmatic focus targets.",
+    "screen_reader": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; } — visually hidden, available to screen readers",
+    "skip_link": ".skip-link { position: absolute; top: -100%; left: 50%; transform: translateX(-50%); z-index: 9999; } .skip-link:focus { top: 0; } — skip navigation for keyboard users",
+    "color_contrast": "4.5:1 ratio for normal text, 3:1 for large text (18px+ bold or 24px+ regular). Test with WebAIM contrast checker."
+  }
+}

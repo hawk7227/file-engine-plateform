@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "name": "design-philosophy",
+    "description": "How to design like a human designer, not an AI that generates generic output",
+    "version": "1.0.0"
+  },
+  "core_philosophy": {
+    "principle": "Every design decision must be INTENTIONAL. Generic is the enemy. If you can't explain WHY you chose a specific font, color, or layout, you chose wrong.",
+    "anti_patterns": [
+      "Purple gradient on white background (the #1 AI cliche)",
+      "Inter/Roboto/Arial as the only font",
+      "Perfectly centered everything with no visual tension",
+      "Blue primary button with rounded corners on white cards",
+      "Generic hero section: big text, subtitle, two buttons, stock image",
+      "Every section having the exact same padding and rhythm",
+      "Gradient text on gradient background",
+      "Using 5+ colors with no clear hierarchy",
+      "Drop shadows that all look the same",
+      "Cookie-cutter card grids with no variation"
+    ]
+  },
+  "design_thinking_process": {
+    "step_1_purpose": {
+      "question": "What problem does this interface solve? Who uses it?",
+      "examples": [
+        "SaaS pricing page → Help users choose the right plan quickly. Reduce decision fatigue.",
+        "Portfolio site → Make the person memorable. Show personality, not just work.",
+        "Dashboard → Surface the most important metric first. Reduce cognitive load.",
+        "Landing page → One clear action. Everything on the page drives toward that action.",
+        "Blog → Make reading comfortable. Typography and spacing are everything."
+      ]
+    },
+    "step_2_aesthetic_direction": {
+      "instruction": "Pick ONE direction and commit fully. Don't blend. Don't hedge with 'clean and modern' (that means nothing).",
+      "directions": {
+        "brutally_minimal": "Almost nothing on the page. Massive whitespace. One font. Two colors max. Content speaks for itself. Think: Apple product pages, Dieter Rams.",
+        "maximalist": "Dense, layered, rich. Multiple textures, overlapping elements, bold typography, saturated colors. Think: Bloomberg Terminal, Japanese street signage.",
+        "retro_futuristic": "Neon on dark. CRT scan lines. Monospace fonts. Glowing borders. Think: Blade Runner UI, synthwave album covers.",
+        "luxury_refined": "Serif fonts, muted palette, generous whitespace, subtle animations. Think: haute couture websites, Aesop, high-end real estate.",
+        "playful": "Rounded shapes, bright colors, bouncy animations, hand-drawn elements, oversized typography. Think: Notion, Linear marketing pages.",
+        "editorial_magazine": "Strong typographic hierarchy, multi-column layouts, pull quotes, dramatic image crops. Think: NYT, Bloomberg Businessweek.",
+        "brutalist": "Raw HTML aesthetic, system fonts, visible structure, monospace, harsh contrasts, no decorative elements. Think: Craigslist but intentional.",
+        "art_deco": "Geometric patterns, gold/black/cream palette, decorative borders, symmetry, ornamental typography. Think: Great Gatsby, 1920s luxury.",
+        "soft_organic": "Pastel colors, rounded shapes, soft shadows, flowing curves, natural imagery. Think: wellness apps, Calm.",
+        "industrial_utilitarian": "Dark backgrounds, amber/green accents (like terminal), dense data, grid-heavy, function over form. Think: SpaceX mission control."
+      }
+    },
+    "step_3_memorable_element": {
+      "instruction": "What's the ONE thing someone remembers after closing the tab?",
+      "examples": [
+        "An unexpected scroll animation that delights",
+        "A typography choice so bold it becomes the identity",
+        "A color so distinctive it's immediately recognizable",
+        "An interaction pattern that feels physically satisfying",
+        "A layout that breaks conventions in a way that just works",
+        "A micro-interaction on hover that shows extreme attention to detail"
+      ]
+    },
+    "step_4_execute_with_precision": {
+      "instruction": "Once you've chosen a direction, EVERY decision must reinforce it.",
+      "consistency_checks": [
+        "Do the fonts match the aesthetic? (Don't use playful fonts in a luxury design)",
+        "Do the colors match the mood? (Don't use bright yellow in a minimalist design)",
+        "Do the animations match the energy? (Don't use bouncy springs in an editorial design)",
+        "Does the spacing match the density? (Don't cram content in a minimal design)",
+        "Does the layout match the personality? (Don't use a grid for an organic design)"
+      ]
+    }
+  },
+  "typography": {
+    "display_fonts": {
+      "geometric_modern": ["Space Grotesk", "Outfit", "Sora", "Cabinet Grotesk", "Satoshi", "General Sans"],
+      "serif_elegant": ["Playfair Display", "Cormorant Garamond", "Bodoni Moda", "Fraunces", "Lora"],
+      "serif_editorial": ["Merriweather", "Literata", "Source Serif 4", "Libre Baskerville"],
+      "display_bold": ["Clash Display", "Abril Fatface", "Anton", "Unbounded", "Bebas Neue"],
+      "humanist": ["DM Sans", "Plus Jakarta Sans", "Nunito Sans", "Lexend"],
+      "monospace": ["JetBrains Mono", "Fira Code", "IBM Plex Mono", "Space Mono", "Source Code Pro"],
+      "handwritten_playful": ["Caveat", "Kalam", "Patrick Hand", "Architects Daughter"]
+    },
+    "pairings": [
+      {"display": "Playfair Display", "body": "DM Sans", "mood": "luxury, editorial"},
+      {"display": "Space Grotesk", "body": "Inter", "mood": "tech, modern"},
+      {"display": "Clash Display", "body": "Plus Jakarta Sans", "mood": "bold, startup"},
+      {"display": "Cormorant Garamond", "body": "Nunito Sans", "mood": "elegant, refined"},
+      {"display": "Sora", "body": "Source Sans 3", "mood": "clean, professional"},
+      {"display": "Outfit", "body": "DM Sans", "mood": "friendly, approachable"},
+      {"display": "Fraunces", "body": "Literata", "mood": "warm, editorial"},
+      {"display": "Bebas Neue", "body": "Source Sans 3", "mood": "bold, industrial"},
+      {"display": "Cabinet Grotesk", "body": "General Sans", "mood": "contemporary, design-forward"},
+      {"display": "Abril Fatface", "body": "Lora", "mood": "dramatic, artistic"}
+    ],
+    "scale": {
+      "sizes_px": [12, 14, 16, 18, 20, 24, 30, 36, 48, 60, 72, 96],
+      "sizes_rem": [0.75, 0.875, 1, 1.125, 1.25, 1.5, 1.875, 2.25, 3, 3.75, 4.5, 6],
+      "line_heights": {"headings": 1.1, "subheadings": 1.25, "body": 1.6, "small": 1.5},
+      "letter_spacing": {"tight_heading": "-0.03em", "heading": "-0.02em", "normal": "0", "wide": "0.05em", "all_caps": "0.1em"},
+      "weights": {"thin": 100, "light": 300, "regular": 400, "medium": 500, "semibold": 600, "bold": 700, "extrabold": 800, "black": 900}
+    },
+    "loading_pattern": "<link href=\"https://fonts.googleapis.com/css2?family=DISPLAY:wght@400;500;600;700;800&family=BODY:wght@300;400;500;600&display=swap\" rel=\"stylesheet\">"
+  },
+  "color": {
+    "system": {
+      "css_variables": "--primary, --primary-hover, --secondary, --accent, --bg, --bg-alt, --surface, --surface-hover, --text, --text-secondary, --text-muted, --border, --border-hover, --shadow, --success, --warning, --error, --info",
+      "naming": "Name by role (--bg, --surface, --text), never by color (--blue, --dark-gray)"
+    },
+    "dark_themes": {
+      "backgrounds": {"deep": "#0a0a0f", "standard": "#0f0f14", "charcoal": "#1a1a2e", "navy": "#0d1117", "warm_dark": "#1c1917"},
+      "surfaces": {"lowest": "rgba(255,255,255,0.03)", "low": "rgba(255,255,255,0.05)", "medium": "rgba(255,255,255,0.08)", "high": "rgba(255,255,255,0.12)", "highest": "rgba(255,255,255,0.16)"},
+      "text": {"primary": "#f5f5f5", "secondary": "#a0a0a0", "muted": "#666666"},
+      "borders": "rgba(255,255,255,0.06) to rgba(255,255,255,0.12)"
+    },
+    "light_themes": {
+      "backgrounds": {"pure": "#ffffff", "warm": "#fafaf8", "cool": "#f8f9fa", "cream": "#fdf6e3"},
+      "surfaces": {"white": "#ffffff", "light": "#f5f5f5", "muted": "#e8e8e8"},
+      "text": {"primary": "#1a1a1a", "secondary": "#4a4a4a", "muted": "#888888"},
+      "borders": "rgba(0,0,0,0.06) to rgba(0,0,0,0.12)"
+    },
+    "accent_palettes": {
+      "electric_blue": {"primary": "#3b82f6", "hover": "#2563eb", "subtle": "rgba(59,130,246,0.1)"},
+      "emerald": {"primary": "#10b981", "hover": "#059669", "subtle": "rgba(16,185,129,0.1)"},
+      "violet": {"primary": "#8b5cf6", "hover": "#7c3aed", "subtle": "rgba(139,92,246,0.1)"},
+      "amber": {"primary": "#f59e0b", "hover": "#d97706", "subtle": "rgba(245,158,11,0.1)"},
+      "rose": {"primary": "#f43f5e", "hover": "#e11d48", "subtle": "rgba(244,63,94,0.1)"},
+      "coral": {"primary": "#ff6b6b", "hover": "#ee5a5a", "subtle": "rgba(255,107,107,0.1)"},
+      "teal": {"primary": "#14b8a6", "hover": "#0d9488", "subtle": "rgba(20,184,166,0.1)"},
+      "indigo": {"primary": "#6366f1", "hover": "#4f46e5", "subtle": "rgba(99,102,241,0.1)"}
+    },
+    "rules": [
+      "NEVER pure black (#000) on pure white (#fff) — too harsh. Use #1a1a1a on #fafafa.",
+      "ONE dominant accent color that owns the page. Not three equal colors.",
+      "Contrast ratio: 4.5:1 for body text, 3:1 for large text (WCAG AA).",
+      "Test readability: can you read body text comfortably for 5 minutes?",
+      "Gradients: max 2-3 stops, subtle angle (135deg or 180deg), don't mix warm and cool."
+    ]
+  },
+  "spacing": {
+    "scale_px": [0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160],
+    "semantic": {
+      "inline_tiny": "4px",
+      "inline_small": "8px",
+      "inline_medium": "12px",
+      "element_gap": "16px",
+      "card_padding": "24px",
+      "section_gap": "32px",
+      "component_gap": "48px",
+      "section_padding_y": "80px",
+      "hero_padding_y": "128px"
+    },
+    "responsive_adjustments": {
+      "mobile": "Reduce section padding by 40-50%. Card padding 16-20px. Hero padding 64px.",
+      "tablet": "Reduce section padding by 20-25%. Card padding 20-24px.",
+      "desktop": "Full spacing values."
+    }
+  },
+  "shadows": {
+    "layers": {
+      "sm": "0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06)",
+      "md": "0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08)",
+      "lg": "0 4px 6px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.12)",
+      "xl": "0 8px 16px rgba(0,0,0,0.06), 0 24px 48px rgba(0,0,0,0.12)",
+      "glow": "0 0 20px rgba(ACCENT,0.3), 0 0 60px rgba(ACCENT,0.1)"
+    },
+    "dark_theme": "Use border rgba(255,255,255,0.06-0.12) instead of shadows. Shadows barely visible on dark backgrounds."
+  },
+  "animation": {
+    "timing": {
+      "instant": "100ms",
+      "fast": "200ms",
+      "normal": "300ms",
+      "slow": "500ms",
+      "reveal": "600-800ms"
+    },
+    "easing": {
+      "default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "ease_out": "cubic-bezier(0, 0, 0.2, 1)",
+      "ease_in": "cubic-bezier(0.4, 0, 1, 1)",
+      "bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+      "spring": "cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+    },
+    "patterns": {
+      "hover_lift": "transform: translateY(-2px); box-shadow: var(--shadow-lg);",
+      "hover_scale": "transform: scale(1.02);",
+      "hover_glow": "box-shadow: 0 0 20px rgba(ACCENT,0.3);",
+      "fade_in": "@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }",
+      "stagger": "animation-delay: calc(var(--i) * 0.1s); where --i is the item index",
+      "scroll_reveal": "IntersectionObserver + classList.add('visible') with CSS: .item { opacity:0; transform:translateY(20px); transition:0.6s ease; } .item.visible { opacity:1; transform:translateY(0); }"
+    },
+    "accessibility": "@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }"
+  },
+  "glass_morphism": {
+    "recipe": "background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;",
+    "when_to_use": "Overlays, floating cards, navigation bars on dark themes. Use sparingly — one glass element per viewport.",
+    "fallback": "@supports not (backdrop-filter: blur(1px)) { background: rgba(15,15,20,0.95); }"
+  },
+  "responsive_design": {
+    "breakpoints": {
+      "phone": "375px",
+      "phone_large": "414px",
+      "tablet": "768px",
+      "laptop": "1024px",
+      "desktop": "1280px",
+      "wide": "1440px",
+      "ultrawide": "1920px"
+    },
+    "approach": "Mobile-first: base styles = phone, then @media (min-width: 768px), then (min-width: 1024px), then (min-width: 1440px)",
+    "patterns": {
+      "navigation": "Hamburger menu on mobile → horizontal nav on desktop",
+      "grid": "1 column mobile → 2 columns tablet → 3-4 columns desktop",
+      "typography": "Reduce heading sizes 20-30% on mobile. Body stays 16px minimum.",
+      "spacing": "Reduce section padding 40-50% on mobile. Card padding 16px.",
+      "images": "width: 100%; height: auto; or aspect-ratio with object-fit: cover",
+      "touch": "All interactive elements minimum 44x44px tap target on mobile"
+    }
+  },
+  "icons": {
+    "font_awesome_6": {
+      "cdn": "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css\">",
+      "usage": "<i class=\"fas fa-icon-name\"></i> (solid), <i class=\"far fa-icon-name\"></i> (regular), <i class=\"fab fa-icon-name\"></i> (brands)",
+      "common": "fa-check, fa-times, fa-arrow-right, fa-star, fa-heart, fa-user, fa-cog, fa-search, fa-home, fa-envelope, fa-phone, fa-globe, fa-lock, fa-eye, fa-download, fa-share, fa-edit, fa-trash, fa-plus, fa-minus, fa-bars, fa-chevron-down, fa-chevron-right, fa-external-link-alt, fa-github, fa-twitter, fa-linkedin"
+    },
+    "lucide_react": "import { Icon } from 'lucide-react' — lightweight, consistent, tree-shakeable",
+    "heroicons": "import { IconName } from '@heroicons/react/24/outline' — Tailwind ecosystem standard"
+  }
+}

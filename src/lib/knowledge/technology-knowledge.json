@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "name": "technology-knowledge",
+    "description": "Deep knowledge of specific technologies, frameworks, libraries, and their patterns",
+    "version": "1.0.0"
+  },
+  "react_18": {
+    "hooks": {
+      "useState": {
+        "usage": "const [value, setValue] = useState(initialValue)",
+        "rules": [
+          "Updates are ASYNC — don't read state immediately after setting it",
+          "Use functional updater for updates based on previous: setValue(prev => prev + 1)",
+          "NEVER mutate state: setValue([...arr, item]) not arr.push(item)",
+          "For objects: setValue(prev => ({ ...prev, name: 'new' }))",
+          "Initial value computed once: useState(() => expensiveComputation())"
+        ]
+      },
+      "useEffect": {
+        "usage": "useEffect(() => { /* effect */ return () => { /* cleanup */ } }, [deps])",
+        "rules": [
+          "Runs AFTER render, not during",
+          "[] deps = mount/unmount only. No deps = every render. [x, y] = when x or y change.",
+          "ALWAYS clean up: timers, subscriptions, abort controllers, event listeners",
+          "Objects/arrays in deps: compare by reference, not value. Wrap in useMemo or extract primitives.",
+          "Don't use for derived state: if you can compute it from props/state, use useMemo instead",
+          "StrictMode runs effects twice in dev to catch missing cleanup"
+        ]
+      },
+      "useRef": {
+        "usage": "const ref = useRef(initialValue)",
+        "use_cases": [
+          "DOM references: <div ref={ref}> → ref.current is the element",
+          "Mutable value that doesn't trigger re-render (interval IDs, previous values)",
+          "Persist value across renders without causing re-render",
+          "Access imperative methods: ref.current.focus(), ref.current.scrollTo()"
+        ]
+      },
+      "useMemo": {
+        "usage": "const computed = useMemo(() => expensiveCalculation(a, b), [a, b])",
+        "rules": [
+          "ONLY for expensive computations — not for every variable",
+          "Deps must include ALL values used in the callback",
+          "Returns the VALUE, not a function",
+          "Don't use for premature optimization — measure first"
+        ]
+      },
+      "useCallback": {
+        "usage": "const handler = useCallback((e) => { ... }, [deps])",
+        "rules": [
+          "ONLY needed when: passing callback to memo'd child, or using in useEffect deps",
+          "Returns a FUNCTION, not a value",
+          "Don't use for every handler — only when reference equality matters"
+        ]
+      },
+      "useReducer": {
+        "usage": "const [state, dispatch] = useReducer(reducer, initialState)",
+        "when": "Complex state with multiple sub-values, state transitions that depend on previous state, or when you want to pass dispatch down instead of multiple setters"
+      },
+      "useContext": {
+        "usage": "const value = useContext(MyContext)",
+        "pattern": "Create context: const Ctx = createContext(defaultValue). Provide: <Ctx.Provider value={...}>. Consume: useContext(Ctx).",
+        "gotcha": "Every consumer re-renders when provider value changes. Split contexts by update frequency."
+      }
+    },
+    "patterns": {
+      "composition": "Prefer children props and render props over deep component hierarchies",
+      "custom_hooks": "Extract reusable logic: useLocalStorage, useDebounce, useMediaQuery, useOnClickOutside, useIntersectionObserver",
+      "error_boundary": "Class component wrapping children. Shows fallback UI when child throws. Reset with key prop change.",
+      "suspense": "<Suspense fallback={<Loading />}><LazyComponent /></Suspense>. Works with React.lazy() and use() hook.",
+      "portals": "createPortal(children, container) — render modals/tooltips outside DOM hierarchy"
+    },
+    "anti_patterns": [
+      "NEVER: setState inside render body (causes infinite loop)",
+      "NEVER: mutate state directly (arr.push, obj.key = val)",
+      "NEVER: useEffect without deps to 'run once' (use [] for mount-only)",
+      "NEVER: prop drilling 5+ levels (use Context or composition)",
+      "NEVER: index as key when list items can reorder/insert/delete",
+      "NEVER: fetch in useEffect without abort controller cleanup"
+    ]
+  },
+  "nextjs_14_app_router": {
+    "file_conventions": {
+      "page.tsx": "Route UI. Must export default component. Server component by default.",
+      "layout.tsx": "Shared UI wrapper. Preserved across navigation. Gets { children }.",
+      "loading.tsx": "Loading UI shown while page.tsx streams.",
+      "error.tsx": "Error boundary. Must be 'use client'. Gets { error, reset }.",
+      "not-found.tsx": "404 UI. Triggered by notFound() function.",
+      "route.ts": "API route. Export GET, POST, PUT, DELETE, PATCH functions."
+    },
+    "server_vs_client": {
+      "server_components": "Default. Can async/await directly. Can access DB, filesystem. CANNOT use hooks, browser APIs, or event handlers.",
+      "client_components": "Add 'use client' at top. CAN use hooks, browser APIs, event handlers. CANNOT be async.",
+      "rule": "Keep components server by default. Only add 'use client' when you need interactivity."
+    },
+    "data_fetching": {
+      "server": "const data = await fetch(url, { next: { revalidate: 60 } }) — cached and revalidated",
+      "client": "Use SWR or React Query: const { data, error, isLoading } = useSWR(url, fetcher)"
+    },
+    "metadata": "export const metadata: Metadata = { title: '...', description: '...' } — in page.tsx or layout.tsx"
+  },
+  "tailwind_css": {
+    "core_patterns": {
+      "flex_center": "flex items-center justify-center",
+      "flex_between": "flex items-center justify-between",
+      "grid_responsive": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+      "card": "bg-white dark:bg-gray-800 rounded-xl shadow-md p-6",
+      "button": "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors",
+      "input": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none",
+      "truncate": "truncate (single line) or line-clamp-3 (multi-line)",
+      "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+    },
+    "responsive": "sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px. Usage: md:grid-cols-2 lg:grid-cols-3",
+    "dark_mode": "dark: prefix. Enable: darkMode: 'class' in config. Toggle: document.documentElement.classList.toggle('dark')",
+    "arbitrary": "w-[300px] bg-[#1a1a2e] grid-cols-[200px_1fr_200px] — escape hatch for exact values",
+    "groups": "group on parent, group-hover:opacity-100 on child — style children on parent hover"
+  },
+  "common_libraries": {
+    "ui": {
+      "shadcn_ui": "Radix-based, copy-paste components for React. Best-in-class accessibility. npx shadcn-ui add button",
+      "headless_ui": "Tailwind Labs. Unstyled, accessible components. Pairs with Tailwind.",
+      "radix_primitives": "Low-level accessible UI primitives. Dialog, Popover, Tooltip, etc.",
+      "framer_motion": "Animation library for React. motion.div, AnimatePresence, layout animations.",
+      "react_spring": "Physics-based animations. useSpring, useTrail, useTransition."
+    },
+    "data": {
+      "tanstack_query": "Server state management. useQuery, useMutation, automatic caching/revalidation.",
+      "swr": "Vercel's data fetching. useSWR(key, fetcher). Stale-while-revalidate pattern.",
+      "zustand": "Lightweight state management. const useStore = create(set => ({ count: 0, inc: () => set(s => ({ count: s.count + 1 })) }))",
+      "zod": "Schema validation. const schema = z.object({ name: z.string().min(1), email: z.string().email() }); schema.parse(data)"
+    },
+    "utilities": {
+      "date_fns": "Date manipulation. format, parseISO, differenceInDays, addMonths. Tree-shakeable.",
+      "lodash": "Utility belt. debounce, throttle, cloneDeep, groupBy, sortBy. Import individual functions: import { debounce } from 'lodash'",
+      "clsx": "Conditional class names. clsx('base', isActive && 'active', { 'disabled': !enabled })",
+      "uuid": "Generate UUIDs. import { v4 as uuidv4 } from 'uuid'. Or use crypto.randomUUID() natively."
+    },
+    "charts": {
+      "recharts": "Declarative charts for React. <LineChart data={data}><Line dataKey='value' /></LineChart>",
+      "chart_js": "Canvas-based charting. Highly customizable. import { Chart } from 'chart.js'",
+      "d3": "Low-level data visualization. Maximum control, steep learning curve. import * as d3 from 'd3'"
+    }
+  },
+  "html_apis": {
+    "intersection_observer": "Detect when elements enter/leave viewport. Use for: lazy loading, scroll animations, infinite scroll.",
+    "resize_observer": "Detect element size changes. Use for: responsive components, dynamic layouts.",
+    "mutation_observer": "Watch DOM changes. Use for: third-party script integration, dynamic content.",
+    "web_storage": "localStorage (persistent) and sessionStorage (tab lifetime). 5MB limit. Synchronous. Strings only (JSON.stringify for objects).",
+    "fetch": "fetch(url, { method, headers, body, signal }). Returns Promise<Response>. Check res.ok. Use res.json(), res.text(), res.blob().",
+    "history": "history.pushState(state, '', url) — update URL without reload. popstate event for back/forward.",
+    "clipboard": "navigator.clipboard.writeText(text) and navigator.clipboard.readText(). Requires HTTPS and user gesture.",
+    "geolocation": "navigator.geolocation.getCurrentPosition(success, error, options). Requires permission.",
+    "web_workers": "new Worker('worker.js') — run JS in background thread. postMessage/onmessage for communication.",
+    "service_workers": "Register: navigator.serviceWorker.register('sw.js'). Intercept fetch events for offline support, caching.",
+    "web_sockets": "new WebSocket('wss://...'). Events: onopen, onmessage, onclose, onerror. Methods: send(), close().",
+    "event_source": "new EventSource('/api/stream'). Server-Sent Events for one-way server→client streaming."
+  },
+  "security": {
+    "xss_prevention": [
+      "NEVER use innerHTML with user input — use textContent",
+      "NEVER use eval() or new Function() with user input",
+      "NEVER use document.write()",
+      "Sanitize HTML if you must render it: DOMPurify.sanitize(html)",
+      "Use Content-Security-Policy header to prevent inline script execution"
+    ],
+    "data_handling": [
+      "NEVER store secrets, API keys, or tokens in client-side code",
+      "NEVER log sensitive data (passwords, tokens, PII)",
+      "ALWAYS use HTTPS for API calls",
+      "ALWAYS validate and sanitize input on the server, not just the client",
+      "Use httpOnly cookies for auth tokens, not localStorage"
+    ],
+    "links": [
+      "ALWAYS add rel='noopener noreferrer' to target='_blank' links",
+      "ALWAYS validate URLs before rendering them as links",
+      "NEVER redirect to user-provided URLs without validation"
+    ]
+  },
+  "performance_patterns": {
+    "loading": {
+      "lazy_images": "<img loading='lazy' src='...'> — native lazy loading for below-fold images",
+      "preconnect": "<link rel='preconnect' href='https://fonts.googleapis.com'> — early DNS + TLS for external resources",
+      "preload": "<link rel='preload' href='font.woff2' as='font' type='font/woff2' crossorigin> — load critical resources early",
+      "async_defer": "<script async> for independent scripts, <script defer> for order-dependent scripts"
+    },
+    "rendering": {
+      "virtualization": "For lists with 1000+ items, use react-virtual or @tanstack/virtual. Only render visible items.",
+      "debounce_input": "Debounce search input (300ms). Don't fetch on every keystroke.",
+      "throttle_scroll": "Throttle scroll handlers (16ms = 60fps). Use requestAnimationFrame.",
+      "code_splitting": "React.lazy(() => import('./HeavyComponent')). Wrap in Suspense."
+    },
+    "caching": {
+      "http": "Cache-Control: public, max-age=31536000 for static assets with content hash in filename",
+      "stale_while_revalidate": "SWR pattern: show cached data immediately, fetch fresh data in background, update when ready",
+      "memoization": "Cache expensive function results. useMemo in React, or manual Map-based cache."
+    }
+  }
+}
