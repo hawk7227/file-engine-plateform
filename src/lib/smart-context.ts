@@ -108,9 +108,9 @@ const INTENT_MAX_TOKENS: Record<MessageIntent, number> = {
   deploy_action: 512,
   style_question: 1024,
   project_question: 1024,
-  generate_code: 8192,
-  refactor: 4096,
-  fix_code: 4096,
+  generate_code: 16384,
+  refactor: 8192,
+  fix_code: 8192,
 }
 
 // =====================================================

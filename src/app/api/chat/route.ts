@@ -253,8 +253,11 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
   try {
     switch (name) {
       case 'create_file': {
-        ctx.files[input.path] = input.content
-        return { success: true, result: `Created ${input.path} (${input.content.split('\n').length} lines)${input.description ? ' — ' + input.description : ''}` }
+        const filePath = input.path || input.filepath || input.file_path || input.filename || 'index.html'
+        const fileContent = input.content || input.code || input.file_content || ''
+        if (!fileContent) return { success: false, result: `No content provided for ${filePath}` }
+        ctx.files[filePath] = fileContent
+        return { success: true, result: `Created ${filePath} (${fileContent.split('\n').length} lines)${input.description ? ' — ' + input.description : ''}` }
       }
       case 'edit_file': {
         const file = ctx.files[input.path]
@@ -768,10 +771,12 @@ async function agentStream(
           // ── EXECUTE TOOLS — PARALLEL (saves 200-2000ms per multi-tool turn) ──
           // Send all tool_call events first, then execute in parallel
           const toolMetas = parsed.toolCalls.map(tc => {
-            const inputSummary = tc.name === 'create_file' ? { path: tc.input.path, lines: tc.input.content?.split('\n').length }
-              : tc.name === 'edit_file' ? { path: tc.input.path, description: tc.input.description }
-                : tc.name === 'think' ? { reasoning: tc.input.reasoning?.slice(0, 300) }
-                  : tc.input
+            const inp = tc.input || {}
+            const inputSummary = tc.name === 'create_file' ? { path: inp.path || inp.filepath || inp.filename || 'file', lines: (inp.content || inp.code || '').split?.('\n')?.length || 0 }
+              : tc.name === 'edit_file' ? { path: inp.path || inp.filepath || 'file', description: inp.description }
+                : tc.name === 'think' ? { reasoning: inp.reasoning?.slice(0, 300) }
+                  : inp
+            console.log(`[Tool Call] ${tc.name} input keys: [${Object.keys(inp).join(',')}]`)
             ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_call', tool: tc.name, input: inputSummary })}\n\n`))
             return tc
           })
@@ -943,7 +948,7 @@ async function streamAgentTurn(
   if (provider === 'anthropic') {
     for (const [, t] of anthropicTools) {
       let input = {}
-      try { input = JSON.parse(t.jsonBuf || '{}') } catch { }
+      try { input = JSON.parse(t.jsonBuf || '{}') } catch (e) { console.error(`[Tool Parse Error] ${t.name}: ${(e as Error).message}, buf length=${t.jsonBuf.length}, first 200=${t.jsonBuf.slice(0, 200)}`) }
       toolCalls.push({ id: t.id, name: t.name, input })
     }
   } else {
