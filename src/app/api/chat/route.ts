@@ -757,11 +757,10 @@ async function agentStream(
         let apiMsgs = buildInitialMessages(provider, messages, attachments)
 
         for (let i = 0; i < MAX_ITER; i++) {
-          // ── STREAM AI RESPONSE (text flows immediately, tools accumulate) ──
-          // Force tool use on first iteration ONLY for code generation intents
-          // Don't force for questions, explanations, or general chat
-          const isCodeIntent = intent === 'generate_code' || intent === 'fix_code' || intent === 'refactor'
-          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc, i === 0 && isCodeIntent)
+          // ── STREAM AI RESPONSE ──
+          // Let AI choose naturally: tools OR code blocks (dual-mode system prompt handles both)
+          // Never force tool_choice — causes truncated JSON with smaller models
+          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc, false)
 
           if (!parsed) break // stream error already sent to client
 
