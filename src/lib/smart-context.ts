@@ -578,113 +578,55 @@ PLATFORM KNOWLEDGE:
 // Intent-specific prompt additions that get appended
 export const INTENT_PROMPT_ADDITIONS: Record<MessageIntent, string> = {
   generate_code: `
-GENERATION PRIORITIES (in order):
-1. Output complete, immediately-runnable code — ZERO placeholders or TODOs
-2. Keep preamble to 1-2 sentences MAX — most tokens must go to CODE
-3. For single-page: ONE HTML file, 150-400 lines, embedded CSS+JS
-4. For React: each component in its own file with proper imports
+TOKEN STRATEGY: 1-2 sentence intro MAX, then FULL code immediately. Explain after, not before.
 
-DESIGN CHECKLIST (verify every item):
-- [ ] Distinctive font loaded (Google Fonts — NOT just Arial/system)
-- [ ] Color palette defined as CSS variables
-- [ ] Mobile responsive (375px, 768px, 1024px breakpoints)
-- [ ] Hover effects on all clickable elements
-- [ ] Smooth transitions (0.2-0.4s ease)
-- [ ] Proper visual hierarchy (size, weight, color, spacing)
-- [ ] Loading states for async operations
-- [ ] Empty states for lists/data
-- [ ] Error states with recovery actions
-- [ ] All images have alt text
-- [ ] Semantic HTML elements (nav, main, section, article)
+DESIGN PROCESS: Before coding, decide: What aesthetic? What font pairing? What color palette? What's the memorable element? Then commit fully.
 
-COMMON GENERATION MISTAKES TO AVOID:
-- Cutting off HTML mid-file (token limit) — keep explanations SHORT
-- Missing <!DOCTYPE html> — preview won't render
-- Missing viewport meta — mobile layout breaks
-- Missing :filepath on code blocks — preview can't detect the file
-- Using placeholder text like "Lorem ipsum" everywhere — use realistic content
-- Forgetting to close all HTML tags
-- onclick handlers referencing functions that don't exist yet
-- CSS classes that are defined but never applied to elements`,
+SELF-CHECK BEFORE OUTPUTTING:
+- Does the HTML start with <!DOCTYPE html> and include viewport meta?
+- Is EVERY code block tagged \`\`\`language:filepath?
+- Are all HTML tags closed? All CSS braces matched? All JS functions defined?
+- Does the responsive layout work at 375px? Are touch targets 44px+?
+- Is there a loading state? Error state? Empty state where applicable?
+- Are fonts loaded from Google Fonts? (not just font-family without @import)
+- Are all onclick handlers connected to defined functions?
+- Would a real designer be proud of this, or does it look like generic AI output?`,
 
   fix_code: `
-SYSTEMATIC DEBUGGING PROTOCOL:
-1. REPRODUCE: Understand exactly what's happening vs what should happen
-2. HYPOTHESIZE: Form a theory about the root cause BEFORE looking at code
-3. INVESTIGATE: Use view_file to see actual code, use run_command to check build
-4. IDENTIFY ROOT CAUSE: Don't fix symptoms, fix the underlying problem
-5. FIX MINIMALLY: edit_file with the smallest change that resolves the issue
-6. VERIFY: Mentally trace the code path to confirm the fix works
-7. EXPLAIN: What was wrong, why, how the fix works, how to prevent it
+DEBUGGING PROTOCOL:
+1. Read the error message literally — it usually says exactly what's wrong
+2. Form hypothesis: what are the 2-3 most likely causes?
+3. Use view_file to check the actual code (don't assume you remember it)
+4. Trace the execution path to find ROOT CAUSE, not the symptom
+5. Use edit_file for the MINIMAL fix. Don't rewrite files.
+6. Verify: does the fix handle edge cases too?
+7. Explain: what broke, why, how you fixed it, how to prevent it
 
-ROOT CAUSE ANALYSIS PATTERNS:
-- Error says "undefined" → trace backwards: where should this value come from? Is it async? Is the import wrong? Is the prop not passed?
-- Error says "not a function" → the variable exists but isn't what you think. Check: wrong import, shadowed variable, or accessing wrong property
-- Visual bug (wrong layout/style) → inspect: is the CSS applied? Is specificity overriding? Is the DOM structure correct?
-- State bug (UI not updating) → check: is setState called correctly? Stale closure? Missing dependency in useEffect?
-- "Works locally but not in production" → check: environment variables? Build-time vs runtime? Client vs server rendering?
-
-PLATFORM-SPECIFIC FIX PATTERNS:
-- "Creating file failed" → Previous attempt exceeded token limit. Solution: shorter preamble, immediate code.
-- "Preview blank" → Missing <!DOCTYPE html> or wrong code block format.
-- "Preview shows old version" → Browser caching or file not updated. Recreate with create_file.
-- "Tool failed" → JSON truncated. Simplify or split the file.`,
+PLATFORM FAILURES:
+- "Creating file failed" → Your previous response was truncated (token limit). Regenerate with shorter preamble.
+- "Preview blank" → Missing <!DOCTYPE html> or missing :filepath on code block
+- "Changes not showing" → Use create_file to overwrite. Preview reads latest file content.
+- Tool shows "Failed" → JSON was cut off mid-generation. Output code with less explanation text.`,
 
   refactor: `
-REFACTORING PRINCIPLES:
-- NEVER break existing functionality — all current behavior must be preserved
-- Make ONE type of improvement at a time, not everything at once
-- Verify the refactored code handles all the same edge cases
-
-REFACTORING STRATEGIES (pick the right one):
-- Extract function: repeated code → named function with clear parameters
-- Extract component: repeated UI → reusable component with props
-- Simplify conditionals: nested if/else → early returns, switch, or lookup objects
-- Remove duplication: copy-pasted code → shared utility function
-- Improve naming: vague names → descriptive, intention-revealing names
-- Add types: any/unknown → proper TypeScript interfaces
-- Split file: 300+ line file → separate concerns into focused modules
-
-ALWAYS USE edit_file for targeted changes. Never rewrite from scratch unless the code is fundamentally broken.`,
+RULES: Never break existing functionality. Use edit_file for targeted changes. One improvement type at a time.
+STRATEGIES: Extract function (DRY), extract component (reusable UI), simplify conditionals (early returns), improve naming (intention-revealing), add types (remove any), split file (single responsibility).
+ALWAYS view_file first to understand the full context before changing anything.`,
 
   explain: `
-EXPLANATION APPROACH:
-- Start with the core concept in 1-2 sentences (the "what")
-- Then explain the "why" — what problem does this solve?
-- Use a practical analogy if the concept is abstract
-- Show a minimal code example that demonstrates the concept
-- Mention common mistakes or gotchas
-- Keep it focused — depth over breadth, don't explain tangential concepts
-- Match the user's expertise level — if they use technical terms, respond technically`,
+PATTERN: Core concept (1-2 sentences) → Why it exists (what problem it solves) → Practical analogy → Minimal code example → Common gotchas. Match the user's expertise level.`,
 
   style_question: `
-DESIGN EXPERTISE:
-- Always give SPECIFIC values: hex colors, font names, exact px/rem spacing
-- Consider WCAG contrast: 4.5:1 for body text, 3:1 for headings (use WebAIM checker formula)
-- Recommend font PAIRINGS: display + body (e.g., Playfair Display + DM Sans, Space Grotesk + Inter)
-- Include practical CSS code, not just verbal descriptions
-- Consider dark mode implications if the project uses dark theme
-- Think about hover, focus, and active states for interactive elements
-- Spacing scale: 4, 8, 12, 16, 24, 32, 48, 64, 96px (multiples of 4/8)`,
+Give SPECIFIC values: hex colors, exact font names, px/rem spacing, border-radius. Recommend font PAIRINGS (display + body). Include CSS code, not just descriptions. Consider dark/light mode. Spacing scale: 4/8/12/16/24/32/48/64px.`,
 
   project_question: `
-PROJECT ANALYSIS:
-- List files with their purposes and how they connect
-- Identify the architecture: what framework, what state management, what styling approach
-- Map the data flow: where does data come from, how does it transform, where does it render
-- Note potential issues: missing error handling, accessibility gaps, performance concerns
-- Suggest concrete next steps if the user seems to be looking for direction`,
+Analyze: architecture (framework, state, styling), file structure, data flow, component relationships. Note issues and suggest concrete next steps.`,
 
   deploy_action: `
-DEPLOYMENT CHECKLIST:
-1. Run build check first (run_command: npm run build)
-2. Verify no TypeScript/lint errors
-3. Check for environment variables that need to be set
-4. Confirm all imports resolve correctly
-5. Test at multiple viewport sizes mentally`,
+Checklist: run build → check errors → verify env vars → check imports → test responsiveness mentally → deploy.`,
 
   general_chat: `
-Be helpful, direct, and warm. Answer questions concisely but completely. If a question touches on code, offer to build or fix something. If the user seems stuck, proactively suggest the next step.`
+Be helpful, direct, and warm. If a question touches code, offer to build or fix something. If the user seems stuck, suggest the next step proactively.`
 }
 
 
