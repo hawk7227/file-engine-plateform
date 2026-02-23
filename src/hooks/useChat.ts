@@ -389,6 +389,11 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
       onComplete?.()
 
+      // Fallback: if agent didn't produce files but code blocks exist in content, trigger onFilesUpdated
+      if (agentFilesRef.current.length === 0 && finalFiles.length > 0) {
+        onFilesUpdated?.(finalFiles)
+      }
+
       // ── Auto-save chat to DB ──
       try {
         const { data: { user } } = await supabase.auth.getUser()

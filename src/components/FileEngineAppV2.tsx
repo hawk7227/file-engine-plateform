@@ -339,11 +339,15 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     if (initialChatId) setCurrentChatId(initialChatId)
   }, [initialChatId])
 
+  const filesCallbackRef = useRef<(files: GeneratedFile[]) => void>(() => {})
+  const [selectedModel, setSelectedModel] = useState('fast')
+  
   const { messages, isLoading: chatLoading, sendMessage, clearMessages, stopGeneration, setMessages } = useChat({
     projectId: currentProjectId || undefined,
     chatId: currentChatId || undefined,
     model: selectedModel,
-    onComplete: () => { const m = messages[messages.length-1]; if(m?.files?.length) handleFilesGenerated(m.files) },
+    onFilesUpdated: (files) => { filesCallbackRef.current(files) },
+    onComplete: () => {},
     onChatCreated: (newChatId, title) => {
         setCurrentChatId(newChatId)
         window.history.pushState({}, '', `/dashboard/${newChatId}`)
@@ -358,7 +362,6 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const [useLocal, setUseLocal] = useState(false)
   const [autoFix, setAutoFix] = useState(true)
   const [inputValue, setInputValue] = useState('')
-  const [selectedModel, setSelectedModel] = useState('fast')
   const [domainInput, setDomainInput] = useState('')
   const [toasts, setToasts] = useState<Toast[]>([])
   const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set())
@@ -433,6 +436,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     if(useLocal){preview.setFiles(files);toast('info','Local Preview','Files ready')}
     else{const r=await preview.verifyBuild(files,{projectId:currentProjectId||undefined,projectName:currentProjectName});if(r.success)toast('success','Preview Ready','Build completed')}
   }
+  filesCallbackRef.current = handleFilesGenerated
   
   const handleNewChat = () => {
     setSidebarOpen(false)
