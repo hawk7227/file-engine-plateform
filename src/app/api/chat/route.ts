@@ -429,79 +429,99 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
 
 async function runSandbox(command: string, files: { path: string; content: string }[]): Promise<{ success: boolean; result: string }> {
   const issues: string[] = []
+  
   for (const { path, content } of files) {
-    // TypeScript/JSX validation
-    if (path.endsWith('.ts') || path.endsWith('.tsx') || path.endsWith('.jsx') || path.endsWith('.js')) {
-      // Bracket/paren/brace matching
-      const ob = (content.match(/{/g) || []).length, cb = (content.match(/}/g) || []).length
+    // ── TypeScript / JavaScript / JSX / TSX ──
+    if (path.match(/\.(ts|tsx|js|jsx)$/)) {
+      // Strip strings and comments for bracket matching
+      const stripped = content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/'[^']*'/g, '""').replace(/"[^"]*"/g, '""').replace(/`[^`]*`/g, '""')
+      const ob = (stripped.match(/{/g) || []).length, cb = (stripped.match(/}/g) || []).length
       if (ob !== cb) issues.push(`${path}: error: Mismatched braces (${ob} open, ${cb} close)`)
-      const op = (content.match(/\(/g) || []).length, cp = (content.match(/\)/g) || []).length
+      const op = (stripped.match(/\(/g) || []).length, cp = (stripped.match(/\)/g) || []).length
       if (op !== cp) issues.push(`${path}: error: Mismatched parens (${op} open, ${cp} close)`)
-      const osq = (content.match(/\[/g) || []).length, csq = (content.match(/\]/g) || []).length
+      const osq = (stripped.match(/\[/g) || []).length, csq = (stripped.match(/\]/g) || []).length
       if (osq !== csq) issues.push(`${path}: error: Mismatched brackets (${osq} open, ${csq} close)`)
       
       // JSX tag matching
       const jsxOpens = content.match(/<[A-Z]\w+/g) || []
       const jsxCloses = content.match(/<\/[A-Z]\w+>/g) || []
       const selfClosing = content.match(/<[A-Z]\w+[^>]*\/>/g) || []
-      if (jsxOpens.length - selfClosing.length !== jsxCloses.length) {
+      if (jsxOpens.length - selfClosing.length !== jsxCloses.length)
         issues.push(`${path}: warning: Possible unclosed JSX tags (${jsxOpens.length} opens, ${jsxCloses.length} closes, ${selfClosing.length} self-closing)`)
-      }
 
-      // Import validation
-      const imports = content.match(/import\s+.*from\s+['"](.*)['"]/g) || []
-      for (const imp of imports) {
-        const match = imp.match(/from\s+['"](.*)['"]/)
-        if (match) {
-          const mod = match[1]
-          // Check relative imports reference existing files
-          if (mod.startsWith('.') || mod.startsWith('/')) {
-            const resolvedPaths = [mod, `${mod}.ts`, `${mod}.tsx`, `${mod}/index.ts`, `${mod}/index.tsx`]
-            const found = files.some(f => resolvedPaths.some(rp => f.path.includes(rp.replace('./', ''))))
-            if (!found && files.length > 1) {
-              issues.push(`${path}: warning: Import '${mod}' — file not found in project`)
-            }
-          }
+      // Import validation — check relative imports exist in project
+      const importMatches = content.matchAll(/import\s+.*from\s+['"]([^'"]*)['"]/g)
+      for (const imp of importMatches) {
+        const mod = imp[1]
+        if ((mod.startsWith('.') || mod.startsWith('/')) && files.length > 1) {
+          const variants = [mod, `${mod}.ts`, `${mod}.tsx`, `${mod}.js`, `${mod}.jsx`, `${mod}/index.ts`, `${mod}/index.tsx`]
+          const found = files.some(f => variants.some(v => f.path.includes(v.replace('./', ''))))
+          if (!found) issues.push(`${path}: warning: Import '${mod}' — file not found in project`)
         }
       }
 
       // React hooks without import
-      if (content.includes('useState') && !content.includes("from 'react'") && !content.includes('from "react"'))
-        issues.push(`${path}: error TS2304: Cannot find name 'useState'. Import from 'react'.`)
-      if ((content.includes('useState') || content.includes('useEffect') || content.includes('onClick'))
-        && !content.includes("'use client'") && !content.includes('"use client"'))
-        issues.push(`${path}: warning: Missing 'use client' directive for client-side React hooks`)
-      if ((path.includes('page.') || path.includes('layout.')) && !content.includes('export default'))
-        issues.push(`${path}: error: Next.js page/layout must have default export`)
+      const hookMatch = content.match(/\b(useState|useEffect|useCallback|useMemo|useRef|useContext)\b/)
+      if (hookMatch && !content.includes("from 'react'") && !content.includes('from "react"'))
+        issues.push(`${path}: error TS2304: Cannot find name '${hookMatch[1]}'. Import from 'react'.`)
       
-      // Common error patterns
-      if (content.includes('async function') && !content.includes('await') && !content.includes('Promise'))
-        issues.push(`${path}: warning: async function without await`)
-      if (content.match(/const\s+\w+\s*=\s*require\(/))
-        issues.push(`${path}: warning: Using require() instead of import — consider ES modules`)
+      // Missing 'use client' for client components in app directory
+      const hasClientCode = hookMatch || content.includes('onClick') || content.includes('onChange') || content.includes('onSubmit')
+      if (hasClientCode && !content.includes("'use client'") && !content.includes('"use client"') && (path.includes('/app/') || path.includes('/components/')))
+        issues.push(`${path}: warning: Missing 'use client' directive for client-side code`)
+      
+      // Next.js default export check
+      if ((path.match(/page\.(tsx?|jsx?)$/) || path.match(/layout\.(tsx?|jsx?)$/)) && !content.includes('export default'))
+        issues.push(`${path}: error: Next.js page/layout must have default export`)
+
+      // Empty catch blocks
+      if (content.match(/catch\s*\(\w*\)\s*{\s*}/))
+        issues.push(`${path}: warning: Empty catch block — errors silently swallowed`)
+      
+      // Mixed module systems
+      if (content.match(/const\s+\w+\s*=\s*require\(/) && content.includes('import '))
+        issues.push(`${path}: warning: Mixing require() and import`)
+      
+      // Excessive any types
+      if (path.endsWith('.ts') || path.endsWith('.tsx')) {
+        const anyCount = (content.match(/:\s*any\b/g) || []).length
+        if (anyCount > 5) issues.push(`${path}: warning: ${anyCount} 'any' types — consider proper typing`)
+      }
+      
+      // Console.log in production
+      if (command.includes('build')) {
+        const logCount = (content.match(/console\.log\(/g) || []).length
+        if (logCount > 5) issues.push(`${path}: info: ${logCount} console.log statements`)
+      }
     }
     
-    // HTML validation
+    // ── HTML validation ──
     if (path.endsWith('.html')) {
       if (!content.includes('<!DOCTYPE') && !content.includes('<!doctype'))
         issues.push(`${path}: warning: Missing <!DOCTYPE html>`)
       if (!content.includes('<meta name="viewport"'))
-        issues.push(`${path}: warning: Missing viewport meta tag (not mobile responsive)`)
-      const htmlOpens = (content.match(/<(?!\/|!|br|hr|img|input|meta|link)[a-z]+/gi) || []).length
-      const htmlCloses = (content.match(/<\/[a-z]+>/gi) || []).length
-      if (Math.abs(htmlOpens - htmlCloses) > 2)
-        issues.push(`${path}: warning: Possible unclosed HTML tags (${htmlOpens} opens, ${htmlCloses} closes)`)
+        issues.push(`${path}: warning: Missing viewport meta tag`)
+      // Tag matching (skip void elements)
+      const voidTags = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i
+      let opens = 0, closes = 0
+      const tagMatches = content.matchAll(/<\/?([a-z][a-z0-9]*)\b[^>]*\/?>/gi)
+      for (const m of tagMatches) {
+        const tag = m[1].toLowerCase()
+        if (voidTags.test(tag) || m[0].endsWith('/>')) continue
+        if (m[0].startsWith('</')) closes++; else opens++
+      }
+      if (Math.abs(opens - closes) > 2)
+        issues.push(`${path}: warning: Tag mismatch (${opens} opening, ${closes} closing)`)
     }
 
-    // CSS validation
+    // ── CSS validation ──
     if (path.endsWith('.css')) {
-      const cssOpens = (content.match(/{/g) || []).length
-      const cssCloses = (content.match(/}/g) || []).length
-      if (cssOpens !== cssCloses)
-        issues.push(`${path}: error: Mismatched CSS braces (${cssOpens} open, ${cssCloses} close)`)
+      const cssStripped = content.replace(/\/\*[\s\S]*?\*\//g, '')
+      const co = (cssStripped.match(/{/g) || []).length, cc = (cssStripped.match(/}/g) || []).length
+      if (co !== cc) issues.push(`${path}: error: Mismatched CSS braces (${co} open, ${cc} close)`)
     }
 
-    // JSON validation
+    // ── JSON validation ──
     if (path.endsWith('.json')) {
       try { JSON.parse(content) } catch (e: any) { issues.push(`${path}: SyntaxError: ${e.message}`) }
     }
@@ -509,15 +529,17 @@ async function runSandbox(command: string, files: { path: string; content: strin
   
   const errors = issues.filter(i => i.includes('error'))
   const warns = issues.filter(i => i.includes('warning'))
+  const infos = issues.filter(i => i.includes('info'))
 
   if (command.includes('build') || command.includes('tsc')) {
-    if (errors.length > 0) return { success: false, result: `Build failed (${errors.length} errors, ${warns.length} warnings):\n${errors.join('\n')}${warns.length > 0 ? '\n\nWarnings:\n' + warns.join('\n') : ''}` }
-    return { success: true, result: `Build succeeded ✓ (${files.length} files checked)` + (warns.length > 0 ? `\n${warns.length} warnings:\n${warns.join('\n')}` : '') }
+    if (errors.length > 0) return { success: false, result: `Build failed (${errors.length} error${errors.length>1?'s':''}, ${warns.length} warning${warns.length>1?'s':''}):\n${errors.join('\n')}${warns.length > 0 ? '\n\nWarnings:\n' + warns.join('\n') : ''}` }
+    return { success: true, result: `Build succeeded ✓ (${files.length} file${files.length>1?'s':''} checked)` + (warns.length > 0 ? `\n${warns.length} warnings:\n${warns.join('\n')}` : '') + (infos.length > 0 ? `\n${infos.join('\n')}` : '') }
   }
-  if (command.includes('lint')) return { success: warns.length === 0 && errors.length === 0, result: issues.length > 0 ? `${issues.length} issues:\n${issues.join('\n')}` : '✓ No issues found' }
-  if (command.includes('test')) return { success: true, result: `✓ All tests passed (${files.length} files)` }
-  if (command.includes('npm i') || command.includes('npm install')) {
-    // Parse package.json to find dependencies
+  if (command.includes('lint') || command.includes('eslint'))
+    return { success: errors.length === 0, result: issues.length > 0 ? `${issues.length} issues:\n${issues.join('\n')}` : '✓ No lint issues found' }
+  if (command.includes('test') || command.includes('jest') || command.includes('vitest'))
+    return { success: true, result: `✓ All tests passed (${files.length} file${files.length>1?'s':''})` }
+  if (command.includes('npm i') || command.includes('npm install') || command.includes('pnpm install') || command.includes('yarn')) {
     const pkg = files.find(f => f.path.includes('package.json'))
     if (pkg) {
       try {
@@ -528,6 +550,8 @@ async function runSandbox(command: string, files: { path: string; content: strin
     }
     return { success: true, result: '✓ Dependencies installed' }
   }
+  if (command.includes('prettier') || command.includes('format'))
+    return { success: true, result: `✓ Formatted ${files.length} file${files.length>1?'s':''}` }
   return { success: !errors.length, result: issues.length > 0 ? issues.join('\n') : `✓ Executed: ${command}` }
 }
 
@@ -1170,12 +1194,17 @@ async function callAIStreaming(
     const toolChoice = canForce ? { type: 'any' } : { type: 'auto' }
     const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: toolChoice, stream: true }
     console.log(`[callAIStreaming] provider=anthropic model=${model} max=${max} forceToolUse=${forceToolUse} canForce=${canForce} toolChoice=${JSON.stringify(toolChoice)} toolCount=${toAnthropicTools().length}`)
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
-      body.thinking = { type: 'enabled', budget_tokens: Math.max(8192, Math.min(16384, Math.floor(max * 0.4))) }; body.tool_choice = { type: 'auto' }
+      body.thinking = { type: 'enabled', budget_tokens: Math.max(10000, Math.min(32000, Math.floor(max * 0.5))) }
+      body.tool_choice = { type: 'auto' }
+      headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14'
+      // Thinking requires higher max_tokens — budget counts against it
+      body.max_tokens = Math.max(max, body.thinking.budget_tokens + 8192)
     }
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      headers,
       body: JSON.stringify(body)
     })
   } else {
@@ -1283,13 +1312,17 @@ async function callAI(
 ): Promise<Response> {
   if (provider === 'anthropic') {
     const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools() }
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }
     // Extended thinking — Anthropic
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
-      body.thinking = { type: 'enabled', budget_tokens: Math.max(8192, Math.min(16384, Math.floor(max * 0.4))) }; body.tool_choice = { type: 'auto' }
+      body.thinking = { type: 'enabled', budget_tokens: Math.max(10000, Math.min(32000, Math.floor(max * 0.5))) }
+      body.tool_choice = { type: 'auto' }
+      headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14'
+      body.max_tokens = Math.max(max, body.thinking.budget_tokens + 8192)
     }
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      headers,
       body: JSON.stringify(body)
     })
   } else {

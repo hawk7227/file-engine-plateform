@@ -443,19 +443,26 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     
     // Check files first (from tool calls)
     if (lastMsg.files?.length) {
-      const htmlFile = lastMsg.files.find(f => f.path.endsWith('.html') || f.language === 'html')
-      if (htmlFile) { setLocalPreviewHtml(htmlFile.content); return }
+      const htmlFile = lastMsg.files.find(f => f.path?.endsWith('.html') || f.language === 'html')
+      if (htmlFile) {
+        setLocalPreviewHtml(htmlFile.content)
+        preview.setFiles(lastMsg.files)
+        return
+      }
     }
     
     // Extract from code blocks in content
     const content = lastMsg.content || ''
     // Match ```html:filename\n...\n``` or ```html\n...\n```
-    const htmlMatch = content.match(/```html(?::[^\n]*)?\n([\s\S]*?)```/)
-    if (htmlMatch?.[1]?.trim()) {
-      const html = htmlMatch[1].trim()
+    const htmlMatch = content.match(/```html(?::([^\n]*))?\n([\s\S]*?)```/)
+    if (htmlMatch?.[2]?.trim()) {
+      const html = htmlMatch[2].trim()
+      const filename = htmlMatch[1]?.trim() || 'index.html'
       // Only update if it looks like real HTML (not a fragment)
       if (html.includes('<') && html.length > 50) {
         setLocalPreviewHtml(html)
+        // Also populate preview.files so download/export works
+        preview.setFiles([{ path: filename, content: html, language: 'html' }])
       }
     }
   }, [messages])
@@ -491,22 +498,55 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       // Combine all CSS
       const allCss = cssFiles.map(f => f.content).join('\n')
       
-      // Build combined React code — strip imports/exports for browser execution
-      const componentCode = reactFiles.map(f => {
+      // Build a dependency graph so components are defined before they're used
+      const fileNames = new Map<string, string>() // path -> component name
+      for (const f of reactFiles) {
+        const nameMatch = f.content.match(/(?:export\s+default\s+)?(?:function|const|class)\s+(\w+)/)
+        if (nameMatch) fileNames.set(f.path, nameMatch[1])
+      }
+      
+      // Simple topological sort: files that import others go later
+      const sorted = [...reactFiles].sort((a, b) => {
+        const aImportsB = a.content.includes(fileNames.get(b.path) || '__NEVER__')
+        const bImportsA = b.content.includes(fileNames.get(a.path) || '__NEVER__')
+        if (aImportsB && !bImportsA) return 1  // a depends on b, b goes first
+        if (bImportsA && !aImportsB) return -1  // b depends on a, a goes first
+        // Entry file always last
+        if (a === entry) return 1
+        if (b === entry) return -1
+        return 0
+      })
+      
+      // Process each file — strip imports/exports, preserve component definitions
+      const componentCode = sorted.map(f => {
         let code = f.content
-        // Remove import statements (Babel standalone can't resolve modules)
+        // Remove TypeScript type imports entirely
+        code = code.replace(/^import\s+type\s+.*$/gm, '')
+        // Remove all import statements (Babel standalone can't resolve)
         code = code.replace(/^import\s+.*$/gm, '')
-        // Convert 'export default' to assignment
+        // Convert 'export default function X' → 'function X'
         code = code.replace(/export\s+default\s+function\s+(\w+)/, 'function $1')
-        code = code.replace(/export\s+default\s+/, 'const __DEFAULT__ = ')
-        // Remove named exports
-        code = code.replace(/^export\s+/gm, '')
+        // Convert 'export default class X' → 'class X'
+        code = code.replace(/export\s+default\s+class\s+(\w+)/, 'class $1')
+        // Convert 'export default X' → (remove, X should already be defined)
+        code = code.replace(/^export\s+default\s+\w+\s*;?\s*$/gm, '')
+        // Convert 'export const/function/class' → remove 'export'
+        code = code.replace(/^export\s+(const|let|var|function|class|interface|type|enum)\s/gm, '$1 ')
+        // Remove TypeScript interfaces and type aliases (Babel handles basic TS but not all)
+        code = code.replace(/^(?:export\s+)?(?:interface|type)\s+\w+[\s\S]*?(?=\n(?:const|let|var|function|class|export|import|\/\/|$))/gm, '')
         return `// --- ${f.path} ---\n${code}`
       }).join('\n\n')
       
-      // Determine the main component name
-      const mainMatch = entry.content.match(/(?:export\s+default\s+)?function\s+(\w+)/)
+      // Determine the main component name from entry
+      const mainMatch = entry.content.match(/(?:export\s+default\s+)?(?:function|const)\s+(\w+)/)
       const mainComponent = mainMatch ? mainMatch[1] : 'App'
+      
+      // Detect if Tailwind is used
+      const usesTailwind = reactFiles.some(f => f.content.includes('className='))
+      
+      // Detect common libraries
+      const usesLucide = reactFiles.some(f => f.content.includes('lucide-react'))
+      const usesFramerMotion = reactFiles.some(f => f.content.includes('framer-motion'))
       
       const reactHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -517,18 +557,39 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>${allCss}</style>
+  ${usesTailwind ? '<script src="https://cdn.tailwindcss.com"></script>' : ''}
+  ${usesLucide ? '<script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.min.js"></script>' : ''}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; }
+    ${allCss}
+  </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel" data-presets="react,typescript">
-    const { useState, useEffect, useCallback, useMemo, useRef, useContext, createContext, Fragment } = React;
+    // React globals
+    const { useState, useEffect, useCallback, useMemo, useRef, useContext, createContext, Fragment, forwardRef, memo, lazy, Suspense } = React;
+    const { createPortal } = ReactDOM;
+    
+    // Stub for lucide-react icons (renders as placeholder if not loaded)
+    const iconHandler = { get: (_, name) => (props) => React.createElement('span', { ...props, style: { display: 'inline-flex', width: props?.size || 24, height: props?.size || 24 } }, '⬡') };
+    const LucideIcons = typeof window.LucideReact !== 'undefined' ? window.LucideReact : new Proxy({}, iconHandler);
+    
+    // Stub for framer-motion
+    const motion = new Proxy({}, { get: (_, tag) => forwardRef((props, ref) => React.createElement(tag, { ...props, ref })) });
+    const AnimatePresence = ({ children }) => children;
     
     ${componentCode}
     
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(${mainComponent}));
+    try {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement(${mainComponent}));
+    } catch (e) {
+      document.getElementById('root').innerHTML = '<div style="padding:20px;color:#ef4444;font-family:monospace;white-space:pre-wrap">Render Error: ' + e.message + '\\n\\n' + e.stack + '</div>';
+    }
   </script>
 </body>
 </html>`
@@ -606,11 +667,8 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
         
         // Restore preview if we found files
         if (restoredFiles.length > 0) {
-          const htmlFile = restoredFiles.find(f => f.path.endsWith('.html') || f.language === 'html')
-          if (htmlFile) {
-            setLocalPreviewHtml(htmlFile.content)
-          }
-          preview.setFiles(restoredFiles)
+          // Use handleFilesGenerated which handles HTML, React, and multi-file properly
+          handleFilesGenerated(restoredFiles)
         }
         
         toast('success', 'Chat Loaded', `Resumed conversation${restoredFiles.length > 0 ? ` (${restoredFiles.length} files restored)` : ''}`)
@@ -693,7 +751,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     if(phase==='error')return<div className="state-container"><div className="state-icon">❌</div><div className="state-title" style={{color:'var(--accent-red)'}}>Build Failed</div><div className="state-desc">{error}</div>{logs&&<details><summary>View logs</summary><pre style={{fontSize:'11px',color:'var(--accent-red)'}}>{logs}</pre></details>}</div>
     return null
   }
-  const isLive=preview.isPreviewReady,showBottomBar=preview.phase==='previewing'||preview.phase==='complete',isDeployed=preview.phase==='complete'
+  const isLive=preview.isPreviewReady,showBottomBar=preview.phase==='previewing'||preview.phase==='complete'||preview.files.length>0||!!localPreviewHtml,isDeployed=preview.phase==='complete'
   const statusText=preview.phase==='previewing'?'✓ Preview ready':preview.phase==='verifying'?'⚡ Building...':preview.phase==='deploying'?'🚀 Deploying...':preview.phase==='complete'?'✓ Deployed!':preview.phase==='error'?'❌ Build failed':''
   const userInitial=(profile?.full_name?.[0]||user?.email?.[0])?.toUpperCase()||'U'
   const planLabel=(subscription?.plan||'free').charAt(0).toUpperCase()+(subscription?.plan||'free').slice(1)
