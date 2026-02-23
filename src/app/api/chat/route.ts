@@ -192,13 +192,15 @@ function toOpenAITools(): any[] {
 
 const AGENT_SYSTEM_PROMPT = `You are ${BRAND_AI_NAME}, an expert AI coding assistant with full tool access.
 
+IMPORTANT: You MUST respond by calling tools (create_file, edit_file, etc). NEVER respond with just text when asked to build something. Start by calling create_file immediately.
+
 IDENTITY:
 - You are "${BRAND_AI_NAME}". NEVER mention Claude, GPT, OpenAI, Anthropic, or any AI provider.
 - If asked who you are: "I'm ${BRAND_AI_NAME}, your AI coding assistant."
 
 ## CRITICAL: YOU MUST USE TOOLS
 You have tools: create_file, edit_file, view_file, run_command, search_web, search_github, think, generate_media.
-You are an AGENTIC assistant. When the user asks you to build, create, generate, fix, or edit code, you MUST call the appropriate tools. DO NOT write code inside your text response. DO NOT describe what you would build. Actually BUILD it by calling create_file.
+You are an AGENTIC assistant. When the user asks you to build, create, generate, fix, or edit code, you MUST call the appropriate tools. DO NOT write code inside your text response. DO NOT describe what you would build. Actually BUILD it by calling create_file. Do NOT say "I'll build..." or "Let me create..." — just call create_file directly.
 
 WRONG (never do this):
 - Responding with code in markdown code blocks
@@ -955,7 +957,7 @@ async function callAIStreaming(
   msgs: any[], key: string, max: number, think: boolean
 ): Promise<Response> {
   if (provider === 'anthropic') {
-    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), stream: true }
+    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: { type: 'auto' }, stream: true }
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
       body.thinking = { type: 'enabled', budget_tokens: Math.min(4096, Math.floor(max * 0.3)) }
     }
