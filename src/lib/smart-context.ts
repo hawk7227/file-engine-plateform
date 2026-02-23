@@ -8,7 +8,7 @@
 import { supabase } from './supabase'
 import { BRAND_AI_NAME } from '@/lib/brand'
 import { matchSkills } from './skills'
-import { getKnowledgeForIntent } from './knowledge-loader'
+import { getFullKnowledgeBase } from './knowledge-loader'
 
 // =====================================================
 // TYPES
@@ -510,13 +510,10 @@ export async function buildSmartContext(options: ContextOptions): Promise<Contex
     debugInfo.memoryInjected.push(`${corrections.length} corrections`)
   }
 
-  // Knowledge base — inject relevant sections based on intent
+  // Knowledge base — ALL knowledge on EVERY request (like Claude's architecture)
   if (useSmartContext) {
-    const knowledge = getKnowledgeForIntent(intent, userMessage)
-    if (knowledge) {
-      contextParts.push(knowledge)
-      debugInfo.skillsInjected.push('knowledge-base')
-    }
+    contextParts.push(getFullKnowledgeBase())
+    debugInfo.skillsInjected.push('full-knowledge-base')
   }
 
   // Attachments
