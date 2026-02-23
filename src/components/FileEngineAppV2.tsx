@@ -372,6 +372,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false)
   const [deployMenuOpen, setDeployMenuOpen] = useState(false)
   const [deployResult, setDeployResult] = useState<{vercelUrl?:string;githubUrl?:string}|null>(null)
+  const [localPreviewHtml, setLocalPreviewHtml] = useState<string|null>(null)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showChatsDialog, setShowChatsDialog] = useState(false)
   const [showProjectsDialog, setShowProjectsDialog] = useState(false)
@@ -434,8 +435,41 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
 
   useEffect(()=>{const h=(e:MouseEvent)=>{if(!(e.target as Element).closest('.dropdown')){setCopyMenuOpen(false);setDownloadMenuOpen(false);setDeployMenuOpen(false)}};document.addEventListener('click',h);return()=>document.removeEventListener('click',h)},[])
   useEffect(()=>{if(chatAreaRef.current)chatAreaRef.current.scrollTop=chatAreaRef.current.scrollHeight},[messages])
+
+  // Live preview: extract HTML from the latest assistant message as it streams
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1]
+    if (!lastMsg || lastMsg.role !== 'assistant') return
+    
+    // Check files first (from tool calls)
+    if (lastMsg.files?.length) {
+      const htmlFile = lastMsg.files.find(f => f.path.endsWith('.html') || f.language === 'html')
+      if (htmlFile) { setLocalPreviewHtml(htmlFile.content); return }
+    }
+    
+    // Extract from code blocks in content
+    const content = lastMsg.content || ''
+    // Match ```html:filename\n...\n``` or ```html\n...\n```
+    const htmlMatch = content.match(/```html(?::[^\n]*)?\n([\s\S]*?)```/)
+    if (htmlMatch?.[1]?.trim()) {
+      const html = htmlMatch[1].trim()
+      // Only update if it looks like real HTML (not a fragment)
+      if (html.includes('<') && html.length > 50) {
+        setLocalPreviewHtml(html)
+      }
+    }
+  }, [messages])
   
   const handleFilesGenerated = async(files:GeneratedFile[])=>{
+    // Try local preview first — find any HTML file and render via srcdoc
+    const htmlFile = files.find(f => f.path.endsWith('.html') || f.language === 'html')
+    if (htmlFile) {
+      setLocalPreviewHtml(htmlFile.content)
+      preview.setFiles(files)
+      toast('success', 'Preview Ready', `Rendered ${htmlFile.path}`)
+      return
+    }
+    // For non-HTML files, try Vercel build
     if(useLocal){preview.setFiles(files);toast('info','Local Preview','Files ready')}
     else{const r=await preview.verifyBuild(files,{projectId:currentProjectId||undefined,projectName:currentProjectName});if(r.success)toast('success','Preview Ready','Build completed')}
   }
@@ -446,6 +480,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     setCurrentChatId(undefined)
     clearMessages()
     preview.reset()
+    setLocalPreviewHtml(null)
     setDeployResult(null)
     toast('info', 'New Chat', currentProjectId ? `In ${currentProjectName}` : 'No project selected')
     window.history.pushState({}, '', '/dashboard')
@@ -547,10 +582,10 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const handleCopy = async(type:string)=>{setCopyMenuOpen(false);try{if(type==='url'&&preview.previewUrl)await navigator.clipboard.writeText(preview.previewUrl);else{const c=preview.files.map(f=>'// '+f.path+'\n'+f.content).join('\n\n');await navigator.clipboard.writeText(c)}toast('success','Copied!',type==='url'?'URL copied':'Code copied')}catch{toast('error','Copy Failed','Could not copy')}}
   const renderPreviewContent = ()=>{
     const{phase,phaseMessage,previewUrl,autoFixAttempts,error,logs}=preview
-    if(phase==='idle'){if(view==='code'&&projectFiles.length>0){return<div className="code-view">{loadingFiles?<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Loading files...</div></div>:projectFiles.map((f,i)=><div key={f.id} className={'code-file '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.file_path}</span><span className="code-file-badge">{f.language||'file'}</span></div><div className="code-file-content"><pre style={{color:'var(--text-muted)',fontStyle:'italic'}}>Click to load content</pre><div className="code-file-footer"><span>{f.language||f.file_path.split('.').pop()}</span><span>{f.file_size} bytes</span></div></div></div>)}</div>}return<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">Preview will appear here</div><div className="state-desc">Generate code to see a live preview</div></div>}
+    if(phase==='idle'){if(localPreviewHtml&&view==='preview'){return<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>}if(view==='code'&&(preview.files.length>0||projectFiles.length>0)){const filesToShow=preview.files.length>0?preview.files.map((f,i)=>({id:String(i),file_path:f.path,language:f.language||f.path.split('.').pop()||'',file_size:f.content.length,content:f.content})):projectFiles;return<div className="code-view">{loadingFiles?<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Loading files...</div></div>:filesToShow.map((f:any,i:number)=><div key={f.id||i} className={'code-file '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.file_path||f.path}</span><span className="code-file-badge">{f.language||'file'}</span></div><div className="code-file-content"><pre>{f.content||'Click to load content'}</pre><div className="code-file-footer"><span>{f.language||(f.file_path||f.path||'').split('.').pop()}</span><span>{typeof f.file_size==='number'?f.file_size+' bytes':f.content?f.content.split('\n').length+' lines':''}</span></div></div></div>)}</div>}return<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">Preview will appear here</div><div className="state-desc">Generate code to see a live preview</div></div>}
     if(phase==='verifying'||phase==='generating')return<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Building preview...</div><div className="state-desc">{phaseMessage||'Deploying...'}</div></div>
     if(phase==='auto-fixing')return<div className="state-container"><div className="state-icon spin">🔧</div><div className="state-title">Auto-fixing errors...</div><div className="state-desc">Attempt {autoFixAttempts}/3</div></div>
-    if(phase==='previewing'){if(view==='preview')return previewUrl?<iframe className="preview-iframe" src={previewUrl} title="Preview"/>:<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">No preview URL</div></div>;return<div className="code-view">{preview.files.map((f,i)=><div key={i} className={'code-file validated '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.path}</span><span className="code-file-badge">validated</span></div><div className="code-file-content"><pre>{f.content}</pre><div className="code-file-footer"><span>{f.path.split('.').pop()}</span><span>{f.content.split('\n').length} lines</span></div></div></div>)}</div>}
+    if(phase==='previewing'){if(view==='preview')return localPreviewHtml?<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>:previewUrl?<iframe className="preview-iframe" src={previewUrl} title="Preview"/>:<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">No preview URL</div></div>;return<div className="code-view">{preview.files.map((f,i)=><div key={i} className={'code-file validated '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.path}</span><span className="code-file-badge">validated</span></div><div className="code-file-content"><pre>{f.content}</pre><div className="code-file-footer"><span>{f.path.split('.').pop()}</span><span>{f.content.split('\n').length} lines</span></div></div></div>)}</div>}
 
     if(phase==='deploying')return<div className="state-container"><div className="state-icon spin">🚀</div><div className="state-title">Deploying...</div></div>
     if(phase==='complete')return<div className="state-container"><div className="state-icon">🎉</div><div className="state-title" style={{color:'var(--accent-green)'}}>Deployed!</div><div className="deploy-links">{deployResult?.vercelUrl&&<a href={deployResult.vercelUrl} target="_blank" rel="noopener noreferrer" className="deploy-link">↗️ {deployResult.vercelUrl}</a>}{deployResult?.githubUrl&&<a href={deployResult.githubUrl} target="_blank" rel="noopener noreferrer" className="deploy-link">↗️ {deployResult.githubUrl}</a>}</div></div>
