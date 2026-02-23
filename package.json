@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=2048' next build",
-    "start": "cross-env NODE_OPTIONS=--max-http-header-size=32768 next start",
+    "build": "NODE_OPTIONS=--max-old-space-size=2048 next build",
+    "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
   },
