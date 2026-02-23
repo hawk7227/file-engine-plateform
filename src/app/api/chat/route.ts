@@ -1011,6 +1011,7 @@ async function agentStream(
               ? (settled[i] as PromiseFulfilledResult<any>).value
               : { success: false, result: `Tool error: ${(settled[i] as PromiseRejectedResult).reason?.message || 'Unknown'}` }
             const resultStr = r?.result || r?.error || 'No result'
+            console.log(`[Tool Result] ${tc.name} settled=${settled[i].status} success=${!!r?.success} resultLen=${String(resultStr).length}`)
             ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_result', tool: tc.name, success: !!r?.success, result: sanitizeResponse(String(resultStr).slice(0, 2000)) })}\n\n`))
             results.push({ tool_use_id: tc.id, content: String(resultStr).slice(0, 4000) })
           }
@@ -1027,10 +1028,14 @@ async function agentStream(
 
         // ── SEND FINAL FILES ──
         if (Object.keys(toolCtx.files).length > 0) {
+          const fileList = Object.entries(toolCtx.files).map(([p, c]) => ({ path: p, language: langFromPath(p), content: c }))
+          console.log(`[Files Updated] ${fileList.length} files: ${fileList.map(f => `${f.path}(${f.content.length}b)`).join(', ')}`)
           ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
             type: 'files_updated',
-            files: Object.entries(toolCtx.files).map(([p, c]) => ({ path: p, language: langFromPath(p), content: c }))
+            files: fileList
           })}\n\n`))
+        } else {
+          console.log(`[Files Updated] No files in toolCtx`)
         }
 
         ctrl.enqueue(enc.encode('data: [DONE]\n\n'))
