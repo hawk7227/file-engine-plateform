@@ -1,17 +1,17 @@
 // =====================================================
-// FILE ENGINE - ChatMarkdown Component
-// Renders markdown with syntax-highlighted code blocks
-// Matches V2 dark theme (CSS variable based)
+// FILE ENGINE - ChatMarkdown Component V3
+// Claude-style rendering:
+// - File cards (collapsed) instead of raw code dumps
+// - Streaming progress indicators
+// - Proper language:filepath parsing
 // =====================================================
 
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
-import ReactMarkdown from 'react-markdown'
-import rehypeHighlight from 'rehype-highlight'
 
 // =====================================================
-// STYLES — injected once, matches V2 CSS vars
+// STYLES
 // =====================================================
 
 const MARKDOWN_CSS = `
@@ -35,48 +35,113 @@ const MARKDOWN_CSS = `
 .md-content table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
 .md-content th { text-align: left; padding: 8px 12px; background: var(--bg-tertiary, #13131a); color: var(--text-primary, #fff); font-weight: 600; border-bottom: 1px solid var(--border-default, #2a2a38); }
 .md-content td { padding: 6px 12px; border-bottom: 1px solid var(--border-subtle, #1e1e28); }
-.md-content img { max-width: 100%; border-radius: 8px; margin: 12px 0; }
 
 /* ── Inline code ── */
-.md-content code:not(pre code) {
+.md-content code {
   padding: 2px 6px; background: rgba(255,255,255,.06); border: 1px solid var(--border-subtle, #1e1e28);
   border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.88em; color: var(--accent-primary, #00ff88);
 }
 
-/* ── Code blocks ── */
-.md-code-block { position: relative; margin: 12px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-subtle, #1e1e28); }
-.md-code-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 6px 12px; background: var(--bg-tertiary, #13131a);
-  border-bottom: 1px solid var(--border-subtle, #1e1e28);
+/* ── File Card (Claude-style collapsed code block) ── */
+.file-card {
+  margin: 12px 0; border: 1px solid var(--border-subtle, #1e1e28); border-radius: 10px;
+  overflow: hidden; background: var(--bg-secondary, #0d0d12); transition: border-color 0.2s;
 }
-.md-code-lang { font-size: 11px; color: var(--text-muted, #6a6a7a); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.md-code-copy {
-  padding: 3px 8px; font-size: 11px; background: transparent; border: 1px solid var(--border-subtle, #1e1e28);
-  border-radius: 4px; color: var(--text-muted, #6a6a7a); cursor: pointer; transition: all 0.15s;
+.file-card:hover { border-color: var(--border-default, #2a2a38); }
+.file-card-header {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  cursor: pointer; user-select: none; background: var(--bg-tertiary, #13131a);
 }
-.md-code-copy:hover { background: var(--bg-elevated, #1a1a24); color: var(--text-primary, #fff); }
-.md-code-copy.copied { color: var(--accent-primary, #00ff88); border-color: var(--accent-primary, #00ff88); }
-.md-code-block pre {
-  margin: 0; padding: 14px 16px; background: var(--bg-secondary, #0d0d12) !important;
-  overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6;
+.file-card-header:hover { background: rgba(255,255,255,0.03); }
+.file-card-icon {
+  width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; flex-shrink: 0;
 }
-.md-code-block pre code { background: none !important; border: none !important; padding: 0 !important; font-size: inherit; color: var(--text-secondary, #a0a0b0); }
+.file-card-icon.html { background: rgba(255,99,34,0.15); color: #ff6322; }
+.file-card-icon.tsx, .file-card-icon.jsx { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.file-card-icon.ts, .file-card-icon.js { background: rgba(234,179,8,0.15); color: #eab308; }
+.file-card-icon.css { background: rgba(168,85,247,0.15); color: #a855f7; }
+.file-card-icon.json { background: rgba(34,197,94,0.15); color: #22c55e; }
+.file-card-icon.default { background: rgba(113,113,122,0.15); color: #71717a; }
+.file-card-info { flex: 1; min-width: 0; }
+.file-card-name {
+  font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 600;
+  color: var(--text-primary, #fff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-card-meta { font-size: 11px; color: var(--text-muted, #6a6a7a); margin-top: 1px; }
+.file-card-actions { display: flex; gap: 4px; }
+.file-card-btn {
+  padding: 4px 10px; font-size: 11px; background: transparent;
+  border: 1px solid var(--border-subtle, #1e1e28); border-radius: 4px;
+  color: var(--text-muted, #6a6a7a); cursor: pointer; transition: all 0.15s;
+}
+.file-card-btn:hover { background: var(--bg-elevated, #1a1a24); color: var(--text-primary, #fff); }
+.file-card-btn.copied { color: var(--accent-primary, #00ff88); border-color: var(--accent-primary, #00ff88); }
+.file-card-chevron {
+  font-size: 10px; color: var(--text-muted, #6a6a7a); transition: transform 0.2s; flex-shrink: 0;
+}
+.file-card.expanded .file-card-chevron { transform: rotate(90deg); }
+.file-card-code {
+  display: none; border-top: 1px solid var(--border-subtle, #1e1e28);
+  max-height: 400px; overflow: auto;
+}
+.file-card.expanded .file-card-code { display: block; }
+.file-card-code pre {
+  margin: 0; padding: 14px 16px; background: var(--bg-secondary, #0d0d12);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6;
+  color: var(--text-secondary, #a0a0b0); white-space: pre; overflow-x: auto;
+}
 
-/* ── highlight.js theme (dark) ── */
-.hljs { color: #c9d1d9; }
-.hljs-keyword,.hljs-selector-tag,.hljs-built_in { color: #ff7b72; }
-.hljs-string,.hljs-attr,.hljs-template-tag { color: #a5d6ff; }
-.hljs-function,.hljs-title { color: #d2a8ff; }
-.hljs-comment,.hljs-quote { color: #8b949e; font-style: italic; }
-.hljs-number,.hljs-literal { color: #79c0ff; }
-.hljs-variable,.hljs-params { color: #ffa657; }
-.hljs-type,.hljs-class .hljs-title { color: #7ee787; }
-.hljs-meta,.hljs-tag { color: #79c0ff; }
-.hljs-attribute { color: #7ee787; }
-.hljs-symbol,.hljs-bullet { color: #ffa657; }
-.hljs-addition { color: #aff5b4; background: rgba(46,160,67,.15); }
-.hljs-deletion { color: #ffdcd7; background: rgba(248,81,73,.15); }
+/* ── Streaming code card (shows while AI writes code) ── */
+.code-streaming-card {
+  margin: 12px 0; border: 1px solid rgba(0,255,136,0.2); border-radius: 10px;
+  overflow: hidden; background: var(--bg-secondary, #0d0d12);
+  animation: cardPulse 2s ease-in-out infinite;
+}
+@keyframes cardPulse {
+  0%, 100% { border-color: rgba(0,255,136,0.15); }
+  50% { border-color: rgba(0,255,136,0.35); }
+}
+.code-streaming-header {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: var(--bg-tertiary, #13131a);
+}
+.code-streaming-spinner {
+  width: 16px; height: 16px; border: 2px solid rgba(0,255,136,0.2);
+  border-top-color: var(--accent-primary, #00ff88); border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.code-streaming-info { flex: 1; }
+.code-streaming-name { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 600; color: var(--text-primary, #fff); }
+.code-streaming-status { font-size: 11px; color: var(--accent-primary, #00ff88); }
+.code-streaming-progress { height: 2px; background: var(--bg-elevated, #1a1a24); }
+.code-streaming-progress-bar {
+  height: 100%; background: linear-gradient(90deg, var(--accent-primary, #00ff88), var(--accent-blue, #0088ff));
+  animation: progressSweep 2s ease-in-out infinite;
+}
+@keyframes progressSweep { 0% { width: 5%; } 50% { width: 70%; } 100% { width: 95%; } }
+
+/* ── Streaming indicator ── */
+.streaming-indicator {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0; margin: 4px 0;
+  font-size: 13px; color: var(--text-muted, #6a6a7a);
+}
+.streaming-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary, #00ff88);
+  animation: streamPulse 1.5s ease-in-out infinite;
+}
+@keyframes streamPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ── Small inline code block ── */
+.md-code-block { position: relative; margin: 12px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-subtle, #1e1e28); }
+.md-code-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--bg-tertiary, #13131a); border-bottom: 1px solid var(--border-subtle, #1e1e28); }
+.md-code-lang { font-size: 11px; color: var(--text-muted, #6a6a7a); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.md-code-block pre { margin: 0; padding: 14px 16px; background: var(--bg-secondary, #0d0d12); overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; }
+.md-code-block pre code { background: none !important; border: none !important; padding: 0 !important; font-size: inherit; color: var(--text-secondary, #a0a0b0); }
 `
 
 let styleInjected = false
@@ -89,73 +154,228 @@ function injectStyles() {
 }
 
 // =====================================================
-// CODE BLOCK with copy button + language label
+// HELPERS
 // =====================================================
 
-function CodeBlock({ className, children }: { className?: string; children?: React.ReactNode }) {
-  const [copied, setCopied] = useState(false)
-  const code = String(children).replace(/\n$/, '')
-  const lang = className?.replace('language-', '') || ''
+function getFileIcon(ext: string): string {
+  const icons: Record<string, string> = {
+    html: '🌐', htm: '🌐', tsx: '⚛️', jsx: '⚛️', ts: '📘', js: '📒',
+    css: '🎨', scss: '🎨', json: '📋', md: '📝', py: '🐍', sql: '🗄️',
+    sh: '⚡', yaml: '⚙️', yml: '⚙️', svg: '🖼️', txt: '📄',
+  }
+  return icons[ext] || '📄'
+}
 
-  const handleCopy = useCallback(async () => {
+function getFileClass(ext: string): string {
+  if (['html', 'htm'].includes(ext)) return 'html'
+  if (['tsx', 'jsx'].includes(ext)) return 'tsx'
+  if (['ts'].includes(ext)) return 'ts'
+  if (['js'].includes(ext)) return 'js'
+  if (['css', 'scss'].includes(ext)) return 'css'
+  if (['json'].includes(ext)) return 'json'
+  return 'default'
+}
+
+// =====================================================
+// FILE CARD (Claude-style collapsed code block)
+// =====================================================
+
+function FileCard({ filename, language, code, lineCount }: {
+  filename: string; language: string; code: string; lineCount: number
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const ext = filename.split('.').pop() || language || ''
+
+  const handleCopy = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation()
     await navigator.clipboard.writeText(code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [code])
 
   return (
-    <div className="md-code-block">
-      <div className="md-code-header">
-        <span className="md-code-lang">{lang || 'code'}</span>
-        <button className={`md-code-copy${copied ? ' copied' : ''}`} onClick={handleCopy}>
-          {copied ? '✓ Copied' : 'Copy'}
-        </button>
+    <div className={`file-card${expanded ? ' expanded' : ''}`}>
+      <div className="file-card-header" onClick={() => setExpanded(!expanded)}>
+        <div className={`file-card-icon ${getFileClass(ext)}`}>{getFileIcon(ext)}</div>
+        <div className="file-card-info">
+          <div className="file-card-name">{filename}</div>
+          <div className="file-card-meta">{language.toUpperCase()} · {lineCount} lines</div>
+        </div>
+        <div className="file-card-actions">
+          <button className={`file-card-btn${copied ? ' copied' : ''}`} onClick={handleCopy}>
+            {copied ? '✓' : 'Copy'}
+          </button>
+        </div>
+        <span className="file-card-chevron">▶</span>
       </div>
-      <pre><code className={className}>{children}</code></pre>
+      <div className="file-card-code">
+        <pre>{code}</pre>
+      </div>
     </div>
   )
 }
 
 // =====================================================
-// MARKDOWN COMPONENT OVERRIDES
+// STREAMING CODE CARD (shows while AI is writing)
 // =====================================================
 
-const mdComponents = {
-  code({ className, children, ...props }: any) {
-    const isBlock = className?.startsWith('language-')
-    if (isBlock) {
-      return <CodeBlock className={className}>{children}</CodeBlock>
-    }
-    return <code className={className} {...props}>{children}</code>
-  },
-  a({ href, children, ...props }: any) {
-    return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
-  },
-  pre({ children }: any) {
-    return <>{children}</>
-  },
+function StreamingCodeCard({ filename, language, linesSoFar }: {
+  filename: string; language: string; linesSoFar: number
+}) {
+  const ext = filename.split('.').pop() || language || ''
+  return (
+    <div className="code-streaming-card">
+      <div className="code-streaming-header">
+        <div className="code-streaming-spinner" />
+        <div className="code-streaming-info">
+          <div className="code-streaming-name">{getFileIcon(ext)} {filename}</div>
+          <div className="code-streaming-status">Writing code... {linesSoFar > 0 ? `${linesSoFar} lines` : ''}</div>
+        </div>
+      </div>
+      <div className="code-streaming-progress">
+        <div className="code-streaming-progress-bar" />
+      </div>
+    </div>
+  )
 }
 
 // =====================================================
-// EXPORT — drop-in content renderer
+// CONTENT PARSER — splits content into text + file cards
+// =====================================================
+
+interface ContentSegment {
+  type: 'text' | 'file' | 'streaming-file'
+  text?: string
+  filename?: string
+  language?: string
+  code?: string
+  lineCount?: number
+  linesSoFar?: number
+}
+
+function parseContent(content: string, isStreaming: boolean): ContentSegment[] {
+  const segments: ContentSegment[] = []
+  
+  // Regex for completed code blocks: ```lang:filepath\n...\n``` or ```lang\n...\n```
+  const codeBlockRegex = /```(\w+)(?::([^\n]+))?\n([\s\S]*?)```/g
+  
+  let lastIndex = 0
+  let match
+  
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    // Text before this code block
+    if (match.index > lastIndex) {
+      const textBefore = content.slice(lastIndex, match.index).trim()
+      if (textBefore) segments.push({ type: 'text', text: textBefore })
+    }
+    
+    const language = match[1] || 'text'
+    const filepath = match[2]?.trim() || ''
+    const code = match[3] || ''
+    const lineCount = code.split('\n').length
+    const filename = filepath || `file.${language}`
+    
+    // Substantial code blocks (>5 lines) → file card; small ones → inline
+    if (lineCount > 5) {
+      segments.push({ type: 'file', filename, language, code: code.trim(), lineCount })
+    } else {
+      segments.push({ type: 'text', text: '```' + language + '\n' + code + '```' })
+    }
+    
+    lastIndex = match.index + match[0].length
+  }
+  
+  // Remaining text after last code block
+  const remaining = content.slice(lastIndex)
+  
+  if (isStreaming && remaining) {
+    // Check for unclosed code block (AI still writing code)
+    const unclosedMatch = remaining.match(/```(\w+)(?::([^\n]+))?\n([\s\S]*)$/)
+    
+    if (unclosedMatch) {
+      const textBefore = remaining.slice(0, remaining.indexOf('```')).trim()
+      if (textBefore) segments.push({ type: 'text', text: textBefore })
+      
+      const lang = unclosedMatch[1] || 'text'
+      const fp = unclosedMatch[2]?.trim() || `file.${lang}`
+      const partialCode = unclosedMatch[3] || ''
+      const linesSoFar = partialCode.split('\n').length
+      
+      segments.push({ type: 'streaming-file', filename: fp, language: lang, linesSoFar })
+    } else if (remaining.trim()) {
+      segments.push({ type: 'text', text: remaining.trim() })
+    }
+  } else if (remaining.trim()) {
+    segments.push({ type: 'text', text: remaining.trim() })
+  }
+  
+  return segments
+}
+
+// =====================================================
+// SIMPLE MARKDOWN RENDERER
+// =====================================================
+
+function renderMarkdown(text: string): string {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    .split('\n\n').map(p => p.trim()).filter(Boolean)
+    .map(p => {
+      if (p.startsWith('### ')) return `<h3>${p.slice(4)}</h3>`
+      if (p.startsWith('## ')) return `<h2>${p.slice(3)}</h2>`
+      if (p.startsWith('# ')) return `<h1>${p.slice(2)}</h1>`
+      if (p.match(/^[-*] /m)) {
+        const items = p.split('\n').filter(l => l.match(/^[-*] /)).map(l => `<li>${l.replace(/^[-*] /, '')}</li>`).join('')
+        return `<ul>${items}</ul>`
+      }
+      if (p.match(/^\d+\. /m)) {
+        const items = p.split('\n').filter(l => l.match(/^\d+\. /)).map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('')
+        return `<ol>${items}</ol>`
+      }
+      // Small inline code blocks
+      if (p.startsWith('```')) {
+        const m = p.match(/```(\w*)\n([\s\S]*?)```/)
+        if (m) return `<div class="md-code-block"><div class="md-code-header"><span class="md-code-lang">${m[1] || 'code'}</span></div><pre><code>${m[2]}</code></pre></div>`
+      }
+      return `<p>${p.replace(/\n/g, '<br/>')}</p>`
+    })
+    .join('')
+}
+
+// =====================================================
+// MAIN COMPONENT
 // =====================================================
 
 export function ChatMarkdown({ content, isStreaming }: { content: string; isStreaming?: boolean }) {
   injectStyles()
-
-  const rendered = useMemo(() => (
-    <ReactMarkdown
-      rehypePlugins={[rehypeHighlight]}
-      components={mdComponents}
-    >
-      {content}
-    </ReactMarkdown>
-  ), [content])
-
+  
+  const segments = useMemo(() => parseContent(content, !!isStreaming), [content, isStreaming])
+  
   return (
     <div className="md-content">
-      {rendered}
-      {isStreaming && <span style={{ display: 'inline-block', width: 8, height: 16, background: 'var(--accent-primary, #00ff88)', animation: 'blink 1s infinite', verticalAlign: 'middle', marginLeft: 4, borderRadius: 2 }} />}
+      {segments.map((seg, i) => {
+        if (seg.type === 'file') {
+          return <FileCard key={`f-${i}-${seg.filename}`} filename={seg.filename!} language={seg.language!} code={seg.code!} lineCount={seg.lineCount!} />
+        }
+        if (seg.type === 'streaming-file') {
+          return <StreamingCodeCard key={`s-${i}-${seg.filename}`} filename={seg.filename!} language={seg.language!} linesSoFar={seg.linesSoFar!} />
+        }
+        return <div key={`t-${i}`} dangerouslySetInnerHTML={{ __html: renderMarkdown(seg.text || '') }} />
+      })}
+      {isStreaming && segments.length === 0 && (
+        <div className="streaming-indicator">
+          <div className="streaming-dot" />
+          <span className="streaming-label" style={{ color: 'var(--text-secondary)' }}>Thinking...</span>
+        </div>
+      )}
+      {isStreaming && segments.length > 0 && !segments.some(s => s.type === 'streaming-file') && (
+        <span style={{ display: 'inline-block', width: 8, height: 16, background: 'var(--accent-primary, #00ff88)', animation: 'blink 1s infinite', verticalAlign: 'middle', marginLeft: 4, borderRadius: 2 }} />
+      )}
     </div>
   )
 }

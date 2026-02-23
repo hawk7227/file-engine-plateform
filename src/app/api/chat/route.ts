@@ -633,7 +633,7 @@ export async function POST(request: NextRequest) {
     const toolCtx: ToolContext = { files: { ...files }, projectId, attachments }
 
     if (stream && needsAgent) {
-      return agentStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx, enableThinking, attachments)
+      return agentStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx, enableThinking, attachments, intent)
     }
     return simpleStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, attachments)
   } catch (error: any) {
@@ -738,7 +738,8 @@ function appendToolResults(
 async function agentStream(
   provider: 'anthropic' | 'openai', model: string, systemPrompt: string,
   messages: Message[], apiKey: string, maxTokens: number,
-  toolCtx: ToolContext, enableThinking: boolean, attachments?: Attachment[]
+  toolCtx: ToolContext, enableThinking: boolean, attachments?: Attachment[],
+  intent?: string
 ): Promise<Response> {
   const enc = new TextEncoder()
   const MAX_ITER = 15
@@ -752,8 +753,10 @@ async function agentStream(
 
         for (let i = 0; i < MAX_ITER; i++) {
           // ── STREAM AI RESPONSE (text flows immediately, tools accumulate) ──
-          // Force tool use on first iteration (i=0) to ensure agent actually calls create_file
-          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc, i === 0)
+          // Force tool use on first iteration ONLY for code generation intents
+          // Don't force for questions, explanations, or general chat
+          const isCodeIntent = intent === 'generate_code' || intent === 'fix_code' || intent === 'refactor'
+          const parsed = await streamAgentTurn(provider, model, systemPrompt, apiMsgs, apiKey, maxTokens, enableThinking, ctrl, enc, i === 0 && isCodeIntent)
 
           if (!parsed) break // stream error already sent to client
 
