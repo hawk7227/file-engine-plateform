@@ -776,7 +776,12 @@ export async function POST(request: NextRequest) {
     }
 
     const optMsgs = smartCtx.trimmedMessages.length > 0 ? smartCtx.trimmedMessages : messages
-    const maxTokens = smartCtx.maxTokens
+    let maxTokens = smartCtx.maxTokens
+    // Safety floor: agent mode needs enough tokens for tool calls (JSON can be large)
+    if (needsAgent && maxTokens < 8192) {
+      console.log(`[Chat API] maxTokens floor: ${maxTokens} → 8192 (agent mode minimum)`)
+      maxTokens = 8192
+    }
     const ctx = smartCtx.injectedContext
 
     // ── Build memory context from parallel-loaded memories ──

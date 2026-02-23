@@ -69,11 +69,14 @@ export type MessageIntent =
 export function classifyIntent(message: string): MessageIntent {
   const lower = message.toLowerCase()
 
-  // Order matters — most specific first
+  // Order matters — most specific first, generation BEFORE styling
   if (lower.match(/deploy|publish|ship|go live/)) return 'deploy_action'
   if (lower.match(/fix|bug|error|broken|crash|fail|doesn'?t work|not working/)) return 'fix_code'
   if (lower.match(/refactor|clean up|improve|optimize|simplify/)) return 'refactor'
   if (lower.match(/explain|how does|what is|why does|teach me|what'?s the difference/)) return 'explain'
+  // CRITICAL: generate_code MUST come before style_question
+  // "Build a landing page with dark theme" = generate, not style
+  if (lower.match(/create|build|generate|make|write|code|add|implement|design|set ?up|develop|page|app|website|component|dashboard|form/)) return 'generate_code'
   if (lower.match(/color|font|spacing|style|theme|dark mode|responsive|layout|align/)) return 'style_question'
   if (lower.match(/what files|show me|list|which components|project structure/)) return 'project_question'
   if (lower.match(/create|build|generate|make|write|code|add|implement|design|set ?up|develop/)) return 'generate_code'
