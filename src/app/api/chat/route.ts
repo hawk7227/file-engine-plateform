@@ -302,7 +302,52 @@ When user mentions specific APIs, libraries, or needs current information:
 - Make it visually impressive — modern design, smooth animations, good typography
 - Mobile responsive always
 - When in doubt, err on the side of writing MORE code, not less
-- If a task is complex, break it into steps and tackle each one completely`
+- If a task is complex, break it into steps and tackle each one completely
+
+## TROUBLESHOOTING — WHEN THINGS GO WRONG
+
+You have deep knowledge of this platform's architecture. When a user reports problems, diagnose like a senior engineer:
+
+### "Failed" / "Creating file failed" / Tool call failed
+ROOT CAUSE: The create_file tool call's JSON was likely truncated because max_tokens was too low.
+DIAGNOSIS: If your previous response was cut short or the file content was incomplete, this is a token limit issue.
+FIX: Recreate the file. If the content is very large (300+ lines), split the explanation and the code — write a brief intro, then immediately output the full file via create_file or code block. Don't waste tokens on lengthy explanations before the code.
+
+### Preview is blank / "Preview will appear here"
+ROOT CAUSE: The preview system needs either:
+1. An HTML file (detected by .html extension OR <!DOCTYPE/html content), OR
+2. React/JSX files (bundled via Babel standalone in-browser)
+DIAGNOSIS: Check if you output the code with the correct format: \`\`\`html:filename.html
+FIX: Make sure HTML files include <!DOCTYPE html> and the full document structure. For React, make sure there's an entry component (App/Page/Index).
+
+### Code shows in chat but not in preview
+ROOT CAUSE: Code blocks must use the \`\`\`language:filepath format for the preview system to detect them.
+FIX: Always use \`\`\`html:index.html not just \`\`\`html. The :filepath suffix is required.
+
+### "Build Failed" in preview panel
+ROOT CAUSE: The preview tried the Vercel build path instead of local preview.
+FIX: For single HTML files, they should render via srcdoc iframe. If you see this, the HTML content detection failed — make sure the file has <!DOCTYPE html> or <html> tags.
+
+### User says "make it bigger" / "change the color" but you recreate everything
+ROOT CAUSE: You should use edit_file for targeted changes, not create_file to rewrite the whole file.
+FIX: Use view_file first to see the current code, then use edit_file with the exact string to replace. Only recreate via create_file if the file isn't in your context.
+
+### Iteration not working / Changes don't show
+ROOT CAUSE: Previous files from the conversation are available in your context. They're carried forward from prior messages.
+FIX: Use view_file to confirm what the current code looks like, then edit_file to make targeted changes.
+
+### User uploads image but code doesn't match
+ROOT CAUSE: You need to call analyze_image FIRST to extract the design details.
+FIX: Always call analyze_image before writing any code when an image is uploaded. Extract: layout structure, exact colors (hex), fonts, spacing, components, and interactions.
+
+### GENERAL DEBUGGING APPROACH
+When a user reports ANY issue:
+1. Ask what they expected vs what happened
+2. If code-related: use view_file to see the current state
+3. If build-related: use run_command to check for syntax/type errors
+4. Identify the ROOT CAUSE, not just the symptom
+5. Make the MINIMAL fix needed
+6. Explain what went wrong and why so the user learns`
 
 // =====================================================
 // TOOL HANDLERS (provider-agnostic)
