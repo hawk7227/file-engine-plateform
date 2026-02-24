@@ -136,6 +136,47 @@ const MARKDOWN_CSS = `
   50% { opacity: 1; transform: scale(1.1); }
 }
 
+/* ── Activity Log (Claude-style tool use indicator) ── */
+.streaming-activity-log {
+  margin: 8px 0; padding: 10px 14px; background: var(--bg-tertiary, #13131a);
+  border: 1px solid var(--border-subtle, #1e1e28); border-radius: 10px;
+  font-size: 13px; overflow: hidden;
+}
+.activity-log-item {
+  display: flex; align-items: center; gap: 10px; padding: 5px 0;
+  animation: activityFadeIn 0.3s ease;
+}
+@keyframes activityFadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.activity-log-icon {
+  width: 22px; height: 22px; border-radius: 5px; display: flex;
+  align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;
+}
+.activity-log-label { color: var(--text-secondary, #a0a0b0); flex: 1; }
+.activity-log-status { font-size: 11px; font-weight: 600; }
+.activity-log-status.active { color: var(--accent-primary, #00ff88); }
+.activity-log-status.done { color: var(--text-muted, #6a6a7a); }
+.activity-log-spinner {
+  width: 12px; height: 12px; border: 2px solid rgba(0,255,136,0.2);
+  border-top-color: var(--accent-primary, #00ff88); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ── Streaming code preview strip ── */
+.streaming-code-preview {
+  margin: 8px 0; border-radius: 8px; overflow: hidden; position: relative;
+  border: 1px solid var(--border-subtle, #1e1e28); max-height: 68px;
+}
+.streaming-code-preview pre {
+  margin: 0; padding: 10px 14px; background: var(--bg-secondary, #0d0d12);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.5;
+  color: var(--text-muted, #6a6a7a); white-space: pre; overflow: hidden;
+}
+.streaming-code-preview::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
+  background: linear-gradient(transparent, var(--bg-secondary, #0d0d12));
+  pointer-events: none;
+}
+
 /* ── Small inline code block ── */
 .md-code-block { position: relative; margin: 12px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-subtle, #1e1e28); }
 .md-code-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--bg-tertiary, #13131a); border-bottom: 1px solid var(--border-subtle, #1e1e28); }
@@ -217,6 +258,66 @@ function FileCard({ filename, language, code, lineCount }: {
 }
 
 // =====================================================
+// STREAMING ACTIVITY LOG (Claude-style tool use)
+// =====================================================
+
+const PHASE_CONFIG: Record<string, { icon: string; bg: string; label: string }> = {
+  thinking:  { icon: '🧠', bg: 'rgba(168,85,247,.15)', label: 'Analyzing request...' },
+  planning:  { icon: '📋', bg: 'rgba(59,130,246,.15)', label: 'Planning approach...' },
+  searching: { icon: '🔍', bg: 'rgba(168,85,247,.15)', label: 'Searching for information...' },
+  creating:  { icon: '📄', bg: 'rgba(34,197,94,.15)',  label: 'Creating file...' },
+  editing:   { icon: '✏️', bg: 'rgba(59,130,246,.15)', label: 'Editing file...' },
+  analyzing: { icon: '👁️', bg: 'rgba(234,179,8,.15)',  label: 'Analyzing image...' },
+  running:   { icon: '⚡', bg: 'rgba(234,179,8,.15)',  label: 'Running command...' },
+  styling:   { icon: '🎨', bg: 'rgba(168,85,247,.15)', label: 'Applying design system...' },
+  generating:{ icon: '⚙️', bg: 'rgba(34,197,94,.15)',  label: 'Generating code...' },
+}
+
+function StreamingActivityLog({ phase, message, completedPhases }: {
+  phase: string; message?: string; completedPhases: string[]
+}) {
+  const config = PHASE_CONFIG[phase] || PHASE_CONFIG.thinking
+  
+  return (
+    <div className="streaming-activity-log">
+      {/* Completed phases */}
+      {completedPhases.map((p, i) => {
+        const c = PHASE_CONFIG[p] || PHASE_CONFIG.thinking
+        return (
+          <div key={i} className="activity-log-item">
+            <div className="activity-log-icon" style={{ background: c.bg }}>{c.icon}</div>
+            <span className="activity-log-label" style={{ color: 'var(--text-muted)' }}>{c.label}</span>
+            <span className="activity-log-status done">✓</span>
+          </div>
+        )
+      })}
+      {/* Current active phase */}
+      <div className="activity-log-item">
+        <div className="activity-log-icon" style={{ background: config.bg }}>{config.icon}</div>
+        <span className="activity-log-label">{message || config.label}</span>
+        <div className="activity-log-spinner" />
+      </div>
+    </div>
+  )
+}
+
+// =====================================================
+// STREAMING CODE PREVIEW (fading code strip)
+// =====================================================
+
+function StreamingCodePreview({ code }: { code: string }) {
+  // Show last ~4 lines of the code being written
+  const lines = code.split('\n')
+  const lastLines = lines.slice(-4).join('\n')
+  
+  return (
+    <div className="streaming-code-preview">
+      <pre>{lastLines}</pre>
+    </div>
+  )
+}
+
+// =====================================================
 // STREAMING CODE CARD (shows while AI is writing)
 // =====================================================
 
@@ -252,6 +353,7 @@ interface ContentSegment {
   code?: string
   lineCount?: number
   linesSoFar?: number
+  partialCode?: string
 }
 
 function parseContent(content: string, isStreaming: boolean): ContentSegment[] {
@@ -302,7 +404,7 @@ function parseContent(content: string, isStreaming: boolean): ContentSegment[] {
       const partialCode = unclosedMatch[3] || ''
       const linesSoFar = partialCode.split('\n').length
       
-      segments.push({ type: 'streaming-file', filename: fp, language: lang, linesSoFar })
+      segments.push({ type: 'streaming-file', filename: fp, language: lang, linesSoFar, partialCode: partialCode })
     } else if (remaining.trim()) {
       segments.push({ type: 'text', text: remaining.trim() })
     }
@@ -351,10 +453,26 @@ function renderMarkdown(text: string): string {
 // MAIN COMPONENT
 // =====================================================
 
-export function ChatMarkdown({ content, isStreaming }: { content: string; isStreaming?: boolean }) {
+export function ChatMarkdown({ content, isStreaming, statusPhase, statusMessage }: { 
+  content: string; isStreaming?: boolean; statusPhase?: string; statusMessage?: string 
+}) {
   injectStyles()
   
   const segments = useMemo(() => parseContent(content, !!isStreaming), [content, isStreaming])
+  
+  // Track completed phases for the activity log
+  const completedPhases = useMemo(() => {
+    const phases: string[] = []
+    if (!statusPhase || !isStreaming) return phases
+    const order = ['thinking', 'planning', 'searching', 'analyzing', 'styling', 'creating', 'editing', 'generating', 'running']
+    const currentIdx = order.indexOf(statusPhase)
+    // All phases before current are "done"
+    for (let i = 0; i < currentIdx && i < order.length; i++) {
+      // Only show phases that are contextually relevant (not all)
+      if (i === 0) phases.push(order[i]) // thinking always shows
+    }
+    return phases
+  }, [statusPhase, isStreaming])
   
   return (
     <div className="md-content">
@@ -363,11 +481,23 @@ export function ChatMarkdown({ content, isStreaming }: { content: string; isStre
           return <FileCard key={`f-${i}-${seg.filename}`} filename={seg.filename!} language={seg.language!} code={seg.code!} lineCount={seg.lineCount!} />
         }
         if (seg.type === 'streaming-file') {
-          return <StreamingCodeCard key={`s-${i}-${seg.filename}`} filename={seg.filename!} language={seg.language!} linesSoFar={seg.linesSoFar!} />
+          return (
+            <div key={`s-${i}-${seg.filename}`}>
+              <StreamingCodeCard filename={seg.filename!} language={seg.language!} linesSoFar={seg.linesSoFar!} />
+              {seg.partialCode && seg.partialCode.length > 20 && (
+                <StreamingCodePreview code={seg.partialCode} />
+              )}
+            </div>
+          )
         }
         return <div key={`t-${i}`} dangerouslySetInnerHTML={{ __html: renderMarkdown(seg.text || '') }} />
       })}
-      {isStreaming && segments.length === 0 && (
+      {/* Activity log: show when streaming with no content yet, or early content */}
+      {isStreaming && statusPhase && segments.length === 0 && (
+        <StreamingActivityLog phase={statusPhase} message={statusMessage} completedPhases={completedPhases} />
+      )}
+      {/* Fallback if no statusPhase */}
+      {isStreaming && !statusPhase && segments.length === 0 && (
         <div className="streaming-indicator">
           <div className="streaming-dot" />
           <span className="streaming-label" style={{ color: 'var(--text-secondary)' }}>Thinking...</span>
