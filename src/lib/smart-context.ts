@@ -80,7 +80,6 @@ export function classifyIntent(message: string): MessageIntent {
   if (lower.match(/create|build|generate|make|write|code|add|implement|design|set ?up|develop|page|app|website|component|dashboard|form/)) return 'generate_code'
   if (lower.match(/color|font|spacing|style|theme|dark mode|responsive|layout|align/)) return 'style_question'
   if (lower.match(/what files|show me|list|which components|project structure/)) return 'project_question'
-  if (lower.match(/create|build|generate|make|write|code|add|implement|design|set ?up|develop/)) return 'generate_code'
 
   return 'general_chat'
 }
