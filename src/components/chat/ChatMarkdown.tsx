@@ -161,6 +161,44 @@ const MARKDOWN_CSS = `
   animation: spin 0.8s linear infinite;
 }
 
+/* ── Claude-style Collapsible Action Block ── */
+.action-block {
+  margin: 8px 0; border: 1px solid var(--border-subtle, #1e1e28); border-radius: 10px;
+  overflow: hidden; background: var(--bg-tertiary, #13131a); transition: border-color 0.2s;
+}
+.action-block:hover { border-color: var(--border-default, #2a2a38); }
+.action-block-header {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  cursor: pointer; user-select: none; transition: background 0.15s;
+}
+.action-block-header:hover { background: rgba(255,255,255,0.02); }
+.action-block-icon {
+  width: 24px; height: 24px; border-radius: 6px; display: flex;
+  align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;
+  background: rgba(0,255,136,0.1);
+}
+.action-block-icon.streaming { background: rgba(0,255,136,0.15); }
+.action-block-label {
+  flex: 1; font-size: 13px; font-weight: 500; color: var(--text-secondary, #a0a0b0);
+}
+.action-block-chevron {
+  font-size: 11px; color: var(--text-muted, #6a6a7a); transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.action-block.open .action-block-chevron { transform: rotate(90deg); }
+.action-block-body {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.action-block.open .action-block-body { max-height: 2000px; }
+.action-block-body-inner { border-top: 1px solid var(--border-subtle, #1e1e28); }
+
+/* Narration text between action blocks */
+.narration-text {
+  font-size: 14.5px; line-height: 1.7; color: var(--text-secondary, #a0a0b0);
+  padding: 4px 0;
+}
+.narration-text strong { color: var(--text-primary, #fff); font-weight: 600; }
+
 /* ── Streaming code preview strip ── */
 .streaming-code-preview {
   margin: 8px 0; border-radius: 8px; overflow: hidden; position: relative;
@@ -459,6 +497,16 @@ export function ChatMarkdown({ content, isStreaming, statusPhase, statusMessage 
   injectStyles()
   
   const segments = useMemo(() => parseContent(content, !!isStreaming), [content, isStreaming])
+  const [openBlocks, setOpenBlocks] = useState<Set<number>>(new Set())
+  
+  const toggleBlock = useCallback((idx: number) => {
+    setOpenBlocks(prev => {
+      const next = new Set(prev)
+      if (next.has(idx)) next.delete(idx)
+      else next.add(idx)
+      return next
+    })
+  }, [])
   
   // Track completed phases for the activity log
   const completedPhases = useMemo(() => {
@@ -466,33 +514,78 @@ export function ChatMarkdown({ content, isStreaming, statusPhase, statusMessage 
     if (!statusPhase || !isStreaming) return phases
     const order = ['thinking', 'planning', 'searching', 'analyzing', 'styling', 'creating', 'editing', 'generating', 'running']
     const currentIdx = order.indexOf(statusPhase)
-    // All phases before current are "done"
     for (let i = 0; i < currentIdx && i < order.length; i++) {
-      // Only show phases that are contextually relevant (not all)
-      if (i === 0) phases.push(order[i]) // thinking always shows
+      if (i === 0) phases.push(order[i])
     }
     return phases
   }, [statusPhase, isStreaming])
+
+  // Determine action label from filename/language
+  const getActionLabel = (filename: string, language: string, lineCount: number) => {
+    const ext = filename.split('.').pop() || ''
+    if (ext === 'html' || ext === 'htm') return `Created ${filename}`
+    if (ext === 'css') return `Styled ${filename}`
+    if (ext === 'js' || ext === 'ts' || ext === 'jsx' || ext === 'tsx') return `Built ${filename}`
+    if (ext === 'json') return `Generated ${filename}`
+    return `Created ${filename}`
+  }
+
+  const getActionIcon = (filename: string) => {
+    const ext = filename.split('.').pop() || ''
+    if (ext === 'html' || ext === 'htm') return '📄'
+    if (ext === 'css') return '🎨'
+    if (ext === 'js' || ext === 'ts' || ext === 'jsx' || ext === 'tsx') return '⚡'
+    if (ext === 'json') return '📋'
+    return '📄'
+  }
   
   return (
     <div className="md-content">
       {segments.map((seg, i) => {
         if (seg.type === 'file') {
-          return <FileCard key={`f-${i}-${seg.filename}`} filename={seg.filename!} language={seg.language!} code={seg.code!} lineCount={seg.lineCount!} />
+          const isOpen = openBlocks.has(i)
+          return (
+            <div key={`f-${i}-${seg.filename}`} className={`action-block${isOpen ? ' open' : ''}`}>
+              <div className="action-block-header" onClick={() => toggleBlock(i)}>
+                <div className="action-block-icon">{getActionIcon(seg.filename!)}</div>
+                <div className="action-block-label">{getActionLabel(seg.filename!, seg.language!, seg.lineCount!)}</div>
+                <span className="action-block-chevron">▶</span>
+              </div>
+              <div className="action-block-body">
+                <div className="action-block-body-inner">
+                  <FileCard filename={seg.filename!} language={seg.language!} code={seg.code!} lineCount={seg.lineCount!} />
+                </div>
+              </div>
+            </div>
+          )
         }
         if (seg.type === 'streaming-file') {
           return (
-            <div key={`s-${i}-${seg.filename}`}>
-              <StreamingCodeCard filename={seg.filename!} language={seg.language!} linesSoFar={seg.linesSoFar!} />
+            <div key={`s-${i}-${seg.filename}`} className="action-block open" style={{ borderColor: 'rgba(0,255,136,0.2)' }}>
+              <div className="action-block-header">
+                <div className="action-block-icon streaming">
+                  <div className="activity-log-spinner" style={{ width: 14, height: 14 }} />
+                </div>
+                <div className="action-block-label" style={{ color: 'var(--accent-primary, #00ff88)' }}>
+                  Writing {seg.filename}... ({seg.linesSoFar} lines)
+                </div>
+              </div>
               {seg.partialCode && seg.partialCode.length > 20 && (
-                <StreamingCodePreview code={seg.partialCode} />
+                <div className="action-block-body" style={{ maxHeight: 2000 }}>
+                  <div className="action-block-body-inner">
+                    <StreamingCodePreview code={seg.partialCode} />
+                  </div>
+                </div>
               )}
             </div>
           )
         }
-        return <div key={`t-${i}`} dangerouslySetInnerHTML={{ __html: renderMarkdown(seg.text || '') }} />
+        // Narration text — render as visible text between action blocks
+        const text = (seg.text || '').trim()
+        if (!text) return null
+        return <div key={`t-${i}`} className="narration-text" dangerouslySetInnerHTML={{ __html: renderMarkdown(text) }} />
       })}
-      {/* Activity log: show when streaming with no content yet, or early content */}
+      {/* Activity log: show when streaming with no content yet */}
       {isStreaming && statusPhase && segments.length === 0 && (
         <StreamingActivityLog phase={statusPhase} message={statusMessage} completedPhases={completedPhases} />
       )}

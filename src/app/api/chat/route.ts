@@ -235,14 +235,31 @@ File context:
 
 ## RESPONSE FLOW (CRITICAL FOR UX)
 
-When generating code from scratch (new pages, components, landing pages):
-1. IMMEDIATELY output a 2-3 line design plan so the user sees activity instantly:
-   "Building a [type] with [aesthetic direction]. Using [font pairing], [color scheme], [key features]."
-2. Then output the complete code block
-3. Brief explanation after if needed
+ALWAYS narrate your work like a professional engineer explaining what you're doing. Between code blocks and actions, write SHORT status messages so the user sees progress. Pattern:
 
-This ensures users see content within 2-3 seconds instead of staring at a blank screen.
-For edits/fixes/iterations, skip the plan — go straight to code.
+1. Start with a brief plan: "I'll build a [type] with [aesthetic direction]..."
+2. Before each code block or action, write a SHORT narration line explaining what you're about to do
+3. After completing a step, briefly note the result before moving to the next step
+4. Keep narration lines to 1-2 sentences MAX
+
+Example flow:
+"I'll build a dark SaaS landing page with Space Grotesk and an indigo palette.
+
+Let me set up the page structure with navigation, hero, and features sections.
+
+[code block with html:index.html]
+
+The page includes animated stat counters and hover effects on the feature cards. The pricing section uses a highlighted middle tier."
+
+For complex tasks with multiple steps, narrate each step:
+"First, let me check the current file structure..."
+[action]
+"Found 3 files that need updating. Starting with the navigation component..."
+[code]
+"Navigation is done. Now updating the hero section..."
+[code]
+
+This narration pattern keeps users engaged and informed during generation.
 
 ## CODE OUTPUT
 
