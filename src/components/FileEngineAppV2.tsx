@@ -373,6 +373,9 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const [deployMenuOpen, setDeployMenuOpen] = useState(false)
   const [deployResult, setDeployResult] = useState<{vercelUrl?:string;githubUrl?:string}|null>(null)
   const [localPreviewHtml, setLocalPreviewHtml] = useState<string|null>(null)
+  const [generationStartTime, setGenerationStartTime] = useState<number|null>(null)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const progressivePreviewRef = useRef<string|null>(null)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showChatsDialog, setShowChatsDialog] = useState(false)
   const [showProjectsDialog, setShowProjectsDialog] = useState(false)
@@ -436,7 +439,30 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   useEffect(()=>{const h=(e:MouseEvent)=>{if(!(e.target as Element).closest('.dropdown')){setCopyMenuOpen(false);setDownloadMenuOpen(false);setDeployMenuOpen(false)}};document.addEventListener('click',h);return()=>document.removeEventListener('click',h)},[])
   useEffect(()=>{if(chatAreaRef.current)chatAreaRef.current.scrollTop=chatAreaRef.current.scrollHeight},[messages])
 
+  // Track generation start/stop for timer
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1]
+    if (lastMsg?.role === 'assistant' && lastMsg.status === 'streaming') {
+      if (!generationStartTime) setGenerationStartTime(Date.now())
+    } else {
+      if (generationStartTime) {
+        setGenerationStartTime(null)
+        setElapsedTime(0)
+      }
+    }
+  }, [messages])
+
+  // Elapsed time counter
+  useEffect(() => {
+    if (!generationStartTime) return
+    const interval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - generationStartTime) / 1000))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [generationStartTime])
+
   // Live preview: extract HTML from the latest assistant message as it streams
+  // PROGRESSIVE: also extracts PARTIAL HTML from incomplete code blocks for live preview
   useEffect(() => {
     const lastMsg = messages[messages.length - 1]
     if (!lastMsg || lastMsg.role !== 'assistant') return
@@ -447,22 +473,53 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       if (htmlFile) {
         setLocalPreviewHtml(htmlFile.content)
         preview.setFiles(lastMsg.files)
+        progressivePreviewRef.current = null
         return
       }
     }
     
-    // Extract from code blocks in content
     const content = lastMsg.content || ''
-    // Match ```html:filename\n...\n``` or ```html\n...\n```
+    
+    // COMPLETE code block — final preview
     const htmlMatch = content.match(/```html(?::([^\n]*))?\n([\s\S]*?)```/)
     if (htmlMatch?.[2]?.trim()) {
       const html = htmlMatch[2].trim()
       const filename = htmlMatch[1]?.trim() || 'index.html'
-      // Only update if it looks like real HTML (not a fragment)
       if (html.includes('<') && html.length > 50) {
         setLocalPreviewHtml(html)
-        // Also populate preview.files so download/export works
         preview.setFiles([{ path: filename, content: html, language: 'html' }])
+        progressivePreviewRef.current = null
+        return
+      }
+    }
+    
+    // PROGRESSIVE PREVIEW: extract partial HTML from INCOMPLETE code block while streaming
+    if (lastMsg.status === 'streaming') {
+      const partialMatch = content.match(/```html(?::([^\n]*))?\n([\s\S]*)$/)
+      if (partialMatch?.[2]) {
+        const partial = partialMatch[2]
+        // Only render if we have enough HTML to show something (at least a body tag starting)
+        if (partial.length > 200 && partial.includes('<')) {
+          // Close any unclosed tags to make valid-ish HTML for the iframe
+          let previewHtml = partial
+          // If it has a <head> but no </head>, close it
+          if (previewHtml.includes('<head') && !previewHtml.includes('</head>')) {
+            previewHtml += '</head><body></body></html>'
+          }
+          // If it has <style> but no </style>, close it
+          if ((previewHtml.match(/<style/g) || []).length > (previewHtml.match(/<\/style>/g) || []).length) {
+            previewHtml += '</style>'
+          }
+          // If it doesn't have </body></html>, add them
+          if (!previewHtml.includes('</html>')) {
+            previewHtml += '</body></html>'
+          }
+          // Only update if meaningfully different (avoid iframe flicker)
+          if (previewHtml.length - (progressivePreviewRef.current?.length || 0) > 100 || !progressivePreviewRef.current) {
+            progressivePreviewRef.current = previewHtml
+            setLocalPreviewHtml(previewHtml)
+          }
+        }
       }
     }
   }, [messages])
@@ -741,6 +798,109 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
   const handleCopy = async(type:string)=>{setCopyMenuOpen(false);try{if(type==='url'&&preview.previewUrl)await navigator.clipboard.writeText(preview.previewUrl);else{const c=preview.files.map(f=>'// '+f.path+'\n'+f.content).join('\n\n');await navigator.clipboard.writeText(c)}toast('success','Copied!',type==='url'?'URL copied':'Code copied')}catch{toast('error','Copy Failed','Could not copy')}}
   const renderPreviewContent = ()=>{
     const{phase,phaseMessage,previewUrl,autoFixAttempts,error,logs}=preview
+    const lastMsg = messages[messages.length - 1]
+    const isGenerating = lastMsg?.role === 'assistant' && lastMsg.status === 'streaming'
+    const statusPhase = lastMsg?.statusPhase
+    const statusMessage = lastMsg?.statusMessage
+    const toolCalls = lastMsg?.toolCalls || []
+    const msgContent = lastMsg?.content || ''
+
+    // ── STREAMING STATE: Show building activity panel ──
+    if (isGenerating && !localPreviewHtml) {
+      const phaseLabels: Record<string, { label: string; icon: string }> = {
+        thinking: { label: 'Analyzing request...', icon: '💭' },
+        planning: { label: 'Planning approach...', icon: '📋' },
+        searching: { label: 'Researching...', icon: '🔍' },
+        creating: { label: 'Writing code...', icon: '✨' },
+        editing: { label: 'Editing code...', icon: '✏️' },
+        analyzing: { label: 'Analyzing image...', icon: '🔬' },
+        running: { label: 'Running...', icon: '⚡' },
+      }
+      const currentPhase = phaseLabels[statusPhase || 'thinking'] || phaseLabels.thinking
+      
+      // Extract text before code block (the planning output)
+      const preCodeText = msgContent.split(/```/)[0]?.trim()
+      
+      // Extract files being created from tool calls
+      const fileActions = toolCalls.map(tc => {
+        const toolLabels: Record<string, string> = { create_file: 'Creating', edit_file: 'Editing', view_file: 'Reading', search_web: 'Searching', analyze_image: 'Analyzing' }
+        const label = toolLabels[tc.tool] || 'Processing'
+        const file = tc.input?.path || tc.input?.filepath || tc.input?.query || ''
+        return { label, file, done: tc.success !== undefined, success: tc.success }
+      })
+
+      // Format elapsed time
+      const mins = Math.floor(elapsedTime / 60)
+      const secs = elapsedTime % 60
+      const timeStr = mins > 0 ? `${mins}:${secs.toString().padStart(2,'0')}` : `${secs}s`
+      
+      return (
+        <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'32px 24px',gap:'16px',background:'var(--bg-secondary)'}}>
+          {/* Animated spinner */}
+          <div style={{width:48,height:48,borderRadius:'50%',border:'3px solid rgba(0,255,136,0.1)',borderTopColor:'var(--accent-primary)',animation:'spin 1s linear infinite'}}/>
+          <style>{`@keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
+          
+          {/* Current phase */}
+          <div style={{fontSize:15,fontWeight:600,color:'var(--text-primary)',display:'flex',alignItems:'center',gap:8}}>
+            <span style={{fontSize:18}}>{currentPhase.icon}</span>
+            {currentPhase.label}
+          </div>
+          
+          {/* Timer */}
+          <div style={{fontSize:12,color:'var(--text-muted)',fontFamily:'var(--font-mono,monospace)'}}>
+            {timeStr} elapsed
+          </div>
+          
+          {/* Planning text output (design decisions streamed before code) */}
+          {preCodeText && preCodeText.length > 10 && (
+            <div style={{maxWidth:360,padding:'12px 16px',background:'rgba(0,255,136,0.04)',border:'1px solid rgba(0,255,136,0.1)',borderRadius:10,fontSize:13,lineHeight:1.5,color:'var(--text-secondary)',animation:'fadeInUp 0.3s ease',textAlign:'center'}}>
+              {preCodeText.length > 200 ? preCodeText.slice(0, 200) + '...' : preCodeText}
+            </div>
+          )}
+          
+          {/* File creation animation */}
+          {fileActions.length > 0 && (
+            <div style={{width:'100%',maxWidth:320,display:'flex',flexDirection:'column',gap:4,marginTop:4}}>
+              {fileActions.map((fa, i) => (
+                <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 10px',background:'rgba(255,255,255,0.02)',borderRadius:6,fontSize:12,color:'var(--text-muted)',animation:`fadeInUp 0.2s ease ${i*0.1}s both`}}>
+                  {fa.done ? (
+                    fa.success ? <span style={{color:'#4ade80',fontSize:11}}>✓</span> : <span style={{color:'#f87171',fontSize:11}}>✗</span>
+                  ) : (
+                    <span style={{width:10,height:10,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.1)',borderTopColor:'var(--accent-primary)',animation:'spin 0.8s linear infinite',flexShrink:0}}/>
+                  )}
+                  <span style={{fontWeight:500}}>{fa.label}</span>
+                  {fa.file && <span style={{fontFamily:'var(--font-mono,monospace)',opacity:0.6,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{fa.file.length > 30 ? '...' + fa.file.slice(-27) : fa.file}</span>}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Code shimmer bar (shows code is being written) */}
+          {msgContent.includes('```') && (
+            <div style={{width:'80%',maxWidth:300,height:6,borderRadius:3,background:'rgba(255,255,255,0.04)',overflow:'hidden',marginTop:4}}>
+              <div style={{width:'60%',height:'100%',borderRadius:3,background:'linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent)',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    // ── PROGRESSIVE PREVIEW: show iframe even while streaming ──
+    if (isGenerating && localPreviewHtml) {
+      return (
+        <div style={{position:'relative',width:'100%',height:'100%'}}>
+          <iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>
+          {/* Building overlay badge */}
+          <div style={{position:'absolute',top:12,right:12,display:'flex',alignItems:'center',gap:6,padding:'4px 12px',background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)',borderRadius:20,fontSize:11,fontWeight:600,color:'#4ade80',zIndex:10,border:'1px solid rgba(0,255,136,0.2)'}}>
+            <span style={{width:6,height:6,borderRadius:'50%',background:'#4ade80',animation:'pulse 1s infinite'}}/>
+            <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
+            Building... {elapsedTime > 0 && `${elapsedTime}s`}
+          </div>
+        </div>
+      )
+    }
+
+    // ── IDLE STATE ──
     if(phase==='idle'){if(localPreviewHtml&&view==='preview'){return<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>}if(view==='code'&&(preview.files.length>0||projectFiles.length>0)){const filesToShow=preview.files.length>0?preview.files.map((f,i)=>({id:String(i),file_path:f.path,language:f.language||f.path.split('.').pop()||'',file_size:f.content.length,content:f.content})):projectFiles;return<div className="code-view">{loadingFiles?<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Loading files...</div></div>:filesToShow.map((f:any,i:number)=><div key={f.id||i} className={'code-file '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.file_path||f.path}</span><span className="code-file-badge">{f.language||'file'}</span></div><div className="code-file-content"><pre>{f.content||'Click to load content'}</pre><div className="code-file-footer"><span>{f.language||(f.file_path||f.path||'').split('.').pop()}</span><span>{typeof f.file_size==='number'?f.file_size+' bytes':f.content?f.content.split('\n').length+' lines':''}</span></div></div></div>)}</div>}return<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">Preview will appear here</div><div className="state-desc">Generate code to see a live preview</div></div>}
     if(phase==='verifying'||phase==='generating')return<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Building preview...</div><div className="state-desc">{phaseMessage||'Deploying...'}</div></div>
     if(phase==='auto-fixing')return<div className="state-container"><div className="state-icon spin">🔧</div><div className="state-title">Auto-fixing errors...</div><div className="state-desc">Attempt {autoFixAttempts}/3</div></div>
