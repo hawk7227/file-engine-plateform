@@ -94,7 +94,7 @@ export const USER_MODEL_OPTIONS = [
 // Map user-facing IDs to actual model IDs (current versions)
 const USER_TO_ACTUAL_MODEL: Record<string, { anthropic: string; openai: string }> = {
   'auto': { anthropic: 'claude-sonnet-4-20250514', openai: 'gpt-4o' },
-  'fast': { anthropic: 'claude-haiku-4-5-20251001', openai: 'gpt-4o-mini' },
+  'fast': { anthropic: 'claude-haiku-4-5-20251001', openai: 'ft:gpt-4o-2024-08-06:az-deal-hub:chat2:DCi22IDX' },
   'pro': { anthropic: 'claude-sonnet-4-20250514', openai: 'gpt-4o' },
   'premium': { anthropic: 'claude-opus-4-0-20250115', openai: 'o1' }
 }

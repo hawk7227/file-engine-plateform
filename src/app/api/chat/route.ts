@@ -681,7 +681,7 @@ export async function POST(request: NextRequest) {
     let resolvedModel: string
     const isPremiumRequest = model === 'premium'
     const modelTiers: Record<string, Record<string, string>> = {
-      fast: { anthropic: 'claude-haiku-4-5-20251001', openai: 'gpt-4o-mini' },
+      fast: { anthropic: 'claude-haiku-4-5-20251001', openai: 'ft:gpt-4o-2024-08-06:az-deal-hub:chat2:DCi22IDX' },
       pro: { anthropic: 'claude-sonnet-4-20250514', openai: 'gpt-4o' },
       premium: { anthropic: 'claude-opus-4-0-20250115', openai: 'o1' },
     }

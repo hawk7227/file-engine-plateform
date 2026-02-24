@@ -309,7 +309,7 @@ export function getBrandModelNames(): Record<string, string> {
     'claude-haiku-4-5-20251001': `${BRAND.name} Fast`,
     'gpt-4o': `${BRAND.name} Pro`,
     'gpt-4o-mini': `${BRAND.name} Fast`,
-    'ft:gpt-4o-2024-08-06:az-deal-hub:chatfunction:DCeE9uM1': `${BRAND.name} Fast`,
+    'ft:gpt-4o-2024-08-06:az-deal-hub:chat2:DCi22IDX': `${BRAND.name} Fast`,
     'gpt-4-turbo': `${BRAND.name} Pro`,
     'o1': `${BRAND.name} Premium`,
     'o3': `${BRAND.name} Premium`,
