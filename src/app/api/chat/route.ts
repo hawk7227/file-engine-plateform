@@ -709,6 +709,15 @@ export async function POST(request: NextRequest) {
       resolvedModel = getActualModelId(model, provider)
     }
 
+    // ── AUTO-UPGRADE: Multi-file projects route to Pro ──
+    const multiFilePatterns = /\b(full app|multi.?file|multiple files|multiple pages|react app|next\.?js app|project structure|dashboard app|full.?stack|components? and pages?|several pages|complete app|whole app|multi.?page)\b/i
+    const isMultiFileRequest = multiFilePatterns.test(msgText)
+    const isFastTier = resolvedModel.includes('ft:') || resolvedModel.includes('mini')
+    if (isMultiFileRequest && isFastTier) {
+      console.log(`[Chat API] Auto-upgrade: multi-file request detected, routing Fast → Pro`)
+      resolvedModel = modelTiers.pro[provider]
+    }
+
     // ── PREMIUM MODEL CAP ENFORCEMENT ──
     const isPremiumModel = resolvedModel.includes('opus') || resolvedModel === 'o1'
     const isProModel = resolvedModel.includes('sonnet') || resolvedModel === 'gpt-4o'

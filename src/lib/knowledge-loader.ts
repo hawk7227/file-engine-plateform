@@ -919,6 +919,75 @@ abstraction levels:
     implementation: useQuery hook, OrderCard component with status badge, date formatting, pagination.
     code: The actual TypeScript/JSX/CSS that implements it.
   rule: Start at the highest level. Only drop down when you need to. Don't write code until the architecture is clear. Don't design architecture until the feature is understood. Don't define features until the user story is clear.
+
+## APP TEMPLATES
+
+You can generate complete pages for: admin dashboards (sidebar+stats+table+charts), login/signup/forgot-password auth flows, settings pages (profile+toggles+API keys+danger zone), blog layouts (featured post+grid+sidebar), 404 error pages (animated), multi-step onboarding wizards, HTML email templates, documentation pages (sidebar nav+code blocks+TOC).
+Dashboard layout: grid-template-columns: 240px 1fr. Sidebar: sticky, full height, nav groups with labels. Main: topbar with breadcrumbs + search, content area with stats grid (4 cols) + charts row (2fr 1fr) + table.
+Auth pages: centered card (max-width 420px), social login buttons, divider "or continue with email", form with validation, footer link to alternate action.
+
+## INTERACTIVE COMPONENTS
+
+You can build these interactive patterns with full JS:
+- Tabs: animated underline indicator using offsetLeft/offsetWidth, panel switching with fade animation
+- Modal: overlay with backdrop-filter:blur(8px), scale+translate entrance, close on Escape/click-outside, focus trap
+- Dropdown: positioned absolute below trigger, click-outside close, keyboard Escape, menu items with icons+shortcuts
+- Search/Filter: real-time filtering with .filter(), highlight matches with regex replace, filter button tabs, empty state
+- Theme Toggle: data-theme attribute on html, CSS variables swap, toggle switch with ::after pseudo-element transition
+- Accordion: max-height transition (0 to scrollHeight), only-one-open pattern, animated chevron rotation
+- Form Validation: real-time onInput/onBlur, .valid/.invalid classes, error messages, password strength (score 0-4), loading submit state
+- Toast Notifications: fixed bottom-right container, slide-in animation, auto-dismiss with progress bar, stacking
+- Carousel: translateX(-N*100%), dot indicators, prev/next arrows, autoplay with pause on hover, touch swipe
+- Animated Counters: IntersectionObserver trigger, requestAnimationFrame loop, ease-out cubic easing, .toLocaleString() formatting
+
+## CONVERSATION PATTERNS
+
+Vague prompts: Ask 2-3 MAX clarifying questions about DESIGN INTENT (what it looks like, who for, what it does). Always provide smart defaults. Never ask about tech implementation.
+Iteration translations: "more modern"=more whitespace+animations+gradients. "more professional"=less playful+muted colors. "make it pop"=bigger headings+bolder colors. "cleaner"=more whitespace+simpler. "too generic"=distinctive font+unique palette+asymmetric layout+personality in copy.
+Response format: narrate between actions. Brief plan → code block → brief note. Never "I'd be happy to help". Code is ALWAYS complete.
+
+## IMAGE TO CODE
+
+Screenshot analysis: 1)Layout structure 2)Color palette 3)Typography 4)Components 5)Spacing 6)Interactions.
+Font ID clues: geometric sans=Inter/DM Sans, grotesque=Space Grotesk/Sora, humanist=Source Sans, modern serif=Playfair, mono=JetBrains Mono.
+Clone approaches: Stripe=gradient mesh+floating cards+vibrant CTAs. Linear=ultra-minimal dark+spotlight glows. Vercel=black/white+gradient text. Notion=clean light+rounded+playful.
+
+## ADVANCED CSS ANIMATION
+
+Layouts: bento grid (repeat(4,1fr)+span 2), auto-fill (repeat(auto-fill,minmax(300px,1fr))), magazine 12-col, sidebar sticky.
+Keyframes: spin, pulse, shimmer/skeleton, slideUp, bounceIn, typewriter, float, gradientShift.
+Gradients: mesh bg (multiple radial-gradients), aurora, gradient border (padding-box+border-box), text gradient (-webkit-background-clip:text).
+Micro-interactions: btn hover translateY(-1px)+shadow, input focus ring (box-shadow 0 0 0 3px), card lift translateY(-4px), toggle switch, link underline ::after, tooltip ::after.
+Motion rules: 0-100ms instant, 100-200ms fast, 200-300ms normal, 300-500ms slow. ease-out for entrances, ease-in for exits. Always respect prefers-reduced-motion. Never animate width/height, use transform.
+
+## COPYWRITING
+
+Headlines: "{Verb} {Result} {Timeframe}", "Stop {Pain}. Start {Benefit}.", "From {Bad} to {Good}".
+CTAs: Start with verb (Start, Get, Try, Build). Arrow → on primary. "No credit card required" below. Ghost CTA for secondary.
+Social proof: Logo bar (4-6, grayscale, opacity 0.4). Stats with real-sounding numbers (12,847 not 12,000). Short testimonial quotes with name+title+company.
+Industry language: SaaS=ship/deploy/scale. Fintech=secure/instant/compliant. Healthcare=care/HIPAA/evidence-based. DevTools=build/ship/type-safe.
+Never use: "Welcome to our platform", "Click here", "We leverage cutting-edge technology", generic Lorem ipsum.
+
+## ACCESSIBILITY & PERFORMANCE
+
+Semantic HTML: one main per page, nav with aria-label, button for actions/a for links, heading hierarchy h1→h2→h3 never skip.
+ARIA: aria-label on icon buttons, aria-expanded on toggles, aria-modal+aria-labelledby on dialogs, role=tablist+tab+tabpanel, aria-live=polite for dynamic content.
+Skip link: first focusable element, visually hidden until focused, position:absolute top:-100%.
+Contrast: 4.5:1 normal text, 3:1 large text. Dark safe: #f0f0f5 on #0a0a0f=18:1. #71717a on #0a0a0f=4.7:1 (min size 14px).
+SEO: title 50-60 chars, meta description 150-160 chars, og:image 1200x630, canonical URL.
+Performance: font-display:swap, preconnect to font CDN, lazy load images with width/height, contain:layout on independent elements.
+Core Web Vitals: LCP<2.5s (preload hero), FID<100ms (defer JS), CLS<0.1 (explicit image dimensions).
+Always add: @media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+
+## REACT NEXTJS PATTERNS
+
+Hooks: useState(object→spread update), useEffect(cleanup, AbortController, dependency array), useRef(DOM+mutable), useMemo(expensive compute), useCallback(stable references).
+Custom hooks: useDebounce, useLocalStorage, useOnClickOutside, useMediaQuery, useFetch(with AbortController).
+Next.js App Router: layout.tsx(root wrapper), page.tsx(route), loading.tsx(Suspense), error.tsx(error boundary), route.ts(API).
+Server vs Client: 'use client' only for useState/useEffect/onClick. Keep boundary LOW. Data fetch in server components with fetch+revalidate.
+Tailwind shortcuts: flex items-center justify-between, grid grid-cols-1 md:grid-cols-3 gap-6, bg-zinc-900 border border-zinc-800 rounded-xl.
+State: Zustand for global state (create+set+get). TanStack Query for server state (useQuery+useMutation+invalidateQueries).
+TypeScript: interface Props with optional(?), utility types (Partial, Pick, Omit, Record), generic components (<T>).
 `
 
 export function getFullKnowledgeBase(): string {
