@@ -1,0 +1,128 @@
+{
+  "id": "react-nextjs-patterns",
+  "version": "1.0",
+  "description": "Complete React, Next.js, Tailwind CSS, and TypeScript patterns for multi-file project generation",
+
+  "react_component_patterns": {
+    "functional_component_template": "import React, { useState, useEffect, useRef } from 'react';\n\ninterface Props {\n  title: string;\n  description?: string;\n  variant?: 'default' | 'primary' | 'ghost';\n  onAction?: () => void;\n  children?: React.ReactNode;\n}\n\nexport default function ComponentName({ title, description, variant = 'default', onAction, children }: Props) {\n  const [isLoading, setIsLoading] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n\n  return (\n    <div className=\"...\">\n      {isLoading && <LoadingSpinner />}\n      {error && <ErrorMessage message={error} />}\n      {!isLoading && !error && children}\n    </div>\n  );\n}",
+
+    "hooks_patterns": {
+      "useState": {
+        "basic": "const [count, setCount] = useState(0);",
+        "object": "const [form, setForm] = useState({ name: '', email: '' });",
+        "update_object": "setForm(prev => ({ ...prev, name: 'New Name' }));",
+        "array": "const [items, setItems] = useState<Item[]>([]);",
+        "add_to_array": "setItems(prev => [...prev, newItem]);",
+        "remove_from_array": "setItems(prev => prev.filter(item => item.id !== targetId));",
+        "update_in_array": "setItems(prev => prev.map(item => item.id === targetId ? { ...item, ...updates } : item));"
+      },
+      "useEffect": {
+        "on_mount": "useEffect(() => {\n  fetchData();\n}, []);",
+        "on_dependency_change": "useEffect(() => {\n  if (userId) fetchUser(userId);\n}, [userId]);",
+        "with_cleanup": "useEffect(() => {\n  const interval = setInterval(tick, 1000);\n  return () => clearInterval(interval);\n}, []);",
+        "event_listener": "useEffect(() => {\n  const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };\n  window.addEventListener('keydown', handler);\n  return () => window.removeEventListener('keydown', handler);\n}, [onClose]);",
+        "abort_controller": "useEffect(() => {\n  const controller = new AbortController();\n  fetch(url, { signal: controller.signal })\n    .then(r => r.json())\n    .then(setData)\n    .catch(e => { if (e.name !== 'AbortError') setError(e.message); });\n  return () => controller.abort();\n}, [url]);"
+      },
+      "useRef": {
+        "dom_ref": "const inputRef = useRef<HTMLInputElement>(null);\n// usage: inputRef.current?.focus();",
+        "mutable_value": "const prevValue = useRef(value);\nuseEffect(() => { prevValue.current = value; });",
+        "timer_ref": "const timerRef = useRef<NodeJS.Timeout>();\n// set: timerRef.current = setTimeout(fn, delay);\n// clear: clearTimeout(timerRef.current);"
+      },
+      "useMemo": "const sortedItems = useMemo(() => {\n  return items.slice().sort((a, b) => a.name.localeCompare(b.name));\n}, [items]);",
+      "useCallback": "const handleSearch = useCallback((query: string) => {\n  setSearchTerm(query);\n  debouncedFetch(query);\n}, [debouncedFetch]);",
+      "useReducer": "type Action = \n  | { type: 'SET_LOADING' }\n  | { type: 'SET_DATA'; payload: Data }\n  | { type: 'SET_ERROR'; payload: string };\n\nfunction reducer(state: State, action: Action): State {\n  switch (action.type) {\n    case 'SET_LOADING': return { ...state, loading: true, error: null };\n    case 'SET_DATA': return { loading: false, data: action.payload, error: null };\n    case 'SET_ERROR': return { loading: false, data: null, error: action.payload };\n  }\n}\n\nconst [state, dispatch] = useReducer(reducer, initialState);"
+    },
+
+    "custom_hooks": {
+      "useDebounce": "function useDebounce<T>(value: T, delay: number): T {\n  const [debounced, setDebounced] = useState(value);\n  useEffect(() => {\n    const timer = setTimeout(() => setDebounced(value), delay);\n    return () => clearTimeout(timer);\n  }, [value, delay]);\n  return debounced;\n}",
+      "useLocalStorage": "function useLocalStorage<T>(key: string, initial: T): [T, (v: T) => void] {\n  const [value, setValue] = useState<T>(() => {\n    try { const item = localStorage.getItem(key); return item ? JSON.parse(item) : initial; }\n    catch { return initial; }\n  });\n  useEffect(() => { localStorage.setItem(key, JSON.stringify(value)); }, [key, value]);\n  return [value, setValue];\n}",
+      "useOnClickOutside": "function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {\n  useEffect(() => {\n    const listener = (e: MouseEvent | TouchEvent) => {\n      if (!ref.current || ref.current.contains(e.target as Node)) return;\n      handler();\n    };\n    document.addEventListener('mousedown', listener);\n    document.addEventListener('touchstart', listener);\n    return () => {\n      document.removeEventListener('mousedown', listener);\n      document.removeEventListener('touchstart', listener);\n    };\n  }, [ref, handler]);\n}",
+      "useMediaQuery": "function useMediaQuery(query: string): boolean {\n  const [matches, setMatches] = useState(false);\n  useEffect(() => {\n    const mql = window.matchMedia(query);\n    setMatches(mql.matches);\n    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);\n    mql.addEventListener('change', handler);\n    return () => mql.removeEventListener('change', handler);\n  }, [query]);\n  return matches;\n}",
+      "useFetch": "function useFetch<T>(url: string) {\n  const [data, setData] = useState<T | null>(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<string | null>(null);\n  useEffect(() => {\n    const controller = new AbortController();\n    setLoading(true); setError(null);\n    fetch(url, { signal: controller.signal })\n      .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })\n      .then(setData)\n      .catch(e => { if (e.name !== 'AbortError') setError(e.message); })\n      .finally(() => setLoading(false));\n    return () => controller.abort();\n  }, [url]);\n  return { data, loading, error };\n}"
+    },
+
+    "component_composition": {
+      "compound_components": "// Parent provides context, children consume it\nconst TabContext = React.createContext<{ active: string; setActive: (v: string) => void } | null>(null);\n\nfunction Tabs({ children, defaultValue }: { children: React.ReactNode; defaultValue: string }) {\n  const [active, setActive] = useState(defaultValue);\n  return <TabContext.Provider value={{ active, setActive }}>{children}</TabContext.Provider>;\n}\n\nfunction TabTrigger({ value, children }: { value: string; children: React.ReactNode }) {\n  const ctx = React.useContext(TabContext)!;\n  return <button onClick={() => ctx.setActive(value)} data-active={ctx.active === value}>{children}</button>;\n}\n\nfunction TabContent({ value, children }: { value: string; children: React.ReactNode }) {\n  const ctx = React.useContext(TabContext)!;\n  return ctx.active === value ? <div>{children}</div> : null;\n}",
+      "render_props": "function MouseTracker({ render }: { render: (pos: { x: number; y: number }) => React.ReactNode }) {\n  const [pos, setPos] = useState({ x: 0, y: 0 });\n  useEffect(() => {\n    const handler = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });\n    window.addEventListener('mousemove', handler);\n    return () => window.removeEventListener('mousemove', handler);\n  }, []);\n  return <>{render(pos)}</>;\n}",
+      "error_boundary": "class ErrorBoundary extends React.Component<{ children: React.ReactNode; fallback: React.ReactNode }, { hasError: boolean }> {\n  state = { hasError: false };\n  static getDerivedStateFromError() { return { hasError: true }; }\n  componentDidCatch(error: Error) { console.error('ErrorBoundary caught:', error); }\n  render() { return this.state.hasError ? this.props.fallback : this.props.children; }\n}"
+    }
+  },
+
+  "nextjs_app_router": {
+    "file_conventions": {
+      "layout.tsx": "Root layout wraps all pages. Contains <html>, <body>, fonts, providers.\nexport default function RootLayout({ children }: { children: React.ReactNode }) {\n  return <html lang='en'><body className={font.className}>{children}</body></html>;\n}",
+      "page.tsx": "Route page component. Must be default export.\nexport default function Page() { return <div>...</div>; }",
+      "loading.tsx": "Automatic loading UI using React Suspense.\nexport default function Loading() { return <Skeleton />; }",
+      "error.tsx": "'use client';\nexport default function Error({ error, reset }: { error: Error; reset: () => void }) {\n  return <div><h2>Something went wrong</h2><button onClick={reset}>Try again</button></div>;\n}",
+      "not-found.tsx": "Custom 404 page.\nexport default function NotFound() { return <div>Page not found</div>; }",
+      "route.ts": "API route handler.\nexport async function GET(request: Request) {\n  return Response.json({ data: 'hello' });\n}\nexport async function POST(request: Request) {\n  const body = await request.json();\n  return Response.json({ received: body });\n}"
+    },
+
+    "server_vs_client": {
+      "server_components_default": "All components are Server Components by default in App Router. They can: fetch data directly, access backend resources, keep secrets on server, reduce bundle size.",
+      "client_components": "'use client' directive at top of file. Required for: useState, useEffect, event handlers (onClick), browser APIs, React Context.",
+      "rule": "Keep 'use client' boundary as low as possible. Make a small ClientButton component rather than making the entire page a client component.",
+      "data_fetching_server": "// In server component (page.tsx):\nasync function getData() {\n  const res = await fetch('https://api.example.com/data', { next: { revalidate: 3600 } });\n  if (!res.ok) throw new Error('Failed');\n  return res.json();\n}\nexport default async function Page() {\n  const data = await getData();\n  return <div>{data.title}</div>;\n}",
+      "data_fetching_client": "// In client component:\n'use client';\nimport { useEffect, useState } from 'react';\nexport default function DataList() {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(true);\n  useEffect(() => {\n    fetch('/api/data').then(r => r.json()).then(setData).finally(() => setLoading(false));\n  }, []);\n  if (loading) return <Skeleton />;\n  return <div>{data?.title}</div>;\n}"
+    },
+
+    "metadata": "// Static metadata\nexport const metadata: Metadata = {\n  title: 'Page Title',\n  description: 'Page description',\n  openGraph: { title: 'OG Title', description: 'OG Desc', images: ['/og.png'] },\n};\n\n// Dynamic metadata\nexport async function generateMetadata({ params }: Props): Promise<Metadata> {\n  const post = await getPost(params.slug);\n  return { title: post.title, description: post.excerpt };\n}",
+
+    "project_structure": {
+      "tree": "app/\n  layout.tsx          (root layout)\n  page.tsx            (home page)\n  globals.css         (global styles)\n  loading.tsx         (global loading)\n  error.tsx           (global error)\n  not-found.tsx       (404 page)\n  (auth)/\n    login/page.tsx\n    signup/page.tsx\n  dashboard/\n    layout.tsx        (dashboard layout with sidebar)\n    page.tsx          (dashboard home)\n    settings/page.tsx\n    [id]/page.tsx     (dynamic route)\n  api/\n    auth/route.ts\n    users/route.ts\n    users/[id]/route.ts\ncomponents/\n  ui/                 (reusable UI primitives)\n    Button.tsx\n    Input.tsx\n    Modal.tsx\n    Card.tsx\n  layout/\n    Navbar.tsx\n    Sidebar.tsx\n    Footer.tsx\n  features/\n    UserProfile.tsx\n    DataTable.tsx\nlib/\n  utils.ts\n  api.ts\n  constants.ts\ntypes/\n  index.ts"
+    }
+  },
+
+  "tailwind_patterns": {
+    "description": "Tailwind CSS utility patterns mapped to custom CSS equivalents",
+    "layout": {
+      "flex_center": "flex items-center justify-center",
+      "flex_between": "flex items-center justify-between",
+      "flex_col": "flex flex-col",
+      "grid_responsive": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+      "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+      "sticky_nav": "sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b"
+    },
+    "dark_card": "bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors",
+    "light_card": "bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow",
+    "glass_card": "bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6",
+    "button_primary": "px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg transition-colors",
+    "button_ghost": "px-4 py-2 bg-transparent border border-zinc-700 hover:border-zinc-600 text-zinc-100 font-medium rounded-lg transition-colors",
+    "input_dark": "w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors",
+    "badge": "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold",
+    "gradient_text": "bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent",
+    "truncate": "truncate overflow-hidden text-ellipsis whitespace-nowrap",
+    "line_clamp": "line-clamp-2 overflow-hidden",
+    "responsive_text": "text-2xl sm:text-3xl md:text-4xl lg:text-5xl",
+    "transition_all": "transition-all duration-200 ease-out",
+    "hover_lift": "hover:-translate-y-1 hover:shadow-lg transition-all duration-200",
+    "focus_ring": "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+  },
+
+  "typescript_patterns": {
+    "interfaces": {
+      "api_response": "interface ApiResponse<T> {\n  data: T;\n  meta: { page: number; total: number; };\n  error?: string;\n}",
+      "user": "interface User {\n  id: string;\n  name: string;\n  email: string;\n  avatar?: string;\n  role: 'admin' | 'member' | 'viewer';\n  createdAt: string;\n}",
+      "form_state": "interface FormState {\n  values: Record<string, string>;\n  errors: Record<string, string>;\n  isSubmitting: boolean;\n  isValid: boolean;\n}",
+      "table_column": "interface Column<T> {\n  key: keyof T;\n  label: string;\n  sortable?: boolean;\n  render?: (value: T[keyof T], row: T) => React.ReactNode;\n}"
+    },
+    "utility_types": {
+      "Partial": "Partial<User> — all fields optional",
+      "Required": "Required<User> — all fields required",
+      "Pick": "Pick<User, 'id' | 'name'> — subset of fields",
+      "Omit": "Omit<User, 'password'> — exclude fields",
+      "Record": "Record<string, number> — key-value map",
+      "Exclude": "Exclude<Status, 'deleted'> — remove from union",
+      "Extract": "Extract<Status, 'active' | 'pending'> — keep from union",
+      "ReturnType": "ReturnType<typeof fetchUser> — infer return type",
+      "Awaited": "Awaited<ReturnType<typeof fetchUser>> — unwrap Promise"
+    },
+    "generic_component": "interface ListProps<T> {\n  items: T[];\n  renderItem: (item: T) => React.ReactNode;\n  keyExtractor: (item: T) => string;\n  emptyMessage?: string;\n}\n\nfunction List<T>({ items, renderItem, keyExtractor, emptyMessage }: ListProps<T>) {\n  if (items.length === 0) return <p>{emptyMessage || 'No items'}</p>;\n  return <ul>{items.map(item => <li key={keyExtractor(item)}>{renderItem(item)}</li>)}</ul>;\n}"
+  },
+
+  "state_management": {
+    "zustand_store": "import { create } from 'zustand';\n\ninterface Store {\n  count: number;\n  items: Item[];\n  isLoading: boolean;\n  increment: () => void;\n  addItem: (item: Item) => void;\n  removeItem: (id: string) => void;\n  fetchItems: () => Promise<void>;\n}\n\nconst useStore = create<Store>((set, get) => ({\n  count: 0,\n  items: [],\n  isLoading: false,\n  increment: () => set(state => ({ count: state.count + 1 })),\n  addItem: (item) => set(state => ({ items: [...state.items, item] })),\n  removeItem: (id) => set(state => ({ items: state.items.filter(i => i.id !== id) })),\n  fetchItems: async () => {\n    set({ isLoading: true });\n    try {\n      const res = await fetch('/api/items');\n      const items = await res.json();\n      set({ items, isLoading: false });\n    } catch {\n      set({ isLoading: false });\n    }\n  },\n}));",
+
+    "tanstack_query": "import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';\n\n// Fetch\nconst { data, isLoading, error } = useQuery({\n  queryKey: ['users'],\n  queryFn: () => fetch('/api/users').then(r => r.json()),\n  staleTime: 5 * 60 * 1000,\n});\n\n// Mutate\nconst queryClient = useQueryClient();\nconst mutation = useMutation({\n  mutationFn: (newUser: User) => fetch('/api/users', { method: 'POST', body: JSON.stringify(newUser) }),\n  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),\n});\n// usage: mutation.mutate({ name: 'New User' });"
+  }
+}

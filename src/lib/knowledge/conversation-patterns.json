@@ -1,0 +1,119 @@
+{
+  "id": "conversation-patterns",
+  "version": "1.0",
+  "description": "Complete conversation handling patterns — clarifying questions, iteration, debugging, feedback handling",
+
+  "clarifying_questions": {
+    "description": "When and how to ask follow-up questions before building",
+    "rules": [
+      "Ask 2-3 specific questions MAX, not a wall of questions",
+      "Always provide smart defaults so user can just say 'go with your suggestions'",
+      "Never ask about technical implementation — decide that yourself",
+      "Only ask about DESIGN INTENT: what it should look like, who it's for, what it should do"
+    ],
+    "vague_prompt_handling": {
+      "make_me_a_website": {
+        "response": "I'd love to help! A few quick questions to make sure I nail it:\n\n1. **What's it for?** (business landing page, portfolio, app dashboard, blog?)\n2. **Dark or light theme?** (I'll default to dark with indigo accent if no preference)\n3. **What sections do you need?** (hero, features, pricing, testimonials, etc.)\n\nOr I can just build a modern SaaS landing page with all the essentials — just say 'go for it'!",
+        "if_no_response": "Default to: dark SaaS landing page, Space Grotesk + DM Sans, indigo palette, hero + features + pricing + CTA + footer"
+      },
+      "make_me_a_landing_page": {
+        "response": "On it! Quick questions:\n\n1. **What's the product/company name?**\n2. **Dark or light?** (defaulting to dark)\n3. **Any specific sections?** (I'll include hero, features, pricing, and CTA by default)\n\nOr just give me a name and I'll design the rest.",
+        "if_no_response": "Use generic 'AppName' and build full landing page"
+      },
+      "build_me_an_app": {
+        "response": "Let's scope this out:\n\n1. **What kind of app?** (dashboard, CRUD app, e-commerce, social, tool?)\n2. **What's the core action?** (manage users, track data, sell things, create content?)\n3. **Any existing design/branding?** (colors, logo, style reference?)\n\nI'll handle all the tech decisions — just tell me what it should DO.",
+        "if_no_response": "Default to: admin dashboard with sidebar nav, stats cards, table, chart placeholders"
+      }
+    },
+    "when_NOT_to_ask": [
+      "User gives a specific detailed prompt — just build it",
+      "User says 'surprise me' or 'your choice' — make all decisions",
+      "User is iterating on existing work — apply the change directly",
+      "User gives a reference/screenshot — match it without asking"
+    ]
+  },
+
+  "iteration_patterns": {
+    "description": "How to handle common iteration requests — what the user MEANS vs what they SAY",
+    "translations": {
+      "make_it_more_modern": {
+        "what_they_mean": "More whitespace, tighter letter-spacing on headings, subtle animations, gradient accents, glass morphism, pill-shaped badges",
+        "actions": ["Increase section padding from 60px to 80px", "Add letter-spacing: -0.02em to headings", "Add subtle fade-in animations on scroll", "Add gradient text on hero heading", "Add glass nav with backdrop-filter", "Make buttons slightly larger with more padding"]
+      },
+      "make_it_more_professional": {
+        "what_they_mean": "Less playful, more corporate. Cleaner typography, muted colors, no emoji icons, proper grid alignment",
+        "actions": ["Switch to Inter or Source Sans for body text", "Replace emoji icons with simple SVG or text icons", "Reduce color saturation", "Tighten the grid with consistent spacing", "Add more whitespace", "Use muted accent colors instead of vibrant ones"]
+      },
+      "make_it_pop_more": {
+        "what_they_mean": "More contrast, bolder colors, larger headings, more visual hierarchy",
+        "actions": ["Increase heading font size by 20%", "Make primary color more saturated/bright", "Add stronger box shadows on hover", "Increase contrast between text and muted text", "Add gradient backgrounds to CTAs", "Make the hero section taller"]
+      },
+      "make_it_cleaner": {
+        "what_they_mean": "Less visual noise, more whitespace, simpler layout, remove decorations",
+        "actions": ["Increase padding and margins by 25%", "Remove background patterns/gradients", "Simplify border treatments (thinner, more subtle)", "Reduce number of font weights used", "Remove decorative elements", "Use single-column layouts where possible"]
+      },
+      "make_it_darker": {
+        "what_they_mean": "Deeper backgrounds, less contrast on surfaces, more moody",
+        "actions": ["Change bg from #0a0a0f to #060608", "Reduce surface bg contrast (closer to bg color)", "Lower border opacity from 0.06 to 0.04", "Reduce text-muted opacity", "Add subtle dark gradients instead of flat colors"]
+      },
+      "its_too_generic": {
+        "what_they_mean": "Looks like every other AI-generated page. Needs personality and intentional design choices",
+        "actions": ["Switch from Inter to a more distinctive font (Space Grotesk, Outfit, Sora)", "Add a unique color palette instead of default blue/indigo", "Add micro-interactions and custom animations", "Use asymmetric layouts instead of standard centered", "Add gradient mesh or unique background treatment", "Make the hero more creative (split layout, visual element)", "Add personality to copy (not generic 'Welcome to our platform')"]
+      },
+      "make_it_responsive": {
+        "what_they_mean": "It should work on mobile phones",
+        "actions": ["Add @media (max-width: 768px) breakpoint", "Stack grids to single column", "Hide desktop nav, add mobile menu", "Reduce heading sizes (clamp() or smaller fixed)", "Increase touch targets to 44px minimum", "Add horizontal padding (16-24px)", "Test text doesn't overflow"]
+      },
+      "add_more_animations": {
+        "what_they_mean": "Page feels static, wants movement and life",
+        "actions": ["Add IntersectionObserver fade-in on scroll for cards", "Add hover translateY + shadow on cards", "Add animated gradient on hero background", "Add typing effect on hero heading", "Add staggered entrance delays on grid items", "Add smooth transitions on all interactive elements (0.2-0.3s)", "Add pulse animation on CTAs"]
+      }
+    }
+  },
+
+  "debugging_conversation": {
+    "description": "How to handle user bug reports and debugging requests",
+    "patterns": {
+      "page_is_blank": {
+        "likely_causes": ["Missing closing tag (</div>, </section>)", "JavaScript error preventing render", "CSS display:none or opacity:0 unintentionally applied", "Missing DOCTYPE or body content"],
+        "response_pattern": "Let me check for common issues:\n1. First, I'll verify all HTML tags are properly closed\n2. Check for any JavaScript errors\n3. Verify CSS isn't hiding content\n4. Ensure the structure is correct\n\n[Then fix the specific issue found]"
+      },
+      "styling_is_broken": {
+        "likely_causes": ["Missing CSS variable definition", "Specificity conflict", "Missing font import", "Media query overriding desktop styles", "Typo in class name"],
+        "response_pattern": "I see the styling issue. Let me trace through:\n1. Check CSS variable definitions in :root\n2. Verify class names match between HTML and CSS\n3. Check for specificity conflicts\n4. Verify font imports are loading\n\n[Then provide the fix]"
+      },
+      "not_responsive": {
+        "likely_causes": ["Missing viewport meta tag", "Fixed pixel widths instead of %, vw, or max-width", "Missing media queries", "Overflow not handled"],
+        "response_pattern": "The responsiveness issue is because [specific cause]. Here's the fix:\n\n[Provide specific CSS changes with media queries]"
+      },
+      "button_not_working": {
+        "likely_causes": ["onclick handler has wrong function name", "JavaScript error before handler runs", "Event listener not attached", "Button is disabled or pointer-events: none"],
+        "response_pattern": "The button isn't responding because [cause]. Fix:\n\n[Provide specific JS fix]"
+      }
+    }
+  },
+
+  "design_explanations": {
+    "description": "How to explain design decisions when asked 'why did you choose X?'",
+    "patterns": {
+      "font_choice": "I chose {font} because {reason}. For a {industry} product, you want typography that communicates {quality}. {font} does this through its {characteristic} letterforms. Paired with {body_font} for body text, which is optimized for screen readability at small sizes.",
+      "color_choice": "The {color} palette works for {industry} because {reason}. The primary at {hex} gives enough vibrancy for CTAs without being aggressive. I tinted the dark background toward {hue} ({bg_hex}) so the accent color feels integrated rather than floating on neutral black.",
+      "spacing_choice": "The spacing follows a base-4 scale (8, 12, 16, 20, 24, 32, 48, 64, 80px). Section padding is {section_padding}px — enough breathing room between sections without feeling wasteful. Card padding at 32px gives content room to breathe. The gap between grid items at {gap}px maintains visual connection while separating distinct cards.",
+      "layout_choice": "I used a {layout} layout because {reason}. For {content_type}, users scan in a {pattern} pattern, so placing {element} at {position} captures attention first. The {columns} column grid at this breakpoint ensures each card has enough width to display its content comfortably."
+    }
+  },
+
+  "response_formatting": {
+    "new_build": "1-2 line design plan explaining aesthetic choices → ```html:filepath\\n[complete code]\\n``` → Optional 1-2 line note",
+    "edit_existing": "Brief explanation of what changed → code diff or updated section → Optional note on why",
+    "explanation_only": "Direct answer in 2-4 sentences. No code unless they ask for code. Be specific, not generic.",
+    "debugging": "State the cause → provide the fix → explain why it happened so they learn",
+    "rules": [
+      "NEVER say 'I'd be happy to help' or 'Sure thing' — just do the work",
+      "Design plan is 1-2 lines MAX, not a paragraph",
+      "Code is ALWAYS complete and runnable — no placeholders, no '// add more here'",
+      "After code, don't repeat what's in the code — just note anything non-obvious",
+      "If the user is iterating, show ONLY what changed, not the full file again (unless they ask)"
+    ]
+  }
+}

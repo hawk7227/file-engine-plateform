@@ -1,0 +1,77 @@
+{
+  "id": "advanced-css-animation",
+  "version": "1.0",
+  "description": "Advanced CSS techniques, complex animations, and motion design",
+
+  "complex_layouts": {
+    "bento_grid": ".bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:180px;gap:16px}.bento .wide{grid-column:span 2}.bento .tall{grid-row:span 2}.bento .large{grid-column:span 2;grid-row:span 2}@media(max-width:768px){.bento{grid-template-columns:1fr 1fr}.bento .wide,.bento .large{grid-column:span 2}}",
+    "magazine_12col": ".magazine{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}.full{grid-column:1/-1}.two-thirds{grid-column:span 8}.one-third{grid-column:span 4}.half{grid-column:span 6}@media(max-width:768px){.magazine>*{grid-column:1/-1!important}}",
+    "auto_responsive": ".auto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}",
+    "sidebar_fixed": ".layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto}@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{display:none}}",
+    "holy_grail": ".layout{display:grid;grid-template:'header header header' auto 'sidebar main aside' 1fr 'footer footer footer' auto / 200px 1fr 200px;min-height:100vh}"
+  },
+
+  "scroll_animations": {
+    "fade_in_css": ".fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}.fade-in.visible{opacity:1;transform:translateY(0)}",
+    "fade_in_js": "const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target)}})},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el))",
+    "stagger_js": "const parent=document.querySelector('.stagger-parent');const items=parent.querySelectorAll('.stagger');const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){items.forEach((item,i)=>{setTimeout(()=>item.classList.add('visible'),i*80)});obs.unobserve(parent)}},{threshold:0.1});obs.observe(parent)",
+    "slide_left": ".slide-left{opacity:0;transform:translateX(-40px);transition:opacity 0.6s,transform 0.6s}.slide-left.visible{opacity:1;transform:translateX(0)}",
+    "slide_right": ".slide-right{opacity:0;transform:translateX(40px);transition:opacity 0.6s,transform 0.6s}.slide-right.visible{opacity:1;transform:translateX(0)}",
+    "scale_in": ".scale-in{opacity:0;transform:scale(0.9);transition:opacity 0.5s,transform 0.5s cubic-bezier(0.4,0,0.2,1)}.scale-in.visible{opacity:1;transform:scale(1)}",
+    "scroll_progress": "js: const bar=document.querySelector('.progress');window.addEventListener('scroll',()=>{bar.style.transform=`scaleX(${window.scrollY/(document.body.scrollHeight-window.innerHeight)})`})"
+  },
+
+  "keyframes": {
+    "spin": "@keyframes spin{to{transform:rotate(360deg)}}.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--primary);border-radius:50%;animation:spin 0.6s linear infinite}",
+    "pulse": "@keyframes pulse{0%,100%{opacity:0.6;transform:scale(0.95)}50%{opacity:1;transform:scale(1.05)}}.pulse{animation:pulse 3s ease-in-out infinite}",
+    "shimmer": "@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-hover) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.5s ease infinite;border-radius:8px}",
+    "slideUp": "@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.slide-up{animation:slideUp 0.4s ease forwards}",
+    "bounceIn": "@keyframes bounceIn{0%{transform:scale(0.3);opacity:0}50%{transform:scale(1.05)}70%{transform:scale(0.95)}100%{transform:scale(1);opacity:1}}.bounce-in{animation:bounceIn 0.5s cubic-bezier(0.68,-0.55,0.265,1.55)}",
+    "typewriter": "@keyframes typing{from{width:0}to{width:100%}}@keyframes blink{0%,100%{border-color:transparent}50%{border-color:var(--primary)}}.typewriter{overflow:hidden;border-right:2px solid;white-space:nowrap;animation:typing 2s steps(30) forwards,blink 0.8s step-end infinite}",
+    "float": "@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}.float{animation:float 3s ease-in-out infinite}",
+    "gradientShift": "@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}.animated-bg{background:linear-gradient(-45deg,#0a0a0f,#1a1040,#0a2030,#0a0a0f);background-size:400% 400%;animation:gradientShift 15s ease infinite}",
+    "countUp": "function animateCounter(el,target,duration=2000){const start=performance.now();function update(now){const progress=Math.min((now-start)/duration,1);const eased=1-Math.pow(1-progress,3);el.textContent=Math.floor(target*eased).toLocaleString();if(progress<1)requestAnimationFrame(update)}requestAnimationFrame(update)}"
+  },
+
+  "gradients": {
+    "mesh_bg": "background:#0a0a0f;background-image:radial-gradient(at 20% 30%,rgba(99,102,241,0.12) 0%,transparent 50%),radial-gradient(at 80% 70%,rgba(168,85,247,0.08) 0%,transparent 50%),radial-gradient(at 50% 50%,rgba(6,182,212,0.06) 0%,transparent 60%)",
+    "aurora": "background:linear-gradient(135deg,rgba(99,102,241,0.1),transparent 40%),linear-gradient(225deg,rgba(16,185,129,0.08),transparent 40%),linear-gradient(315deg,rgba(244,63,94,0.06),transparent 40%)",
+    "gradient_border": "background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(135deg,var(--primary),var(--primary-hover)) border-box;border:1px solid transparent;border-radius:12px",
+    "text_gradient": "background:linear-gradient(135deg,#6366f1 0%,#a78bfa 50%,#c084fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent",
+    "noise_overlay": "Use inline SVG data URI with feTurbulence filter at opacity 0.03 for subtle grain texture"
+  },
+
+  "micro_interactions": {
+    "btn_press": ".btn{transition:all 0.15s}.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px var(--primary-glow)}.btn:active{transform:translateY(0);box-shadow:none}",
+    "input_focus": ".input{border:1.5px solid var(--border);transition:border-color 0.2s,box-shadow 0.2s}.input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-subtle);outline:none}",
+    "card_lift": ".card{transition:transform 0.3s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s,border-color 0.3s}.card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,0.3);border-color:var(--border-hover)}",
+    "toggle": ".toggle{width:44px;height:24px;border-radius:12px;background:rgba(255,255,255,0.1);position:relative;cursor:pointer;transition:background 0.2s}.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;transition:transform 0.2s cubic-bezier(0.4,0,0.2,1)}.toggle.on{background:var(--primary)}.toggle.on::after{transform:translateX(20px)}",
+    "link_underline": ".link{position:relative;text-decoration:none}.link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--primary);transition:width 0.2s}.link:hover::after{width:100%}",
+    "tooltip": ".tooltip{position:relative}.tooltip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--surface);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:12px;white-space:nowrap;opacity:0;visibility:hidden;transition:all 0.15s;pointer-events:none}.tooltip:hover::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}"
+  },
+
+  "motion_principles": {
+    "timing_guide": {
+      "instant_0_100ms": "Button states, toggles, focus rings",
+      "fast_100_200ms": "Hover effects, tooltips, dropdowns",
+      "normal_200_300ms": "Modals, drawers, expanding content",
+      "slow_300_500ms": "Page transitions, scroll reveals, entrance animations",
+      "decorative_500ms_plus": "Loading animations, background effects, counters"
+    },
+    "easing_guide": {
+      "ease_out": "cubic-bezier(0.4,0,0.2,1) — entrances, most common",
+      "ease_in": "cubic-bezier(0.4,0,1,1) — exits only",
+      "spring": "cubic-bezier(0.68,-0.55,0.265,1.55) — bouncy, playful",
+      "sharp": "cubic-bezier(0.4,0,0.6,1) — decisive toggles"
+    },
+    "rules": [
+      "Animation explains UI behavior, not decorates",
+      "Max 2-3 animation types per page",
+      "Always respect prefers-reduced-motion",
+      "Entrance: move + fade. Exit: faster than entrance",
+      "Stagger: 60-100ms between items, max 6-8 items",
+      "Never animate width/height, use transform:scale()",
+      "Use will-change sparingly on animated elements only"
+    ]
+  }
+}

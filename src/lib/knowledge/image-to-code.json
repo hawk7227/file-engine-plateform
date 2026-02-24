@@ -1,0 +1,145 @@
+{
+  "id": "image-to-code",
+  "version": "1.0",
+  "description": "Patterns for recreating designs from screenshots, descriptions, and references",
+
+  "screenshot_analysis": {
+    "description": "Systematic approach to converting a screenshot/image into code",
+    "steps": [
+      {
+        "step": 1,
+        "name": "Identify Layout Structure",
+        "what_to_look_for": ["Overall grid/flex structure", "Number of columns", "Sidebar vs full-width", "Fixed vs scrolling elements", "Header/footer presence"],
+        "output": "Layout skeleton: e.g., 'fixed sidebar 240px + scrollable main, topbar 56px, content padded 24px'"
+      },
+      {
+        "step": 2,
+        "name": "Extract Color Palette",
+        "what_to_look_for": ["Background color (is it pure black, dark gray, off-white?)", "Text colors (primary, secondary, muted)", "Accent/primary color", "Border colors and opacity", "Surface/card background colors"],
+        "output": "CSS variables: --bg, --surface, --text, --muted, --primary, --border",
+        "common_dark_bgs": {"near-black": "#0a0a0f to #111118", "charcoal": "#18181b to #1f1f23", "navy-tinted": "#0d1117 to #151b28"},
+        "common_light_bgs": {"warm-white": "#faf9f6 to #fdf8f6", "cool-white": "#f8f9fc to #f9fafb", "pure-ish": "#f5f5f5 to #fafafa"}
+      },
+      {
+        "step": 3,
+        "name": "Identify Typography",
+        "what_to_look_for": ["Heading font (serif vs sans-serif, geometric vs humanist)", "Body font", "Font sizes (hero heading, section headings, body, small text)", "Font weights used", "Letter spacing (tight on headings?)"],
+        "font_identification_clues": {
+          "geometric_sans": "Perfectly round O, uniform stroke width → Inter, DM Sans, Outfit",
+          "grotesque_sans": "Slightly squared, technical feel → Space Grotesk, Sora",
+          "humanist_sans": "Slight organic curves, warm → Source Sans, Commissioner",
+          "modern_serif": "High contrast, sharp serifs → Playfair Display, Cormorant",
+          "monospace": "Fixed width, code-like → JetBrains Mono, Fira Code",
+          "rounded_sans": "Soft, friendly terminals → Nunito, Outfit, Plus Jakarta Sans"
+        }
+      },
+      {
+        "step": 4,
+        "name": "Identify Components",
+        "what_to_look_for": ["Navigation (glass? solid? transparent?)", "Cards (borders? shadows? glass?)", "Buttons (filled? outline? sizes?)", "Badges/pills", "Form inputs style", "Icons (emoji? SVG? icon library?)", "Dividers and spacing"],
+        "output": "Component list with style notes for each"
+      },
+      {
+        "step": 5,
+        "name": "Identify Spacing & Rhythm",
+        "what_to_look_for": ["Section padding (small 40px, medium 60-80px, large 100-120px)", "Card padding (16px, 24px, 32px)", "Grid gaps", "Element spacing within cards", "Overall density (tight/compact vs spacious)"],
+        "output": "Spacing values to use"
+      },
+      {
+        "step": 6,
+        "name": "Identify Interactions & Effects",
+        "what_to_look_for": ["Hover effects on cards (lift? glow? border change?)", "Button hover states", "Animations (fade-in? slide? parallax?)", "Transitions on interactive elements", "Gradient effects", "Blur/glass effects"],
+        "output": "CSS transitions and animations to implement"
+      }
+    ]
+  },
+
+  "clone_website_approach": {
+    "description": "How to recreate an existing website from a URL or description",
+    "rules": [
+      "NEVER copy content verbatim — use placeholder content that matches the structure",
+      "Match the DESIGN SYSTEM (colors, fonts, spacing) not pixel-perfect layout",
+      "Identify the 5-6 key design decisions that define the site's look",
+      "Simplify overly complex JS interactions into CSS where possible"
+    ],
+    "process": [
+      "1. Note the overall vibe (minimal? bold? corporate? playful?)",
+      "2. Extract the color palette (3-5 key colors)",
+      "3. Identify the font pairing",
+      "4. Map out the section structure top to bottom",
+      "5. Identify the 3 most distinctive design elements",
+      "6. Build from top to bottom: nav → hero → sections → footer",
+      "7. Add interactions last (hover, scroll, animations)"
+    ],
+    "common_sites_to_clone": {
+      "stripe_style": {
+        "key_elements": ["Gradient mesh background", "Floating UI elements/cards at angles", "Very refined typography with tight letter-spacing", "Micro-animations on scroll", "Vibrant gradient CTAs"],
+        "palette": "Dark navy (#0a2540) with cyan/purple gradients, white text",
+        "fonts": "Custom sans-serif similar to Inter/Söhne"
+      },
+      "linear_style": {
+        "key_elements": ["Ultra-minimal dark theme", "Spotlight/glow effects", "Keyboard-first design aesthetic", "Subtle gradient borders on cards", "Very fast, crisp animations"],
+        "palette": "Near-black (#0a0a0a) with purple/blue accent, minimal color",
+        "fonts": "Inter or similar geometric sans"
+      },
+      "vercel_style": {
+        "key_elements": ["Black and white dominance", "Gradient text headings", "Terminal/code aesthetic", "Sharp geometric shapes", "Very high contrast"],
+        "palette": "Pure black (#000) and white, minimal accent color",
+        "fonts": "Inter, with monospace for code elements"
+      },
+      "notion_style": {
+        "key_elements": ["Clean light theme", "Rounded UI elements", "Playful illustrations", "Soft shadows", "Friendly typography"],
+        "palette": "Light (#ffffff bg, soft grays) with colorful accent spots",
+        "fonts": "Rounded sans-serif, slightly playful"
+      },
+      "apple_style": {
+        "key_elements": ["Massive hero with product shot", "Scroll-triggered animations", "Very large typography", "Minimal navigation", "Full-bleed sections"],
+        "palette": "White or near-black with product-color accents",
+        "fonts": "SF Pro / system sans-serif, very clean"
+      }
+    }
+  },
+
+  "figma_to_code": {
+    "description": "Converting Figma designs to code",
+    "mapping": {
+      "auto_layout": "display: flex; gap: {item spacing}px; padding: {padding}px;",
+      "auto_layout_vertical": "display: flex; flex-direction: column;",
+      "frame_fill": "Fixed: width: {n}px; Hug: width: fit-content; Fill: width: 100% / flex: 1;",
+      "corner_radius": "border-radius: {n}px; (mixed: border-radius: {TL}px {TR}px {BR}px {BL}px;)",
+      "effects_shadow": "box-shadow: {x}px {y}px {blur}px {spread}px rgba(0,0,0,{opacity});",
+      "effects_blur": "backdrop-filter: blur({n}px); (layer blur) or filter: blur({n}px); (background blur)",
+      "text_styles": "font-family; font-size; font-weight; line-height; letter-spacing; text-align;",
+      "colors": "Solid: hex/rgb. Gradient: linear-gradient({angle}deg, {color1}, {color2});",
+      "constraints": "Fixed positioning or percentage-based responsive layout",
+      "component_variants": "CSS classes or data attributes for different states"
+    },
+    "common_figma_to_css_mistakes": [
+      "Figma uses absolute positioning by default — convert to flex/grid for responsive",
+      "Figma 'Fill container' = flex: 1 or width: 100%, not a fixed pixel width",
+      "Figma border radius on components may need overflow: hidden on parent",
+      "Figma auto-layout gap is CSS gap property, not margin between children",
+      "Figma text line-height is often percentage (140%) — convert to unitless (1.4) or pixels",
+      "Figma blur effects: 'Layer blur' = filter:blur(), 'Background blur' = backdrop-filter:blur()"
+    ]
+  },
+
+  "visual_pattern_recognition": {
+    "description": "Common visual patterns and how to implement them",
+    "patterns": {
+      "bento_grid": "CSS Grid with varying span sizes: grid-template-columns: repeat(4, 1fr); then specific items get grid-column: span 2; or grid-row: span 2;",
+      "masonry": "CSS columns: column-count: 3; column-gap: 16px; .item { break-inside: avoid; margin-bottom: 16px; }",
+      "sticky_sidebar": "position: sticky; top: 24px; align-self: start;",
+      "full_bleed_section": "width: 100vw; margin-left: calc(-50vw + 50%); padding: 80px calc(50vw - 50%);",
+      "gradient_border": "background: linear-gradient(var(--bg), var(--bg)) padding-box, linear-gradient(135deg, #6366f1, #a78bfa) border-box; border: 1px solid transparent; border-radius: 12px;",
+      "spotlight_glow": "position: relative; &::before { content: ''; position: absolute; inset: -1px; background: conic-gradient(from var(--angle), transparent, var(--primary), transparent); border-radius: inherit; z-index: -1; filter: blur(20px); }",
+      "frosted_glass": "background: rgba(255,255,255,0.05); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255,255,255,0.08);",
+      "text_gradient": "background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;",
+      "animated_gradient_bg": "background: linear-gradient(-45deg, #0a0a0f, #1a1040, #0a2030, #0a0a0f); background-size: 400% 400%; animation: gradientShift 15s ease infinite;",
+      "card_hover_glow": ".card:hover { box-shadow: 0 0 30px rgba(99,102,241,0.15), 0 8px 24px rgba(0,0,0,0.3); }",
+      "staggered_grid": ".item:nth-child(1) { animation-delay: 0s; } .item:nth-child(2) { animation-delay: 0.08s; } /* etc */",
+      "parallax_section": "background-attachment: fixed; background-position: center; background-size: cover;",
+      "scroll_reveal": "IntersectionObserver with threshold 0.1, adds .visible class that transitions opacity and transform"
+    }
+  }
+}

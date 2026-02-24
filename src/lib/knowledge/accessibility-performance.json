@@ -1,0 +1,151 @@
+{
+  "id": "accessibility-performance",
+  "version": "1.0",
+  "description": "Web accessibility (a11y), SEO meta tags, performance optimization, and Core Web Vitals",
+
+  "semantic_html": {
+    "landmark_regions": {
+      "header": "<header> — site header/nav area, use role='banner' if not direct child of body",
+      "nav": "<nav> — primary navigation, use aria-label if multiple navs",
+      "main": "<main> — primary content area, only ONE per page",
+      "aside": "<aside> — sidebar, related content",
+      "footer": "<footer> — site footer, use role='contentinfo'",
+      "section": "<section> — thematic grouping, MUST have heading (h2-h6)",
+      "article": "<article> — self-contained content (blog post, card, comment)"
+    },
+    "heading_hierarchy": [
+      "One <h1> per page (page title)",
+      "Don't skip levels: h1 → h2 → h3 (never h1 → h3)",
+      "Headings describe structure, not visual size (use CSS for sizing)",
+      "Section headings should be h2, subsections h3"
+    ],
+    "interactive_elements": {
+      "buttons_vs_links": "Button = does something (toggle, submit, open modal). Link = goes somewhere (navigation). NEVER use div with onclick for buttons.",
+      "button": "<button type='button'> for actions, <button type='submit'> in forms",
+      "link": "<a href='#section'> for navigation, <a href='/page'> for pages",
+      "skip_nav": "<a href='#main' class='skip-link'>Skip to content</a> — first focusable element, visually hidden until focused"
+    },
+    "skip_link_css": ".skip-link { position: absolute; top: -100%; left: 16px; padding: 8px 16px; background: var(--primary); color: white; border-radius: 0 0 8px 8px; z-index: 9999; font-size: 14px; font-weight: 600; text-decoration: none; transition: top 0.2s; }\n.skip-link:focus { top: 0; }"
+  },
+
+  "aria_attributes": {
+    "essential": {
+      "aria-label": "Provides accessible name when visible text is insufficient. <button aria-label='Close dialog'>×</button>",
+      "aria-labelledby": "References ID of element that labels this one. <div role='dialog' aria-labelledby='dialog-title'>",
+      "aria-describedby": "References ID of description. <input aria-describedby='password-help'>",
+      "aria-hidden": "Hides decorative elements from screen readers. <span aria-hidden='true'>🔍</span>",
+      "aria-expanded": "Toggles for expandable content. <button aria-expanded='false' aria-controls='menu'>",
+      "aria-live": "Announces dynamic content changes. <div aria-live='polite'> for non-urgent, 'assertive' for urgent",
+      "aria-current": "Indicates current item. <a aria-current='page'>Dashboard</a>",
+      "role": "Defines element role when semantic HTML isn't used. role='dialog', role='alert', role='tab'"
+    },
+    "common_patterns": {
+      "modal_dialog": "<div role='dialog' aria-modal='true' aria-labelledby='modal-title'>\n  <h2 id='modal-title'>Title</h2>\n  <button aria-label='Close dialog'>×</button>\n</div>",
+      "tabs": "<div role='tablist'>\n  <button role='tab' aria-selected='true' aria-controls='panel-1'>Tab 1</button>\n</div>\n<div role='tabpanel' id='panel-1' aria-labelledby='tab-1'>Content</div>",
+      "accordion": "<button aria-expanded='false' aria-controls='content-1'>Question</button>\n<div id='content-1' role='region' aria-labelledby='btn-1' hidden>Answer</div>",
+      "nav_with_current": "<nav aria-label='Main navigation'>\n  <a href='/' aria-current='page'>Home</a>\n  <a href='/about'>About</a>\n</nav>",
+      "loading_state": "<div aria-busy='true' aria-live='polite'>Loading...</div>",
+      "form_errors": "<input aria-invalid='true' aria-describedby='error-msg'>\n<span id='error-msg' role='alert'>Email is required</span>"
+    }
+  },
+
+  "color_contrast": {
+    "wcag_aa": {
+      "normal_text": "4.5:1 minimum contrast ratio (text < 18px or < 14px bold)",
+      "large_text": "3:1 minimum (text >= 18px or >= 14px bold)",
+      "ui_components": "3:1 minimum for borders, icons, focus indicators"
+    },
+    "dark_theme_safe_combos": {
+      "primary_text": "#f0f0f5 on #0a0a0f = ~18:1 ✅",
+      "muted_text": "#71717a on #0a0a0f = ~4.7:1 ✅ (barely passes AA)",
+      "secondary_text": "#a1a1aa on #0a0a0f = ~7.5:1 ✅",
+      "primary_accent": "#818cf8 on #0a0a0f = ~6.2:1 ✅",
+      "danger": "#ef4444 on #0a0a0f = ~4.6:1 ✅ (for large text/icons)",
+      "warning": "Never use muted text (#71717a) smaller than 14px — fails contrast"
+    },
+    "light_theme_safe_combos": {
+      "primary_text": "#111827 on #f8f9fc = ~16:1 ✅",
+      "muted_text": "#6b7280 on #f8f9fc = ~5.3:1 ✅",
+      "link_text": "#4f46e5 on #f8f9fc = ~6.8:1 ✅"
+    }
+  },
+
+  "keyboard_accessibility": {
+    "focus_management": [
+      "All interactive elements must be keyboard focusable (tab order)",
+      "Custom focus styles: outline: 2px solid var(--primary); outline-offset: 2px;",
+      "NEVER use outline: none without a replacement focus style",
+      "Focus trap in modals (Tab cycles through modal, doesn't escape)",
+      "Return focus to trigger element when modal closes"
+    ],
+    "focus_visible_css": ":focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }\n:focus:not(:focus-visible) { outline: none; }",
+    "keyboard_shortcuts": {
+      "escape": "Close modals, dropdowns, overlays",
+      "enter_space": "Activate buttons and links",
+      "arrow_keys": "Navigate within tabs, menus, lists",
+      "tab": "Move between focusable elements"
+    },
+    "focus_trap_js": "function trapFocus(el) {\n  const focusable = el.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex=\"-1\"])');\n  const first = focusable[0], last = focusable[focusable.length - 1];\n  el.addEventListener('keydown', e => {\n    if (e.key === 'Tab') {\n      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n    }\n  });\n  first?.focus();\n}"
+  },
+
+  "seo_meta_tags": {
+    "essential_head": "<head>\n  <meta charset='UTF-8'>\n  <meta name='viewport' content='width=device-width, initial-scale=1.0'>\n  <title>Page Title — Brand Name</title>\n  <meta name='description' content='150-160 char description with primary keyword'>\n  <link rel='canonical' href='https://example.com/page'>\n  \n  <!-- Open Graph (Facebook, LinkedIn) -->\n  <meta property='og:type' content='website'>\n  <meta property='og:title' content='Page Title'>\n  <meta property='og:description' content='Description for social sharing'>\n  <meta property='og:image' content='https://example.com/og-image.png'>\n  <meta property='og:url' content='https://example.com/page'>\n  \n  <!-- Twitter Card -->\n  <meta name='twitter:card' content='summary_large_image'>\n  <meta name='twitter:title' content='Page Title'>\n  <meta name='twitter:description' content='Description'>\n  <meta name='twitter:image' content='https://example.com/twitter-image.png'>\n  \n  <!-- Favicon -->\n  <link rel='icon' href='/favicon.ico' sizes='any'>\n  <link rel='icon' href='/icon.svg' type='image/svg+xml'>\n  <link rel='apple-touch-icon' href='/apple-touch-icon.png'>\n  \n  <!-- Theme Color (browser chrome) -->\n  <meta name='theme-color' content='#0a0a0f'>\n</head>",
+    "title_format": "Page Name — Brand Name (50-60 chars max)",
+    "description_rules": [
+      "150-160 characters",
+      "Include primary keyword naturally",
+      "Include a call to action",
+      "Unique per page"
+    ],
+    "og_image_specs": "1200×630px, PNG or JPG, under 5MB, include brand/title text"
+  },
+
+  "performance_optimization": {
+    "font_loading": {
+      "font_display_swap": "<link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>",
+      "preload_critical": "<link rel='preload' href='/fonts/Inter-Regular.woff2' as='font' type='font/woff2' crossorigin>",
+      "subsetting": "Only load weights you actually use. 400;500;600;700 not 100;200;300;400;500;600;700;800;900",
+      "system_font_fallback": "font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;"
+    },
+    "image_optimization": {
+      "lazy_loading": "<img loading='lazy' alt='Description' width='400' height='300'>",
+      "responsive_images": "<img srcset='img-400.webp 400w, img-800.webp 800w, img-1200.webp 1200w' sizes='(max-width: 768px) 100vw, 50vw' src='img-800.webp' alt='Description'>",
+      "aspect_ratio": "Always include width and height attributes to prevent layout shift",
+      "webp_format": "Use WebP with JPEG/PNG fallback: <picture><source srcset='img.webp' type='image/webp'><img src='img.jpg' alt=''></picture>"
+    },
+    "css_performance": {
+      "contain": "contain: layout style paint; — tells browser this element is independent, enables paint optimization",
+      "content_visibility": "content-visibility: auto; — skips rendering off-screen elements (huge perf win for long pages)",
+      "will_change": "will-change: transform; — only on elements about to animate, remove after animation",
+      "avoid": "Never animate width, height, top, left — use transform and opacity instead"
+    },
+    "loading_strategy": {
+      "above_fold": "Inline critical CSS, preload hero image, preconnect to font CDN",
+      "below_fold": "Lazy load images, defer non-critical JS, use IntersectionObserver for animations",
+      "preconnect": "<link rel='preconnect' href='https://fonts.googleapis.com'>\n<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>",
+      "dns_prefetch": "<link rel='dns-prefetch' href='https://analytics.example.com'>"
+    },
+    "core_web_vitals": {
+      "LCP": {
+        "what": "Largest Contentful Paint — when main content loads",
+        "target": "Under 2.5s",
+        "fixes": ["Preload hero image", "Inline critical CSS", "Use font-display: swap", "Server-side render above fold"]
+      },
+      "FID": {
+        "what": "First Input Delay — responsiveness to first interaction",
+        "target": "Under 100ms",
+        "fixes": ["Defer non-critical JS", "Break up long tasks", "Use web workers for heavy computation"]
+      },
+      "CLS": {
+        "what": "Cumulative Layout Shift — visual stability",
+        "target": "Under 0.1",
+        "fixes": ["Set explicit width/height on images", "Reserve space for dynamic content", "Use font-display: optional if CLS matters more than FOUT", "Don't insert content above existing content"]
+      }
+    }
+  },
+
+  "reduced_motion": {
+    "media_query": "@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after {\n    animation-duration: 0.01ms !important;\n    animation-iteration-count: 1 !important;\n    transition-duration: 0.01ms !important;\n    scroll-behavior: auto !important;\n  }\n}",
+    "rule": "Always include this at the end of your stylesheet. Non-negotiable for accessibility."
+  }
+}
