@@ -2,28 +2,53 @@
   "id": "image-to-code",
   "version": "1.0",
   "description": "Patterns for recreating designs from screenshots, descriptions, and references",
-
   "screenshot_analysis": {
     "description": "Systematic approach to converting a screenshot/image into code",
     "steps": [
       {
         "step": 1,
         "name": "Identify Layout Structure",
-        "what_to_look_for": ["Overall grid/flex structure", "Number of columns", "Sidebar vs full-width", "Fixed vs scrolling elements", "Header/footer presence"],
+        "what_to_look_for": [
+          "Overall grid/flex structure",
+          "Number of columns",
+          "Sidebar vs full-width",
+          "Fixed vs scrolling elements",
+          "Header/footer presence"
+        ],
         "output": "Layout skeleton: e.g., 'fixed sidebar 240px + scrollable main, topbar 56px, content padded 24px'"
       },
       {
         "step": 2,
         "name": "Extract Color Palette",
-        "what_to_look_for": ["Background color (is it pure black, dark gray, off-white?)", "Text colors (primary, secondary, muted)", "Accent/primary color", "Border colors and opacity", "Surface/card background colors"],
+        "what_to_look_for": [
+          "Background color (is it pure black, dark gray, off-white?)",
+          "Text colors (primary, secondary, muted)",
+          "Accent/primary color",
+          "Border colors and opacity",
+          "Surface/card background colors"
+        ],
         "output": "CSS variables: --bg, --surface, --text, --muted, --primary, --border",
-        "common_dark_bgs": {"near-black": "#0a0a0f to #111118", "charcoal": "#18181b to #1f1f23", "navy-tinted": "#0d1117 to #151b28"},
-        "common_light_bgs": {"warm-white": "#faf9f6 to #fdf8f6", "cool-white": "#f8f9fc to #f9fafb", "pure-ish": "#f5f5f5 to #fafafa"}
+        "common_dark_bgs": {
+          "near-black": "#0a0a0f to #111118",
+          "charcoal": "#18181b to #1f1f23",
+          "navy-tinted": "#0d1117 to #151b28"
+        },
+        "common_light_bgs": {
+          "warm-white": "#faf9f6 to #fdf8f6",
+          "cool-white": "#f8f9fc to #f9fafb",
+          "pure-ish": "#f5f5f5 to #fafafa"
+        }
       },
       {
         "step": 3,
         "name": "Identify Typography",
-        "what_to_look_for": ["Heading font (serif vs sans-serif, geometric vs humanist)", "Body font", "Font sizes (hero heading, section headings, body, small text)", "Font weights used", "Letter spacing (tight on headings?)"],
+        "what_to_look_for": [
+          "Heading font (serif vs sans-serif, geometric vs humanist)",
+          "Body font",
+          "Font sizes (hero heading, section headings, body, small text)",
+          "Font weights used",
+          "Letter spacing (tight on headings?)"
+        ],
         "font_identification_clues": {
           "geometric_sans": "Perfectly round O, uniform stroke width → Inter, DM Sans, Outfit",
           "grotesque_sans": "Slightly squared, technical feel → Space Grotesk, Sora",
@@ -36,24 +61,44 @@
       {
         "step": 4,
         "name": "Identify Components",
-        "what_to_look_for": ["Navigation (glass? solid? transparent?)", "Cards (borders? shadows? glass?)", "Buttons (filled? outline? sizes?)", "Badges/pills", "Form inputs style", "Icons (emoji? SVG? icon library?)", "Dividers and spacing"],
+        "what_to_look_for": [
+          "Navigation (glass? solid? transparent?)",
+          "Cards (borders? shadows? glass?)",
+          "Buttons (filled? outline? sizes?)",
+          "Badges/pills",
+          "Form inputs style",
+          "Icons (emoji? SVG? icon library?)",
+          "Dividers and spacing"
+        ],
         "output": "Component list with style notes for each"
       },
       {
         "step": 5,
         "name": "Identify Spacing & Rhythm",
-        "what_to_look_for": ["Section padding (small 40px, medium 60-80px, large 100-120px)", "Card padding (16px, 24px, 32px)", "Grid gaps", "Element spacing within cards", "Overall density (tight/compact vs spacious)"],
+        "what_to_look_for": [
+          "Section padding (small 40px, medium 60-80px, large 100-120px)",
+          "Card padding (16px, 24px, 32px)",
+          "Grid gaps",
+          "Element spacing within cards",
+          "Overall density (tight/compact vs spacious)"
+        ],
         "output": "Spacing values to use"
       },
       {
         "step": 6,
         "name": "Identify Interactions & Effects",
-        "what_to_look_for": ["Hover effects on cards (lift? glow? border change?)", "Button hover states", "Animations (fade-in? slide? parallax?)", "Transitions on interactive elements", "Gradient effects", "Blur/glass effects"],
+        "what_to_look_for": [
+          "Hover effects on cards (lift? glow? border change?)",
+          "Button hover states",
+          "Animations (fade-in? slide? parallax?)",
+          "Transitions on interactive elements",
+          "Gradient effects",
+          "Blur/glass effects"
+        ],
         "output": "CSS transitions and animations to implement"
       }
     ]
   },
-
   "clone_website_approach": {
     "description": "How to recreate an existing website from a URL or description",
     "rules": [
@@ -73,33 +118,84 @@
     ],
     "common_sites_to_clone": {
       "stripe_style": {
-        "key_elements": ["Gradient mesh background", "Floating UI elements/cards at angles", "Very refined typography with tight letter-spacing", "Micro-animations on scroll", "Vibrant gradient CTAs"],
+        "key_elements": [
+          "Gradient mesh background",
+          "Floating UI elements/cards at angles",
+          "Very refined typography with tight letter-spacing",
+          "Micro-animations on scroll",
+          "Vibrant gradient CTAs"
+        ],
         "palette": "Dark navy (#0a2540) with cyan/purple gradients, white text",
         "fonts": "Custom sans-serif similar to Inter/Söhne"
       },
       "linear_style": {
-        "key_elements": ["Ultra-minimal dark theme", "Spotlight/glow effects", "Keyboard-first design aesthetic", "Subtle gradient borders on cards", "Very fast, crisp animations"],
+        "key_elements": [
+          "Ultra-minimal dark theme",
+          "Spotlight/glow effects",
+          "Keyboard-first design aesthetic",
+          "Subtle gradient borders on cards",
+          "Very fast, crisp animations"
+        ],
         "palette": "Near-black (#0a0a0a) with purple/blue accent, minimal color",
         "fonts": "Inter or similar geometric sans"
       },
       "vercel_style": {
-        "key_elements": ["Black and white dominance", "Gradient text headings", "Terminal/code aesthetic", "Sharp geometric shapes", "Very high contrast"],
+        "key_elements": [
+          "Black and white dominance",
+          "Gradient text headings",
+          "Terminal/code aesthetic",
+          "Sharp geometric shapes",
+          "Very high contrast"
+        ],
         "palette": "Pure black (#000) and white, minimal accent color",
         "fonts": "Inter, with monospace for code elements"
       },
       "notion_style": {
-        "key_elements": ["Clean light theme", "Rounded UI elements", "Playful illustrations", "Soft shadows", "Friendly typography"],
+        "key_elements": [
+          "Clean light theme",
+          "Rounded UI elements",
+          "Playful illustrations",
+          "Soft shadows",
+          "Friendly typography"
+        ],
         "palette": "Light (#ffffff bg, soft grays) with colorful accent spots",
         "fonts": "Rounded sans-serif, slightly playful"
       },
       "apple_style": {
-        "key_elements": ["Massive hero with product shot", "Scroll-triggered animations", "Very large typography", "Minimal navigation", "Full-bleed sections"],
-        "palette": "White or near-black with product-color accents",
-        "fonts": "SF Pro / system sans-serif, very clean"
+        "key_elements": [
+          "Full-viewport hero stack — one product per screen",
+          "Alternating pure black (#000) and white (#fff) sections",
+          "44px frosted glass nav with backdrop-filter:blur(20px)",
+          "System font stack (-apple-system) — zero font loading",
+          "Ultra-tight letter-spacing (-0.04em) on massive headings (56-80px)",
+          "Minimal copy: 3-5 words per product headline",
+          "Text link CTAs (Learn more › / Buy ›) not buttons",
+          "2-up card grid for secondary products",
+          "Scroll-triggered parallax on product images"
+        ],
+        "palette": "Binary: pure #000 and #fff backgrounds only. Text: #1d1d1f on white, #f5f5f7 on black. Links: #2997ff (Apple blue). Muted: #86868b",
+        "fonts": "SF Pro / -apple-system,BlinkMacSystemFont system stack. No external fonts.",
+        "layout": "nav(44px sticky) → hero1(100vh, dark) → hero2(100vh, light) → 2-up-grid(rounded cards) → 2-up-grid → footer",
+        "category": "Product Showcase / Brand Experience"
+      },
+      "hp_ecommerce_style": {
+        "key_elements": [
+          "Hero carousel with 3-5 auto-rotating promotional slides",
+          "2-row sticky nav: top(logo+search+cart) + bottom(category links)",
+          "Category grid with product thumbnails and starting prices",
+          "Deal cards with strikethrough prices and savings badges",
+          "Branded promo banner with gradient background",
+          "Massive 4-column footer with link groups",
+          "Sale urgency: red badges, countdown timers, percent-off callouts",
+          "Search bar prominently in nav"
+        ],
+        "palette": "White (#fff) dominant. Brand blue (#0096d6) accent. Sale red (#c00). Text: #1a1a1a primary, #555 secondary. Cards: #f9f9f9 bg with #eee borders.",
+        "fonts": "System sans-serif stack or brand proprietary. Modest heading sizes (24-36px).",
+        "layout": "mega-nav(sticky 2-row) → carousel(400px, auto-play) → category-grid(4 cols) → deals-grid(3 cols with prices) → promo-banner(gradient) → footer(4-col grid)",
+        "category": "E-Commerce / Retail Catalog"
       }
     }
   },
-
   "figma_to_code": {
     "description": "Converting Figma designs to code",
     "mapping": {
@@ -123,7 +219,6 @@
       "Figma blur effects: 'Layer blur' = filter:blur(), 'Background blur' = backdrop-filter:blur()"
     ]
   },
-
   "visual_pattern_recognition": {
     "description": "Common visual patterns and how to implement them",
     "patterns": {

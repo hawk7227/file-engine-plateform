@@ -951,6 +951,8 @@ Response format: narrate between actions. Brief plan → code block → brief no
 Screenshot analysis: 1)Layout structure 2)Color palette 3)Typography 4)Components 5)Spacing 6)Interactions.
 Font ID clues: geometric sans=Inter/DM Sans, grotesque=Space Grotesk/Sora, humanist=Source Sans, modern serif=Playfair, mono=JetBrains Mono.
 Clone approaches: Stripe=gradient mesh+floating cards+vibrant CTAs. Linear=ultra-minimal dark+spotlight glows. Vercel=black/white+gradient text. Notion=clean light+rounded+playful.
+Apple-style: hero-stack layout (one product per 100vh section), alternating pure #000/#fff backgrounds, system font (-apple-system), 44px frosted glass nav, ultra-tight letter-spacing (-0.04em), massive headings (56-80px), "Learn more ›" text links not buttons, 2-up card grid, minimal copy (3-5 words). Category: Product Showcase.
+HP/E-commerce-style: hero carousel (3-5 slides, auto-rotating), 2-row nav (search bar + category links), category grid with starting prices, deal cards with strikethrough prices + savings badges, branded promo banner, 4-column footer. Colors: white bg, brand blue (#0096d6), sale red (#c00). Category: Retail Catalog.
 
 ## ADVANCED CSS ANIMATION
 
