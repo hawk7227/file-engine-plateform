@@ -10,17 +10,11 @@ import type { DevicePreset } from './WorkplaceLayout'
 const CANVAS_CSS = `
 .wp-canvas{flex:1;position:relative;overflow:hidden;background:var(--wp-bg-0);background-image:radial-gradient(circle at 50% 40%,rgba(18,28,18,.3),var(--wp-bg-0) 70%)}
 .wp-device{position:absolute;cursor:grab;transition:filter .15s;z-index:2}.wp-device:active{cursor:grabbing}.wp-device:hover{filter:drop-shadow(0 0 24px rgba(52,211,153,.06))}
-.wp-phone{position:relative;border:12px solid #1c1c1e;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column}
-.wp-phone-di{position:absolute;z-index:10;width:126px;height:36px;background:#000;border-radius:20px;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
+.wp-phone{position:relative;border:14px solid #1c1c1e;border-radius:55px;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column}
+.wp-phone-di{position:absolute;z-index:10;width:126px;height:37px;background:#000;border-radius:20px;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
 .wp-phone-di .cam{width:10px;height:10px;border-radius:50%;background:#1a1a2e;border:1px solid #2a2a3e}
-.wp-phone-status{display:flex;justify-content:space-between;color:#fff;padding:12px 28px 6px;font-size:12px;font-weight:600;flex-shrink:0;background:#000}
-.wp-phone-bar{display:flex;align-items:center;height:44px;background:#f8f9fa;border-bottom:1px solid #e0e0e0;padding:0 8px;gap:6px;flex-shrink:0}
-.wp-phone-bar .bnav{display:flex;gap:8px;font-size:13px;color:#888}
-.wp-phone-bar .burl{flex:1;display:flex;align-items:center;background:#fff;border:1px solid #d0d0d0;border-radius:20px;padding:5px 12px;font-size:10px;color:#555;gap:4px;overflow:hidden;font-family:sans-serif}
-.wp-phone-bar .lk{font-size:10px;color:#22c55e}
-.wp-phone-bar .ut{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wp-phone-iframe{flex:1;border:none;width:100%;background:#fff}
-.wp-phone-home{display:flex;align-items:center;justify-content:space-around;height:44px;background:#f8f9fa;border-top:1px solid #e0e0e0;font-size:16px;color:#888;flex-shrink:0}
+.wp-phone-screen{flex:1;border-radius:41px;overflow:hidden;position:relative;background:#000}
+.wp-phone-iframe{width:100%;height:100%;border:none;background:#fff}
 .wp-hindicator{position:absolute;z-index:20;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.15);bottom:8px;left:50%;transform:translateX(-50%)}
 .wp-dlabel{text-align:center;margin-top:8px;font-family:var(--wp-mono);font-size:9px;color:var(--wp-text-4)}
 .wp-browser{position:absolute;cursor:grab;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);background:var(--wp-bg-2);display:flex;flex-direction:column;z-index:3}
@@ -131,7 +125,6 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
 
   const iframeSrc = previewUrl || 'about:blank'
   const { width: vw, height: vh } = activeDevice.cssViewport
-  const phoneContentH = vh - 106 // status bar + address bar + bottom nav
 
   return (
     <>
@@ -143,29 +136,19 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
           className="wp-device"
           style={{ left: '50%', top: '50%', transform: `translate(-50%, -50%) scale(${zoom})` }}
         >
-          <div className="wp-phone" style={{ width: vw, borderRadius: activeDevice.borderRadius }}>
+          <div className="wp-phone" style={{ width: vw, height: vh, borderRadius: 55 }}>
             {activeDevice.frameType === 'phone-dynamic-island' && (
               <div className="wp-phone-di"><div className="cam" /></div>
             )}
-            <div className="wp-phone-status">
-              <span>9:41</span>
-              <span style={{ fontSize: 10 }}>●●● 📶 🔋</span>
+            <div className="wp-phone-screen">
+              <iframe
+                className="wp-phone-iframe"
+                src={iframeSrc}
+                style={{ width: vw, height: vh }}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                title="Mobile Preview"
+              />
             </div>
-            <div className="wp-phone-bar">
-              <div className="bnav"><span style={{ opacity: .3 }}>‹</span> ›</div>
-              <div className="burl">
-                <span className="lk">🔒</span>
-                <span className="ut">{previewUrl || 'staging.fileengine.com'}</span>
-              </div>
-            </div>
-            <iframe
-              className="wp-phone-iframe"
-              src={iframeSrc}
-              style={{ height: phoneContentH }}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              title="Mobile Preview"
-            />
-            <div className="wp-phone-home">◁ ○ □</div>
             <div className="wp-hindicator" />
           </div>
           <div className="wp-dlabel">

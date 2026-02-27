@@ -44,6 +44,7 @@ export interface DevicePreset {
 
 export const DEVICES: DevicePreset[] = [
   { id: 'se', name: 'iPhone SE', label: 'SE', cssViewport: { width: 375, height: 667 }, dpr: 2, screenSize: '4.7"', frameType: 'phone-home-button', borderRadius: 38 },
+  { id: '14pm', name: 'iPhone 14 Pro Max', label: '14 PM', cssViewport: { width: 430, height: 932 }, dpr: 3, screenSize: '6.7"', frameType: 'phone-dynamic-island', borderRadius: 55 },
   { id: '15pro', name: 'iPhone 15 Pro', label: '15 Pro', cssViewport: { width: 393, height: 852 }, dpr: 3, screenSize: '6.1"', frameType: 'phone-dynamic-island', borderRadius: 50 },
   { id: '16pm', name: 'iPhone 16 Pro Max', label: '16 PM', cssViewport: { width: 440, height: 956 }, dpr: 3, screenSize: '6.9"', frameType: 'phone-dynamic-island', borderRadius: 55 },
   { id: 'pixel', name: 'Pixel 8', label: 'Pixel', cssViewport: { width: 412, height: 915 }, dpr: 2.625, screenSize: '6.2"', frameType: 'phone-android', borderRadius: 40 },
@@ -132,7 +133,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [bottomTab, setBottomTab] = useState<BottomTab>('sql')
   const [bottomHeight, setBottomHeight] = useState(48)
   const [bottomExpanded, setBottomExpanded] = useState(false)
-  const [activeDevice, setActiveDevice] = useState<DevicePreset>(DEVICES[1]) // 15 Pro
+  const [activeDevice, setActiveDevice] = useState<DevicePreset>(DEVICES[1]) // 14 Pro Max
   const [showBrowser, setShowBrowser] = useState(false)
   const [zoom, setZoom] = useState(0.7)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
