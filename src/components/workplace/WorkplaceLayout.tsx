@@ -26,6 +26,8 @@ import { WPToolbar } from './WPToolbar'
 import { WPPreviewCanvas } from './WPPreviewCanvas'
 import { WPCodeOutput } from './WPCodeOutput'
 import { WPDocViewer } from './WPDocViewer'
+import { WPDiffPreview } from './WPDiffPreview'
+import type { DiffProposal } from './WPDiffPreview'
 
 // ============================================
 // DEVICE PRESETS (Researched, accurate)
@@ -116,6 +118,9 @@ const CSS = `
 .wp-toast.err{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.15);color:#f87171}
 .wp-toast.nfo{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.15);color:#60a5fa}
 @keyframes wp-si{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+@media(max-width:768px){.wp-left{position:fixed;left:0;top:36px;bottom:28px;z-index:50;width:280px;transform:translateX(-100%);transition:transform .22s ease}.wp-left.open{transform:none}.wp-mobile-toggle{display:flex}.wp-center{width:100%}.wp-bottom{height:48px!important}}
+@media(min-width:769px){.wp-mobile-toggle{display:none}.wp-left{transform:none!important}}
+@media(max-width:480px){.wp-topbar{padding:0 6px;gap:4px}.wp-topbar .wp-tb{font-size:7px;padding:2px 5px}}
 `
 
 // ============================================
@@ -139,38 +144,48 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([])
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [rotated, setRotated] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [diffProposal, setDiffProposal] = useState<DiffProposal | null>(null)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
-  // ── Build preview HTML from generated files ──
+  // ── Build preview HTML from generated files (debounced 150ms) ──
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
     if (!generatedFiles.length) {
       setPreviewHtml(null)
       return
     }
-    // Find HTML file first, then try to build from JSX/TSX
-    const htmlFile = generatedFiles.find(f => f.path.endsWith('.html'))
-    if (htmlFile) {
-      setPreviewHtml(htmlFile.content)
-      return
-    }
-    // Assemble preview from all generated files
-    const cssFiles = generatedFiles.filter(f => f.path.endsWith('.css'))
-    const jsFiles = generatedFiles.filter(f => f.path.endsWith('.js') || f.path.endsWith('.ts'))
-    const cssContent = cssFiles.map(f => f.content).join('\n')
-    const jsContent = jsFiles.map(f => f.content).join('\n')
-    const assembled = `<!DOCTYPE html>
+    debounceRef.current = setTimeout(() => {
+      const htmlFile = generatedFiles.find(f => f.path.endsWith('.html'))
+      if (htmlFile) {
+        setPreviewHtml(htmlFile.content)
+        setRefreshKey(k => k + 1)
+        return
+      }
+      const cssFiles = generatedFiles.filter(f => f.path.endsWith('.css'))
+      const jsFiles = generatedFiles.filter(f => f.path.endsWith('.js') || f.path.endsWith('.ts'))
+      const cssContent = cssFiles.map(f => f.content).join('\n')
+      const jsContent = jsFiles.map(f => f.content).join('\n')
+      const assembled = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif}${cssContent}</style>
 </head><body>
 <div id="root"></div>
-<script>${jsContent}</script>
+<script>${jsContent}<\/script>
 <script>
-// If React files were generated, try to render
 if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
   try{ReactDOM.render(React.createElement(App||function(){return React.createElement('div','No App component')}),document.getElementById('root'))}catch(e){document.body.innerHTML='<pre style="padding:16px;color:#f87171">'+e.message+'</pre>'}
 }
-</script>
+window.onerror=function(msg){window.parent.postMessage({type:'wp-iframe-error',message:String(msg)},'*')}
+<\/script>
 </body></html>`
-    setPreviewHtml(assembled)
+      setPreviewHtml(assembled)
+      setRefreshKey(k => k + 1)
+    }, 150)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [generatedFiles])
 
   // ── Refs ──
@@ -286,6 +301,7 @@ if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
         {/* ═══ TOP BAR ═══ */}
         <div className="wp-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button className="wp-tb wp-mobile-toggle" onClick={() => setMobileSidebarOpen(p => !p)} style={{ padding: '3px 6px' }}>☰</button>
             <div className="wp-logo" style={{ width: 22, height: 22, fontSize: 7 }}>FE</div>
             <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '-.3px' }}>Workplace</span>
             <span style={{ fontSize: 7, color: 'var(--wp-text-4)', fontWeight: 700 }}>ADMIN v3</span>
@@ -316,7 +332,7 @@ if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
         {/* ═══ MAIN ═══ */}
         <div className="wp-main">
           {/* ═══ LEFT PANEL ═══ */}
-          <div className="wp-left">
+          <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`}>
             <div className="wp-lheader">
               <div className="wp-logo">FE</div>
               <div>
@@ -379,9 +395,14 @@ if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
               showBrowser={showBrowser}
               previewUrl={previewUrl}
               previewPhase={preview.phase}
+              rotated={rotated}
+              theme={theme}
               onDeviceChange={setActiveDevice}
               onZoomChange={setZoom}
               onToggleBrowser={() => setShowBrowser(p => !p)}
+              onToggleRotation={() => setRotated(r => !r)}
+              onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+              onRefresh={() => setRefreshKey(k => k + 1)}
               toast={toast}
             />
             <div className="wp-canvas-area">
@@ -391,6 +412,9 @@ if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
                 zoom={zoom}
                 previewUrl={previewUrl || preview.previewUrl}
                 previewHtml={previewHtml}
+                rotated={rotated}
+                theme={theme}
+                refreshKey={refreshKey}
                 onCloseBrowser={() => setShowBrowser(false)}
               />
             </div>
@@ -432,6 +456,8 @@ if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
           <span>Device: <span>{activeDevice.name}</span></span>
           <span>Screen: <span>{activeDevice.cssViewport.width}×{activeDevice.cssViewport.height}</span></span>
           <span>DPR: <span>{activeDevice.dpr}x</span></span>
+          <span>Theme: <span style={{ color: theme === 'dark' ? 'var(--wp-yellow)' : 'var(--wp-blue)' }}>{theme.toUpperCase()}</span></span>
+          {rotated && <span style={{ color: 'var(--wp-purple)' }}>LANDSCAPE</span>}
           <span>Env: <span style={{ color: 'var(--wp-yellow)' }}>STAGING</span></span>
           <span>Build: <span style={{ color: preview.phase === 'error' ? 'var(--wp-red)' : 'var(--wp-accent)' }}>
             {preview.phase === 'error' ? ' FAIL' : preview.phase === 'previewing' ? ' PASS' : preview.phase === 'idle' ? '—' : '⏳'}
@@ -441,7 +467,31 @@ if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
 
         {/* Toast container */}
         <div className="wp-toast-wrap" ref={toastRef} />
+
+        {/* Mobile sidebar backdrop */}
+        {mobileSidebarOpen && (
+          <div onClick={() => setMobileSidebarOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'rgba(0,0,0,.5)' }} className="wp-mobile-toggle" />
+        )}
       </div>
+
+      {/* Diff preview overlay (portal-level, outside wp-root to avoid overflow:hidden) */}
+      {diffProposal && (
+        <WPDiffPreview
+          proposal={diffProposal}
+          onApprove={() => {
+            toast('Applied', `Changes to ${diffProposal.filePath}`, 'ok')
+            setDiffProposal(null)
+          }}
+          onReject={() => {
+            toast('Rejected', 'Changes discarded', 'err')
+            setDiffProposal(null)
+          }}
+          onAlternative={() => {
+            toast('Alternative', 'Requesting different approach...', 'nfo')
+            setDiffProposal(null)
+          }}
+        />
+      )}
     </>
   )
 }

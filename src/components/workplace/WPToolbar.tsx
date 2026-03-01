@@ -2,19 +2,36 @@
 
 import type { DevicePreset } from './WorkplaceLayout'
 
-const S = {
-  bar: { display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', borderBottom: '1px solid var(--wp-border)', background: 'var(--wp-bg-2)', minHeight: 36, flexShrink: 0, overflowX: 'auto' as const },
-  url: { display: 'flex', alignItems: 'center', background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)', borderRadius: 8, overflow: 'hidden', minWidth: 80, maxWidth: 200, flex: 1 },
-  urlLk: { padding: '0 8px', fontSize: 9, color: 'var(--wp-accent)', flexShrink: 0 },
-  urlInp: { flex: 1, background: 'none', border: 'none', fontSize: 9, color: 'var(--wp-text-3)', fontFamily: 'var(--wp-mono)', padding: '5px 8px 5px 0', outline: 'none', minWidth: 40 },
-  dbar: { display: 'flex', background: 'var(--wp-bg-3)', borderRadius: 8, border: '1px solid var(--wp-border)', padding: 2, gap: 1 },
-  dbtn: (on: boolean) => ({ padding: '3px 6px', borderRadius: 5, fontSize: 7, fontWeight: 700, border: 'none', background: on ? 'var(--wp-accent-dim)' : 'none', color: on ? 'var(--wp-accent)' : 'var(--wp-text-4)', cursor: 'pointer', whiteSpace: 'nowrap' as const, fontFamily: 'var(--wp-font)' }),
-  webBtn: (on: boolean) => ({ padding: '3px 6px', borderRadius: 5, fontSize: 7, fontWeight: 700, border: `1px solid ${on ? 'rgba(96,165,250,.25)' : 'rgba(96,165,250,.1)'}`, background: on ? 'rgba(96,165,250,.12)' : 'rgba(167,139,250,.08)', color: 'var(--wp-blue)', cursor: 'pointer', fontFamily: 'var(--wp-font)' }),
-  tb: { padding: '3px 6px', borderRadius: 8, fontSize: 8, fontWeight: 700, border: '1px solid var(--wp-border)', background: 'none', color: 'var(--wp-text-4)', cursor: 'pointer', fontFamily: 'var(--wp-font)' },
-  sep: { width: 1, height: 16, background: 'var(--wp-border)', flexShrink: 0 },
-  env: { fontSize: 7, fontWeight: 700, fontFamily: 'var(--wp-mono)', padding: '2px 8px', borderRadius: 20, background: 'rgba(251,191,36,.08)', color: 'var(--wp-yellow)', border: '1px solid rgba(251,191,36,.1)', flexShrink: 0 },
-  zoom: { fontSize: 8, color: 'var(--wp-text-3)', fontFamily: 'var(--wp-mono)', minWidth: 28, textAlign: 'center' as const },
-}
+const CSS = `
+.wpt-bar{display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px solid var(--wp-border);background:var(--wp-bg-2);min-height:36px;flex-shrink:0;overflow-x:auto}
+.wpt-bar::-webkit-scrollbar{display:none}
+.wpt-url{display:flex;align-items:center;background:var(--wp-bg-3);border:1px solid var(--wp-border);border-radius:8px;overflow:hidden;min-width:80px;max-width:200px;flex:1}
+.wpt-url-lk{padding:0 8px;font-size:9px;color:var(--wp-accent);flex-shrink:0}
+.wpt-url-inp{flex:1;background:none;border:none;font-size:9px;color:var(--wp-text-3);font-family:var(--wp-mono);padding:5px 8px 5px 0;outline:none;min-width:40px}
+.wpt-dbar{display:flex;background:var(--wp-bg-3);border-radius:8px;border:1px solid var(--wp-border);padding:2px;gap:1px}
+.wpt-dbtn{padding:3px 6px;border-radius:5px;font-size:7px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;font-family:var(--wp-font);transition:background .15s,color .15s}
+.wpt-dbtn.off{background:none;color:var(--wp-text-4)}.wpt-dbtn.off:hover{color:var(--wp-text-2)}
+.wpt-dbtn.on{background:var(--wp-accent-dim);color:var(--wp-accent)}
+.wpt-sep{width:1px;height:16px;background:var(--wp-border);flex-shrink:0}
+.wpt-btn{padding:3px 6px;border-radius:8px;font-size:8px;font-weight:700;border:1px solid var(--wp-border);background:none;color:var(--wp-text-4);cursor:pointer;font-family:var(--wp-font);transition:all .15s;white-space:nowrap}
+.wpt-btn:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
+.wpt-btn.active{background:var(--wp-accent-dim);border-color:rgba(52,211,153,.2);color:var(--wp-accent)}
+.wpt-web{padding:3px 6px;border-radius:5px;font-size:7px;font-weight:700;cursor:pointer;font-family:var(--wp-font);transition:all .15s}
+.wpt-web.off{border:1px solid rgba(96,165,250,.1);background:rgba(167,139,250,.08);color:var(--wp-blue)}
+.wpt-web.on{border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.12);color:var(--wp-blue)}
+.wpt-zoom{font-size:8px;color:var(--wp-text-3);font-family:var(--wp-mono);min-width:28px;text-align:center}
+.wpt-env{font-size:7px;font-weight:700;font-family:var(--wp-mono);padding:2px 8px;border-radius:20px;background:rgba(251,191,36,.08);color:var(--wp-yellow);border:1px solid rgba(251,191,36,.1);flex-shrink:0}
+.wpt-phase{font-size:7px;font-weight:700;font-family:var(--wp-mono);padding:2px 8px;border-radius:20px;flex-shrink:0}
+.wpt-phase.err{background:rgba(248,113,113,.08);color:var(--wp-red)}
+.wpt-phase.ok{background:rgba(52,211,153,.08);color:var(--wp-accent)}
+.wpt-phase.busy{background:rgba(96,165,250,.08);color:var(--wp-blue)}
+.wpt-theme{padding:3px 8px;border-radius:6px;font-size:9px;border:1px solid var(--wp-border);background:none;cursor:pointer;transition:all .15s}
+.wpt-theme.dark{color:var(--wp-yellow)}.wpt-theme.light{color:var(--wp-blue)}
+.wpt-theme:hover{border-color:var(--wp-border-2)}
+.wpt-rotate{padding:3px 6px;border-radius:6px;font-size:9px;border:1px solid var(--wp-border);background:none;color:var(--wp-text-4);cursor:pointer;transition:all .15s}
+.wpt-rotate:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
+.wpt-rotate.on{background:var(--wp-purple-dim);border-color:rgba(167,139,250,.2);color:var(--wp-purple)}
+`
 
 interface Props {
   activeDevice: DevicePreset
@@ -23,64 +40,77 @@ interface Props {
   showBrowser: boolean
   previewUrl: string | null
   previewPhase: string
+  rotated: boolean
+  theme: 'dark' | 'light'
   onDeviceChange: (d: DevicePreset) => void
   onZoomChange: (z: number) => void
   onToggleBrowser: () => void
+  onToggleRotation: () => void
+  onToggleTheme: () => void
+  onRefresh: () => void
   toast: (t: string, m: string, type?: string) => void
 }
 
 export function WPToolbar({
   activeDevice, devices, zoom, showBrowser, previewUrl, previewPhase,
-  onDeviceChange, onZoomChange, onToggleBrowser, toast,
+  rotated, theme,
+  onDeviceChange, onZoomChange, onToggleBrowser, onToggleRotation, onToggleTheme, onRefresh, toast,
 }: Props) {
+  const phaseClass = previewPhase === 'error' ? 'err' : (previewPhase === 'previewing' || previewPhase === 'complete') ? 'ok' : 'busy'
+  const phaseText = previewPhase === 'error' ? 'FAIL' : (previewPhase === 'previewing' || previewPhase === 'complete') ? 'PASS' : previewPhase.toUpperCase()
+
   return (
-    <div style={S.bar}>
-      <div style={S.url}>
-        <span style={S.urlLk}></span>
-        <input
-          style={S.urlInp}
-          value={previewUrl || 'staging.fileengine.com'}
-          readOnly
-        />
+    <>
+      <style>{CSS}</style>
+      <div className="wpt-bar">
+        {/* URL bar */}
+        <div className="wpt-url">
+          <span className="wpt-url-lk">🔒</span>
+          <input className="wpt-url-inp" value={previewUrl || 'staging.fileengine.com'} readOnly />
+        </div>
+
+        {/* Device selector */}
+        <div className="wpt-dbar">
+          {devices.map(d => (
+            <button key={d.id} className={`wpt-dbtn ${activeDevice.id === d.id ? 'on' : 'off'}`} onClick={() => onDeviceChange(d)}>
+              {d.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Rotation toggle */}
+        <button className={`wpt-rotate ${rotated ? 'on' : ''}`} onClick={onToggleRotation} title="Rotate device">
+          ↻ {rotated ? 'Land' : 'Port'}
+        </button>
+
+        {/* Theme toggle */}
+        <button className={`wpt-theme ${theme}`} onClick={onToggleTheme} title="Toggle preview theme">
+          {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
+        </button>
+
+        {/* Browser toggle */}
+        <button className={`wpt-web ${showBrowser ? 'on' : 'off'}`} onClick={onToggleBrowser}>
+          {showBrowser ? '✓ Web' : '+ Web'}
+        </button>
+
+        <div className="wpt-sep" />
+
+        {/* Zoom controls */}
+        <button className="wpt-btn" onClick={() => onZoomChange(Math.max(0.2, zoom - 0.1))} title="Zoom Out">−</button>
+        <span className="wpt-zoom">{Math.round(zoom * 100)}%</span>
+        <button className="wpt-btn" onClick={() => onZoomChange(Math.min(1.5, zoom + 0.1))} title="Zoom In">+</button>
+
+        {/* Refresh */}
+        <button className="wpt-btn" onClick={onRefresh} title="Refresh preview">⟳</button>
+
+        <div className="wpt-sep" />
+
+        <span className="wpt-env">STAGING</span>
+
+        {previewPhase !== 'idle' && (
+          <span className={`wpt-phase ${phaseClass}`}>{phaseText}</span>
+        )}
       </div>
-
-      <div style={S.dbar}>
-        {devices.map(d => (
-          <button
-            key={d.id}
-            style={S.dbtn(activeDevice.id === d.id)}
-            onClick={() => onDeviceChange(d)}
-          >
-            {d.label}
-          </button>
-        ))}
-      </div>
-
-      <button style={S.webBtn(showBrowser)} onClick={onToggleBrowser}>
-        {showBrowser ? ' Web' : '+ Web'}
-      </button>
-
-      <div style={S.sep} />
-
-      <button style={S.tb} onClick={() => onZoomChange(Math.max(0.2, zoom - 0.1))} title="Zoom Out">−</button>
-      <span style={S.zoom}>{Math.round(zoom * 100)}%</span>
-      <button style={S.tb} onClick={() => onZoomChange(Math.min(1.5, zoom + 0.1))} title="Zoom In">+</button>
-
-      <button style={S.tb} onClick={() => toast('Refreshed', 'Preview reloaded', 'nfo')} title="Refresh"></button>
-
-      <div style={S.sep} />
-
-      <span style={S.env}>STAGING</span>
-
-      {previewPhase !== 'idle' && (
-        <span style={{
-          fontSize: 7, fontWeight: 700, fontFamily: 'var(--wp-mono)', padding: '2px 8px', borderRadius: 20,
-          background: previewPhase === 'error' ? 'rgba(248,113,113,.08)' : previewPhase === 'previewing' || previewPhase === 'complete' ? 'rgba(52,211,153,.08)' : 'rgba(96,165,250,.08)',
-          color: previewPhase === 'error' ? 'var(--wp-red)' : previewPhase === 'previewing' || previewPhase === 'complete' ? 'var(--wp-accent)' : 'var(--wp-blue)',
-        }}>
-          {previewPhase === 'error' ? ' FAIL' : previewPhase === 'previewing' || previewPhase === 'complete' ? ' PASS' : '⏳ ' + previewPhase.toUpperCase()}
-        </span>
-      )}
-    </div>
+    </>
   )
 }
