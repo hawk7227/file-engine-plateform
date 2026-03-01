@@ -97,7 +97,7 @@ body {
   border: none;
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .btn-ghost {
@@ -265,7 +265,7 @@ body {
   font-size: 15px;
   font-family: var(--font-sans);
   outline: none;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .form-input:focus {
@@ -325,7 +325,7 @@ body {
   border: none;
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
   background: var(--accent-primary), var(--accent-blue));
   color: var(--bg-primary);
 }
@@ -373,7 +373,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
   margin-bottom: 10px;
 }
 
@@ -464,7 +464,7 @@ body {
   font-family: var(--font-mono);
   text-align: center;
   outline: none;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
   caret-color: var(--accent-primary);
 }
 
@@ -673,7 +673,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: all 0.2s;
+  transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .new-project-btn:hover {
@@ -741,7 +741,7 @@ body {
   border-radius: var(--radius-md);
   cursor: pointer;
   text-align: center;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .template-card:hover {
@@ -773,7 +773,7 @@ body {
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .project-item:hover {
@@ -976,7 +976,7 @@ body {
   border-radius: var(--radius-lg);
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s;
+  transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .quick-card:hover {
@@ -1043,7 +1043,7 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .input-box:focus-within {
@@ -1067,7 +1067,7 @@ body {
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .tool-btn:hover {
@@ -1104,7 +1104,7 @@ body {
   border-radius: var(--radius-sm);
   color: var(--bg-primary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .send-btn:hover {
@@ -1195,7 +1195,7 @@ body {
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .preview-tab:hover {
@@ -1224,7 +1224,7 @@ body {
   cursor: pointer;
   font-size: 12px;
   font-family: var(--font-mono);
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .file-item:hover {
@@ -2063,7 +2063,7 @@ body {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: opacity 150ms ease, transform 150ms ease;
   text-align: center;
 }
 

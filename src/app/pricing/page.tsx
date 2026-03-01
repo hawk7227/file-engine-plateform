@@ -441,7 +441,7 @@ export default function PricingPage() {
           font-size: 15px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: opacity 180ms ease, transform 180ms ease;
         }
         
         .pricing-cta.primary {

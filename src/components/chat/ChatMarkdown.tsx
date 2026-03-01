@@ -73,7 +73,7 @@ const MARKDOWN_CSS = `
 .file-card-btn {
   padding: 4px 10px; font-size: 11px; background: transparent;
   border: 1px solid var(--border-subtle, #1e1e28); border-radius: 4px;
-  color: var(--text-muted, #6a6a7a); cursor: pointer; transition: all 0.15s;
+  color: var(--text-muted, #6a6a7a); cursor: pointer; transition: opacity 150ms ease, transform 150ms ease;
 }
 .file-card-btn:hover { background: var(--bg-elevated, #1a1a24); color: var(--text-primary, #fff); }
 .file-card-btn.copied { color: var(--accent-primary, var(--accent-primary)); border-color: var(--accent-primary, var(--accent-primary)); }

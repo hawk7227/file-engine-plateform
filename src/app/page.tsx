@@ -83,37 +83,37 @@ export default function LandingPage() {
       icon: <Zap className="w-6 h-6" />,
       title: 'Agentic AI — Not Just Chat',
       description: '10+ tools: create files, edit code, run commands, search the web, deploy — all in one conversation.',
-      color: 'from-yellow-500 to-orange-500'
+      color: ''
     },
     {
       icon: <Shield className="w-6 h-6" />,
       title: 'Dual-Provider Failover',
       description: 'Powered by the best AI models with automatic failover. Zero downtime when providers go down.',
-      color: 'from-green-500 to-emerald-500'
+      color: ''
     },
     {
       icon: <Cpu className="w-6 h-6" />,
       title: 'Media Generation Built In',
       description: 'Generate video, audio, voice, and 3D alongside your code. No other AI coding tool can do this.',
-      color: 'from-blue-500 to-cyan-500'
+      color: ''
     },
     {
       icon: <Globe className="w-6 h-6" />,
       title: 'One-Click Deploy',
       description: 'From prompt to production in minutes. Deploy to Vercel, download ZIP, or push to GitHub.',
-      color: 'from-purple-500 to-pink-500'
+      color: ''
     },
     {
       icon: <Code className="w-6 h-6" />,
       title: 'Smart Model Routing',
       description: 'Auto-selects the best AI model for each task. Fast for chat, powerful for code, premium for complexity.',
-      color: 'from-pink-500 to-rose-500'
+      color: ''
     },
     {
       icon: <Lock className="w-6 h-6" />,
       title: 'Vision + Web Search',
       description: 'Upload screenshots for pixel-perfect recreations. Search the web and GitHub for code references.',
-      color: 'from-cyan-500 to-blue-500'
+      color: ''
     }
   ]
 
@@ -165,7 +165,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-emerald-500">
                 <span className="text-white">{brand.logo.emoji || <Sparkles className="w-5 h-5" />}</span>
               </div>
               <span className="text-xl font-bold">{BRAND_NAME}</span>
@@ -176,7 +176,7 @@ export default function LandingPage() {
               <a href="#pricing" className="text-zinc-400 hover:text-white transition-colors">Pricing</a>
               <a href="#faq" className="text-zinc-400 hover:text-white transition-colors">FAQ</a>
               <Link href="/auth/login" className="text-zinc-400 hover:text-white transition-colors">Login</Link>
-              <Link href="/auth/signup" className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium hover:opacity-90 transition-opacity">
+              <Link href="/auth/signup" className="px-4 py-2 bg-emerald-600 rounded-lg font-medium hover:opacity-90 transition-opacity">
                 Get Started Free
               </Link>
             </div>
@@ -194,7 +194,7 @@ export default function LandingPage() {
               <a href="#pricing" className="block text-zinc-400 hover:text-white">Pricing</a>
               <a href="#faq" className="block text-zinc-400 hover:text-white">FAQ</a>
               <Link href="/auth/login" className="block text-zinc-400 hover:text-white">Login</Link>
-              <Link href="/auth/signup" className="block w-full text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium">
+              <Link href="/auth/signup" className="block w-full text-center px-4 py-2 bg-emerald-600 rounded-lg font-medium">
                 Get Started Free
               </Link>
             </div>
@@ -207,14 +207,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800/50 rounded-full border border-zinc-700 mb-8">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
+              <Sparkles className="w-4 h-4 text-emerald-500" />
               <span className="text-sm text-zinc-300">Not just a chatbot — an agentic builder</span>
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
               Describe it. Build it.
               <br />
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              <span className="text-emerald-400">
                 Deploy it.
               </span>
             </h1>
@@ -225,7 +225,7 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Link href="/auth/signup" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+              <Link href="/auth/signup" className="w-full sm:w-auto px-8 py-4 bg-emerald-600 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                 Start Building Free
                 <ArrowRight className="w-5 h-5" />
               </Link>
@@ -238,7 +238,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-zinc-400">
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500'].map((bg, i) => (
+                  {['bg-zinc-600', 'bg-zinc-500', 'bg-zinc-600', 'bg-zinc-500'].map((bg, i) => (
                     <div key={i} className={`w-8 h-8 rounded-full ${bg} border-2 border-zinc-950`} />
                   ))}
                 </div>
@@ -246,7 +246,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  <Star key={i} className="w-5 h-5 text-emerald-500" />
                 ))}
                 <span className="ml-2">4.9/5 rating</span>
               </div>
@@ -255,13 +255,13 @@ export default function LandingPage() {
 
           {/* Demo Preview */}
           <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent z-10 pointer-events-none" />
             <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden shadow-2xl">
               <div className="flex items-center gap-2 px-4 py-3 bg-zinc-800/50 border-b border-zinc-700">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="w-3 h-3 rounded-full bg-zinc-500" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
                 </div>
                 <div className="flex-1 flex justify-center">
                   <div className="px-4 py-1 bg-zinc-900 rounded text-sm text-zinc-400">app.{brand.domain}</div>
@@ -271,7 +271,7 @@ export default function LandingPage() {
               <div className="p-6 h-96 flex">
                 <div className="w-64 bg-zinc-800/30 rounded-lg p-4 mr-4">
                   <div className="flex items-center gap-2 mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600" />
+                    <div className="w-8 h-8 rounded-lg bg-emerald-600" />
                     <span className="font-semibold">{BRAND_NAME}</span>
                   </div>
                   <div className="space-y-2">
@@ -311,7 +311,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="p-6 bg-zinc-800/50 rounded-2xl border border-zinc-700 hover:border-zinc-600 transition-colors">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
+                <div className="w-10 h-10 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center mb-4 text-emerald-500">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
@@ -321,7 +321,7 @@ export default function LandingPage() {
           </div>
 
           {/* Validation Highlight */}
-          <div className="mt-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl border border-zinc-700 p-8 lg:p-12">
+          <div className="mt-20 bg-zinc-800/50 rounded-3xl border border-zinc-700 p-8 lg:p-12">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h3 className="text-3xl font-bold mb-4">10-Layer Validation System</h3>
@@ -331,7 +331,7 @@ export default function LandingPage() {
                 <div className="space-y-3">
                   {['Syntax & Parsing Validation', 'TypeScript Type Checking', 'Import & Dependency Resolution', 'React Hooks Rules', 'Security Vulnerability Scan', 'Best Practices & Linting', 'Accessibility Checks', 'Performance Analysis', 'Auto-Fix Engine', 'AI-Powered Error Correction'].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -339,7 +339,7 @@ export default function LandingPage() {
               </div>
               <div className="bg-zinc-900 rounded-xl p-6 font-mono text-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
                   <span className="text-green-400">All checks passed</span>
                 </div>
                 <div className="space-y-2 text-zinc-400">
@@ -367,7 +367,7 @@ export default function LandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {useCases.map((useCase, index) => (
-              <div key={index} className="p-6 bg-zinc-800/50 rounded-2xl border border-zinc-700 hover:border-zinc-600 transition-all hover:-translate-y-1">
+              <div key={index} className="p-6 bg-zinc-800/50 rounded-2xl border border-zinc-700 hover:border-zinc-600 transition-all ">
                 <div className="text-5xl mb-4">{useCase.image}</div>
                 <h3 className="text-xl font-semibold mb-2">{useCase.title}</h3>
                 <p className="text-zinc-400">{useCase.description}</p>
@@ -391,13 +391,13 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-bold text-zinc-300">{comp.name}</h3>
                 </div>
-                <div className="text-red-400 font-bold text-sm mb-1">{comp.price}</div>
+                <div className="text-zinc-500 font-bold text-sm mb-1">{comp.price}</div>
                 <div className="text-xs text-zinc-500 mb-4">{comp.monthly}</div>
                 <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider font-semibold">What you&apos;re paying for:</p>
                 <ul className="space-y-2">
                   {comp.lacks.map((lack, j) => (
                     <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
-                      <span className="text-red-400 mt-0.5 flex-shrink-0"></span>
+                      <span className="text-zinc-500 mt-0.5 flex-shrink-0"></span>
                       <span>{lack}</span>
                     </li>
                   ))}
@@ -407,7 +407,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-3 bg-zinc-900 border border-emerald-700/50 rounded-xl px-8 py-5">
+            <div className="inline-flex items-center gap-3 bg-zinc-900 border border-emerald-500/20 rounded-xl px-8 py-5">
               <span className="text-3xl"></span>
               <div className="text-left">
                 <div className="text-lg font-bold text-white">{BRAND_NAME} Pro: $19/mo — everything included</div>
@@ -435,12 +435,12 @@ export default function LandingPage() {
               <div key={index} className="p-6 bg-zinc-800/50 rounded-2xl border border-zinc-700">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <Star key={i} className="w-4 h-4 text-emerald-500" />
                   ))}
                 </div>
                 <p className="text-zinc-300 mb-6">&quot;{testimonial.content}&quot;</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-semibold">
                     {testimonial.avatar}
                   </div>
                   <div>
@@ -464,9 +464,9 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <div key={index} className={`p-8 rounded-2xl border ${plan.popular ? 'bg-gradient-to-b from-blue-500/10 to-purple-500/10 border-blue-500/50' : 'bg-zinc-800/50 border-zinc-700'} relative`}>
+              <div key={index} className={`p-8 rounded-2xl border ${plan.popular ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-zinc-800/50 border-zinc-700'} relative`}>
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-sm font-medium">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-600 rounded-full text-sm font-medium">
                     Most Popular
                   </div>
                 )}
@@ -481,12 +481,12 @@ export default function LandingPage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <Link href={plan.name === 'Enterprise' ? '/contact' : '/auth/signup'} className={`block w-full py-3 rounded-xl font-semibold text-center transition-colors ${plan.popular ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90' : 'bg-zinc-700 hover:bg-zinc-600'}`}>
+                <Link href={plan.name === 'Enterprise' ? '/contact' : '/auth/signup'} className={`block w-full py-3 rounded-xl font-semibold text-center transition-colors ${plan.popular ? 'bg-emerald-600 hover:opacity-90' : 'bg-zinc-700 hover:bg-zinc-600'}`}>
                   {plan.cta}
                 </Link>
               </div>
@@ -522,7 +522,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to build faster?</h2>
           <p className="text-xl text-zinc-400 mb-8">Join 10,000+ developers shipping production code with {BRAND_NAME}.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity">
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-zinc-100 text-zinc-900 rounded-xl font-semibold text-lg hover:opacity-90 transition-opacity">
             Start Building Free
             <ArrowRight className="w-5 h-5" />
           </Link>
@@ -536,7 +536,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-emerald-500">
                   <span className="text-white">{brand.logo.emoji || <Sparkles className="w-5 h-5" />}</span>
                 </div>
                 <span className="text-xl font-bold">{BRAND_NAME}</span>

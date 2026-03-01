@@ -81,7 +81,7 @@ export function QuickActionsBar({ state, actions, compact = false }: QuickAction
           color: var(--text-secondary);
           font-size: 13px;
           cursor: pointer;
-          transition: all 0.15s;
+          transition: opacity 150ms ease, transform 150ms ease;
         }
 
         .compact .quick-action {
@@ -227,7 +227,7 @@ export function FloatingActionButton({
           font-weight: 600;
           cursor: pointer;
           box-shadow: 0 4px 20px var(--accent-glow);
-          transition: all 0.2s;
+          transition: opacity 180ms ease, transform 180ms ease;
           z-index: 100;
         }
 
@@ -331,7 +331,7 @@ export function InlineActions({ actions }: InlineActionsProps) {
           border-radius: var(--radius-sm);
           color: var(--text-muted);
           cursor: pointer;
-          transition: all 0.1s;
+          transition: opacity 150ms ease, transform 150ms ease;
         }
 
         .inline-action:hover {
@@ -404,7 +404,7 @@ export function BreadcrumbActions({ items }: BreadcrumbActionsProps) {
           color: var(--text-secondary);
           cursor: pointer;
           border-radius: var(--radius-sm);
-          transition: all 0.1s;
+          transition: opacity 150ms ease, transform 150ms ease;
         }
 
         .breadcrumb-btn:hover:not(:disabled) {

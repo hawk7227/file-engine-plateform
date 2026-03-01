@@ -279,7 +279,7 @@ shadows:
     md: 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08)
     lg: 0 4px 6px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.12)
     xl: 0 8px 16px rgba(0,0,0,0.06), 0 24px 48px rgba(0,0,0,0.12)
-    glow: 0 0 20px rgba(ACCENT,0.3), 0 0 60px rgba(ACCENT,0.1)
+    shadow: 0 4px 14px rgba(0,0,0,0.06)
   dark theme: Use border rgba(255,255,255,0.06-0.12) instead of shadows. Shadows barely visible on dark backgrounds.
 animation:
   timing:
@@ -297,7 +297,7 @@ animation:
   patterns:
     hover lift: transform: translateY(-2px); box-shadow: var(--shadow-lg);
     hover scale: transform: scale(1.02);
-    hover glow: box-shadow: 0 0 20px rgba(ACCENT,0.3);
+    hover glow: box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     fade in: @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     stagger: animation-delay: calc(var(--i) * 0.1s); where --i is the item index
     scroll reveal: IntersectionObserver + classList.add('visible') with CSS: .item { opacity:0; transform:translateY(20px); transition:0.6s ease; } .item.visible { opacity:1; transform:translateY(0); }

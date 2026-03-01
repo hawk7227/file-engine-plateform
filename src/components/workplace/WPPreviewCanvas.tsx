@@ -9,7 +9,7 @@ import type { DevicePreset } from './WorkplaceLayout'
 
 const CANVAS_CSS = `
 .wp-canvas{flex:1;position:relative;overflow:hidden;background:var(--wp-bg-0);background-image:radial-gradient(circle at 50% 40%,rgba(18,28,18,.3),var(--wp-bg-0) 70%)}
-.wp-device{position:absolute;cursor:grab;transition:filter .15s;z-index:2}.wp-device:active{cursor:grabbing}.wp-device:hover{filter:drop-shadow(0 0 24px rgba(52,211,153,.06))}
+.wp-device{position:absolute;cursor:grab;transition:filter .15s;z-index:2}.wp-device:active{cursor:grabbing}.wp-device:hover{filter:none}
 .wp-phone{position:relative;border:14px solid #1c1c1e;border-radius:55px;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column}
 .wp-phone-di{position:absolute;z-index:10;width:126px;height:37px;background:#000;border-radius:20px;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
 .wp-phone-di .cam{width:10px;height:10px;border-radius:50%;background:#1a1a2e;border:1px solid #2a2a3e}

@@ -525,7 +525,7 @@ export function EnhancementPreview({ enhancement, onAccept, onDismiss }: Enhance
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.15s;
+          transition: opacity 150ms ease, transform 150ms ease;
         }
 
         .enhancement-btn.primary {

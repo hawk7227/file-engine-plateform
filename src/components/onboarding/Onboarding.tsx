@@ -481,7 +481,7 @@ export function OnboardingModal({
           height: 8px;
           border-radius: 50%;
           background: var(--bg-tertiary);
-          transition: all 0.2s;
+          transition: opacity 180ms ease, transform 180ms ease;
         }
 
         .progress-dot.active {
@@ -526,7 +526,7 @@ export function OnboardingModal({
           border: 2px solid var(--border-subtle);
           border-radius: var(--radius-md);
           cursor: pointer;
-          transition: all 0.15s;
+          transition: opacity 150ms ease, transform 150ms ease;
           text-align: left;
         }
 
@@ -564,7 +564,7 @@ export function OnboardingModal({
           border-radius: var(--radius-md);
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.15s;
+          transition: opacity 150ms ease, transform 150ms ease;
           font-size: 14px;
         }
 

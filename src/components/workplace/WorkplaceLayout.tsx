@@ -106,7 +106,7 @@ const CSS = `
 .wp-footer{display:flex;gap:12px;padding:3px 10px;border-top:1px solid var(--wp-border);background:var(--wp-bg-1);font-size:7px;font-family:var(--wp-mono);color:var(--wp-text-4);flex-shrink:0;align-items:center}
 .wp-footer span span{color:var(--wp-text-2)}
 .wp-tb{padding:3px 6px;border-radius:6px;font-size:8px;font-weight:700;border:1px solid var(--wp-border);background:none;color:var(--wp-text-4);cursor:pointer;transition:all .1s;font-family:var(--wp-font)}.wp-tb:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
-.wp-tb-primary{background:var(--accent-primary),var(--wp-blue));color:#000;border:none;font-weight:800;padding:4px 10px}.wp-tb-primary:hover{box-shadow:0 0 12px rgba(52,211,153,.2)}
+.wp-tb-primary{background:var(--accent-primary),var(--wp-blue));color:#000;border:none;font-weight:800;padding:4px 10px}.wp-tb-primary:hover{box-shadow: 0 4px 14px rgba(0,0,0,0.06)}
 .wp-tsep{width:1px;height:16px;background:var(--wp-border);flex-shrink:0}
 .wp-avstack{display:flex;align-items:center}.wp-avt{width:18px;height:18px;border-radius:50%;border:2px solid var(--wp-bg-1);margin-left:-6px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0}.wp-avt:first-child{margin-left:0}
 .wp-avcount{font-size:7px;color:var(--wp-text-3);margin-left:6px;font-weight:700}

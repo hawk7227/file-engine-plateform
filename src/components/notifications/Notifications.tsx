@@ -347,7 +347,7 @@ function NotificationItem({ notification, onDismiss }: NotificationItemProps) {
           border-radius: var(--radius-sm);
           font-size: 12px;
           cursor: pointer;
-          transition: all 0.1s;
+          transition: opacity 150ms ease, transform 150ms ease;
         }
 
         .notification-action:hover {
@@ -495,7 +495,7 @@ export function ConfirmDialog({
           font-size: 14px;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.15s;
+          transition: opacity 150ms ease, transform 150ms ease;
         }
 
         .confirm-btn.secondary {

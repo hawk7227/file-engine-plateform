@@ -60,7 +60,7 @@ const CSS = `
 
   /* View Toggle */
   .view-toggle { display: flex; background: var(--bg-tertiary); padding: 3px; border-radius: 8px; border: 1px solid var(--border-subtle); }
-  .view-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: transparent; border: none; border-radius: 4px; color: var(--text-muted); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .view-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: transparent; border: none; border-radius: 4px; color: var(--text-muted); font-size: 12px; font-weight: 500; cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; }
   .view-btn:hover { color: var(--text-secondary); }
   .view-btn.active { background: var(--bg-elevated); color: var(--text-primary); shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
@@ -72,21 +72,21 @@ const CSS = `
   .dot { width: 4px; height: 4px; background: currentColor; border-radius: 50%; }
 
   /* Buttons */
-  .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+  .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; border: 1px solid transparent; }
   .btn-primary { background: var(--text-primary); color: var(--bg-primary); }
   .btn-primary:hover { opacity: 0.9; }
   .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-subtle); }
   .btn-secondary:hover { background: var(--bg-elevated); }
   .btn-ghost { background: transparent; color: var(--text-secondary); }
   .btn-ghost:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-  .toolbar-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
+  .toolbar-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; }
   .toolbar-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-default); }
 
   /* Dropdown */
   .dropdown { position: relative; }
-  .dropdown-btn { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .dropdown-btn { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; }
   .dropdown-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
-  .dropdown-menu { position: absolute; top: calc(100% + 4px); right: 0; min-width: 180px; background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: 8px; padding: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: all 0.15s; z-index: 100; }
+  .dropdown-menu { position: absolute; top: calc(100% + 4px); right: 0; min-width: 180px; background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: 8px; padding: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 150ms ease, transform 150ms ease; z-index: 100; }
   .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
   .dropdown-menu.bottom { bottom: calc(100% + 8px); top: auto; }
   .dropdown-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; background: transparent; border: none; border-radius: 4px; color: var(--text-secondary); font-size: 13px; cursor: pointer; text-align: left; }
@@ -97,11 +97,11 @@ const CSS = `
   .app-container { display: grid; grid-template-columns: 260px 1fr 400px; grid-template-rows: 60px 1fr 32px; height: 100vh; background: var(--bg-primary); }
   .header { grid-column: 1/-1; }
   .sidebar { grid-row: 2/-1; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; padding: 16px; gap: 24px; overflow-y: auto; }
-  .new-project-btn { width: 100%; padding: 12px; background: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+  .new-project-btn { width: 100%; padding: 12px; background: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 180ms ease; }
   .new-project-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
   .sidebar-section { display: flex; flex-direction: column; gap: 4px; }
   .sidebar-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; }
   .nav-item:hover, .nav-item.active { background: var(--bg-tertiary); color: var(--text-primary); }
   .nav-icon { font-size: 16px; opacity: 0.7; }
   .recent-list { display: flex; flex-direction: column; gap: 2px; }
@@ -109,7 +109,7 @@ const CSS = `
   .recent-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
   .recent-item.active { background: rgba(16,185,129,0.05); color: var(--accent-primary); }
   
-  .tool-card { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+  .tool-card { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; margin-bottom: 8px; }
   .tool-card:hover { border-color: var(--border-default); transform: translateY(-1px); }
   .tool-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
   .tool-info { flex: 1; min-width: 0; }
@@ -122,7 +122,7 @@ const CSS = `
   .setting-row:last-child { margin-bottom: 0; }
   .setting-label { font-size: 12px; color: var(--text-secondary); }
   .toggle { width: 36px; height: 20px; background: var(--bg-elevated); border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; }
-  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: var(--text-muted); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: var(--text-muted); border-radius: 50%; transition: transform 180ms ease, background 0.2s; }
   .toggle.active { background: rgba(16,185,129,0.2); }
   .toggle.active::after { transform: translateX(16px); background: var(--accent-primary); }
 
@@ -169,7 +169,7 @@ const CSS = `
   .input-box:focus-within { border-color: var(--accent-primary); }
   .input-field { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 15px; font-family: inherit; resize: none; max-height: 200px; outline: none; }
   .input-field::placeholder { color: var(--text-muted); }
-  .send-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--text-primary); color: var(--bg-primary); border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .send-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--text-primary); color: var(--bg-primary); border: none; border-radius: 8px; cursor: pointer; transition: opacity 180ms ease, transform 180ms ease; }
   .send-btn:hover { transform: scale(1.05); }
   .send-btn:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
 
@@ -184,7 +184,7 @@ const CSS = `
   .code-file.validated { border-left: 2px solid var(--accent-primary); }
   .code-file-header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; background: rgba(255,255,255,0.02); }
   .code-file-header:hover { background: rgba(255,255,255,0.04); }
-  .code-file-chevron { font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
+  .code-file-chevron { font-size: 10px; color: var(--text-muted); transition: transform 180ms ease; }
   .expanded .code-file-chevron { transform: rotate(90deg); }
   .code-file-name { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); flex: 1; }
   .code-file-badge { font-size: 9px; padding: 2px 6px; background: rgba(16,185,129,0.1); color: var(--accent-primary); border-radius: 4px; text-transform: uppercase; font-weight: 600; }
@@ -988,7 +988,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
              {attachedFiles.length > 0 && (
                 <div style={{display:'flex', flexWrap:'wrap', gap:'8px', padding:'4px 0'}}>
                   {attachedFiles.map(f => (
-                    <div key={f.id} style={{display:'flex', alignItems:'center', gap:'6px', padding:'4px 8px', background:'var(--bg-elevated)', borderRadius:'6px', fontSize:'12px', border:'1px solid var(--border-subtle)'}}>
+                    <div key={f.id} style={{display:'flex', alignItems:'center', gap:'6px', padding:'4px 8px', background:'var(--bg-elevated)', borderRadius:'8px', fontSize:'12px', border:'1px solid var(--border-subtle)'}}>
                       <span>{f.icon}</span>
                       <span style={{maxWidth:'150px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{f.name}</span>
                       <button onClick={() => removeAttachedFile(f.id)} style={{background:'transparent', border:'none', color:'var(--text-muted)', cursor:'pointer', marginLeft:'4px'}}>×</button>
@@ -1043,8 +1043,8 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
           <div style={{padding:'20px',maxHeight:'80vh',overflowY:'auto'}}>
              <div style={{marginBottom:'24px'}}>
                 <div style={{fontSize:'12px',fontWeight:600,color:'var(--text-muted)',marginBottom:'12px',textTransform:'uppercase',letterSpacing:'0.5px'}}>Account</div>
-                <div style={{marginBottom:'12px'}}><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Email</label><input type="email" style={{width:'100%',padding:'8px 12px',background:'var(--bg-tertiary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-muted)'}} defaultValue={user?.email || ""} disabled /></div>
-                <div><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Name</label><input type="text" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} value={profileFormName} onChange={(e) => setProfileFormName(e.target.value)} onBlur={async () => { if (user) { try { await supabase.from("profiles").update({ full_name: profileFormName }).eq("id", user.id); toast("success", "Profile updated", "Name saved"); } catch (err: any) { toast("error", "Save failed", err.message || "Could not update profile"); } } }} /></div>
+                <div style={{marginBottom:'12px'}}><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Email</label><input type="email" style={{width:'100%',padding:'8px 12px',background:'var(--bg-tertiary)',border:'1px solid var(--border-subtle)',borderRadius:'8px',color:'var(--text-muted)'}} defaultValue={user?.email || ""} disabled /></div>
+                <div><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Name</label><input type="text" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'8px',color:'var(--text-primary)'}} value={profileFormName} onChange={(e) => setProfileFormName(e.target.value)} onBlur={async () => { if (user) { try { await supabase.from("profiles").update({ full_name: profileFormName }).eq("id", user.id); toast("success", "Profile updated", "Name saved"); } catch (err: any) { toast("error", "Save failed", err.message || "Could not update profile"); } } }} /></div>
              </div>
              
              <div style={{marginBottom:'24px'}}>
@@ -1108,8 +1108,8 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
              <div style={{marginBottom:'24px'}}>
                 <div style={{fontSize:'12px',fontWeight:600,color:'var(--text-muted)',marginBottom:'12px',textTransform:'uppercase',letterSpacing:'0.5px'}}>API Keys</div>
                 <div style={{fontSize:'12px',color:'var(--text-muted)',marginBottom:'12px'}}>Add your own API keys for unlimited generation.</div>
-                <div style={{marginBottom:'12px'}}><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Primary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot1.trim(); await fetch('/api/user/settings', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`}, body:JSON.stringify({primaryKey:key||null}) }); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
-                <div><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Secondary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'6px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot2.trim(); await fetch('/api/user/settings', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`}, body:JSON.stringify({secondaryKey:key||null}) }); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
+                <div style={{marginBottom:'12px'}}><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Primary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'8px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot1.trim(); await fetch('/api/user/settings', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`}, body:JSON.stringify({primaryKey:key||null}) }); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
+                <div><label style={{display:'block',fontSize:'12px',marginBottom:'4px',color:'var(--text-secondary)'}}>Secondary API Key</label><input type="password" style={{width:'100%',padding:'8px 12px',background:'var(--bg-primary)',border:'1px solid var(--border-subtle)',borderRadius:'8px',color:'var(--text-primary)'}} placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (user) { try { const key = apiKeySlot2.trim(); await fetch('/api/user/settings', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`}, body:JSON.stringify({secondaryKey:key||null}) }); toast("success", "API key saved", "Key updated"); } catch (err: any) { toast("error", "Save failed", err.message); } } }} /></div>
              </div>
           </div>
         </div>
@@ -1133,11 +1133,11 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
               onInput={(e) => handleUrlPreview((e.target as HTMLInputElement).value)}
               autoFocus
             />
-            <div className={`url-import-preview ${urlPreview ? "visible" : ""}`} style={{display: urlPreview ? 'block' : 'none', marginBottom:'12px', padding:'10px', background:'var(--bg-tertiary)', borderRadius:'6px'}}>
+            <div className={`url-import-preview ${urlPreview ? "visible" : ""}`} style={{display: urlPreview ? 'block' : 'none', marginBottom:'12px', padding:'10px', background:'var(--bg-tertiary)', borderRadius:'8px'}}>
                <div style={{fontWeight:600}}>{urlPreview?.hostname}</div>
                <div style={{fontSize:'12px',color:'var(--text-muted)'}}>{urlPreview?.url}</div>
             </div>
-            <button style={{width:'100%',padding:'10px',background:'var(--text-primary)',color:'var(--bg-primary)',border:'none',borderRadius:'6px',fontWeight:600,cursor:!urlPreview?'not-allowed':'pointer',opacity:!urlPreview?0.5:1}} onClick={importUrl} disabled={!urlPreview}>Import URL</button>
+            <button style={{width:'100%',padding:'10px',background:'var(--text-primary)',color:'var(--bg-primary)',border:'none',borderRadius:'8px',fontWeight:600,cursor:!urlPreview?'not-allowed':'pointer',opacity:!urlPreview?0.5:1}} onClick={importUrl} disabled={!urlPreview}>Import URL</button>
            </div>
          </div>
       </div>

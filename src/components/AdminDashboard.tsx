@@ -93,18 +93,18 @@ const CSS = `
 /* Sidebar */
 .admin-side{width:230px;background:#050507;border-right:1px solid #27272a;padding:20px 12px;flex-shrink:0;display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
 .admin-side-hdr{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid #27272a;margin-bottom:16px}
-.admin-side-logo{width:32px;height:32px;background:var(--accent-primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;box-shadow:0 0 20px rgba(34,197,94,0.3)}
+.admin-side-logo{width:32px;height:32px;background:var(--accent-primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;box-shadow: 0 4px 14px rgba(0,0,0,0.06)}
 .admin-side-name{font-size:15px;font-weight:700}
 .admin-side-sub{font-size:10px;color:#71717a;margin-top:1px}
 .admin-side-nav{display:flex;flex-direction:column;gap:2px;flex:1}
 .admin-side-section{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#52525b;padding:12px 10px 6px;font-weight:600}
-.admin-side-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:#71717a;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:inherit;transition:all 0.12s}
+.admin-side-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:#71717a;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:inherit;transition: opacity 150ms ease, transform 150ms ease}
 .admin-side-item:hover{background:#18181b;color:#fafafa}
 .admin-side-item.active{background:rgba(34,197,94,0.08);color:#22c55e;font-weight:600}
 .admin-side-item .ico{width:18px;text-align:center;font-size:14px}
 .admin-side-item .bdg{margin-left:auto;padding:1px 7px;background:#22c55e;color:#000;border-radius:10px;font-size:10px;font-weight:700}
 .admin-side-back{margin-top:auto;padding-top:16px;border-top:1px solid #27272a}
-.admin-side-back a{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;color:#71717a;text-decoration:none;transition:all 0.12s}
+.admin-side-back a{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;color:#71717a;text-decoration:none;transition: opacity 150ms ease, transform 150ms ease}
 .admin-side-back a:hover{background:#18181b;color:#fafafa}
 
 /* Content */
@@ -170,7 +170,7 @@ const CSS = `
 /* Buttons */
 .btn{padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s}
 .btn-p{background:var(--accent-primary);color:#000}
-.btn-p:hover{box-shadow:0 0 20px rgba(34,197,94,0.3)}
+.btn-p:hover{box-shadow: 0 4px 14px rgba(0,0,0,0.06)}
 .btn-p:disabled{opacity:0.5;cursor:not-allowed}
 .btn-g{background:transparent;color:#71717a;border:1px solid #27272a}
 .btn-g:hover{border-color:#3f3f46;color:#fafafa}
@@ -215,7 +215,7 @@ const CSS = `
 .key-row:hover{border-color:#3f3f46}
 .key-row-top{display:flex;align-items:center;gap:12px}
 .key-row-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.key-row-dot.on{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,0.5)}
+.key-row-dot.on{background:#22c55e;box-shadow: 0 4px 14px rgba(0,0,0,0.06)}
 .key-row-dot.off{background:#52525b}
 .key-row-info{flex:1;min-width:0}
 .key-row-name{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -225,7 +225,7 @@ const CSS = `
 .key-tag.new{background:rgba(139,92,246,0.08);color:#8b5cf6}
 .key-row-sub{font-size:10px;color:#71717a;margin-top:2px}
 .key-row-actions{display:flex;gap:6px;flex-shrink:0}
-.key-btn{padding:4px 10px;font-size:10px;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;transition:all 0.12s}
+.key-btn{padding:4px 10px;font-size:10px;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;transition: opacity 150ms ease, transform 150ms ease}
 .key-btn-edit{background:#18181b;color:#a1a1aa;border:1px solid #27272a}
 .key-btn-edit:hover{color:#fafafa;border-color:#3f3f46}
 .key-btn-save{background:var(--accent-primary);color:#000}
