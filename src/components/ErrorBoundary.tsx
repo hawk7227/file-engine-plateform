@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
             maxWidth: 500,
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}></div>
             <h1 style={{ fontSize: 24, marginBottom: 8 }}>Something went wrong</h1>
             <p style={{ 
               color: 'var(--text-secondary, #888)', 

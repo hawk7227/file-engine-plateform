@@ -148,32 +148,32 @@ export function getActionsForState(
   switch (state) {
     case 'empty':
       return [
-        { id: 'new', label: 'New Project', icon: '✨', onClick: handlers.onNewProject || (() => {}), variant: 'primary' }
+        { id: 'new', label: 'New Project', icon: '', onClick: handlers.onNewProject || (() => {}), variant: 'primary' }
       ]
 
     case 'generating':
       return [
-        { id: 'cancel', label: 'Cancel', icon: '⏹️', onClick: handlers.onCancel || (() => {}), variant: 'danger' }
+        { id: 'cancel', label: 'Cancel', icon: '⏹', onClick: handlers.onCancel || (() => {}), variant: 'danger' }
       ]
 
     case 'completed':
       return [
-        { id: 'export', label: 'Export', icon: '📦', onClick: handlers.onExport || (() => {}) },
-        { id: 'deploy', label: 'Deploy', icon: '🚀', onClick: handlers.onDeploy || (() => {}), variant: 'primary' },
-        { id: 'share', label: 'Share', icon: '🔗', onClick: handlers.onShare || (() => {}) },
-        { id: 'copy', label: 'Copy', icon: '📋', onClick: handlers.onCopy || (() => {}) }
+        { id: 'export', label: 'Export', icon: '', onClick: handlers.onExport || (() => {}) },
+        { id: 'deploy', label: 'Deploy', icon: '', onClick: handlers.onDeploy || (() => {}), variant: 'primary' },
+        { id: 'share', label: 'Share', icon: '', onClick: handlers.onShare || (() => {}) },
+        { id: 'copy', label: 'Copy', icon: '', onClick: handlers.onCopy || (() => {}) }
       ]
 
     case 'error':
       return [
-        { id: 'retry', label: 'Retry', icon: '🔄', onClick: handlers.onRetry || (() => {}), variant: 'primary' }
+        { id: 'retry', label: 'Retry', icon: '', onClick: handlers.onRetry || (() => {}), variant: 'primary' }
       ]
 
     case 'deployed':
       return [
-        { id: 'view', label: 'View Live', icon: '🌐', onClick: handlers.onViewLive || (() => {}), variant: 'primary' },
-        { id: 'export', label: 'Export', icon: '📦', onClick: handlers.onExport || (() => {}) },
-        { id: 'share', label: 'Share', icon: '🔗', onClick: handlers.onShare || (() => {}) }
+        { id: 'view', label: 'View Live', icon: '', onClick: handlers.onViewLive || (() => {}), variant: 'primary' },
+        { id: 'export', label: 'Export', icon: '', onClick: handlers.onExport || (() => {}) },
+        { id: 'share', label: 'Share', icon: '', onClick: handlers.onShare || (() => {}) }
       ]
 
     default:
@@ -219,7 +219,7 @@ export function FloatingActionButton({
           align-items: center;
           gap: 8px;
           padding: 16px;
-          background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+          background: var(--accent-primary), var(--accent-blue));
           color: var(--bg-primary);
           border: none;
           border-radius: 50px;

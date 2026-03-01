@@ -287,7 +287,7 @@ export function generateContextPrompt(context: ProjectContext): string {
   if (knownIssues.length > 0) {
     prompt += `### Known Issues\n`
     knownIssues.forEach(issue => {
-      prompt += `- ⚠️ ${issue}\n`
+      prompt += `-  ${issue}\n`
     })
     prompt += '\n'
   }

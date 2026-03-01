@@ -7,11 +7,11 @@ const FILTERS = ['All', 'Edits', 'Deploys', 'Chat', 'System'] as const
 type FilterType = typeof FILTERS[number]
 
 const EVENT_ICONS: Record<string, string> = {
-  file_open: '📂', file_edit: '✏️', file_save: '💾', file_close: '📄',
-  git_push: '📄', git_pull: '📥', deploy_start: '🚀', deploy_pass: '✅',
-  deploy_fail: '❌', chat_send: '💬', chat_receive: '🤖', auto_fix: '🔧',
-  preview_load: '🖥', device_switch: '🖥', session_start: '🟢', session_end: '🔴',
-  video_generate: '🎬', image_generate: '🖼',
+  file_open: '', file_edit: '', file_save: '', file_close: '',
+  git_push: '', git_pull: '', deploy_start: '', deploy_pass: '',
+  deploy_fail: '', chat_send: '', chat_receive: '', auto_fix: '',
+  preview_load: '', device_switch: '', session_start: '', session_end: '',
+  video_generate: '', image_generate: '',
 }
 
 const EVENT_FILTER_MAP: Record<FilterType, string[]> = {
@@ -33,7 +33,7 @@ function timeAgo(iso: string): string {
 }
 
 function getEventDescription(evt: ActivityEvent): string {
-  const icon = EVENT_ICONS[evt.event_type] || '📌'
+  const icon = EVENT_ICONS[evt.event_type] || ''
   const d = evt.detail || {}
   switch (evt.event_type) {
     case 'file_edit': return `${icon} Edited ${d.file || 'file'}${d.line_start ? ` (lines ${d.line_start}-${d.line_end})` : ''}`
@@ -98,7 +98,7 @@ export function WPActivityFeed({ activities }: Props) {
     <div>
       <style>{`@keyframes wp-pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       <div style={S.header}>
-        <span>📡 ACTIVITY</span>
+        <span> ACTIVITY</span>
         <span style={S.live}><span style={S.liveDot} /><span style={{ color: 'var(--wp-accent)' }}>Live</span></span>
       </div>
       <div style={S.filters}>

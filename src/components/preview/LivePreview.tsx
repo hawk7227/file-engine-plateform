@@ -215,7 +215,7 @@ export function LivePreview({ files, onReady, onError, onLog }: LivePreviewProps
 
         {status === 'error' && (
           <div className="live-preview-error">
-            <span>❌</span>
+            <span></span>
             <p>Preview failed to load</p>
             <p className="error-hint">Check the console tab for details</p>
           </div>

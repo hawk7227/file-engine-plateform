@@ -24,7 +24,7 @@ export default function GlobalError({
           maxWidth: 500,
           textAlign: 'center'
         }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>💥</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}></div>
           <h1 style={{ fontSize: 24, marginBottom: 8 }}>Critical Error</h1>
           <p style={{ 
             color: '#888', 

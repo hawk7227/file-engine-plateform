@@ -93,7 +93,7 @@ export default function VerifyOtpPage() {
 
         <div className="auth-card">
           {/* Email icon */}
-          <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 10 }}>✉️</div>
+          <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 10 }}></div>
           <h1 className="auth-title">Check your email</h1>
           <p className="auth-subtitle">
             We sent an {TOTAL}-digit code to <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>

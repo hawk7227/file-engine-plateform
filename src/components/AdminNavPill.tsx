@@ -9,8 +9,8 @@ import Link from 'next/link'
  */
 
 const TABS = [
-  { href: '/admin', label: '⚡ Admin Dashboard' },
-  { href: '/admin/workplace', label: '🖥 Workplace IDE' },
+  { href: '/admin', label: ' Admin Dashboard' },
+  { href: '/admin/workplace', label: ' Workplace IDE' },
 ]
 
 const S = {
@@ -24,7 +24,7 @@ const S = {
     background: 'rgba(10,10,14,.85)',
     backdropFilter: 'blur(12px)',
     border: '1px solid rgba(255,255,255,.06)',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 3,
     gap: 2,
     boxShadow: '0 4px 20px rgba(0,0,0,.5)',
@@ -37,7 +37,7 @@ const S = {
     fontFamily: "'DM Sans', 'Inter', -apple-system, sans-serif",
     color: active ? '#000' : 'rgba(255,255,255,.5)',
     background: active
-      ? 'linear-gradient(135deg, #34d399, #60a5fa)'
+      ? 'var(--accent-primary)'
       : 'transparent',
     textDecoration: 'none',
     transition: 'all .15s',

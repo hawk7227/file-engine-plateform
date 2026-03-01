@@ -65,28 +65,28 @@ export const USER_MODEL_OPTIONS = [
     id: 'auto',
     name: `${BRAND_NAME} Auto`,
     description: 'Automatically selects the best model for your task',
-    icon: '✨',
+    icon: '',
     recommended: true
   },
   {
     id: 'fast',
     name: `${BRAND_NAME} Fast`,
     description: 'Quick responses for rapid iteration',
-    icon: '⚡',
+    icon: '',
     recommended: false
   },
   {
     id: 'pro',
     name: `${BRAND_NAME} Pro`,
     description: 'Best balance of speed and quality',
-    icon: '🚀',
+    icon: '',
     recommended: false
   },
   {
     id: 'premium',
     name: `${BRAND_NAME} Premium`,
     description: 'Highest quality for complex projects',
-    icon: '💎',
+    icon: '',
     recommended: false
   }
 ]

@@ -25,17 +25,17 @@ const CSS = `
     --text-primary: #ffffff;
     --text-secondary: #a0a0b0;
     --text-muted: #6a6a7a;
-    --accent-primary: #00ff88;
-    --accent-blue: #0088ff;
-    --accent-purple: #8a2be2;
+    --accent-primary: var(--accent-primary);
+    --accent-blue: var(--accent-primary);
+    --accent-purple: var(--accent-primary);
     --accent-orange: #ff6622;
     --accent-yellow: #ffc800;
-    --accent-glow: rgba(0, 255, 136, 0.3);
+    --accent-glow: rgba(16, 185, 129, 0.3);
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
     --radius-xl: 20px;
-    --shadow-glow: 0 0 20px rgba(0, 255, 136, 0.3);
+    --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
     --font-sans: 'Inter', -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
@@ -49,7 +49,7 @@ const CSS = `
   .header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
   .header-left { display: flex; align-items: center; gap: 20px; }
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; }
-  .logo-mark { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--bg-primary); }
+  .logo-mark { width: 32px; height: 32px; background: var(--accent-primary), var(--accent-blue)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--bg-primary); }
   .header-divider { width: 1px; height: 24px; background: var(--border-subtle); }
   .live-stats { display: flex; gap: 16px; }
   .stat-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
@@ -65,16 +65,16 @@ const CSS = `
   .btn-ghost { background: transparent; color: var(--text-secondary); }
   .btn-ghost:hover { background: var(--bg-tertiary); }
   .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-subtle); }
-  .btn-deploy { background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); font-weight: 600; }
+  .btn-deploy { background: var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); font-weight: 600; }
   .btn-deploy:hover { box-shadow: var(--shadow-glow); }
-  .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer; overflow: hidden; border: 2px solid transparent; transition: border-color 0.2s; }
+  .user-avatar { width: 32px; height: 32px; background: var(--accent-primary), var(--accent-blue)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer; overflow: hidden; border: 2px solid transparent; transition: border-color 0.2s; }
   .user-avatar:hover { border-color: var(--accent-primary); }
   .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .user-menu { position: relative; }
   .user-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 220px; background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(0,0,0,0.5); z-index: 500; overflow: hidden; animation: dropIn 0.15s ease; }
   @keyframes dropIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
   .user-dropdown-header { padding: 14px 16px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; }
-  .user-dropdown-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; overflow: hidden; }
+  .user-dropdown-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-primary), var(--accent-blue)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; overflow: hidden; }
   .user-dropdown-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .user-dropdown-info { flex: 1; min-width: 0; }
   .user-dropdown-name { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -116,14 +116,14 @@ const CSS = `
   .chat-action-btn.delete:hover { color: #ff6464; background: rgba(255, 100, 100, 0.1); }
   .chat-input { background: var(--bg-primary); border: 1px solid var(--accent-primary); color: var(--text-primary); font-size: 13px; padding: 2px 6px; border-radius: 4px; width: 100%; outline: none; }
   .sidebar-section.grow { flex: 1; overflow-y: auto; border-bottom: none; }
-  .new-project-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+  .new-project-btn { width: 100%; padding: 12px; background: var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
   .new-project-btn:hover { box-shadow: var(--shadow-glow); }
   .capacity-section { background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 12px; }
   .capacity-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
   .capacity-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
   .capacity-value { font-size: 12px; font-weight: 600; color: var(--accent-primary); }
   .capacity-bar { height: 4px; background: var(--bg-elevated); border-radius: 2px; margin-bottom: 8px; }
-  .capacity-fill { height: 100%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue)); border-radius: 2px; }
+  .capacity-fill { height: 100%; background: var(--accent-primary), var(--accent-blue)); border-radius: 2px; }
   .capacity-details { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
   .sidebar-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
   .sidebar-tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -138,7 +138,7 @@ const CSS = `
   .project-list { display: flex; flex-direction: column; gap: 4px; }
   .project-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; }
   .project-item:hover { background: var(--bg-tertiary); }
-  .project-item.active { background: rgba(0, 255, 136, 0.1); border-left: 2px solid var(--accent-primary); }
+  .project-item.active { background: rgba(16, 185, 129, 0.1); border-left: 2px solid var(--accent-primary); }
   .project-dot { width: 8px; height: 8px; border-radius: 50%; }
   .project-dot.running { background: var(--accent-primary); animation: pulse 2s infinite; }
   .project-dot.building { background: var(--accent-yellow); }
@@ -164,7 +164,7 @@ const CSS = `
   
   /* Welcome Screen */
   .welcome-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; }
-  .welcome-logo { width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 24px; animation: float 3s ease-in-out infinite; }
+  .welcome-logo { width: 80px; height: 80px; background: var(--accent-primary), var(--accent-blue)); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 24px; animation: float 3s ease-in-out infinite; }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
   .welcome-subtitle { font-size: 16px; color: var(--text-secondary); max-width: 500px; margin-bottom: 32px; }
@@ -175,19 +175,19 @@ const CSS = `
   .quick-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); cursor: pointer; text-align: left; }
   .quick-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
   .quick-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-  .quick-icon.web { background: linear-gradient(135deg, #ff6b6b, #feca57); }
-  .quick-icon.api { background: linear-gradient(135deg, #54a0ff, #5f27cd); }
-  .quick-icon.dash { background: linear-gradient(135deg, #00d2d3, #01a3a4); }
-  .quick-icon.app { background: linear-gradient(135deg, #ff9ff3, #f368e0); }
+  .quick-icon.web { background: var(--accent-primary); }
+  .quick-icon.api { background: var(--accent-primary); }
+  .quick-icon.dash { background: var(--accent-primary); }
+  .quick-icon.app { background: var(--accent-primary); }
   .quick-content h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .quick-content p { font-size: 12px; color: var(--text-muted); }
   
   /* Chat Messages */
   .chat-messages { display: flex; flex-direction: column; gap: 16px; }
   .chat-message { display: flex; gap: 12px; }
-  .chat-message-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
-  .chat-message.user .chat-message-avatar { background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); }
-  .chat-message.assistant .chat-message-avatar { background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); }
+  .chat-message-avatar { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+  .chat-message.user .chat-message-avatar { background: var(--accent-primary), var(--accent-blue)); }
+  .chat-message.assistant .chat-message-avatar { background: var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); }
   .chat-message-content { flex: 1; padding: 12px 16px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); font-size: 14px; }
   .chat-message-content pre { white-space: pre-wrap; font-family: inherit; margin: 0; }
   
@@ -195,26 +195,26 @@ const CSS = `
   .activity-feed { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; margin: 12px 0; }
   .activity-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-subtle); }
   .activity-title { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .activity-count { padding: 2px 6px; background: var(--accent-primary); color: var(--bg-primary); border-radius: 10px; font-size: 10px; }
+  .activity-count { padding: 2px 6px; background: var(--accent-primary); color: var(--bg-primary); border-radius: 12px; font-size: 10px; }
   .activity-list { max-height: 200px; overflow-y: auto; }
   .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); }
   .activity-item:last-child { border-bottom: none; }
-  .activity-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .activity-icon { width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
   .activity-icon.analyzing { background: rgba(0, 136, 255, 0.2); }
   .activity-icon.connecting { background: rgba(138, 43, 226, 0.2); }
-  .activity-icon.generating { background: rgba(0, 255, 136, 0.2); }
+  .activity-icon.generating { background: rgba(16, 185, 129, 0.2); }
   .activity-icon.validating { background: rgba(255, 200, 0, 0.2); }
-  .activity-icon.writing { background: rgba(0, 255, 136, 0.2); }
+  .activity-icon.writing { background: rgba(16, 185, 129, 0.2); }
   .activity-content { flex: 1; }
   .activity-label { font-size: 13px; font-weight: 500; }
   .activity-detail { font-size: 11px; color: var(--text-muted); }
   .activity-status { font-size: 11px; padding: 2px 6px; border-radius: 4px; }
   .activity-status.running { background: rgba(255, 200, 0, 0.2); color: var(--accent-yellow); }
-  .activity-status.completed { background: rgba(0, 255, 136, 0.2); color: var(--accent-primary); }
+  .activity-status.completed { background: rgba(16, 185, 129, 0.2); color: var(--accent-primary); }
   
   /* Generated Files */
   .generated-files { background: var(--bg-secondary); border: 1px solid var(--accent-primary); border-radius: var(--radius-lg); overflow: hidden; }
-  .generated-files-header { padding: 12px 16px; background: rgba(0, 255, 136, 0.1); font-size: 14px; font-weight: 600; }
+  .generated-files-header { padding: 12px 16px; background: rgba(16, 185, 129, 0.1); font-size: 14px; font-weight: 600; }
   .generated-file { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--border-subtle); cursor: pointer; }
   .generated-file:hover { background: var(--bg-tertiary); }
   .generated-file-path { font-size: 13px; font-family: var(--font-mono); color: var(--text-secondary); }
@@ -236,7 +236,7 @@ const CSS = `
   .tool-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
   .input-field { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 15px; font-family: var(--font-sans); resize: none; outline: none; min-height: 24px; max-height: 180px; }
   .input-field::placeholder { color: var(--text-muted); }
-  .send-btn { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); border: none; border-radius: var(--radius-md); color: var(--bg-primary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .send-btn { width: 40px; height: 40px; background: var(--accent-primary), var(--accent-blue)); border: none; border-radius: var(--radius-md); color: var(--bg-primary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .send-btn:hover { box-shadow: var(--shadow-glow); }
   .send-btn.cancel { background: var(--accent-orange); }
   .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding: 0 4px; }
@@ -249,7 +249,7 @@ const CSS = `
   .model-dropdown { position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); min-width: 200px; overflow: hidden; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
   .model-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; font-size: 13px; color: var(--text-secondary); transition: all 0.15s; }
   .model-dropdown-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-  .model-dropdown-item.active { background: rgba(0, 255, 136, 0.1); color: var(--accent-primary); }
+  .model-dropdown-item.active { background: rgba(16, 185, 129, 0.1); color: var(--accent-primary); }
   .model-dropdown-item .model-provider { font-size: 10px; color: var(--text-muted); margin-left: auto; padding: 2px 6px; background: var(--bg-tertiary); border-radius: 4px; }
   .model-dropdown-item .model-check { color: var(--accent-primary); font-size: 14px; }
   
@@ -274,7 +274,7 @@ const CSS = `
   .url-import-preview.visible { display: block; }
   .url-import-preview-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
   .url-import-preview-url { font-size: 11px; color: var(--text-muted); word-break: break-all; }
-  .url-import-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .url-import-btn { width: 100%; padding: 12px; background: var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; }
   .url-import-btn:hover { box-shadow: var(--shadow-glow); }
   .url-import-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   
@@ -293,7 +293,7 @@ const CSS = `
   .file-tree { display: flex; flex-direction: column; gap: 2px; }
   .file-tree-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-family: var(--font-mono); color: var(--text-secondary); }
   .file-tree-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-  .file-tree-item.active { background: rgba(0, 255, 136, 0.1); color: var(--accent-primary); }
+  .file-tree-item.active { background: rgba(16, 185, 129, 0.1); color: var(--accent-primary); }
   .code-preview { background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; }
   .code-preview-header { display: flex; align-items: center; padding: 10px 14px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-subtle); }
   .code-preview-filename { font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary); }
@@ -330,8 +330,8 @@ const CSS = `
   .setting-label { font-size: 12px; color: var(--text-secondary); }
 
   /* Tool Call Timeline */
-  .tool-call-item { display: flex; align-items: center; gap: 8px; padding: 4px 10px; margin-bottom: 2px; border-radius: 6px; font-size: 11px; }
-  .tool-call-item.success { background: rgba(0,255,136,0.05); border-left: 2px solid var(--accent-primary); }
+  .tool-call-item { display: flex; align-items: center; gap: 8px; padding: 4px 10px; margin-bottom: 2px; border-radius: 8px; font-size: 11px; }
+  .tool-call-item.success { background: rgba(16,185,129,0.05); border-left: 2px solid var(--accent-primary); }
   .tool-call-item.error { background: rgba(255,100,100,0.1); border-left: 2px solid #ff6464; }
   .tool-call-item.running { background: var(--bg-tertiary); border-left: 2px solid var(--accent-yellow); }
 
@@ -363,7 +363,7 @@ const CSS = `
   /* Header Project Badge */
   .header-project-badge { display: flex; align-items: center; gap: 6px; }
   .header-project-name { font-size: 11px; font-weight: 600; }
-  .header-live-badge { display: none; align-items: center; gap: 3px; padding: 2px 6px; background: rgba(0, 255, 136, 0.15); color: var(--accent-primary); border-radius: 3px; font-size: 9px; font-weight: 600; }
+  .header-live-badge { display: none; align-items: center; gap: 3px; padding: 2px 6px; background: rgba(16, 185, 129, 0.15); color: var(--accent-primary); border-radius: 3px; font-size: 9px; font-weight: 600; }
   .header-live-badge.visible { display: flex; }
   .header-live-dot { width: 5px; height: 5px; background: var(--accent-primary); border-radius: 50%; animation: pulse 2s infinite; }
 
@@ -371,22 +371,22 @@ const CSS = `
   .preview-status-text { color: var(--accent-primary); font-weight: 500; }
 
   /* Savings Widget */
-  .savings-card { background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,100,255,0.06)); border: 1px solid rgba(0,255,136,0.2); border-radius: var(--radius-lg); padding: 14px; }
+  .savings-card { background: var(--accent-primary), rgba(0,100,255,0.06)); border: 1px solid rgba(16,185,129,0.2); border-radius: var(--radius-lg); padding: 14px; }
   .savings-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .savings-card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--accent-primary); letter-spacing: 0.5px; }
-  .savings-card-badge { font-size: 9px; padding: 2px 6px; background: rgba(0,255,136,0.15); color: var(--accent-primary); border-radius: 4px; font-weight: 700; }
+  .savings-card-badge { font-size: 9px; padding: 2px 6px; background: rgba(16,185,129,0.15); color: var(--accent-primary); border-radius: 4px; font-weight: 700; }
   .savings-big-number { font-size: 28px; font-weight: 800; color: var(--accent-primary); line-height: 1; }
   .savings-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .savings-bar { height: 6px; background: var(--bg-tertiary); border-radius: 3px; margin-top: 10px; overflow: hidden; }
-  .savings-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue)); border-radius: 3px; transition: width 0.5s ease; }
+  .savings-bar-fill { height: 100%; background: var(--accent-primary), var(--accent-blue)); border-radius: 3px; transition: width 0.5s ease; }
   .savings-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 3px 0; }
   .savings-row-label { color: var(--text-muted); }
   .savings-row-value { font-weight: 600; color: var(--text-primary); }
   .savings-row-value.green { color: var(--accent-primary); }
-  .upsell-card { background: linear-gradient(135deg, rgba(138,43,226,0.1), rgba(0,100,255,0.08)); border: 1px solid rgba(138,43,226,0.25); border-radius: var(--radius-lg); padding: 14px; margin-top: 12px; }
+  .upsell-card { background: var(--accent-primary), rgba(0,100,255,0.08)); border: 1px solid rgba(138,43,226,0.25); border-radius: var(--radius-lg); padding: 14px; margin-top: 12px; }
   .upsell-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
   .upsell-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4; }
-  .upsell-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  .upsell-btn { width: 100%; padding: 8px; background: var(--accent-primary); color: #fff; border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
   .upsell-btn:hover { opacity: 0.9; }
   
   /* Command Palette */
@@ -404,7 +404,7 @@ const CSS = `
   .command-group-label { padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
   .command-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; }
   .command-item:hover, .command-item.selected { background: var(--bg-tertiary); }
-  .command-item.selected { background: linear-gradient(90deg, rgba(0, 255, 136, 0.1), transparent); border-left: 2px solid var(--accent-primary); }
+  .command-item.selected { background: var(--accent-primary), transparent); border-left: 2px solid var(--accent-primary); }
   .command-icon { font-size: 18px; width: 28px; text-align: center; }
   .command-info { flex: 1; }
   .command-label { display: block; font-weight: 500; }
@@ -425,7 +425,7 @@ const CSS = `
   .skill-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
   .skill-option { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-tertiary); border: 2px solid var(--border-subtle); border-radius: var(--radius-md); cursor: pointer; text-align: left; }
   .skill-option:hover { border-color: var(--border-default); }
-  .skill-option.active { border-color: var(--accent-primary); background: rgba(0, 255, 136, 0.05); }
+  .skill-option.active { border-color: var(--accent-primary); background: rgba(16, 185, 129, 0.05); }
   .skill-icon { font-size: 24px; }
   .skill-label { font-weight: 600; display: block; }
   .skill-desc { font-size: 12px; color: var(--text-muted); }
@@ -437,7 +437,7 @@ const CSS = `
   .onboarding-btn.text { background: none; border: none; color: var(--text-muted); }
   
   /* Contextual Tip */
-  .contextual-tip { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; max-width: 400px; display: flex; gap: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 136, 255, 0.1)); border: 1px solid rgba(0, 255, 136, 0.2); border-radius: var(--radius-md); }
+  .contextual-tip { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; max-width: 400px; display: flex; gap: 12px; padding: 12px 16px; background: var(--accent-primary), rgba(0, 136, 255, 0.1)); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); }
   .contextual-tip.hidden { display: none; }
   .tip-content { flex: 1; }
   .tip-content strong { display: block; font-size: 13px; margin-bottom: 4px; }
@@ -448,7 +448,7 @@ const CSS = `
   .notification-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column-reverse; gap: 12px; max-width: 400px; }
   .notification-item { display: flex; gap: 12px; padding: 14px 16px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-left-width: 3px; border-radius: var(--radius-lg); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); animation: slideIn 0.3s ease; }
   @keyframes slideIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
-  .notification-item.success { background: rgba(0, 255, 136, 0.1); border-left-color: var(--accent-primary); }
+  .notification-item.success { background: rgba(16, 185, 129, 0.1); border-left-color: var(--accent-primary); }
   .notification-item.error { background: rgba(255, 102, 34, 0.1); border-left-color: var(--accent-orange); }
   .notification-item.info { background: rgba(0, 136, 255, 0.1); border-left-color: var(--accent-blue); }
   .notification-icon { font-size: 20px; flex-shrink: 0; }
@@ -497,7 +497,7 @@ const CSS = `
 
   /* Enhancement Preview */
   .enhancement-preview { background: var(--bg-secondary); border: 1px solid var(--accent-primary); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
-  .enhancement-header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(0, 255, 136, 0.1); border-bottom: 1px solid var(--border-subtle); }
+  .enhancement-header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid var(--border-subtle); }
   .enhancement-title { flex: 1; font-weight: 600; font-size: 13px; }
   .enhancement-dismiss { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; }
   .enhancement-content { padding: 16px; }
@@ -525,7 +525,7 @@ const CSS = `
   .send-btn.cancel:hover { box-shadow: 0 0 20px rgba(255, 102, 34, 0.3); }
   
   /* Project loading skeleton */
-  .project-skeleton { height: 40px; background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-elevated) 50%, var(--bg-tertiary) 75%); background-size: 200% 100%; border-radius: var(--radius-md); animation: shimmer 1.5s infinite; margin-bottom: 4px; }
+  .project-skeleton { height: 40px; background: var(--accent-primary) 25%, var(--bg-elevated) 50%, var(--bg-tertiary) 75%); background-size: 200% 100%; border-radius: var(--radius-md); animation: shimmer 1.5s infinite; margin-bottom: 4px; }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
   /* Usage limit warning */
@@ -540,10 +540,10 @@ const QUICK_PROMPTS = {
 };
 
 const FILE_STRUCTURES = {
-  landing: ["📄 index.html", "🎨 styles.css", "⚡ app.js", "📦 package.json"],
-  api: ["🟢 server.js", "📁 routes/", "📁 controllers/", "📁 models/", "🔒 .env", "📦 package.json"],
-  dashboard: ["📊 Dashboard.jsx", "📈 Charts.jsx", "📋 DataTable.jsx", "📁 api/", "📦 package.json"],
-  app: ["📁 frontend/", "📁 backend/", "📁 database/", "🐳 docker-compose.yml", "📖 README.md"],
+  landing: [" index.html", " styles.css", " app.js", " package.json"],
+  api: [" server.js", " routes/", " controllers/", " models/", " .env", " package.json"],
+  dashboard: [" Dashboard.jsx", " Charts.jsx", " DataTable.jsx", " api/", " package.json"],
+  app: [" frontend/", " backend/", " database/", " docker-compose.yml", " README.md"],
 };
 
 const MODELS = [
@@ -554,26 +554,26 @@ const MODELS = [
 ];
 
 const COMMANDS = [
-  { id: "new-project", label: "New Project", desc: "Start a new project", icon: "✨", category: "create" },
-  { id: "new-landing", label: "New Landing Page", desc: "Create a landing page", icon: "🎨", category: "create" },
-  { id: "new-api", label: "New API Project", desc: "Create a backend API", icon: "⚡", category: "create" },
-  { id: "deploy", label: "Deploy to Vercel", desc: "Deploy current project", icon: "🚀", category: "action", shortcut: "⌘⇧D" },
-  { id: "export", label: "Export Project", desc: "Download as ZIP", icon: "📦", category: "action" },
-  { id: "clear-chat", label: "Clear Chat", desc: "Start fresh", icon: "🗑️", category: "action" },
-  { id: "settings", label: "Open Settings", desc: "Configure preferences", icon: "⚙️", category: "settings", shortcut: "⌘," },
-  { id: "profile", label: "Open Profile", desc: "View account", icon: "👤", category: "settings" },
-  { id: "docs", label: "View Documentation", desc: "Open help docs", icon: "📚", category: "help" },
+  { id: "new-project", label: "New Project", desc: "Start a new project", icon: "", category: "create" },
+  { id: "new-landing", label: "New Landing Page", desc: "Create a landing page", icon: "", category: "create" },
+  { id: "new-api", label: "New API Project", desc: "Create a backend API", icon: "", category: "create" },
+  { id: "deploy", label: "Deploy to Vercel", desc: "Deploy current project", icon: "", category: "action", shortcut: "⌘⇧D" },
+  { id: "export", label: "Export Project", desc: "Download as ZIP", icon: "", category: "action" },
+  { id: "clear-chat", label: "Clear Chat", desc: "Start fresh", icon: "", category: "action" },
+  { id: "settings", label: "Open Settings", desc: "Configure preferences", icon: "", category: "settings", shortcut: "⌘," },
+  { id: "profile", label: "Open Profile", desc: "View account", icon: "", category: "settings" },
+  { id: "docs", label: "View Documentation", desc: "Open help docs", icon: "", category: "help" },
 ];
 
 const ONBOARDING_STEPS = [
-  { title: `Welcome to ${BRAND_NAME}! 🚀`, desc: "Build complete projects by describing what you want. No boilerplate, no setup - just results." },
+  { title: `Welcome to ${BRAND_NAME}! `, desc: "Build complete projects by describing what you want. No boilerplate, no setup - just results." },
   { title: "Tell us about yourself", desc: "This helps us customize suggestions for you.", hasSkill: true },
-  { title: "You\u2019re ready! 🎉", desc: "Start building. We\u2019ll show helpful tips as you go." },
+  { title: "You\u2019re ready! ", desc: "Start building. We\u2019ll show helpful tips as you go." },
 ];
 
-const CATEGORY_LABELS = { create: "✨ Create", action: "⚡ Actions", settings: "⚙️ Settings", help: "❓ Help" };
+const CATEGORY_LABELS = { create: " Create", action: " Actions", settings: " Settings", help: " Help" };
 
-const ACTIVITY_ICONS = { analyzing: "🔍", connecting: "🔌", generating: "⚡", validating: "✅", writing: "✍️" };
+const ACTIVITY_ICONS = { analyzing: "", connecting: "", generating: "", validating: "", writing: "" };
 
 export function FileEngineApp() {
   // =====================================================
@@ -583,7 +583,7 @@ export function FileEngineApp() {
 
   const showNotification = useCallback((type: string, title: string, message = "") => {
     const id = "notif-" + Date.now();
-    const icons: Record<string, string> = { success: "✅", error: "❌", warning: "⚠️", info: "ℹ️" };
+    const icons: Record<string, string> = { success: "", error: "", warning: "", info: "ℹ" };
     setNotifications((prev) => [...prev, { id, type, title, message, icon: icons[type] }]);
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -640,17 +640,17 @@ export function FileEngineApp() {
   // Helper: tool call display label
   const toolCallLabel = (tool: string) => {
     const labels: Record<string, string> = {
-      create_file: '📝 Creating file',
-      edit_file: '✏️ Editing file',
-      view_file: '👁️ Reading file',
-      run_command: '⚡ Running command',
-      search_web: '🔍 Searching web',
-      search_npm: '📦 Searching packages',
-      analyze_image: '🖼️ Analyzing image',
-      think: '🧠 Planning',
-      generate_media: '🎬 Generating media',
+      create_file: ' Creating file',
+      edit_file: ' Editing file',
+      view_file: ' Reading file',
+      run_command: ' Running command',
+      search_web: ' Searching web',
+      search_npm: ' Searching packages',
+      analyze_image: ' Analyzing image',
+      think: ' Planning',
+      generate_media: ' Generating media',
     };
-    return labels[tool] || `🔧 ${tool}`;
+    return labels[tool] || ` ${tool}`;
   };
   const [messages, setMessages] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -844,7 +844,7 @@ export function FileEngineApp() {
         content: f.content || ''
       }));
       setGeneratedFileContents(fileContents);
-      setFiles(fileContents.map((f: any) => `📄 ${f.path}`));
+      setFiles(fileContents.map((f: any) => ` ${f.path}`));
     }
   }, [chatHook.messages, generateHook.files.length]);
 
@@ -876,7 +876,7 @@ export function FileEngineApp() {
   // Sync generated files → file tree AND trigger preview verification
   useEffect(() => {
     if (generateHook.files.length > 0) {
-      const fileList = generateHook.files.map((f: any) => `📄 ${f.path || f.filepath}`);
+      const fileList = generateHook.files.map((f: any) => ` ${f.path || f.filepath}`);
       setFiles(fileList);
       
       // Store file contents for preview panel
@@ -957,7 +957,7 @@ export function FileEngineApp() {
   // Initial tip
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setTipData({ title: "💡 Quick Start", message: "Try clicking one of the project cards or type your own description. Press / to focus the input." });
+      setTipData({ title: " Quick Start", message: "Try clicking one of the project cards or type your own description. Press / to focus the input." });
     }, 2000);
     return () => clearTimeout(timeout);
   }, []);
@@ -1239,7 +1239,7 @@ export function FileEngineApp() {
             setPhaseMessage(message);
           },
           onComplete: (generatedFiles: any[]) => {
-            setFiles(generatedFiles.map((f: any) => `📄 ${f.path || f.filepath}`));
+            setFiles(generatedFiles.map((f: any) => ` ${f.path || f.filepath}`));
             showNotification("success", "Generation complete", `${generatedFiles.length} files generated successfully`);
           },
           onError: (error: string) => {
@@ -1352,24 +1352,24 @@ export function FileEngineApp() {
     const buildTime = previewHook.buildTime;
     switch (phase) {
       case 'idle': return '';
-      case 'generating': return '⚡ Generating...';
-      case 'verifying': return '⚡ Building...';
-      case 'auto-fixing': return `🔧 Auto-fixing (${previewHook.autoFixAttempts}/3)`;
-      case 'fixing': return '🔧 Fixing...';
-      case 'deploying': return '🚀 Deploying...';
+      case 'generating': return ' Generating...';
+      case 'verifying': return ' Building...';
+      case 'auto-fixing': return ` Auto-fixing (${previewHook.autoFixAttempts}/3)`;
+      case 'fixing': return ' Fixing...';
+      case 'deploying': return ' Deploying...';
       case 'previewing': return `✓ Preview ready${buildTime ? ` • ${(buildTime / 1000).toFixed(1)}s` : ''}`;
       case 'complete': return '✓ Deployed!';
-      case 'error': return '❌ Build failed';
+      case 'error': return ' Build failed';
       default: return '';
     }
   };
 
   const handleFileAttach = async (event: any) => {
     const newFiles = Array.from(event.target.files) as File[];
-    const fileExtIcons: Record<string, string> = { js: "🟨", ts: "🔷", jsx: "⚛️", tsx: "⚛️", html: "🌐", css: "🎨", json: "📋", md: "📝", py: "🐍", sql: "🗃️", csv: "📊", txt: "📄", pdf: "📕", png: "🖼️", jpg: "🖼️", jpeg: "🖼️", gif: "🖼️", svg: "🎨" };
+    const fileExtIcons: Record<string, string> = { js: "", ts: "", jsx: "", tsx: "", html: "", css: "", json: "", md: "", py: "", sql: "", csv: "", txt: "", pdf: "", png: "", jpg: "", jpeg: "", gif: "", svg: "" };
     const mapped = newFiles.map((file) => {
       const ext = file.name.split(".").pop()?.toLowerCase() || "";
-      return { id: "file-" + Date.now() + Math.random().toString(36).slice(2), name: file.name, size: file.size, icon: fileExtIcons[ext] || "📁", file };
+      return { id: "file-" + Date.now() + Math.random().toString(36).slice(2), name: file.name, size: file.size, icon: fileExtIcons[ext] || "", file };
     });
     setAttachedFiles((prev: any[]) => [...prev, ...mapped]);
 
@@ -1573,21 +1573,21 @@ export function FileEngineApp() {
           {step.hasSkill && (
             <div className="skill-selector">
               <div className={`skill-option ${skillLevel === "beginner" ? "active" : ""}`} onClick={() => setSkillLevel("beginner")}>
-                <span className="skill-icon">🌱</span>
+                <span className="skill-icon"></span>
                 <div>
                   <span className="skill-label">Beginner</span>
                   <span className="skill-desc">New to coding</span>
                 </div>
               </div>
               <div className={`skill-option ${skillLevel === "intermediate" ? "active" : ""}`} onClick={() => setSkillLevel("intermediate")}>
-                <span className="skill-icon">🚀</span>
+                <span className="skill-icon"></span>
                 <div>
                   <span className="skill-label">Intermediate</span>
                   <span className="skill-desc">Comfortable with code</span>
                 </div>
               </div>
               <div className={`skill-option ${skillLevel === "expert" ? "active" : ""}`} onClick={() => setSkillLevel("expert")}>
-                <span className="skill-icon">⚡</span>
+                <span className="skill-icon"></span>
                 <div>
                   <span className="skill-label">Expert</span>
                   <span className="skill-desc">Professional developer</span>
@@ -1666,7 +1666,7 @@ export function FileEngineApp() {
             borderRadius: '8px', fontSize: '12px', color: 'var(--text-muted)'
           }}>
             <div style={{ fontSize: '10px', fontWeight: 600, marginBottom: '4px', color: 'var(--accent-purple)', textTransform: 'uppercase' }}>
-              🧠 Thinking
+               Thinking
             </div>
             <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>
               {thinking.length > 300 ? thinking.slice(0, 300) + '...' : thinking}
@@ -1681,11 +1681,11 @@ export function FileEngineApp() {
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
                 padding: '4px 10px', marginBottom: '2px',
-                background: tc.success === false ? 'rgba(255,100,100,0.1)' : tc.success ? 'rgba(0,255,136,0.05)' : 'var(--bg-tertiary)',
+                background: tc.success === false ? 'rgba(255,100,100,0.1)' : tc.success ? 'rgba(16,185,129,0.05)' : 'var(--bg-tertiary)',
                 borderRadius: '6px', fontSize: '11px', color: 'var(--text-secondary)',
                 borderLeft: `2px solid ${tc.success === false ? '#ff6464' : tc.success ? 'var(--accent-primary)' : 'var(--accent-yellow)'}`
               }}>
-                <span>{tc.success === false ? '✗' : tc.success ? '✓' : '●'}</span>
+                <span>{tc.success === false ? '' : tc.success ? '✓' : '●'}</span>
                 <span style={{ fontWeight: 500 }}>{toolCallLabel(tc.tool)}</span>
                 {tc.tool === 'create_file' && tc.input?.path && (
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' }}>{tc.input.path}</span>
@@ -1730,7 +1730,7 @@ export function FileEngineApp() {
                   onClick={() => setHeaderViewMode('code')}
                   title={`View ${file.filepath} in preview panel`}
                 >
-                  <span style={{ fontSize: '11px' }}>📄</span>
+                  <span style={{ fontSize: '11px' }}></span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>{file.filepath}</span>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{file.language}</span>
                 </div>
@@ -1739,7 +1739,7 @@ export function FileEngineApp() {
             
             {codeFiles.length > 0 && (
               <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--accent-primary)' }}>
-                ✅ {codeFiles.length} file{codeFiles.length > 1 ? 's' : ''} generated — view in preview panel →
+                 {codeFiles.length} file{codeFiles.length > 1 ? 's' : ''} generated — view in preview panel →
               </div>
             )}
           </>
@@ -1783,11 +1783,11 @@ export function FileEngineApp() {
               <button className="header-dropdown-btn" onClick={() => setHeaderCopyMenuOpen(!headerCopyMenuOpen)}>Copy ▾</button>
               {headerCopyMenuOpen && (
                 <div className="header-dropdown-menu">
-                  <button className="header-dropdown-item" onClick={() => headerCopyAction('code')}>📄 Copy code</button>
-                  <button className="header-dropdown-item" onClick={() => headerCopyAction('url')}>🔗 Copy URL</button>
-                  <button className="header-dropdown-item" onClick={() => headerCopyAction('all')}>📋 Copy all</button>
+                  <button className="header-dropdown-item" onClick={() => headerCopyAction('code')}> Copy code</button>
+                  <button className="header-dropdown-item" onClick={() => headerCopyAction('url')}> Copy URL</button>
+                  <button className="header-dropdown-item" onClick={() => headerCopyAction('all')}> Copy all</button>
                   <div className="header-dropdown-divider"></div>
-                  <button className="header-dropdown-item" onClick={() => headerCopyAction('zip')}>📦 Export ZIP</button>
+                  <button className="header-dropdown-item" onClick={() => headerCopyAction('zip')}> Export ZIP</button>
                 </div>
               )}
             </div>
@@ -1799,10 +1799,10 @@ export function FileEngineApp() {
               } else {
                 showNotification('info', 'Refresh', 'Generate code first');
               }
-            }} title="Refresh preview">🔄</button>
+            }} title="Refresh preview"></button>
             <div className="header-divider"></div>
-            <button className="btn btn-ghost" onClick={() => setShowPreviewPanel(!showPreviewPanel)} title={showPreviewPanel ? "Hide Preview" : "Show Preview"}>{showPreviewPanel ? "👁️" : "👁️‍🗨️"}</button>
-            <button className="btn btn-ghost" onClick={() => setShowSettingsModal(true)}>⚙️</button>
+            <button className="btn btn-ghost" onClick={() => setShowPreviewPanel(!showPreviewPanel)} title={showPreviewPanel ? "Hide Preview" : "Show Preview"}>{showPreviewPanel ? "" : ""}</button>
+            <button className="btn btn-ghost" onClick={() => setShowSettingsModal(true)}></button>
             <button className="btn btn-secondary" onClick={() => { const proj = realProjects.find((p: any) => p.id === currentProjectId); if (proj?.github_repo) { window.open(proj.github_repo, "_blank"); } else { showNotification("info", "GitHub", "No GitHub repo linked to this project"); } }}>GitHub</button>
             <button className="btn btn-deploy" onClick={async () => { 
               if (previewHook.isPreviewReady && generatedFileContents.length > 0) {
@@ -1826,7 +1826,7 @@ export function FileEngineApp() {
                   else { showNotification("error", "Deploy failed", data.error); } 
                 } catch (err: any) { showNotification("error", "Deploy failed", err.message); }
               }
-            }}>🚀 Deploy</button>
+            }}> Deploy</button>
             {/* Generation Usage Bar (free plan) */}
             {authUser && planLimits.generations_per_day !== 999999 && (
               <div className="usage-bar-wrap" title={`${usageToday} of ${planLimits.generations_per_day} generations used today`}>
@@ -1890,13 +1890,13 @@ export function FileEngineApp() {
                         className="user-dropdown-item"
                         onClick={() => { setShowUserDropdown(false); setShowProfileModal(true); }}
                       >
-                        <span>👤</span> My Profile
+                        <span></span> My Profile
                       </button>
                       <button
                         className="user-dropdown-item"
                         onClick={() => { setShowUserDropdown(false); setShowSettingsModal(true); }}
                       >
-                        <span>⚙️</span> Settings
+                        <span></span> Settings
                       </button>
                       <div className="user-dropdown-divider" />
                       <button
@@ -1907,7 +1907,7 @@ export function FileEngineApp() {
                           window.location.href = '/auth/login';
                         }}
                       >
-                        <span>🚪</span> Sign Out
+                        <span></span> Sign Out
                       </button>
                     </div>
                   </div>
@@ -1925,9 +1925,9 @@ export function FileEngineApp() {
 
           {/* Navigation */}
           <div className="sidebar-section">
-            <div className="nav-item" onClick={() => { setShowCommandPalette(true); }}><span className="nav-icon">🔍</span><span>Search</span></div>
-            <div className="nav-item" onClick={() => showNotification("info", "Chats", "Loading chat history...")}><span className="nav-icon">💬</span><span>Chats</span></div>
-            <div className="nav-item" onClick={() => showNotification("info", "Projects", "Loading projects...")}><span className="nav-icon">📁</span><span>Projects</span></div>
+            <div className="nav-item" onClick={() => { setShowCommandPalette(true); }}><span className="nav-icon"></span><span>Search</span></div>
+            <div className="nav-item" onClick={() => showNotification("info", "Chats", "Loading chat history...")}><span className="nav-icon"></span><span>Chats</span></div>
+            <div className="nav-item" onClick={() => showNotification("info", "Projects", "Loading projects...")}><span className="nav-icon"></span><span>Projects</span></div>
           </div>
 
           {/* Chat List */}
@@ -1999,7 +1999,7 @@ export function FileEngineApp() {
                         }}
                         title="Rename"
                       >
-                        ✎
+                        
                       </button>
                       <button 
                         className="chat-action-btn delete"
@@ -2009,7 +2009,7 @@ export function FileEngineApp() {
                         }}
                         title="Delete"
                       >
-                        🗑️
+                        
                       </button>
                     </div>
                   </div>
@@ -2021,11 +2021,11 @@ export function FileEngineApp() {
           {/* AI Tools */}
           <div className="sidebar-section">
             <div className="tool-card" onClick={() => openTool('image')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)' }}>🎨</div>
+              <div className="tool-icon-box" style={{ background: 'var(--accent-primary)' }}></div>
               <div className="tool-info"><div className="tool-name">Image Generator</div><div className="tool-desc">DALL-E 3, Flux, Midjourney</div></div>
             </div>
             <div className="tool-card" onClick={() => openTool('video')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)' }}>🎬</div>
+              <div className="tool-icon-box" style={{ background: 'var(--accent-primary)' }}></div>
               <div className="tool-info"><div className="tool-name">Video Generator</div><div className="tool-desc">Ven 3, Sora, Runway, Pika</div></div>
             </div>
           </div>
@@ -2034,23 +2034,23 @@ export function FileEngineApp() {
           <div className="sidebar-section">
             <div className="sidebar-label">VIDEO OVERLAYS</div>
             <div className="tool-card" onClick={() => openTool('assembler')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #10b981, #06b6d4)' }}>🎞️</div>
+              <div className="tool-icon-box" style={{ background: 'var(--accent-primary)' }}></div>
               <div className="tool-info"><div className="tool-name">Video Assembler</div><div className="tool-desc">JSON2Video, Shotstack</div></div>
             </div>
             <div className="tool-card" onClick={() => openTool('captions')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>💬</div>
+              <div className="tool-icon-box" style={{ background: 'var(--accent-primary)' }}></div>
               <div className="tool-info"><div className="tool-name">Caption Generator</div><div className="tool-desc">Whisper, AssemblyAI</div></div>
             </div>
             <div className="tool-card" onClick={() => openTool('color')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>🎨</div>
+              <div className="tool-icon-box" style={{ background: 'var(--accent-primary)' }}></div>
               <div className="tool-info"><div className="tool-name">Color Grading</div><div className="tool-desc">LUT Apply, Auto Color</div></div>
             </div>
             <div className="tool-card" onClick={() => openTool('bgremove')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>✂️</div>
+              <div className="tool-icon-box" style={{ background: 'var(--red)' }}></div>
               <div className="tool-info"><div className="tool-name">Background Remover</div><div className="tool-desc">RunwayML, Remove.bg</div></div>
             </div>
             <div className="tool-card" onClick={() => openTool('audio')}>
-              <div className="tool-icon-box" style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}>🔊</div>
+              <div className="tool-icon-box" style={{ background: 'var(--accent-primary)' }}></div>
               <div className="tool-info"><div className="tool-name">Audio Enhancer</div><div className="tool-desc">Adobe Enhance, Dolby.io</div></div>
             </div>
           </div>
@@ -2058,7 +2058,7 @@ export function FileEngineApp() {
           {/* Preview Settings */}
           <div className="sidebar-section">
             <div className="settings-card">
-              <div className="settings-card-title">⚡ Preview Settings</div>
+              <div className="settings-card-title"> Preview Settings</div>
               <div className="setting-row">
                 <span className="setting-label">Vercel Preview</span>
                 <div className={`toggle ${useVercelPreview ? "active" : ""}`} onClick={toggleVercelPreview}></div>
@@ -2113,35 +2113,35 @@ export function FileEngineApp() {
             </div>
             <div className="builds-separator"></div>
             <div className="queue-status">Queue: <strong>{queuedBuilds}</strong> &bull; Avg: <strong>{avgDuration}</strong></div>
-            <button className={`activity-toggle ${showActivityPanel ? "active" : ""}`} onClick={toggleActivity}>⚙️ Activity</button>
+            <button className={`activity-toggle ${showActivityPanel ? "active" : ""}`} onClick={toggleActivity}> Activity</button>
           </div>
 
           <div className="messages-area" ref={messagesAreaRef}>
             {showWelcome && messages.length === 0 ? (
               <div className="welcome-container">
-                <div className="welcome-logo">⚡</div>
+                <div className="welcome-logo"></div>
                 <h1 className="welcome-title">Build Anything. No Limits.</h1>
                 <p className="welcome-subtitle">Describe what you want. {BRAND_NAME} writes code, generates files, and deploys — all from one conversation.</p>
                 <div className="welcome-badges">
-                  <div className="welcome-badge"><span>⚡</span><strong>20</strong> concurrent builds</div>
-                  <div className="welcome-badge"><span>🚀</span>Zero throttling</div>
-                  <div className="welcome-badge"><span>👥</span><strong>100K+</strong> scalable</div>
+                  <div className="welcome-badge"><span></span><strong>20</strong> concurrent builds</div>
+                  <div className="welcome-badge"><span></span>Zero throttling</div>
+                  <div className="welcome-badge"><span></span><strong>100K+</strong> scalable</div>
                 </div>
                 <div className="quick-grid">
                   <div className="quick-card" onClick={() => startProject("landing")}>
-                    <div className="quick-icon web">🎨</div>
+                    <div className="quick-icon web"></div>
                     <div className="quick-content"><h4>Landing Page</h4><p>Marketing, portfolios, product pages</p></div>
                   </div>
                   <div className="quick-card" onClick={() => startProject("api")}>
-                    <div className="quick-icon api">⚡</div>
+                    <div className="quick-icon api"></div>
                     <div className="quick-content"><h4>Backend API</h4><p>REST, GraphQL, webhooks, DB</p></div>
                   </div>
                   <div className="quick-card" onClick={() => startProject("dashboard")}>
-                    <div className="quick-icon dash">📊</div>
+                    <div className="quick-icon dash"></div>
                     <div className="quick-content"><h4>Dashboard</h4><p>Admin panels, analytics, charts</p></div>
                   </div>
                   <div className="quick-card" onClick={() => startProject("app")}>
-                    <div className="quick-icon app">🚀</div>
+                    <div className="quick-icon app"></div>
                     <div className="quick-content"><h4>Full Stack App</h4><p>Complete apps with auth &amp; DB</p></div>
                   </div>
                 </div>
@@ -2150,11 +2150,11 @@ export function FileEngineApp() {
               <div className="chat-messages">
                 {messages.map((msg, i) => (
                   <div key={msg.id || i} className={`chat-message ${msg.role} ${msg.status === "error" ? "error" : ""}`}>
-                    <div className="chat-message-avatar">{msg.role === "user" ? (profile?.full_name?.[0]?.toUpperCase() || authUser?.email?.[0]?.toUpperCase() || "U") : "⚡"}</div>
+                    <div className="chat-message-avatar">{msg.role === "user" ? (profile?.full_name?.[0]?.toUpperCase() || authUser?.email?.[0]?.toUpperCase() || "U") : ""}</div>
                     <div className="chat-message-content">
                       {msg.role === 'assistant' ? renderMessageContent(msg) : <pre>{msg.content}</pre>}
                       {msg.status === "error" && (
-                        <button className="quick-action" style={{ marginTop: "8px" }} onClick={() => chatHook.regenerate(msg.id)}>🔄 Retry</button>
+                        <button className="quick-action" style={{ marginTop: "8px" }} onClick={() => chatHook.regenerate(msg.id)}> Retry</button>
                       )}
                     </div>
                   </div>
@@ -2163,12 +2163,12 @@ export function FileEngineApp() {
                 {showActivityPanel && activities.length > 0 && (
                   <div className="activity-feed">
                     <div className="activity-header">
-                      <span className="activity-title">⚙️ Activity <span className="activity-count">{activities.filter((a) => a.status === "running").length}</span></span>
+                      <span className="activity-title"> Activity <span className="activity-count">{activities.filter((a) => a.status === "running").length}</span></span>
                     </div>
                     <div className="activity-list">
                       {activities.map((a, i) => (
                         <div key={i} className="activity-item">
-                          <div className={`activity-icon ${a.type}`}>{ACTIVITY_ICONS[a.type as keyof typeof ACTIVITY_ICONS] || "⚙️"}</div>
+                          <div className={`activity-icon ${a.type}`}>{ACTIVITY_ICONS[a.type as keyof typeof ACTIVITY_ICONS] || ""}</div>
                           <div className="activity-content">
                             <div className="activity-label">{a.label}</div>
                             <div className="activity-detail">{a.detail}</div>
@@ -2182,7 +2182,7 @@ export function FileEngineApp() {
 
                 {isGenerating && (
                   <div className="chat-message assistant">
-                    <div className="chat-message-avatar">⚡</div>
+                    <div className="chat-message-avatar"></div>
                     <div className="chat-message-content">
                       <div className="thinking-indicator">
                         <div className="thinking-dots">
@@ -2198,15 +2198,15 @@ export function FileEngineApp() {
 
                 {files.length > 0 && !isGenerating && (
                   <div className="generated-files">
-                    <div className="generated-files-header">✅ Generated {files.length} files<span style={{ marginLeft: "8px", color: "var(--accent-primary)" }}>&bull; All checks passed</span></div>
+                    <div className="generated-files-header"> Generated {files.length} files<span style={{ marginLeft: "8px", color: "var(--accent-primary)" }}>&bull; All checks passed</span></div>
                     {files.map((f, i) => (
                       <div key={i} className="generated-file"><span className="generated-file-path">{f}</span></div>
                     ))}
                     <div className="quick-actions-bar">
-                      <button className="quick-action" onClick={async () => { showNotification("info", "Export", "Preparing ZIP..."); try { const res = await fetch(`/api/builds/${currentProjectId}/export`); if (res.ok) { const blob = await res.blob(); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "project.zip"; a.click(); showNotification("success", "Export", "Download started"); } else { showNotification("error", "Export", "Export failed"); } } catch { showNotification("info", "Export", "Export feature coming soon"); } }}>📦 Export</button>
-                      <button className="quick-action primary" onClick={async () => { if (!currentProjectId) { showNotification("info", "Deploy", "No project selected"); return; } showNotification("info", "Deploy", "Starting deployment..."); try { const res = await fetch("/api/deploy", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: currentProjectId }) }); const data = await res.json(); if (res.ok) { showNotification("success", "Deployed!", data.url || "Deployment started"); } else { showNotification("error", "Deploy failed", data.error); } } catch (err: any) { showNotification("error", "Deploy failed", err.message); } }}>🚀 Deploy</button>
-                      <button className="quick-action" onClick={() => { if (typeof navigator !== "undefined" && navigator.clipboard) { navigator.clipboard.writeText(window.location.href); showNotification("success", "Copied", "Link copied"); } }}>🔗 Share</button>
-                      <button className="quick-action" onClick={() => { const content = generateHook.files.map((f: any) => `// ${f.path || f.filepath}\n${f.content}`).join("\n\n"); if (typeof navigator !== "undefined" && navigator.clipboard) { navigator.clipboard.writeText(content); showNotification("success", "Copied", `${files.length} files copied to clipboard`); } }}>📋 Copy</button>
+                      <button className="quick-action" onClick={async () => { showNotification("info", "Export", "Preparing ZIP..."); try { const res = await fetch(`/api/builds/${currentProjectId}/export`); if (res.ok) { const blob = await res.blob(); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "project.zip"; a.click(); showNotification("success", "Export", "Download started"); } else { showNotification("error", "Export", "Export failed"); } } catch { showNotification("info", "Export", "Export feature coming soon"); } }}> Export</button>
+                      <button className="quick-action primary" onClick={async () => { if (!currentProjectId) { showNotification("info", "Deploy", "No project selected"); return; } showNotification("info", "Deploy", "Starting deployment..."); try { const res = await fetch("/api/deploy", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: currentProjectId }) }); const data = await res.json(); if (res.ok) { showNotification("success", "Deployed!", data.url || "Deployment started"); } else { showNotification("error", "Deploy failed", data.error); } } catch (err: any) { showNotification("error", "Deploy failed", err.message); } }}> Deploy</button>
+                      <button className="quick-action" onClick={() => { if (typeof navigator !== "undefined" && navigator.clipboard) { navigator.clipboard.writeText(window.location.href); showNotification("success", "Copied", "Link copied"); } }}> Share</button>
+                      <button className="quick-action" onClick={() => { const content = generateHook.files.map((f: any) => `// ${f.path || f.filepath}\n${f.content}`).join("\n\n"); if (typeof navigator !== "undefined" && navigator.clipboard) { navigator.clipboard.writeText(content); showNotification("success", "Copied", `${files.length} files copied to clipboard`); } }}> Copy</button>
                     </div>
                   </div>
                 )}
@@ -2218,7 +2218,7 @@ export function FileEngineApp() {
             <div className="input-wrapper">
               {enhancement && (
                 <div className="enhancement-preview">
-                  <div className="enhancement-header"><span>✨</span><span className="enhancement-title">Improved prompt</span><button className="enhancement-dismiss" onClick={dismissEnhancement}>×</button></div>
+                  <div className="enhancement-header"><span></span><span className="enhancement-title">Improved prompt</span><button className="enhancement-dismiss" onClick={dismissEnhancement}>×</button></div>
                   <div className="enhancement-content">
                     <div className="enhancement-text">{enhancement.enhanced}</div>
                     <div className="enhancement-improvements">
@@ -2271,7 +2271,7 @@ export function FileEngineApp() {
                   onInput={handleInputChange}
                   onKeyDown={handleKeyDown}
                 ></textarea>
-                <button className={`send-btn ${isGenerating ? "cancel" : ""}`} onClick={() => { if (isGenerating) { chatHook.stopGeneration(); generateHook.abort(); setIsGenerating(false); showNotification("info", "Stopped", "Generation cancelled"); } else { handleSend(); } }}>{isGenerating ? "■" : "➤"}</button>
+                <button className={`send-btn ${isGenerating ? "cancel" : ""}`} onClick={() => { if (isGenerating) { chatHook.stopGeneration(); generateHook.abort(); setIsGenerating(false); showNotification("info", "Stopped", "Generation cancelled"); } else { handleSend(); } }}>{isGenerating ? "■" : ""}</button>
               </div>
 
               {attachedFiles.length > 0 && (
@@ -2289,7 +2289,7 @@ export function FileEngineApp() {
               <div className="input-footer">
                 <span className="input-hint"><kbd>Enter</kbd> send &bull; <kbd>Shift+Enter</kbd> new line &bull; <kbd>⌘K</kbd> commands &bull; <kbd>⌘N</kbd> new</span>
                 {showEnhanceBtn && (
-                  <button className="enhance-btn" onClick={enhancePrompt}>✨ Enhance prompt</button>
+                  <button className="enhance-btn" onClick={enhancePrompt}> Enhance prompt</button>
                 )}
                 <div className="model-selector" ref={modelSelectorRef} onClick={() => setShowModelDropdown((prev) => !prev)}>
                   <span className="model-dot"></span>
@@ -2380,7 +2380,7 @@ export function FileEngineApp() {
           <div className="status-left">
             <div className="status-item"><span className={`status-dot ${isOnline ? "online" : ""}`}></span>{isOnline ? "Connected" : "Offline"}</div>
             <div className="status-item">Region: US-East</div>
-            {isGenerating && <div className="status-item" style={{ color: "var(--accent-yellow)" }}>⚡ Generating...</div>}
+            {isGenerating && <div className="status-item" style={{ color: "var(--accent-yellow)" }}> Generating...</div>}
             {getPreviewStatusText() && !isGenerating && <div className="status-item preview-status-text">{getPreviewStatusText()}</div>}
           </div>
           <div className="status-right">
@@ -2397,7 +2397,7 @@ export function FileEngineApp() {
       >
         <div className="command-palette" onClick={(e) => e.stopPropagation()}>
           <div className="command-search">
-            <span className="command-search-icon">🔍</span>
+            <span className="command-search-icon"></span>
             <input
               type="text"
               className="command-input"
@@ -2527,7 +2527,7 @@ export function FileEngineApp() {
               {/* Upsell for free users in profile */}
               {(!subscription || subscription.plan === 'free') && (
                 <div className="upsell-card" style={{ marginTop: "12px" }}>
-                  <div className="upsell-title">💎 Save up to 65% on API costs</div>
+                  <div className="upsell-title"> Save up to 65% on API costs</div>
                   <div className="upsell-desc">Pro and Business plans include intelligent cost optimization that automatically reduces your AI spending without sacrificing quality.</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
                     <div style={{ padding: "8px", background: "rgba(138,43,226,0.1)", borderRadius: "var(--radius-md)", textAlign: "center" }}>
@@ -2579,7 +2579,7 @@ export function FileEngineApp() {
             {isAdmin && (
               <div className="modal-section">
                 <div className="modal-section-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>⚡ Cost Optimization</span>
+                  <span> Cost Optimization</span>
                   <span style={{ fontSize: "10px", padding: "2px 6px", background: "var(--accent-primary)", color: "#fff", borderRadius: "4px", fontWeight: 600 }}>ADMIN</span>
                 </div>
                 <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>
@@ -2621,18 +2621,18 @@ export function FileEngineApp() {
                         <div className="savings-row"><span className="savings-row-label">Without optimization</span><span className="savings-row-value">${savings.withoutOpt.toFixed(2)}/mo</span></div>
                         <div className="savings-row"><span className="savings-row-label">With optimization</span><span className="savings-row-value green">${savings.withOpt.toFixed(2)}/mo</span></div>
                         <div style={{ borderTop: "1px solid var(--border-subtle)", marginTop: "6px", paddingTop: "6px" }}>
-                          <div className="savings-row"><span className="savings-row-label">🎯 Smart model routing</span><span className="savings-row-value green">{savings.breakdown.modelRouting > 0 ? `-${savings.breakdown.modelRouting}%` : "OFF"}</span></div>
-                          <div className="savings-row"><span className="savings-row-label">🧠 Smart context</span><span className="savings-row-value green">{savings.breakdown.smartContext > 0 ? `-${savings.breakdown.smartContext}%` : "OFF"}</span></div>
-                          <div className="savings-row"><span className="savings-row-label">🔄 Dual call prevention</span><span className="savings-row-value green">{savings.breakdown.dualCalls > 0 ? `-${savings.breakdown.dualCalls}%` : "OFF"}</span></div>
-                          <div className="savings-row"><span className="savings-row-label">📝 History compression</span><span className="savings-row-value green">{savings.breakdown.trimming > 0 ? `-${savings.breakdown.trimming}%` : "OFF"}</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> Smart model routing</span><span className="savings-row-value green">{savings.breakdown.modelRouting > 0 ? `-${savings.breakdown.modelRouting}%` : "OFF"}</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> Smart context</span><span className="savings-row-value green">{savings.breakdown.smartContext > 0 ? `-${savings.breakdown.smartContext}%` : "OFF"}</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> Dual call prevention</span><span className="savings-row-value green">{savings.breakdown.dualCalls > 0 ? `-${savings.breakdown.dualCalls}%` : "OFF"}</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> History compression</span><span className="savings-row-value green">{savings.breakdown.trimming > 0 ? `-${savings.breakdown.trimming}%` : "OFF"}</span></div>
                         </div>
                       </div>
                       {adminUsageData?.tierBreakdown && (
                         <div style={{ marginTop: "10px", borderTop: "1px solid var(--border-subtle)", paddingTop: "8px" }}>
                           <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "4px", fontWeight: 600 }}>MODEL TIER USAGE</div>
-                          <div className="savings-row"><span className="savings-row-label">⚡ Fast (Haiku/mini)</span><span className="savings-row-value">{adminUsageData.tierBreakdown.fast} requests</span></div>
-                          <div className="savings-row"><span className="savings-row-label">🔷 Pro (Sonnet/4o)</span><span className="savings-row-value">{adminUsageData.tierBreakdown.pro} requests</span></div>
-                          <div className="savings-row"><span className="savings-row-label">💎 Premium (Opus/o1)</span><span className="savings-row-value">{adminUsageData.tierBreakdown.premium} requests</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> Fast (Haiku/mini)</span><span className="savings-row-value">{adminUsageData.tierBreakdown.fast} requests</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> Pro (Sonnet/4o)</span><span className="savings-row-value">{adminUsageData.tierBreakdown.pro} requests</span></div>
+                          <div className="savings-row"><span className="savings-row-label"> Premium (Opus/o1)</span><span className="savings-row-value">{adminUsageData.tierBreakdown.premium} requests</span></div>
                         </div>
                       )}
                     </div>
@@ -2708,7 +2708,7 @@ export function FileEngineApp() {
         <div className="url-import-modal" onClick={(e) => { if (e.target === e.currentTarget) setShowUrlImport(false); }}>
           <div className="url-import-content">
             <div className="url-import-header">
-              <span className="url-import-title">🔗 Import URL</span>
+              <span className="url-import-title"> Import URL</span>
               <button className="url-import-close" onClick={() => setShowUrlImport(false)}>×</button>
             </div>
             <input

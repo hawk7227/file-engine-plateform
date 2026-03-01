@@ -78,10 +78,10 @@ export default function LoginPage() {
           <div className="form-divider">or continue with</div>
           
           <button className="btn-social" onClick={() => handleOAuth('google')}>
-            🔵 Continue with Google
+             Continue with Google
           </button>
           <button className="btn-social" onClick={() => handleOAuth('github')}>
-            ⚫ Continue with GitHub
+             Continue with GitHub
           </button>
           
           <p className="auth-footer">

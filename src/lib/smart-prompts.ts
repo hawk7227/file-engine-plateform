@@ -261,7 +261,7 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
   {
     id: 'tpl_new_project',
     name: 'Start New Project',
-    icon: '🚀',
+    icon: '',
     color: '#10B981',
     description: 'Set up a new project from scratch with best practices',
     popularity: 95,
@@ -321,7 +321,7 @@ Set up the complete project structure with all necessary files.`,
   {
     id: 'tpl_component',
     name: 'Create Component',
-    icon: '🧩',
+    icon: '',
     color: '#6366F1',
     description: 'Build a new React component with proper typing and tests',
     popularity: 92,
@@ -378,7 +378,7 @@ Include TypeScript types, proper error handling, and Tailwind styling.`,
   {
     id: 'tpl_api',
     name: 'Build API',
-    icon: '🔌',
+    icon: '',
     color: '#F59E0B',
     description: 'Create API routes with validation and error handling',
     popularity: 88,
@@ -437,7 +437,7 @@ Include proper validation, error handling, and TypeScript types.`,
   {
     id: 'tpl_fix_bug',
     name: 'Fix Bug',
-    icon: '🐛',
+    icon: '',
     color: '#EF4444',
     description: 'Debug and fix issues with proper verification',
     popularity: 90,
@@ -495,7 +495,7 @@ Fix ONLY this specific error. Do not change anything else.`,
   {
     id: 'tpl_feature',
     name: 'Add Feature',
-    icon: '✨',
+    icon: '',
     color: '#8B5CF6',
     description: 'Implement a new feature with planning and testing',
     popularity: 87,
@@ -553,7 +553,7 @@ Plan the implementation first, then build it step by step.`,
   {
     id: 'tpl_continue',
     name: 'Continue Project',
-    icon: '▶️',
+    icon: '▶',
     color: '#3B82F6',
     description: 'Resume work with full context loaded',
     popularity: 93,
@@ -607,51 +607,51 @@ What should we work on next?`,
 export const QUICK_PROMPTS = [
   {
     id: 'qp_explain',
-    label: '📖 Explain this code',
+    label: ' Explain this code',
     prompt: 'Explain what this code does, step by step. Highlight any potential issues or improvements.',
-    icon: '📖'
+    icon: ''
   },
   {
     id: 'qp_fix',
-    label: '🔧 Fix this error',
+    label: ' Fix this error',
     prompt: 'Fix this error. Make ONLY the minimal changes needed. Do not refactor or change unrelated code.',
-    icon: '🔧'
+    icon: ''
   },
   {
     id: 'qp_improve',
-    label: '✨ Improve this',
+    label: ' Improve this',
     prompt: 'Suggest improvements for this code. List them first, then ask which ones I want you to implement.',
-    icon: '✨'
+    icon: ''
   },
   {
     id: 'qp_test',
-    label: '🧪 Write tests',
+    label: ' Write tests',
     prompt: 'Write comprehensive tests for this code. Include unit tests, edge cases, and error scenarios.',
-    icon: '🧪'
+    icon: ''
   },
   {
     id: 'qp_document',
-    label: '📝 Add documentation',
+    label: ' Add documentation',
     prompt: 'Add JSDoc comments and inline documentation to this code. Explain complex logic.',
-    icon: '📝'
+    icon: ''
   },
   {
     id: 'qp_typescript',
-    label: '📘 Add TypeScript types',
+    label: ' Add TypeScript types',
     prompt: 'Add proper TypeScript types to this code. Create interfaces for all data structures.',
-    icon: '📘'
+    icon: ''
   },
   {
     id: 'qp_refactor',
-    label: '♻️ Refactor',
+    label: ' Refactor',
     prompt: 'Refactor this code to be cleaner and more maintainable. Explain each change you make.',
-    icon: '♻️'
+    icon: ''
   },
   {
     id: 'qp_optimize',
-    label: '⚡ Optimize performance',
+    label: ' Optimize performance',
     prompt: 'Analyze and optimize this code for performance. Explain the bottlenecks and fixes.',
-    icon: '⚡'
+    icon: ''
   }
 ]
 
@@ -692,7 +692,7 @@ export class NotificationGenerator {
     return {
       id: 'notif_welcome',
       type: 'welcome',
-      title: `👋 Welcome to ${BRAND_NAME}`,
+      title: ` Welcome to ${BRAND_NAME}`,
       description: 'Start with a template or describe what you want to build',
       priority: 100,
       prompt: {
@@ -722,7 +722,7 @@ export class NotificationGenerator {
     return {
       id: 'notif_continue',
       type: 'continue_project',
-      title: '▶️ Continue Your Project',
+      title: '▶ Continue Your Project',
       description: lastSession?.summary || 'Pick up where you left off',
       priority: 95,
       prompt: {
@@ -768,7 +768,7 @@ What should we work on next?`,
         suggestions.push({
           id: 'notif_add_tests',
           type: 'suggested_task',
-          title: '🧪 Add Tests to Your Project',
+          title: ' Add Tests to Your Project',
           description: 'Your project has no tests. Want me to generate them?',
           priority: 70,
           prompt: PROMPT_TEMPLATES.find(t => t.id === 'tpl_component')!.prompts[0]
@@ -780,7 +780,7 @@ What should we work on next?`,
         suggestions.push({
           id: 'notif_add_docs',
           type: 'suggested_task',
-          title: '📝 Document Your Code',
+          title: ' Document Your Code',
           description: 'Add documentation to make your code easier to maintain',
           priority: 60,
           prompt: {
@@ -808,12 +808,12 @@ What should we work on next?`,
   private createDailyPrompt(): NewChatNotification {
     const dailyPrompts = [
       {
-        title: '🎯 Build Something New',
+        title: ' Build Something New',
         description: 'Create a new component or feature today',
         template: PROMPT_TEMPLATES.find(t => t.id === 'tpl_component')!.prompts[0]
       },
       {
-        title: '🔍 Code Review',
+        title: ' Code Review',
         description: 'Let me review your code for improvements',
         template: {
           id: 'p_review',
@@ -832,7 +832,7 @@ What should we work on next?`,
         }
       },
       {
-        title: '⚡ Performance Check',
+        title: ' Performance Check',
         description: 'Optimize your app\'s performance',
         template: {
           id: 'p_perf',

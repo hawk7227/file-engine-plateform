@@ -10,10 +10,10 @@ interface SettingsModalProps {
 }
 
 const MODEL_TIERS = [
-  { id: 'auto', name: 'Auto', desc: 'Best model for your task', icon: '✨' },
-  { id: 'fast', name: 'Fast', desc: 'Quick responses for rapid iteration', icon: '⚡' },
-  { id: 'pro', name: 'Pro', desc: 'Best balance of speed & quality', icon: '🚀' },
-  { id: 'premium', name: 'Premium', desc: 'Highest quality for complex projects', icon: '💎' }
+  { id: 'auto', name: 'Auto', desc: 'Best model for your task', icon: '' },
+  { id: 'fast', name: 'Fast', desc: 'Quick responses for rapid iteration', icon: '' },
+  { id: 'pro', name: 'Pro', desc: 'Best balance of speed & quality', icon: '' },
+  { id: 'premium', name: 'Premium', desc: 'Highest quality for complex projects', icon: '' }
 ]
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
@@ -89,7 +89,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
         <div className="ai-provider-section">
           <div className="ai-provider-title">API Keys (Optional — Bring Your Own)</div>
           <div className="form-group" style={{ marginBottom: 12 }}>
-            <label className="form-label">Primary API Key {hasPrimaryKey && <span style={{color:'var(--accent-primary,#00ff88)',fontSize:11}}>✓ Set</span>}</label>
+            <label className="form-label">Primary API Key {hasPrimaryKey && <span style={{color:'var(--accent-primary,var(--accent-primary))',fontSize:11}}>✓ Set</span>}</label>
             <input
               type="password"
               className="form-input"
@@ -100,7 +100,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
             />
           </div>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">Secondary API Key {hasSecondaryKey && <span style={{color:'var(--accent-primary,#00ff88)',fontSize:11}}>✓ Set</span>}</label>
+            <label className="form-label">Secondary API Key {hasSecondaryKey && <span style={{color:'var(--accent-primary,var(--accent-primary))',fontSize:11}}>✓ Set</span>}</label>
             <input
               type="password"
               className="form-input"

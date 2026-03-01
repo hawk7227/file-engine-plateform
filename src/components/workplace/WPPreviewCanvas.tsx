@@ -163,7 +163,7 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
             className="wp-browser"
             style={{ left: '60%', top: '8%', width: browserSize.w, height: browserSize.h }}
           >
-            <div className="wp-browser-close" onClick={onCloseBrowser}>✕</div>
+            <div className="wp-browser-close" onClick={onCloseBrowser}></div>
             <div className="wp-browser-tb">
               <div className="wp-traffic">
                 <span className="t-r" onClick={onCloseBrowser} />
@@ -174,7 +174,7 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
                 <span style={{ opacity: .4 }}>‹</span> › ⟳
               </div>
               <div className="wp-browser-url">
-                <span className="lk">🔒</span>
+                <span className="lk"></span>
                 {previewUrl || 'staging.fileengine.com'}
               </div>
             </div>

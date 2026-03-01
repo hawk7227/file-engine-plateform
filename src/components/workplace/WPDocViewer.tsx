@@ -32,7 +32,7 @@ const S = {
   },
   sqlRun: {
     padding: '2px 8px', borderRadius: 4, fontSize: 7, fontWeight: 700,
-    background: 'linear-gradient(135deg, var(--wp-accent), var(--wp-blue))',
+    background: 'var(--accent-primary), var(--wp-blue))',
     color: '#000', border: 'none', cursor: 'pointer', fontFamily: 'var(--wp-font)',
   },
   th: {
@@ -47,7 +47,7 @@ const S = {
     textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
   },
   logBadge: (type: string) => ({
-    fontSize: 5, fontWeight: 700, padding: '2px 6px', borderRadius: 10, flexShrink: 0, marginTop: 2, whiteSpace: 'nowrap' as const,
+    fontSize: 5, fontWeight: 700, padding: '2px 6px', borderRadius: 12, flexShrink: 0, marginTop: 2, whiteSpace: 'nowrap' as const,
     background: type === 'pass' ? 'rgba(52,211,153,.08)' : type === 'fail' ? 'rgba(248,113,113,.08)' : type === 'fix' ? 'rgba(96,165,250,.08)' : 'rgba(251,191,36,.08)',
     color: type === 'pass' ? 'var(--wp-accent)' : type === 'fail' ? 'var(--wp-red)' : type === 'fix' ? 'var(--wp-blue)' : 'var(--wp-yellow)',
   }),
@@ -144,7 +144,7 @@ export function WPDocViewer({ activeTab, onTabChange, onExpand, expanded, previe
         </div>
         {sqlError && (
           <div style={{ padding: '4px 8px', fontSize: 8, color: 'var(--wp-red)', background: 'rgba(248,113,113,.04)' }}>
-            ❌ {sqlError}
+             {sqlError}
           </div>
         )}
         {sqlMeta && (
@@ -192,16 +192,16 @@ export function WPDocViewer({ activeTab, onTabChange, onExpand, expanded, previe
       {/* GIT */}
       <div style={S.pane(activeTab === 'git')}>
         <div style={{ padding: 8, fontSize: 9, color: 'var(--wp-text-3)', fontFamily: 'var(--wp-mono)', lineHeight: 1.8 }}>
-          📁 src/<br />
-          &nbsp;&nbsp;📁 app/<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;📁 api/<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 chat/route.ts <span style={{ color: 'var(--wp-accent)' }}>M</span><br />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 deploy/route.ts<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;📄 page.tsx <span style={{ color: 'var(--wp-accent)' }}>M</span><br />
-          &nbsp;&nbsp;📁 components/<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;📄 PricingTable.tsx <span style={{ color: 'var(--wp-blue)' }}>A</span><br />
-          &nbsp;&nbsp;📁 lib/<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;📄 ai.ts <span style={{ color: 'var(--wp-accent)' }}>M</span>
+           src/<br />
+          &nbsp;&nbsp; app/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp; api/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; chat/route.ts <span style={{ color: 'var(--wp-accent)' }}>M</span><br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; deploy/route.ts<br />
+          &nbsp;&nbsp;&nbsp;&nbsp; page.tsx <span style={{ color: 'var(--wp-accent)' }}>M</span><br />
+          &nbsp;&nbsp; components/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp; PricingTable.tsx <span style={{ color: 'var(--wp-blue)' }}>A</span><br />
+          &nbsp;&nbsp; lib/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp; ai.ts <span style={{ color: 'var(--wp-accent)' }}>M</span>
         </div>
       </div>
 
@@ -226,7 +226,7 @@ export function WPDocViewer({ activeTab, onTabChange, onExpand, expanded, previe
             borderBottom: '1px solid var(--wp-border)', cursor: 'pointer',
           }}>
             <span style={S.logBadge(l.status)}>
-              {l.status === 'pass' ? '✅ PASS' : l.status === 'fail' ? '❌ FAIL' : l.status === 'fix' ? '🔧 FIX' : '⚡ ACT'}
+              {l.status === 'pass' ? ' PASS' : l.status === 'fail' ? ' FAIL' : l.status === 'fix' ? ' FIX' : ' ACT'}
             </span>
             <div>
               <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--wp-text-1)' }}>

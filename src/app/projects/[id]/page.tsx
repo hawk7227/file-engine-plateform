@@ -185,14 +185,14 @@ export default function ProjectPage() {
         <div className="header-actions">
           {project.deploy_url && (
             <a href={project.deploy_url} target="_blank" rel="noopener noreferrer" className="action-btn">
-              🌐 View Site
+               View Site
             </a>
           )}
           <button onClick={handleDeploy} className="action-btn primary">
-            🚀 Deploy
+             Deploy
           </button>
           <button onClick={() => router.push('/dashboard')} className="action-btn">
-            💬 Continue Building
+             Continue Building
           </button>
         </div>
       </header>
@@ -202,19 +202,19 @@ export default function ProjectPage() {
           className={`tab ${activeTab === 'files' ? 'active' : ''}`}
           onClick={() => setActiveTab('files')}
         >
-          📁 Files ({files.length})
+           Files ({files.length})
         </button>
         <button 
           className={`tab ${activeTab === 'builds' ? 'active' : ''}`}
           onClick={() => setActiveTab('builds')}
         >
-          🔨 Builds ({builds.length})
+           Builds ({builds.length})
         </button>
         <button 
           className={`tab ${activeTab === 'settings' ? 'active' : ''}`}
           onClick={() => setActiveTab('settings')}
         >
-          ⚙️ Settings
+           Settings
         </button>
       </div>
 
@@ -234,10 +234,10 @@ export default function ProjectPage() {
                       onClick={() => setSelectedFile(file)}
                     >
                       <span className="file-icon">
-                        {file.path.endsWith('.tsx') ? '⚛️' : 
-                         file.path.endsWith('.ts') ? '📘' :
-                         file.path.endsWith('.css') ? '🎨' :
-                         file.path.endsWith('.json') ? '📋' : '📄'}
+                        {file.path.endsWith('.tsx') ? '' : 
+                         file.path.endsWith('.ts') ? '' :
+                         file.path.endsWith('.css') ? '' :
+                         file.path.endsWith('.json') ? '' : ''}
                       </span>
                       <span className="file-name">{file.path}</span>
                     </li>
@@ -275,9 +275,9 @@ export default function ProjectPage() {
                 {builds.map(build => (
                   <li key={build.id} className={`build-item ${build.status}`}>
                     <div className="build-status">
-                      {build.status === 'completed' ? '✅' :
-                       build.status === 'failed' ? '❌' :
-                       build.status === 'running' ? '🔄' : '⏳'}
+                      {build.status === 'completed' ? '' :
+                       build.status === 'failed' ? '' :
+                       build.status === 'running' ? '' : '⏳'}
                     </div>
                     <div className="build-info">
                       <p className="build-prompt">{build.prompt.slice(0, 100)}...</p>
@@ -441,7 +441,7 @@ const styles = `
 
   .action-btn {
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 13px;
     cursor: pointer;
     background: var(--bg-tertiary);
@@ -517,7 +517,7 @@ const styles = `
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
   }
@@ -635,7 +635,7 @@ const styles = `
     padding: 8px 12px;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-primary);
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--text-primary);
     font-size: 14px;
   }
@@ -659,7 +659,7 @@ const styles = `
     background: var(--accent-orange);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
   }

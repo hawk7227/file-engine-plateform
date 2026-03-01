@@ -118,12 +118,12 @@ export default function LandingPage() {
   ]
 
   const useCases = [
-    { title: 'Full-Stack Apps', description: 'Complete web applications with frontend, backend, and database', image: '🚀' },
-    { title: 'Landing Pages', description: 'Beautiful, responsive marketing pages deployed in minutes', image: '🎨' },
-    { title: 'Dashboards', description: 'Admin panels with real-time charts, tables, and auth', image: '📊' },
-    { title: 'APIs + Backends', description: 'REST/GraphQL APIs with authentication and validation', image: '🔌' },
-    { title: 'Media Content', description: 'AI-generated videos, audio, voice, and 3D assets', image: '🎬' },
-    { title: 'Mobile-Ready UIs', description: 'Responsive React components that work on every device', image: '📱' }
+    { title: 'Full-Stack Apps', description: 'Complete web applications with frontend, backend, and database', image: 'rocket' },
+    { title: 'Landing Pages', description: 'Beautiful, responsive marketing pages deployed in minutes', image: 'palette' },
+    { title: 'Dashboards', description: 'Admin panels with real-time charts, tables, and auth', image: 'chart' },
+    { title: 'APIs + Backends', description: 'REST/GraphQL APIs with authentication and validation', image: 'plug' },
+    { title: 'Media Content', description: 'AI-generated videos, audio, voice, and 3D assets', image: 'film' },
+    { title: 'Mobile-Ready UIs', description: 'Responsive React components that work on every device', image: 'phone' }
   ]
 
   const competitors = [
@@ -343,12 +343,12 @@ export default function LandingPage() {
                   <span className="text-green-400">All checks passed</span>
                 </div>
                 <div className="space-y-2 text-zinc-400">
-                  <div>✓ Syntax valid</div>
-                  <div>✓ Types correct</div>
-                  <div>✓ Imports resolved</div>
-                  <div>✓ React rules followed</div>
-                  <div>✓ No security issues</div>
-                  <div>✓ Best practices met</div>
+                  <div> Syntax valid</div>
+                  <div> Types correct</div>
+                  <div> Imports resolved</div>
+                  <div> React rules followed</div>
+                  <div> No security issues</div>
+                  <div> Best practices met</div>
                   <div className="pt-4 text-green-400">→ Code ready for production</div>
                 </div>
               </div>
@@ -397,7 +397,7 @@ export default function LandingPage() {
                 <ul className="space-y-2">
                   {comp.lacks.map((lack, j) => (
                     <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
-                      <span className="text-red-400 mt-0.5 flex-shrink-0">✗</span>
+                      <span className="text-red-400 mt-0.5 flex-shrink-0"></span>
                       <span>{lack}</span>
                     </li>
                   ))}
@@ -408,7 +408,7 @@ export default function LandingPage() {
 
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-3 bg-zinc-900 border border-emerald-700/50 rounded-xl px-8 py-5">
-              <span className="text-3xl">⚡</span>
+              <span className="text-3xl"></span>
               <div className="text-left">
                 <div className="text-lg font-bold text-white">{BRAND_NAME} Pro: $19/mo — everything included</div>
                 <div className="text-sm text-zinc-400">Agentic AI • Code execution • One-click deploy • Media generation • Vision analysis • Dual-provider failover • No implementation fees</div>

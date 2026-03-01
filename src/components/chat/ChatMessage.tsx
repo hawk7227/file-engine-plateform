@@ -198,45 +198,45 @@ function formatText(text: string): React.ReactNode {
 
 const TOOL_LABELS: Record<string, { label: string; icon: string }> = {
   // File operations
-  'create_file': { label: 'Creating file', icon: '📄' },
-  'edit_file': { label: 'Editing file', icon: '✏️' },
-  'write_file': { label: 'Writing file', icon: '📝' },
-  'read_file': { label: 'Reading file', icon: '👁️' },
-  'view_file': { label: 'Reading file', icon: '👁️' },
-  'delete_file': { label: 'Removing file', icon: '🗑️' },
+  'create_file': { label: 'Creating file', icon: '' },
+  'edit_file': { label: 'Editing file', icon: '' },
+  'write_file': { label: 'Writing file', icon: '' },
+  'read_file': { label: 'Reading file', icon: '' },
+  'view_file': { label: 'Reading file', icon: '' },
+  'delete_file': { label: 'Removing file', icon: '' },
   // Code operations
-  'execute_code': { label: 'Running code', icon: '⚡' },
-  'run_command': { label: 'Running command', icon: '⚡' },
-  'bash': { label: 'Running command', icon: '⚡' },
-  'terminal': { label: 'Running command', icon: '⚡' },
+  'execute_code': { label: 'Running code', icon: '' },
+  'run_command': { label: 'Running command', icon: '' },
+  'bash': { label: 'Running command', icon: '' },
+  'terminal': { label: 'Running command', icon: '' },
   // Search/research
-  'web_search': { label: 'Searching the web', icon: '🔍' },
-  'search': { label: 'Searching', icon: '🔍' },
-  'fetch_url': { label: 'Fetching resource', icon: '🌐' },
+  'web_search': { label: 'Searching the web', icon: '' },
+  'search': { label: 'Searching', icon: '' },
+  'fetch_url': { label: 'Fetching resource', icon: '' },
   // Analysis
-  'analyze_image': { label: 'Analyzing image', icon: '🖼️' },
-  'vision': { label: 'Analyzing image', icon: '🖼️' },
+  'analyze_image': { label: 'Analyzing image', icon: '' },
+  'vision': { label: 'Analyzing image', icon: '' },
   // Deploy
-  'deploy': { label: 'Deploying', icon: '🚀' },
-  'build': { label: 'Building project', icon: '🔨' },
+  'deploy': { label: 'Deploying', icon: '' },
+  'build': { label: 'Building project', icon: '' },
 }
 
 const PHASE_LABELS: Record<string, { label: string; icon: string }> = {
-  'thinking': { label: 'Thinking...', icon: '💭' },
-  'planning': { label: 'Planning approach...', icon: '📋' },
-  'searching': { label: 'Searching...', icon: '🔍' },
-  'creating': { label: 'Writing code...', icon: '✨' },
-  'editing': { label: 'Editing code...', icon: '✏️' },
-  'analyzing': { label: 'Analyzing...', icon: '🔬' },
-  'running': { label: 'Running...', icon: '⚡' },
+  'thinking': { label: 'Thinking...', icon: '' },
+  'planning': { label: 'Planning approach...', icon: '' },
+  'searching': { label: 'Searching...', icon: '' },
+  'creating': { label: 'Writing code...', icon: '' },
+  'editing': { label: 'Editing code...', icon: '' },
+  'analyzing': { label: 'Analyzing...', icon: '' },
+  'running': { label: 'Running...', icon: '' },
 }
 
 function getToolLabel(toolName: string): { label: string; icon: string } {
-  return TOOL_LABELS[toolName] || { label: `Processing`, icon: '⚙️' }
+  return TOOL_LABELS[toolName] || { label: `Processing`, icon: '' }
 }
 
 function getPhaseLabel(phase: string): { label: string; icon: string } {
-  return PHASE_LABELS[phase] || { label: 'Working...', icon: '⚙️' }
+  return PHASE_LABELS[phase] || { label: 'Working...', icon: '' }
 }
 
 // =====================================================

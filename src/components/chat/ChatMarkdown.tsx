@@ -21,7 +21,7 @@ const MARKDOWN_CSS = `
 .md-content p:last-child { margin-bottom: 0; }
 .md-content strong { color: var(--text-primary, #fff); font-weight: 600; }
 .md-content em { font-style: italic; }
-.md-content a { color: var(--accent-blue, #0088ff); text-decoration: none; }
+.md-content a { color: var(--accent-blue, var(--accent-primary)); text-decoration: none; }
 .md-content a:hover { text-decoration: underline; }
 .md-content h1,.md-content h2,.md-content h3,.md-content h4 { color: var(--text-primary, #fff); font-weight: 700; margin: 20px 0 8px; }
 .md-content h1 { font-size: 1.4em; }
@@ -30,7 +30,7 @@ const MARKDOWN_CSS = `
 .md-content ul,.md-content ol { margin: 8px 0; padding-left: 24px; }
 .md-content li { margin: 4px 0; }
 .md-content li::marker { color: var(--text-muted, #6a6a7a); }
-.md-content blockquote { border-left: 3px solid var(--accent-purple, #8a2be2); padding: 4px 16px; margin: 12px 0; background: rgba(138,43,226,.06); border-radius: 0 6px 6px 0; }
+.md-content blockquote { border-left: 3px solid var(--accent-purple, var(--accent-primary)); padding: 4px 16px; margin: 12px 0; background: rgba(138,43,226,.06); border-radius: 0 6px 6px 0; }
 .md-content hr { border: none; border-top: 1px solid var(--border-subtle, #1e1e28); margin: 16px 0; }
 .md-content table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
 .md-content th { text-align: left; padding: 8px 12px; background: var(--bg-tertiary, #13131a); color: var(--text-primary, #fff); font-weight: 600; border-bottom: 1px solid var(--border-default, #2a2a38); }
@@ -39,12 +39,12 @@ const MARKDOWN_CSS = `
 /* ── Inline code ── */
 .md-content code {
   padding: 2px 6px; background: rgba(255,255,255,.06); border: 1px solid var(--border-subtle, #1e1e28);
-  border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.88em; color: var(--accent-primary, #00ff88);
+  border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.88em; color: var(--accent-primary, var(--accent-primary));
 }
 
 /* ── File Card (Claude-style collapsed code block) ── */
 .file-card {
-  margin: 12px 0; border: 1px solid var(--border-subtle, #1e1e28); border-radius: 10px;
+  margin: 12px 0; border: 1px solid var(--border-subtle, #1e1e28); border-radius: 12px;
   overflow: hidden; background: var(--bg-secondary, #0d0d12); transition: border-color 0.2s;
 }
 .file-card:hover { border-color: var(--border-default, #2a2a38); }
@@ -54,7 +54,7 @@ const MARKDOWN_CSS = `
 }
 .file-card-header:hover { background: rgba(255,255,255,0.03); }
 .file-card-icon {
-  width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center;
+  width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center;
   justify-content: center; font-size: 13px; flex-shrink: 0;
 }
 .file-card-icon.html { background: rgba(255,99,34,0.15); color: #ff6322; }
@@ -76,7 +76,7 @@ const MARKDOWN_CSS = `
   color: var(--text-muted, #6a6a7a); cursor: pointer; transition: all 0.15s;
 }
 .file-card-btn:hover { background: var(--bg-elevated, #1a1a24); color: var(--text-primary, #fff); }
-.file-card-btn.copied { color: var(--accent-primary, #00ff88); border-color: var(--accent-primary, #00ff88); }
+.file-card-btn.copied { color: var(--accent-primary, var(--accent-primary)); border-color: var(--accent-primary, var(--accent-primary)); }
 .file-card-chevron {
   font-size: 10px; color: var(--text-muted, #6a6a7a); transition: transform 0.2s; flex-shrink: 0;
 }
@@ -94,30 +94,30 @@ const MARKDOWN_CSS = `
 
 /* ── Streaming code card (shows while AI writes code) ── */
 .code-streaming-card {
-  margin: 12px 0; border: 1px solid rgba(0,255,136,0.2); border-radius: 10px;
+  margin: 12px 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 12px;
   overflow: hidden; background: var(--bg-secondary, #0d0d12);
   animation: cardPulse 2s ease-in-out infinite;
 }
 @keyframes cardPulse {
-  0%, 100% { border-color: rgba(0,255,136,0.15); }
-  50% { border-color: rgba(0,255,136,0.35); }
+  0%, 100% { border-color: rgba(16,185,129,0.15); }
+  50% { border-color: rgba(16,185,129,0.35); }
 }
 .code-streaming-header {
   display: flex; align-items: center; gap: 10px; padding: 10px 14px;
   background: var(--bg-tertiary, #13131a);
 }
 .code-streaming-spinner {
-  width: 16px; height: 16px; border: 2px solid rgba(0,255,136,0.2);
-  border-top-color: var(--accent-primary, #00ff88); border-radius: 50%;
+  width: 16px; height: 16px; border: 2px solid rgba(16,185,129,0.2);
+  border-top-color: var(--accent-primary, var(--accent-primary)); border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .code-streaming-info { flex: 1; }
 .code-streaming-name { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 600; color: var(--text-primary, #fff); }
-.code-streaming-status { font-size: 11px; color: var(--accent-primary, #00ff88); }
+.code-streaming-status { font-size: 11px; color: var(--accent-primary, var(--accent-primary)); }
 .code-streaming-progress { height: 2px; background: var(--bg-elevated, #1a1a24); }
 .code-streaming-progress-bar {
-  height: 100%; background: linear-gradient(90deg, var(--accent-primary, #00ff88), var(--accent-blue, #0088ff));
+  height: 100%; background: var(--accent-primary)), var(--accent-blue, var(--accent-primary)));
   animation: progressSweep 2s ease-in-out infinite;
 }
 @keyframes progressSweep { 0% { width: 5%; } 50% { width: 70%; } 100% { width: 95%; } }
@@ -128,7 +128,7 @@ const MARKDOWN_CSS = `
   font-size: 13px; color: var(--text-muted, #6a6a7a);
 }
 .streaming-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary, #00ff88);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary, var(--accent-primary));
   animation: streamPulse 1.5s ease-in-out infinite;
 }
 @keyframes streamPulse {
@@ -139,7 +139,7 @@ const MARKDOWN_CSS = `
 /* ── Activity Log (Claude-style tool use indicator) ── */
 .streaming-activity-log {
   margin: 8px 0; padding: 10px 14px; background: var(--bg-tertiary, #13131a);
-  border: 1px solid var(--border-subtle, #1e1e28); border-radius: 10px;
+  border: 1px solid var(--border-subtle, #1e1e28); border-radius: 12px;
   font-size: 13px; overflow: hidden;
 }
 .activity-log-item {
@@ -153,17 +153,17 @@ const MARKDOWN_CSS = `
 }
 .activity-log-label { color: var(--text-secondary, #a0a0b0); flex: 1; }
 .activity-log-status { font-size: 11px; font-weight: 600; }
-.activity-log-status.active { color: var(--accent-primary, #00ff88); }
+.activity-log-status.active { color: var(--accent-primary, var(--accent-primary)); }
 .activity-log-status.done { color: var(--text-muted, #6a6a7a); }
 .activity-log-spinner {
-  width: 12px; height: 12px; border: 2px solid rgba(0,255,136,0.2);
-  border-top-color: var(--accent-primary, #00ff88); border-radius: 50%;
+  width: 12px; height: 12px; border: 2px solid rgba(16,185,129,0.2);
+  border-top-color: var(--accent-primary, var(--accent-primary)); border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 /* ── Claude-style Collapsible Action Block ── */
 .action-block {
-  margin: 8px 0; border: 1px solid var(--border-subtle, #1e1e28); border-radius: 10px;
+  margin: 8px 0; border: 1px solid var(--border-subtle, #1e1e28); border-radius: 12px;
   overflow: hidden; background: var(--bg-tertiary, #13131a); transition: border-color 0.2s;
 }
 .action-block:hover { border-color: var(--border-default, #2a2a38); }
@@ -173,11 +173,11 @@ const MARKDOWN_CSS = `
 }
 .action-block-header:hover { background: rgba(255,255,255,0.02); }
 .action-block-icon {
-  width: 24px; height: 24px; border-radius: 6px; display: flex;
+  width: 24px; height: 24px; border-radius: 8px; display: flex;
   align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;
-  background: rgba(0,255,136,0.1);
+  background: rgba(16,185,129,0.1);
 }
-.action-block-icon.streaming { background: rgba(0,255,136,0.15); }
+.action-block-icon.streaming { background: rgba(16,185,129,0.15); }
 .action-block-label {
   flex: 1; font-size: 13px; font-weight: 500; color: var(--text-secondary, #a0a0b0);
 }
@@ -211,7 +211,7 @@ const MARKDOWN_CSS = `
 }
 .streaming-code-preview::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
-  background: linear-gradient(transparent, var(--bg-secondary, #0d0d12));
+  background: var(--accent-bg));
   pointer-events: none;
 }
 
@@ -238,11 +238,11 @@ function injectStyles() {
 
 function getFileIcon(ext: string): string {
   const icons: Record<string, string> = {
-    html: '🌐', htm: '🌐', tsx: '⚛️', jsx: '⚛️', ts: '📘', js: '📒',
-    css: '🎨', scss: '🎨', json: '📋', md: '📝', py: '🐍', sql: '🗄️',
-    sh: '⚡', yaml: '⚙️', yml: '⚙️', svg: '🖼️', txt: '📄',
+    html: '', htm: '', tsx: '', jsx: '', ts: '', js: '',
+    css: '', scss: '', json: '', md: '', py: '', sql: '',
+    sh: '', yaml: '', yml: '', svg: '', txt: '',
   }
-  return icons[ext] || '📄'
+  return icons[ext] || ''
 }
 
 function getFileClass(ext: string): string {
@@ -300,15 +300,15 @@ function FileCard({ filename, language, code, lineCount }: {
 // =====================================================
 
 const PHASE_CONFIG: Record<string, { icon: string; bg: string; label: string }> = {
-  thinking:  { icon: '🧠', bg: 'rgba(168,85,247,.15)', label: 'Analyzing request...' },
-  planning:  { icon: '📋', bg: 'rgba(59,130,246,.15)', label: 'Planning approach...' },
-  searching: { icon: '🔍', bg: 'rgba(168,85,247,.15)', label: 'Searching for information...' },
-  creating:  { icon: '📄', bg: 'rgba(34,197,94,.15)',  label: 'Creating file...' },
-  editing:   { icon: '✏️', bg: 'rgba(59,130,246,.15)', label: 'Editing file...' },
-  analyzing: { icon: '👁️', bg: 'rgba(234,179,8,.15)',  label: 'Analyzing image...' },
-  running:   { icon: '⚡', bg: 'rgba(234,179,8,.15)',  label: 'Running command...' },
-  styling:   { icon: '🎨', bg: 'rgba(168,85,247,.15)', label: 'Applying design system...' },
-  generating:{ icon: '⚙️', bg: 'rgba(34,197,94,.15)',  label: 'Generating code...' },
+  thinking:  { icon: '', bg: 'rgba(168,85,247,.15)', label: 'Analyzing request...' },
+  planning:  { icon: '', bg: 'rgba(59,130,246,.15)', label: 'Planning approach...' },
+  searching: { icon: '', bg: 'rgba(168,85,247,.15)', label: 'Searching for information...' },
+  creating:  { icon: '', bg: 'rgba(34,197,94,.15)',  label: 'Creating file...' },
+  editing:   { icon: '', bg: 'rgba(59,130,246,.15)', label: 'Editing file...' },
+  analyzing: { icon: '', bg: 'rgba(234,179,8,.15)',  label: 'Analyzing image...' },
+  running:   { icon: '', bg: 'rgba(234,179,8,.15)',  label: 'Running command...' },
+  styling:   { icon: '', bg: 'rgba(168,85,247,.15)', label: 'Applying design system...' },
+  generating:{ icon: '', bg: 'rgba(34,197,94,.15)',  label: 'Generating code...' },
 }
 
 function StreamingActivityLog({ phase, message, completedPhases }: {
@@ -532,11 +532,11 @@ export function ChatMarkdown({ content, isStreaming, statusPhase, statusMessage 
 
   const getActionIcon = (filename: string) => {
     const ext = filename.split('.').pop() || ''
-    if (ext === 'html' || ext === 'htm') return '📄'
-    if (ext === 'css') return '🎨'
-    if (ext === 'js' || ext === 'ts' || ext === 'jsx' || ext === 'tsx') return '⚡'
-    if (ext === 'json') return '📋'
-    return '📄'
+    if (ext === 'html' || ext === 'htm') return ''
+    if (ext === 'css') return ''
+    if (ext === 'js' || ext === 'ts' || ext === 'jsx' || ext === 'tsx') return ''
+    if (ext === 'json') return ''
+    return ''
   }
   
   return (
@@ -561,12 +561,12 @@ export function ChatMarkdown({ content, isStreaming, statusPhase, statusMessage 
         }
         if (seg.type === 'streaming-file') {
           return (
-            <div key={`s-${i}-${seg.filename}`} className="action-block open" style={{ borderColor: 'rgba(0,255,136,0.2)' }}>
+            <div key={`s-${i}-${seg.filename}`} className="action-block open" style={{ borderColor: 'rgba(16,185,129,0.2)' }}>
               <div className="action-block-header">
                 <div className="action-block-icon streaming">
                   <div className="activity-log-spinner" style={{ width: 14, height: 14 }} />
                 </div>
-                <div className="action-block-label" style={{ color: 'var(--accent-primary, #00ff88)' }}>
+                <div className="action-block-label" style={{ color: 'var(--accent-primary, var(--accent-primary))' }}>
                   Writing {seg.filename}... ({seg.linesSoFar} lines)
                 </div>
               </div>
@@ -597,7 +597,7 @@ export function ChatMarkdown({ content, isStreaming, statusPhase, statusMessage 
         </div>
       )}
       {isStreaming && segments.length > 0 && !segments.some(s => s.type === 'streaming-file') && (
-        <span style={{ display: 'inline-block', width: 8, height: 16, background: 'var(--accent-primary, #00ff88)', animation: 'blink 1s infinite', verticalAlign: 'middle', marginLeft: 4, borderRadius: 2 }} />
+        <span style={{ display: 'inline-block', width: 8, height: 16, background: 'var(--accent-primary, var(--accent-primary))', animation: 'blink 1s infinite', verticalAlign: 'middle', marginLeft: 4, borderRadius: 2 }} />
       )}
     </div>
   )

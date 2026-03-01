@@ -2,33 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+/* §6: System font stack — no external font dependencies */
 
 :root {
-  --bg-primary: #07070a;
-  --bg-secondary: #0c0c10;
-  --bg-tertiary: #121218;
-  --bg-elevated: #1a1a22;
-  --border-subtle: #1e1e28;
-  --border-default: #2a2a38;
-  --text-primary: #f5f5f7;
-  --text-secondary: #a0a0b0;
-  --text-muted: #606070;
-  --accent-primary: #00ff88;
-  --accent-secondary: #00cc6a;
-  --accent-glow: rgba(0, 255, 136, 0.12);
-  --accent-blue: #0088ff;
-  --accent-purple: #8855ff;
-  --accent-orange: #ff6622;
-  --accent-yellow: #ffcc00;
-  --font-sans: 'Outfit', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* ═══ CONSTITUTION-LOCKED DESIGN TOKENS ═══ */
+
+  /* §6 Spacing (4px base) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+  --s-16: 64px; --s-20: 80px; --s-24: 96px;
+
+  /* §6 Radius (LOCKED) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-glow: 0 0 40px rgba(0, 255, 136, 0.15);
-  --shadow-glow-intense: 0 0 80px rgba(0, 255, 136, 0.25);
+  --radius-2xl: 24px;
+  --radius-full: 999px;
+
+  /* §6 Shadows (LOCKED) */
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 18px 60px rgba(0, 0, 0, 0.10);
+
+  /* §6 Motion (LOCKED: transform + opacity ONLY, 150-220ms) */
+  --motion-fast: 150ms;
+  --motion-normal: 180ms;
+  --motion-slow: 220ms;
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* Colors — §6: Maximum ONE accent color */
+  --bg-primary: #09090b;
+  --bg-secondary: #111114;
+  --bg-tertiary: #18181b;
+  --bg-elevated: #1f1f23;
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-default: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+  --accent-primary: #10b981;
+  --accent-dim: #059669;
+  --accent-bg: rgba(16, 185, 129, 0.08);
+  --accent-border: rgba(16, 185, 129, 0.2);
+  --accent-glow: rgba(16, 185, 129, 0.12);
+  --red: #ef4444;
+  --red-bg: rgba(239, 68, 68, 0.08);
+  --amber: #eab308;
+  --amber-bg: rgba(234, 179, 8, 0.08);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59, 130, 246, 0.08);
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Legacy aliases (for existing Tailwind/component compat) */
+  --accent-secondary: var(--accent-primary);
+  --accent-purple: var(--accent-primary);
+  --accent-orange: var(--red);
+  --accent-yellow: var(--amber);
+  --accent-blue: var(--blue);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+  --shadow-glow-intense: 0 0 40px var(--accent-glow);
 }
 
 * {
@@ -41,7 +78,11 @@ body {
   font-family: var(--font-sans);
   background: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100vh;
+  /* §7: Body must not scroll. App-shell required. */
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Buttons */
@@ -76,7 +117,7 @@ body {
 }
 
 .btn-deploy {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   color: var(--bg-primary);
   font-weight: 600;
 }
@@ -165,7 +206,7 @@ body {
 .auth-logo-mark {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
@@ -285,7 +326,7 @@ body {
   cursor: pointer;
   font-family: var(--font-sans);
   transition: all 0.15s;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   color: var(--bg-primary);
 }
 
@@ -524,7 +565,7 @@ body {
 .logo-mark {
   width: 30px;
   height: 30px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -579,7 +620,7 @@ body {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+  background: var(--accent-primary), var(--accent-orange));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -624,7 +665,7 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 12px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border: none;
   border-radius: var(--radius-md);
   color: var(--bg-primary);
@@ -674,7 +715,7 @@ body {
 
 .capacity-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border-radius: 2px;
   transition: width 0.5s;
 }
@@ -796,7 +837,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(90deg, rgba(0, 255, 136, 0.08), rgba(0, 136, 255, 0.08));
+  background: var(--accent-primary), rgba(0, 136, 255, 0.08));
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -862,7 +903,7 @@ body {
 .welcome-logo {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
@@ -986,7 +1027,7 @@ body {
 /* Input Area */
 .input-area {
   padding: 16px 32px 20px;
-  background: linear-gradient(to top, var(--bg-primary) 70%, transparent);
+  background: var(--accent-primary) 70%, transparent);
 }
 
 .input-wrapper {
@@ -1418,7 +1459,7 @@ body {
 
 .dash-bar {
   flex: 1;
-  background: linear-gradient(to top, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border-radius: 3px 3px 0 0;
   min-height: 10px;
 }
@@ -1553,11 +1594,11 @@ body {
 }
 
 .chat-message.user .chat-message-avatar {
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+  background: var(--accent-primary), var(--accent-orange));
 }
 
 .chat-message.assistant .chat-message-avatar {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   color: var(--bg-primary);
 }
 
@@ -1684,7 +1725,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  background: linear-gradient(90deg, rgba(0, 255, 136, 0.08), rgba(0, 136, 255, 0.08));
+  background: var(--accent-primary), rgba(0, 136, 255, 0.08));
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   margin-bottom: 10px;
@@ -1829,7 +1870,7 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+  background: var(--accent-primary), var(--accent-orange));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1853,7 +1894,7 @@ body {
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
@@ -1939,7 +1980,7 @@ body {
   color: var(--bg-primary);
   font-size: 10px;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .plan-features {
@@ -1963,7 +2004,7 @@ body {
 .btn-upgrade {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: var(--accent-primary), var(--accent-blue));
   border: none;
   border-radius: var(--radius-md);
   color: var(--bg-primary);

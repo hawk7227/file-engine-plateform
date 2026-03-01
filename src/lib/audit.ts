@@ -833,22 +833,22 @@ function generateSummary(
   let summary = `Project audit score: ${score}/100\n\n`
   
   if (status === 'complete') {
-    summary += '✅ Project structure is complete and ready for deployment.\n'
+    summary += ' Project structure is complete and ready for deployment.\n'
   } else {
-    summary += '⚠️ Project has issues that should be addressed:\n'
+    summary += ' Project has issues that should be addressed:\n'
   }
   
   if (criticalMissing > 0) {
-    summary += `\n🔴 ${criticalMissing} critical file(s) missing`
+    summary += `\n ${criticalMissing} critical file(s) missing`
   }
   if (importantMissing > 0) {
-    summary += `\n🟡 ${importantMissing} important file(s) missing`
+    summary += `\n ${importantMissing} important file(s) missing`
   }
   if (errorCount > 0) {
-    summary += `\n❌ ${errorCount} syntax error(s) found`
+    summary += `\n ${errorCount} syntax error(s) found`
   }
   if (warningCount > 0) {
-    summary += `\n⚠️ ${warningCount} warning(s) to review`
+    summary += `\n ${warningCount} warning(s) to review`
   }
   
   return summary

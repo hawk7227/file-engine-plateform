@@ -158,11 +158,11 @@ export async function GET(req: NextRequest) {
 
         // ── Aggregate ──
         const groups = [
-            { group: 'Environment Variables', icon: '🔑', checks: envChecks },
-            { group: 'Media & Provider Keys', icon: '🎬', checks: mediaChecks },
-            { group: 'Supabase Tables', icon: '🗄️', checks: tableChecks },
-            { group: 'Connectivity', icon: '🔌', checks: connectivityChecks },
-            { group: 'Build & Runtime', icon: '🚀', checks: buildChecks },
+            { group: 'Environment Variables', icon: '', checks: envChecks },
+            { group: 'Media & Provider Keys', icon: '', checks: mediaChecks },
+            { group: 'Supabase Tables', icon: '', checks: tableChecks },
+            { group: 'Connectivity', icon: '', checks: connectivityChecks },
+            { group: 'Build & Runtime', icon: '', checks: buildChecks },
         ]
 
         let total = 0, pass = 0, warn = 0, fail = 0

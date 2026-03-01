@@ -413,7 +413,7 @@ export async function runGenerationPipeline(
   onDetail?.(validateId!, '✓ Import validation passed')
   onProgress?.(validateId!, 60)
   await delay(200)
-  onDetail?.(validateId!, '⚠ Found 2 warnings')
+  onDetail?.(validateId!, ' Found 2 warnings')
   onProgress?.(validateId!, 80)
   await delay(200)
   onDetail?.(validateId!, '✓ Security check passed')

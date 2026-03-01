@@ -16,28 +16,28 @@ import { ChatMarkdown } from '@/components/chat/ChatMarkdown'
 
 const CSS = `
   :root {
-    --bg-primary: #07070a;
-    --bg-secondary: #0d0d12;
-    --bg-tertiary: #13131a;
-    --bg-elevated: #1a1a24;
-    --border-subtle: #1e1e28;
-    --border-default: #2a2a38;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0b0;
-    --text-muted: #6a6a7a;
-    --accent-primary: #00ff88;
-    --accent-blue: #0088ff;
-    --accent-purple: #8a2be2;
-    --accent-orange: #ff6622;
-    --accent-yellow: #ffc800;
-    --accent-glow: rgba(0, 255, 136, 0.3);
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
+    --bg-primary: #09090b;
+    --bg-secondary: #111114;
+    --bg-tertiary: #18181b;
+    --bg-elevated: #1f1f23;
+    --border-subtle: rgba(255,255,255,0.04);
+    --border-default: rgba(255,255,255,0.07);
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-muted: #52525b;
+    --accent-primary: #10b981;
+    --accent-blue: #3b82f6;
+    --accent-purple: #10b981;
+    --accent-orange: #ef4444;
+    --accent-yellow: #eab308;
+    --accent-glow: rgba(16, 185, 129, 0.12);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
     --radius-xl: 20px;
-    --shadow-glow: 0 0 20px rgba(0, 255, 136, 0.3);
-    --font-sans: 'Inter', -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --shadow-glow: 0 4px 14px rgba(0,0,0,0.06);
+    --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    --font-mono: 'SF Mono', 'JetBrains Mono', monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); line-height: 1.5; overflow: hidden; }
@@ -49,7 +49,7 @@ const CSS = `
   .header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); height: 56px; }
   .header-left { display: flex; align-items: center; gap: 20px; }
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #fff; }
-  .logo-mark { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--bg-primary); }
+  .logo-mark { width: 32px; height: 32px; background: var(--accent-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--bg-primary); }
   .header-divider { width: 1px; height: 24px; background: var(--border-subtle); }
   .header-stats { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); }
   .header-stats span { display: flex; align-items: center; gap: 6px; }
@@ -59,32 +59,32 @@ const CSS = `
   .header-right { display: flex; align-items: center; gap: 12px; }
 
   /* View Toggle */
-  .view-toggle { display: flex; background: var(--bg-tertiary); padding: 3px; border-radius: 6px; border: 1px solid var(--border-subtle); }
+  .view-toggle { display: flex; background: var(--bg-tertiary); padding: 3px; border-radius: 8px; border: 1px solid var(--border-subtle); }
   .view-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: transparent; border: none; border-radius: 4px; color: var(--text-muted); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
   .view-btn:hover { color: var(--text-secondary); }
   .view-btn.active { background: var(--bg-elevated); color: var(--text-primary); shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
   /* Project Badge */
-  .project-badge { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 6px; }
+  .project-badge { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; }
   .project-badge-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-  .live-badge { display: none; align-items: center; gap: 4px; padding: 2px 6px; background: rgba(0,255,136,0.1); color: var(--accent-primary); font-size: 10px; font-weight: 700; border-radius: 4px; text-transform: uppercase; }
+  .live-badge { display: none; align-items: center; gap: 4px; padding: 2px 6px; background: rgba(16,185,129,0.1); color: var(--accent-primary); font-size: 10px; font-weight: 700; border-radius: 4px; text-transform: uppercase; }
   .live-badge.visible { display: flex; }
   .dot { width: 4px; height: 4px; background: currentColor; border-radius: 50%; }
 
   /* Buttons */
-  .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+  .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
   .btn-primary { background: var(--text-primary); color: var(--bg-primary); }
   .btn-primary:hover { opacity: 0.9; }
   .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-subtle); }
   .btn-secondary:hover { background: var(--bg-elevated); }
   .btn-ghost { background: transparent; color: var(--text-secondary); }
   .btn-ghost:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-  .toolbar-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
+  .toolbar-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
   .toolbar-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-default); }
 
   /* Dropdown */
   .dropdown { position: relative; }
-  .dropdown-btn { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .dropdown-btn { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; }
   .dropdown-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
   .dropdown-menu { position: absolute; top: calc(100% + 4px); right: 0; min-width: 180px; background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: 8px; padding: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: all 0.15s; z-index: 100; }
   .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -97,21 +97,21 @@ const CSS = `
   .app-container { display: grid; grid-template-columns: 260px 1fr 400px; grid-template-rows: 60px 1fr 32px; height: 100vh; background: var(--bg-primary); }
   .header { grid-column: 1/-1; }
   .sidebar { grid-row: 2/-1; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; padding: 16px; gap: 24px; overflow-y: auto; }
-  .new-project-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
-  .new-project-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,255,136,0.2); }
+  .new-project-btn { width: 100%; padding: 12px; background: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+  .new-project-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
   .sidebar-section { display: flex; flex-direction: column; gap: 4px; }
   .sidebar-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; }
   .nav-item:hover, .nav-item.active { background: var(--bg-tertiary); color: var(--text-primary); }
   .nav-icon { font-size: 16px; opacity: 0.7; }
   .recent-list { display: flex; flex-direction: column; gap: 2px; }
-  .recent-item { padding: 8px 12px; border-radius: 6px; color: var(--text-secondary); font-size: 13px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .recent-item { padding: 8px 12px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .recent-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-  .recent-item.active { background: rgba(0,255,136,0.05); color: var(--accent-primary); }
+  .recent-item.active { background: rgba(16,185,129,0.05); color: var(--accent-primary); }
   
   .tool-card { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
   .tool-card:hover { border-color: var(--border-default); transform: translateY(-1px); }
-  .tool-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+  .tool-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
   .tool-info { flex: 1; min-width: 0; }
   .tool-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
   .tool-desc { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -121,9 +121,9 @@ const CSS = `
   .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .setting-row:last-child { margin-bottom: 0; }
   .setting-label { font-size: 12px; color: var(--text-secondary); }
-  .toggle { width: 36px; height: 20px; background: var(--bg-elevated); border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle { width: 36px; height: 20px; background: var(--bg-elevated); border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; }
   .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: var(--text-muted); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
-  .toggle.active { background: rgba(0,255,136,0.2); }
+  .toggle.active { background: rgba(16,185,129,0.2); }
   .toggle.active::after { transform: translateX(16px); background: var(--accent-primary); }
 
   /* Main Area */
@@ -141,9 +141,9 @@ const CSS = `
   .chat-message { display: flex; gap: 16px; opacity: 0; animation: fadeIn 0.3s forwards; }
   .chat-message.user { flex-direction: row-reverse; }
   @keyframes fadeIn { to { opacity: 1; } }
-  .chat-avatar { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+  .chat-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
   .chat-message.user .chat-avatar { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
-  .chat-message.assistant .chat-avatar { background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); color: var(--bg-primary); }
+  .chat-message.assistant .chat-avatar { background: var(--accent-primary); color: var(--bg-primary); }
   .chat-content { flex: 1; font-size: 15px; line-height: 1.6; color: var(--text-secondary); padding-top: 4px; }
   .chat-message.user .chat-content { color: var(--text-primary); text-align: right; background: var(--bg-tertiary); padding: 12px 16px; border-radius: 16px 16px 4px 16px; border: 1px solid var(--border-subtle); }
   .chat-content.streaming { /* streaming state handled by ChatMarkdown */ }
@@ -169,7 +169,7 @@ const CSS = `
   .input-box:focus-within { border-color: var(--accent-primary); }
   .input-field { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 15px; font-family: inherit; resize: none; max-height: 200px; outline: none; }
   .input-field::placeholder { color: var(--text-muted); }
-  .send-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--text-primary); color: var(--bg-primary); border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+  .send-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--text-primary); color: var(--bg-primary); border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
   .send-btn:hover { transform: scale(1.05); }
   .send-btn:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
 
@@ -187,7 +187,7 @@ const CSS = `
   .code-file-chevron { font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
   .expanded .code-file-chevron { transform: rotate(90deg); }
   .code-file-name { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); flex: 1; }
-  .code-file-badge { font-size: 9px; padding: 2px 6px; background: rgba(0,255,136,0.1); color: var(--accent-primary); border-radius: 4px; text-transform: uppercase; font-weight: 600; }
+  .code-file-badge { font-size: 9px; padding: 2px 6px; background: rgba(16,185,129,0.1); color: var(--accent-primary); border-radius: 4px; text-transform: uppercase; font-weight: 600; }
   .code-file-content { display: none; padding: 12px; border-top: 1px solid var(--border-subtle); background: var(--bg-primary); }
   .expanded .code-file-content { display: block; }
   .code-file-content pre { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); overflow-x: auto; white-space: pre; }
@@ -201,8 +201,8 @@ const CSS = `
   .go-live-pricing { font-size: 11px; color: var(--text-muted); margin-left: 4px; }
 
   .action-bar { padding: 12px; border-top: 1px solid var(--border-subtle); display: flex; gap: 8px; }
-  .download-btn { flex: 1; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; }
-  .deploy-btn { flex: 1; padding: 10px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue)); border: none; border-radius: 6px; color: var(--bg-primary); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,255,136,0.2); }
+  .download-btn { flex: 1; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; }
+  .deploy-btn { flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: var(--bg-primary); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
   .deploy-btn.success { background: var(--accent-primary); }
 
   /* Status Bar */
@@ -277,16 +277,16 @@ const CSS = `
 `
 
 const TOOLS = [
-  { id: 'web-app', name: 'Web App', desc: 'Full stack application', icon: '🌐', gradient: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' },
-  { id: 'landing-page', name: 'Landing Page', desc: 'High converting page', icon: '🎨', gradient: 'linear-gradient(135deg, #10b981, #3b82f6)' },
-  { id: 'database', name: 'Database', desc: 'Schema & Queries', icon: '🗄️', gradient: 'linear-gradient(135deg, #f59e0b, #ec4899)' },
-  { id: 'api', name: 'REST API', desc: 'Backend endpoints', icon: '⚡', gradient: 'linear-gradient(135deg, #6366f1, #ec4899)' }
+  { id: 'web-app', name: 'Web App', desc: 'Full stack application', icon: 'globe', gradient: 'none' },
+  { id: 'landing-page', name: 'Landing Page', desc: 'High converting page', icon: 'layout', gradient: 'none' },
+  { id: 'database', name: 'Database', desc: 'Schema & Queries', icon: 'database', gradient: 'none' },
+  { id: 'api', name: 'REST API', desc: 'Backend endpoints', icon: 'zap', gradient: 'none' }
 ]
 
 const VIDEO_TOOLS = [
-  { id: 'captions', name: 'Captions', desc: 'Auto-generate captions', icon: '📝', gradient: 'linear-gradient(135deg, #ef4444, #f59e0b)' },
-  { id: 'progress', name: 'Progress Bar', desc: 'Dynamic progress', icon: '📊', gradient: 'linear-gradient(135deg, #3b82f6, #10b981)' },
-  { id: 'watermark', name: 'Watermark', desc: 'Add branding', icon: '💧', gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }
+  { id: 'captions', name: 'Captions', desc: 'Auto-generate captions', icon: 'type', gradient: 'none' },
+  { id: 'progress', name: 'Progress Bar', desc: 'Dynamic progress', icon: 'bar-chart', gradient: 'none' },
+  { id: 'watermark', name: 'Watermark', desc: 'Add branding', icon: 'droplet', gradient: 'none' }
 ]
 
 type ViewMode = 'preview' | 'code'
@@ -751,7 +751,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
         id: Math.random().toString(36).substring(7),
         file,
         name: file.name,
-        icon: file.type.startsWith('image/') ? '🖼️' : '📄'
+        icon: file.type.startsWith('image/') ? '' : ''
       }));
       setAttachedFiles(prev => [...prev, ...newFiles]);
     }
@@ -808,13 +808,13 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     // ── STREAMING STATE: Show building activity panel ──
     if (isGenerating && !localPreviewHtml) {
       const phaseLabels: Record<string, { label: string; icon: string }> = {
-        thinking: { label: 'Analyzing request...', icon: '💭' },
-        planning: { label: 'Planning approach...', icon: '📋' },
-        searching: { label: 'Researching...', icon: '🔍' },
-        creating: { label: 'Writing code...', icon: '✨' },
-        editing: { label: 'Editing code...', icon: '✏️' },
-        analyzing: { label: 'Analyzing image...', icon: '🔬' },
-        running: { label: 'Running...', icon: '⚡' },
+        thinking: { label: 'Analyzing request...', icon: '' },
+        planning: { label: 'Planning approach...', icon: '' },
+        searching: { label: 'Researching...', icon: '' },
+        creating: { label: 'Writing code...', icon: '' },
+        editing: { label: 'Editing code...', icon: '' },
+        analyzing: { label: 'Analyzing image...', icon: '' },
+        running: { label: 'Running...', icon: 'zap' },
       }
       const currentPhase = phaseLabels[statusPhase || 'thinking'] || phaseLabels.thinking
       
@@ -837,7 +837,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       return (
         <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'32px 24px',gap:'16px',background:'var(--bg-secondary)'}}>
           {/* Animated spinner */}
-          <div style={{width:48,height:48,borderRadius:'50%',border:'3px solid rgba(0,255,136,0.1)',borderTopColor:'var(--accent-primary)',animation:'spin 1s linear infinite'}}/>
+          <div style={{width:48,height:48,borderRadius:'50%',border:'3px solid rgba(16,185,129,0.1)',borderTopColor:'var(--accent-primary)',animation:'spin 1s linear infinite'}}/>
           <style>{`@keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
           
           {/* Current phase */}
@@ -853,7 +853,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
           
           {/* Planning text output (design decisions streamed before code) */}
           {preCodeText && preCodeText.length > 10 && (
-            <div style={{maxWidth:360,padding:'12px 16px',background:'rgba(0,255,136,0.04)',border:'1px solid rgba(0,255,136,0.1)',borderRadius:10,fontSize:13,lineHeight:1.5,color:'var(--text-secondary)',animation:'fadeInUp 0.3s ease',textAlign:'center'}}>
+            <div style={{maxWidth:360,padding:'12px 16px',background:'rgba(16,185,129,0.04)',border:'1px solid rgba(16,185,129,0.1)',borderRadius:10,fontSize:13,lineHeight:1.5,color:'var(--text-secondary)',animation:'fadeInUp 0.3s ease',textAlign:'center'}}>
               {preCodeText.length > 200 ? preCodeText.slice(0, 200) + '...' : preCodeText}
             </div>
           )}
@@ -864,7 +864,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
               {fileActions.map((fa, i) => (
                 <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 10px',background:'rgba(255,255,255,0.02)',borderRadius:6,fontSize:12,color:'var(--text-muted)',animation:`fadeInUp 0.2s ease ${i*0.1}s both`}}>
                   {fa.done ? (
-                    fa.success ? <span style={{color:'#4ade80',fontSize:11}}>✓</span> : <span style={{color:'#f87171',fontSize:11}}>✗</span>
+                    fa.success ? <span style={{color:'#4ade80',fontSize:11}}>✓</span> : <span style={{color:'#f87171',fontSize:11}}>×</span>
                   ) : (
                     <span style={{width:10,height:10,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.1)',borderTopColor:'var(--accent-primary)',animation:'spin 0.8s linear infinite',flexShrink:0}}/>
                   )}
@@ -878,7 +878,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
           {/* Code shimmer bar (shows code is being written) */}
           {msgContent.includes('```') && (
             <div style={{width:'80%',maxWidth:300,height:6,borderRadius:3,background:'rgba(255,255,255,0.04)',overflow:'hidden',marginTop:4}}>
-              <div style={{width:'60%',height:'100%',borderRadius:3,background:'linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent)',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/>
+              <div style={{width:'60%',height:'100%',borderRadius:3,background:'var(--accent-bg)',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/>
             </div>
           )}
         </div>
@@ -891,7 +891,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
         <div style={{position:'relative',width:'100%',height:'100%'}}>
           <iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>
           {/* Building overlay badge */}
-          <div style={{position:'absolute',top:12,right:12,display:'flex',alignItems:'center',gap:6,padding:'4px 12px',background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)',borderRadius:20,fontSize:11,fontWeight:600,color:'#4ade80',zIndex:10,border:'1px solid rgba(0,255,136,0.2)'}}>
+          <div style={{position:'absolute',top:12,right:12,display:'flex',alignItems:'center',gap:6,padding:'4px 12px',background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)',borderRadius:20,fontSize:11,fontWeight:600,color:'#4ade80',zIndex:10,border:'1px solid rgba(16,185,129,0.2)'}}>
             <span style={{width:6,height:6,borderRadius:'50%',background:'#4ade80',animation:'pulse 1s infinite'}}/>
             <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
             Building... {elapsedTime > 0 && `${elapsedTime}s`}
@@ -901,18 +901,18 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     }
 
     // ── IDLE STATE ──
-    if(phase==='idle'){if(localPreviewHtml&&view==='preview'){return<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>}if(view==='code'&&(preview.files.length>0||projectFiles.length>0)){const filesToShow=preview.files.length>0?preview.files.map((f,i)=>({id:String(i),file_path:f.path,language:f.language||f.path.split('.').pop()||'',file_size:f.content.length,content:f.content})):projectFiles;return<div className="code-view">{loadingFiles?<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Loading files...</div></div>:filesToShow.map((f:any,i:number)=><div key={f.id||i} className={'code-file '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.file_path||f.path}</span><span className="code-file-badge">{f.language||'file'}</span></div><div className="code-file-content"><pre>{f.content||'Click to load content'}</pre><div className="code-file-footer"><span>{f.language||(f.file_path||f.path||'').split('.').pop()}</span><span>{typeof f.file_size==='number'?f.file_size+' bytes':f.content?f.content.split('\n').length+' lines':''}</span></div></div></div>)}</div>}return<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">Preview will appear here</div><div className="state-desc">Generate code to see a live preview</div></div>}
+    if(phase==='idle'){if(localPreviewHtml&&view==='preview'){return<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>}if(view==='code'&&(preview.files.length>0||projectFiles.length>0)){const filesToShow=preview.files.length>0?preview.files.map((f,i)=>({id:String(i),file_path:f.path,language:f.language||f.path.split('.').pop()||'',file_size:f.content.length,content:f.content})):projectFiles;return<div className="code-view">{loadingFiles?<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Loading files...</div></div>:filesToShow.map((f:any,i:number)=><div key={f.id||i} className={'code-file '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.file_path||f.path}</span><span className="code-file-badge">{f.language||'file'}</span></div><div className="code-file-content"><pre>{f.content||'Click to load content'}</pre><div className="code-file-footer"><span>{f.language||(f.file_path||f.path||'').split('.').pop()}</span><span>{typeof f.file_size==='number'?f.file_size+' bytes':f.content?f.content.split('\n').length+' lines':''}</span></div></div></div>)}</div>}return<div className="state-container"><div className="state-icon">preview</div><div className="state-title">Preview will appear here</div><div className="state-desc">Generate code to see a live preview</div></div>}
     if(phase==='verifying'||phase==='generating')return<div className="state-container"><div className="state-icon spin">⏳</div><div className="state-title">Building preview...</div><div className="state-desc">{phaseMessage||'Deploying...'}</div></div>
-    if(phase==='auto-fixing')return<div className="state-container"><div className="state-icon spin">🔧</div><div className="state-title">Auto-fixing errors...</div><div className="state-desc">Attempt {autoFixAttempts}/3</div></div>
-    if(phase==='previewing'){if(view==='preview')return localPreviewHtml?<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>:previewUrl?<iframe className="preview-iframe" src={previewUrl} title="Preview"/>:<div className="state-container"><div className="state-icon">👁️</div><div className="state-title">No preview URL</div></div>;return<div className="code-view">{preview.files.map((f,i)=><div key={i} className={'code-file validated '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.path}</span><span className="code-file-badge">validated</span></div><div className="code-file-content"><pre>{f.content}</pre><div className="code-file-footer"><span>{f.path.split('.').pop()}</span><span>{f.content.split('\n').length} lines</span></div></div></div>)}</div>}
+    if(phase==='auto-fixing')return<div className="state-container"><div className="state-icon spin"></div><div className="state-title">Auto-fixing errors...</div><div className="state-desc">Attempt {autoFixAttempts}/3</div></div>
+    if(phase==='previewing'){if(view==='preview')return localPreviewHtml?<iframe className="preview-iframe" srcDoc={localPreviewHtml} title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"/>:previewUrl?<iframe className="preview-iframe" src={previewUrl} title="Preview"/>:<div className="state-container"><div className="state-icon">preview</div><div className="state-title">No preview URL</div></div>;return<div className="code-view">{preview.files.map((f,i)=><div key={i} className={'code-file validated '+(expandedFiles.has(i)?'expanded':'')}><div className="code-file-header" onClick={()=>toggleFile(i)}><span className="code-file-chevron">▶</span><span className="code-file-name">{f.path}</span><span className="code-file-badge">validated</span></div><div className="code-file-content"><pre>{f.content}</pre><div className="code-file-footer"><span>{f.path.split('.').pop()}</span><span>{f.content.split('\n').length} lines</span></div></div></div>)}</div>}
 
-    if(phase==='deploying')return<div className="state-container"><div className="state-icon spin">🚀</div><div className="state-title">Deploying...</div></div>
-    if(phase==='complete')return<div className="state-container"><div className="state-icon">🎉</div><div className="state-title" style={{color:'var(--accent-green)'}}>Deployed!</div><div className="deploy-links">{deployResult?.vercelUrl&&<a href={deployResult.vercelUrl} target="_blank" rel="noopener noreferrer" className="deploy-link">↗️ {deployResult.vercelUrl}</a>}{deployResult?.githubUrl&&<a href={deployResult.githubUrl} target="_blank" rel="noopener noreferrer" className="deploy-link">↗️ {deployResult.githubUrl}</a>}</div></div>
-    if(phase==='error')return<div className="state-container"><div className="state-icon">❌</div><div className="state-title" style={{color:'var(--accent-red)'}}>Build Failed</div><div className="state-desc">{error}</div>{logs&&<details><summary>View logs</summary><pre style={{fontSize:'11px',color:'var(--accent-red)'}}>{logs}</pre></details>}</div>
+    if(phase==='deploying')return<div className="state-container"><div className="state-icon spin"></div><div className="state-title">Deploying...</div></div>
+    if(phase==='complete')return<div className="state-container"><div className="state-icon"></div><div className="state-title" style={{color:'var(--accent-green)'}}>Deployed!</div><div className="deploy-links">{deployResult?.vercelUrl&&<a href={deployResult.vercelUrl} target="_blank" rel="noopener noreferrer" className="deploy-link">↗ {deployResult.vercelUrl}</a>}{deployResult?.githubUrl&&<a href={deployResult.githubUrl} target="_blank" rel="noopener noreferrer" className="deploy-link">↗ {deployResult.githubUrl}</a>}</div></div>
+    if(phase==='error')return<div className="state-container"><div className="state-icon">×</div><div className="state-title" style={{color:'var(--accent-red)'}}>Build Failed</div><div className="state-desc">{error}</div>{logs&&<details><summary>View logs</summary><pre style={{fontSize:'11px',color:'var(--accent-red)'}}>{logs}</pre></details>}</div>
     return null
   }
   const isLive=preview.isPreviewReady,showBottomBar=preview.phase==='previewing'||preview.phase==='complete'||preview.files.length>0||!!localPreviewHtml,isDeployed=preview.phase==='complete'
-  const statusText=preview.phase==='previewing'?'✓ Preview ready':preview.phase==='verifying'?'⚡ Building...':preview.phase==='deploying'?'🚀 Deploying...':preview.phase==='complete'?'✓ Deployed!':preview.phase==='error'?'❌ Build failed':''
+  const statusText=preview.phase==='previewing'?'✓ Preview ready':preview.phase==='verifying'?' Building...':preview.phase==='deploying'?' Deploying...':preview.phase==='complete'?'✓ Deployed!':preview.phase==='error'?'× Build failed':''
   const userInitial=(profile?.full_name?.[0]||user?.email?.[0])?.toUpperCase()||'U'
   const planLabel=(subscription?.plan||'free').charAt(0).toUpperCase()+(subscription?.plan||'free').slice(1)
   const planColorMap: Record<string,string>={free:'#71717a',starter:'#f59e0b',pro:'#3b82f6',max:'#8b5cf6',enterprise:'#ec4899'}
@@ -922,7 +922,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
     <div className="app-container">
       <header className="header">
         <div className="header-left">
-          <button className="hamburger" onClick={()=>setSidebarOpen(v=>!v)}>☰</button>
+          <button className="hamburger" onClick={()=>setSidebarOpen(v=>!v)}>≡</button>
           <div className="logo"><div className="logo-mark">{BRAND_SHORT}</div>{BRAND_NAME}</div>
           <div className="header-divider"/>
           <div className="header-stats"><span><span className="stat-dot"/>Active: <span className="stat-value">{activeBuilds}/20</span></span><span>Queue: <span className="stat-value" style={{color:queuedBuilds>0?'var(--accent-yellow)':undefined}}>{queuedBuilds}</span></span></div>
@@ -930,10 +930,10 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
         <div className="header-right">
           <div className="view-toggle"><button className={'view-btn '+(view==='preview'?'active':'')} onClick={()=>setView('preview')}>◉ Preview</button><button className={'view-btn '+(view==='code'?'active':'')} onClick={()=>setView('code')}>▤ Code</button></div>
           <div className="project-badge"><span className="project-badge-name">{currentProjectName}</span><div className={'live-badge '+(isLive?'visible':'')}><span className="dot"/>Live</div></div>
-          <div className="dropdown"><button className="dropdown-btn" onClick={e=>{e.stopPropagation();setCopyMenuOpen(!copyMenuOpen)}}>Copy ▾</button><div className={'dropdown-menu '+(copyMenuOpen?'show':'')}><button className="dropdown-item" onClick={()=>handleCopy('code')}>📄 Copy code</button><button className="dropdown-item" onClick={()=>handleCopy('url')}>🔗 Copy URL</button></div></div>
-          <button className="toolbar-btn" onClick={()=>preview.files.length&&preview.verifyBuild(preview.files,{projectName:currentProjectName})} title="Refresh">🔄</button>
-          <div className="header-divider"/><button className="btn btn-ghost">⚙️</button><button className="btn btn-secondary">GitHub</button>
-          <button className="btn btn-primary" onClick={()=>preview.isPreviewReady&&handleDeploy('vercel')}>{isDeployed?'✓ Deployed':'🚀 Deploy'}</button>
+          <div className="dropdown"><button className="dropdown-btn" onClick={e=>{e.stopPropagation();setCopyMenuOpen(!copyMenuOpen)}}>Copy ▾</button><div className={'dropdown-menu '+(copyMenuOpen?'show':'')}><button className="dropdown-item" onClick={()=>handleCopy('code')}> Copy code</button><button className="dropdown-item" onClick={()=>handleCopy('url')}> Copy URL</button></div></div>
+          <button className="toolbar-btn" onClick={()=>preview.files.length&&preview.verifyBuild(preview.files,{projectName:currentProjectName})} title="Refresh"></button>
+          <div className="header-divider"/><button className="btn btn-ghost"></button><button className="btn btn-secondary">GitHub</button>
+          <button className="btn btn-primary" onClick={()=>preview.isPreviewReady&&handleDeploy('vercel')}>{isDeployed?'✓ Deployed':' Deploy'}</button>
           <div style={{position:'relative'}}>
             <div className="user-avatar" onClick={()=>setShowUserDropdown(v=>!v)} title={profile?.full_name||user?.email||'Profile'} style={{overflow:'hidden',border:'2px solid transparent',transition:'border-color .2s'}} onMouseEnter={e=>(e.currentTarget.style.borderColor='var(--accent-green)')} onMouseLeave={e=>(e.currentTarget.style.borderColor='transparent')}>
               {profile?.avatar_url?<img src={profile.avatar_url} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<span>{userInitial}</span>}
@@ -943,7 +943,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
               <div style={{position:'absolute',top:'calc(100% + 8px)',right:0,minWidth:'220px',background:'var(--bg-elevated)',border:'1px solid var(--border-default)',borderRadius:'var(--radius-lg)',boxShadow:'0 16px 48px rgba(0,0,0,.6)',zIndex:500,overflow:'hidden',animation:'dropIn .15s ease'}}>
                 <style>{`@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
                 <div style={{padding:'14px 16px',background:'var(--bg-tertiary)',borderBottom:'1px solid var(--border-subtle)',display:'flex',alignItems:'center',gap:'12px'}}>
-                  <div style={{width:'40px',height:'40px',borderRadius:'50%',background:'linear-gradient(135deg,var(--accent-purple),var(--accent-blue))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',fontWeight:700,flexShrink:0,overflow:'hidden'}}>
+                  <div style={{width:'40px',height:'40px',borderRadius:'50%',background:'var(--accent-primary)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',fontWeight:700,flexShrink:0,overflow:'hidden'}}>
                     {profile?.avatar_url?<img src={profile.avatar_url} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<span>{userInitial}</span>}
                   </div>
                   <div style={{flex:1,minWidth:0}}>
@@ -957,10 +957,10 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
                   <div style={{height:'4px',background:'var(--border-default)',borderRadius:'2px',overflow:'hidden'}}><div style={{height:'100%',borderRadius:'2px',background:usageToday>=planLimits.generations_per_day?'var(--accent-red)':usageToday>=planLimits.generations_per_day*.8?'var(--accent-yellow)':'var(--accent-green)',width:`${Math.min(100,(usageToday/planLimits.generations_per_day)*100)}%`,transition:'width .3s'}}/></div>
                 </div>}
                 <div style={{padding:'6px'}}>
-                  <button style={{display:'flex',alignItems:'center',gap:'8px',width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'4px',color:'var(--text-secondary)',fontSize:'12px',cursor:'pointer',textAlign:'left',fontFamily:'var(--font-sans)'}} onMouseEnter={e=>{e.currentTarget.style.background='var(--bg-tertiary)';e.currentTarget.style.color='var(--text-primary)'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color='var(--text-secondary)'}} onClick={()=>{setShowUserDropdown(false);setShowProfileModal(true)}}><span>👤</span> My Profile</button>
-                  <button style={{display:'flex',alignItems:'center',gap:'8px',width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'4px',color:'var(--text-secondary)',fontSize:'12px',cursor:'pointer',textAlign:'left',fontFamily:'var(--font-sans)'}} onMouseEnter={e=>{e.currentTarget.style.background='var(--bg-tertiary)';e.currentTarget.style.color='var(--text-primary)'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color='var(--text-secondary)'}} onClick={()=>{setShowUserDropdown(false);setShowSettingsModal(true)}}><span>⚙️</span> Settings</button>
+                  <button style={{display:'flex',alignItems:'center',gap:'8px',width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'4px',color:'var(--text-secondary)',fontSize:'12px',cursor:'pointer',textAlign:'left',fontFamily:'var(--font-sans)'}} onMouseEnter={e=>{e.currentTarget.style.background='var(--bg-tertiary)';e.currentTarget.style.color='var(--text-primary)'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color='var(--text-secondary)'}} onClick={()=>{setShowUserDropdown(false);setShowProfileModal(true)}}><span></span> My Profile</button>
+                  <button style={{display:'flex',alignItems:'center',gap:'8px',width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'4px',color:'var(--text-secondary)',fontSize:'12px',cursor:'pointer',textAlign:'left',fontFamily:'var(--font-sans)'}} onMouseEnter={e=>{e.currentTarget.style.background='var(--bg-tertiary)';e.currentTarget.style.color='var(--text-primary)'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color='var(--text-secondary)'}} onClick={()=>{setShowUserDropdown(false);setShowSettingsModal(true)}}><span></span> Settings</button>
                   <div style={{height:'1px',background:'var(--border-subtle)',margin:'4px 0'}}/>
-                  <button style={{display:'flex',alignItems:'center',gap:'8px',width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'4px',color:'#ef4444',fontSize:'12px',cursor:'pointer',textAlign:'left',fontFamily:'var(--font-sans)'}} onMouseEnter={e=>{e.currentTarget.style.background='rgba(239,68,68,.1)'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent'}} onClick={async()=>{setShowUserDropdown(false);await supabase.auth.signOut();window.location.href='/auth/login'}}><span>🚪</span> Sign Out</button>
+                  <button style={{display:'flex',alignItems:'center',gap:'8px',width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'4px',color:'#ef4444',fontSize:'12px',cursor:'pointer',textAlign:'left',fontFamily:'var(--font-sans)'}} onMouseEnter={e=>{e.currentTarget.style.background='rgba(239,68,68,.1)'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent'}} onClick={async()=>{setShowUserDropdown(false);await supabase.auth.signOut();window.location.href='/auth/login'}}><span></span> Sign Out</button>
                 </div>
               </div>
             </>}
@@ -971,18 +971,18 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       <aside className={`sidebar${sidebarOpen?' open':''}`}>
         <button className="new-project-btn" onClick={handleNewChat}>+ New Chat</button>
         <div className="sidebar-section">
-          <div className="nav-item" onClick={() => setShowChatsDialog(true)}><span className="nav-icon">💬</span><span>All Chats</span></div>
-          <div className="nav-item" onClick={() => setShowProjectsDialog(true)}><span className="nav-icon">📁</span><span>Projects</span></div>
+          <div className="nav-item" onClick={() => setShowChatsDialog(true)}><span className="nav-icon">chat</span><span>All Chats</span></div>
+          <div className="nav-item" onClick={() => setShowProjectsDialog(true)}><span className="nav-icon">folder</span><span>Projects</span></div>
         </div>
         <div className="sidebar-section"><div className="sidebar-label">Recent Chats</div><div className="recent-list">{chatsLoading?<div className="skeleton" style={{height:'72px'}}/>:savedChats.length===0?<div style={{fontSize:12,color:'var(--text-muted)',padding:'8px 12px'}}>No chats yet</div>:savedChats.slice(0,12).map(c=>{const isActive=currentChatId===c.id;const age=Date.now()-new Date(c.updated_at).getTime();const timeLabel=age<86400000?'today':age<172800000?'yesterday':new Date(c.updated_at).toLocaleDateString(undefined,{month:'short',day:'numeric'});return<div key={c.id} className={'recent-item '+(isActive?'active':'')} onClick={()=>handleLoadChat(c)} style={{display:'flex',justifyContent:'space-between',alignItems:'center'}} title={c.title}><div style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.title||'Untitled'}</div><div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}><span style={{fontSize:10,color:'var(--text-muted)'}}>{timeLabel}</span><button onClick={e=>{e.stopPropagation();if(confirm('Delete this chat?'))deleteChat(c.id)}} style={{background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:12,padding:'0 2px',opacity:0.4}} onMouseEnter={e=>(e.currentTarget.style.opacity='1')} onMouseLeave={e=>(e.currentTarget.style.opacity='0.4')}>×</button></div></div>})}</div></div>
         {projects.length>0&&<div className="sidebar-section"><div className="sidebar-label">Projects</div><div className="recent-list">{projects.slice(0,6).map(p=><div key={p.id} className={'recent-item '+(currentProjectId===p.id?'active':'')} onClick={()=>handleSelectProject(p)}>{p.name}</div>)}</div></div>}
         <div className="sidebar-section">{TOOLS.map(t=><div key={t.id} className="tool-card" onClick={()=>toast('info',t.name,t.desc)}><div className="tool-icon" style={{background:t.gradient}}>{t.icon}</div><div className="tool-info"><div className="tool-name">{t.name}</div><div className="tool-desc">{t.desc}</div></div></div>)}</div>
         <div className="sidebar-section"><div className="sidebar-label">VIDEO OVERLAYS</div>{VIDEO_TOOLS.map(t=><div key={t.id} className="tool-card" onClick={()=>toast('info',t.name,t.desc)}><div className="tool-icon" style={{background:t.gradient}}>{t.icon}</div><div className="tool-info"><div className="tool-name">{t.name}</div><div className="tool-desc">{t.desc}</div></div></div>)}</div>
-        <div className="settings-card"><div className="settings-card-title">⚡ Preview Settings</div><div className="setting-row"><span className="setting-label">Vercel Preview</span><div className={'toggle '+(useVercel?'active':'')} onClick={()=>{setUseVercel(!useVercel);if(!useVercel)setUseLocal(false)}}/></div><div className="setting-row"><span className="setting-label">Local Preview</span><div className={'toggle '+(useLocal?'active':'')} onClick={()=>{setUseLocal(!useLocal);if(!useLocal)setUseVercel(false)}}/></div><div className="setting-row"><span className="setting-label">Auto-fix Errors</span><div className={'toggle '+(autoFix?'active':'')} onClick={()=>setAutoFix(!autoFix)}/></div></div>
-        <div className="settings-card" style={{background:'linear-gradient(135deg,rgba(34,197,94,.08),rgba(59,130,246,.06))',borderColor:'rgba(34,197,94,.2)'}}><div className="settings-card-title" style={{color:'var(--accent-green)'}}>💰 Token Savings</div><div style={{fontSize:'28px',fontWeight:800,color:'var(--accent-green)'}}>$47.20</div><div style={{fontSize:'11px',color:'var(--text-muted)',marginBottom:'8px'}}>saved this month</div><div style={{height:'6px',background:'var(--bg-elevated)',borderRadius:'3px',overflow:'hidden'}}><div style={{width:'65%',height:'100%',background:'linear-gradient(90deg,var(--accent-green),var(--accent-blue))',borderRadius:'3px'}}/></div></div>
+        <div className="settings-card"><div className="settings-card-title"> Preview Settings</div><div className="setting-row"><span className="setting-label">Vercel Preview</span><div className={'toggle '+(useVercel?'active':'')} onClick={()=>{setUseVercel(!useVercel);if(!useVercel)setUseLocal(false)}}/></div><div className="setting-row"><span className="setting-label">Local Preview</span><div className={'toggle '+(useLocal?'active':'')} onClick={()=>{setUseLocal(!useLocal);if(!useLocal)setUseVercel(false)}}/></div><div className="setting-row"><span className="setting-label">Auto-fix Errors</span><div className={'toggle '+(autoFix?'active':'')} onClick={()=>setAutoFix(!autoFix)}/></div></div>
+        <div className="settings-card" style={{background:'var(--accent-bg)',borderColor:'rgba(34,197,94,.2)'}}><div className="settings-card-title" style={{color:'var(--accent-green)'}}>cost Token Savings</div><div style={{fontSize:'28px',fontWeight:800,color:'var(--accent-green)'}}>$47.20</div><div style={{fontSize:'11px',color:'var(--text-muted)',marginBottom:'8px'}}>saved this month</div><div style={{height:'6px',background:'var(--bg-elevated)',borderRadius:'3px',overflow:'hidden'}}><div style={{width:'65%',height:'100%',background:'var(--accent-primary)',borderRadius:'3px'}}/></div></div>
       </aside>
       <main className="main-area">
-        <div className="chat-area" ref={chatAreaRef}><div className="chat-messages">{messages.length===0?<div className="state-container" style={{flex:'none',padding:'40px 20px'}}><div className="state-icon">💬</div><div className="state-title">Start building</div><div className="state-desc">Describe what you want to create</div></div>:messages.map((m,i)=><div key={m.id||i} className={'chat-message '+m.role}><div className="chat-avatar">{m.role==='user'?userInitial:'FE'}</div><div className={'chat-content '+(m.status==='streaming'?'streaming':'')}><ChatMarkdown content={m.content} isStreaming={m.status==='streaming'} statusPhase={m.statusPhase} statusMessage={m.statusMessage} />{m.toolCalls&&m.toolCalls.length>0&&<div className="activity-feed"><div className="activity-header"><div className="activity-title">⚡ Agent Activity <span className="activity-badge">{m.toolCalls.length}</span></div></div><div className="activity-list">{m.toolCalls.map((tc,ti)=><div key={ti} className="activity-item"><div className="activity-icon" style={{background:tc.tool==='create_file'?'rgba(34,197,94,.15)':tc.tool==='edit_file'?'rgba(59,130,246,.15)':tc.tool==='run_command'?'rgba(234,179,8,.15)':tc.tool==='search_web'?'rgba(168,85,247,.15)':'rgba(113,113,122,.15)'}}>{tc.tool==='create_file'?'📄':tc.tool==='edit_file'?'✏️':tc.tool==='run_command'?'⚡':tc.tool==='search_web'?'🔍':tc.tool==='think'?'🧠':'🔧'}</div><div className="activity-content"><div className="activity-label">{tc.tool==='create_file'?`Creating ${tc.input?.path||'file'}`:tc.tool==='edit_file'?`Editing ${tc.input?.path||'file'}`:tc.tool==='run_command'?'Running command':tc.tool==='search_web'?`Searching: ${tc.input?.query||''}`:tc.tool==='think'?'Reasoning...':tc.tool}</div><div className="activity-detail">{tc.success===true?'✓ Done':tc.success===false?'✕ Failed':'⏳ Working...'}</div></div><span className={'activity-status '+(tc.success===true?'done':tc.success===false?'error':'pending')}>{tc.success===true?'Done':tc.success===false?'Failed':'...'}</span></div>)}</div></div>}{m.files&&m.files.length>0&&<div className="activity-feed"><div className="activity-header"><div className="activity-title">⚡ Generated Files <span className="activity-badge">{m.files.length}</span></div></div><div className="activity-list">{m.files.map((f,fi)=><div key={fi} className="activity-item"><div className="activity-icon" style={{background:'rgba(34,197,94,.15)'}}>📄</div><div className="activity-content"><div className="activity-label">{f.path || 'index.html'}</div><div className="activity-detail">{f.language || 'text'}</div></div><span className="activity-status done">Ready</span></div>)}</div></div>}</div></div>)}</div></div>
+        <div className="chat-area" ref={chatAreaRef}><div className="chat-messages">{messages.length===0?<div className="state-container" style={{flex:'none',padding:'40px 20px'}}><div className="state-icon">chat</div><div className="state-title">Start building</div><div className="state-desc">Describe what you want to create</div></div>:messages.map((m,i)=><div key={m.id||i} className={'chat-message '+m.role}><div className="chat-avatar">{m.role==='user'?userInitial:'FE'}</div><div className={'chat-content '+(m.status==='streaming'?'streaming':'')}><ChatMarkdown content={m.content} isStreaming={m.status==='streaming'} statusPhase={m.statusPhase} statusMessage={m.statusMessage} />{m.toolCalls&&m.toolCalls.length>0&&<div className="activity-feed"><div className="activity-header"><div className="activity-title"> Agent Activity <span className="activity-badge">{m.toolCalls.length}</span></div></div><div className="activity-list">{m.toolCalls.map((tc,ti)=><div key={ti} className="activity-item"><div className="activity-icon" style={{background:tc.tool==='create_file'?'rgba(34,197,94,.15)':tc.tool==='edit_file'?'rgba(59,130,246,.15)':tc.tool==='run_command'?'rgba(234,179,8,.15)':tc.tool==='search_web'?'rgba(168,85,247,.15)':'rgba(113,113,122,.15)'}}>{tc.tool==='create_file'?'':tc.tool==='edit_file'?'':tc.tool==='run_command'?'':tc.tool==='search_web'?'':tc.tool==='think'?'':''}</div><div className="activity-content"><div className="activity-label">{tc.tool==='create_file'?`Creating ${tc.input?.path||'file'}`:tc.tool==='edit_file'?`Editing ${tc.input?.path||'file'}`:tc.tool==='run_command'?'Running command':tc.tool==='search_web'?`Searching: ${tc.input?.query||''}`:tc.tool==='think'?'Reasoning...':tc.tool}</div><div className="activity-detail">{tc.success===true?'✓ Done':tc.success===false?'× Failed':'⏳ Working...'}</div></div><span className={'activity-status '+(tc.success===true?'done':tc.success===false?'error':'pending')}>{tc.success===true?'Done':tc.success===false?'Failed':'...'}</span></div>)}</div></div>}{m.files&&m.files.length>0&&<div className="activity-feed"><div className="activity-header"><div className="activity-title"> Generated Files <span className="activity-badge">{m.files.length}</span></div></div><div className="activity-list">{m.files.map((f,fi)=><div key={fi} className="activity-item"><div className="activity-icon" style={{background:'rgba(34,197,94,.15)'}}></div><div className="activity-content"><div className="activity-label">{f.path || 'index.html'}</div><div className="activity-detail">{f.language || 'text'}</div></div><span className="activity-status done">Ready</span></div>)}</div></div>}</div></div>)}</div></div>
         <div className="input-area">
           <div className="input-box" style={{display:'flex', flexDirection:'column', gap:'8px'}}>
              {attachedFiles.length > 0 && (
@@ -1012,12 +1012,12 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
                  </button>
               </div>
               <textarea className="input-field" placeholder="Describe what you want to build..." rows={1} value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={handleKeyDown} disabled={chatLoading} style={{minHeight:'24px', maxHeight:'200px', paddingTop:'8px'}}/>
-              <button className="send-btn" onClick={chatLoading?stopGeneration:handleSend} disabled={(!inputValue.trim() && attachedFiles.length === 0) && !chatLoading}>{chatLoading?'⏹':'➤'}</button>
+              <button className="send-btn" onClick={chatLoading?stopGeneration:handleSend} disabled={(!inputValue.trim() && attachedFiles.length === 0) && !chatLoading}>{chatLoading?'⏹':'→'}</button>
             </div>
             <div style={{display:'flex',gap:'6px',alignItems:'center',flexWrap:'wrap'}}>
               <span style={{fontSize:10,color:'var(--text-muted)',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.5px'}}>Model</span>
-              {[{id:'auto',icon:'✨',label:'Auto'},{id:'fast',icon:'⚡',label:'Fast'},{id:'pro',icon:'🚀',label:'Pro'},{id:'premium',icon:'💎',label:'Premium'}].map(m=>(
-                <button key={m.id} onClick={()=>setSelectedModel(m.id)} style={{padding:'3px 10px',fontSize:11,fontWeight:selectedModel===m.id?600:400,background:selectedModel===m.id?'rgba(0,255,136,.1)':'transparent',border:`1px solid ${selectedModel===m.id?'var(--accent-primary)':'var(--border-subtle)'}`,borderRadius:20,color:selectedModel===m.id?'var(--accent-primary)':'var(--text-muted)',cursor:'pointer',transition:'all .15s',display:'flex',alignItems:'center',gap:'4px'}}><span style={{fontSize:12}}>{m.icon}</span>{m.label}</button>
+              {[{id:'auto',icon:'',label:'Auto'},{id:'fast',icon:'',label:'Fast'},{id:'pro',icon:'',label:'Pro'},{id:'premium',icon:'',label:'Premium'}].map(m=>(
+                <button key={m.id} onClick={()=>setSelectedModel(m.id)} style={{padding:'3px 10px',fontSize:11,fontWeight:selectedModel===m.id?600:400,background:selectedModel===m.id?'rgba(16,185,129,.1)':'transparent',border:`1px solid ${selectedModel===m.id?'var(--accent-primary)':'var(--border-subtle)'}`,borderRadius:20,color:selectedModel===m.id?'var(--accent-primary)':'var(--text-muted)',cursor:'pointer',transition:'all .15s',display:'flex',alignItems:'center',gap:'4px'}}><span style={{fontSize:12}}>{m.icon}</span>{m.label}</button>
               ))}
             </div>
           </div>
@@ -1025,12 +1025,12 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       </main>
       <aside className="preview-panel">
         <div className="preview-content">{renderPreviewContent()}</div>
-        {showBottomBar&&<><div className="go-live-section"><span className="go-live-title">🌐 Go Live<span className="go-live-badge">PRO</span></span><input type="text" className="domain-input" placeholder="yourdomain.com" value={domainInput} onChange={e=>setDomainInput(e.target.value)}/><button className="connect-btn" onClick={()=>toast('info','Connecting...',domainInput)}>Connect</button><span className="go-live-pricing"><strong>$9/mo</strong></span></div>
-        <div className="action-bar"><div className="dropdown"><button className="download-btn" onClick={e=>{e.stopPropagation();setDownloadMenuOpen(!downloadMenuOpen)}}>⬇️ Download ▾</button><div className={'dropdown-menu bottom '+(downloadMenuOpen?'show':'')}><button className="dropdown-item" onClick={async()=>{setDownloadMenuOpen(false);try{const{downloadAsZip}=await import('@/lib/export');const files=preview.files.map(f=>({path:f.path,content:f.content,language:f.path.split('.').pop()}));await downloadAsZip(files,currentProjectName);toast('success','Downloaded','ZIP saved')}catch(e:any){toast('error','Download Failed',e.message)}}}>📦 Download ZIP</button><button className="dropdown-item" onClick={async()=>{setDownloadMenuOpen(false);try{const{copyAllFilesAsText}=await import('@/lib/export');const files=preview.files.map(f=>({path:f.path,content:f.content}));await copyAllFilesAsText(files);toast('success','Copied','All files copied to clipboard')}catch(e:any){toast('error','Copy Failed',e.message)}}}>📋 Copy All Code</button></div></div><div className="dropdown"><button className={'deploy-btn '+(isDeployed?'success':'')} onClick={e=>{e.stopPropagation();setDeployMenuOpen(!deployMenuOpen)}}>{isDeployed?'✓ Deployed':'🚀 Deploy ▾'}</button><div className={'dropdown-menu bottom '+(deployMenuOpen?'show':'')}><button className="dropdown-item" onClick={()=>handleDeploy('vercel')}>▲ Deploy to Vercel</button><button className="dropdown-item" onClick={()=>handleDeploy('github')}>🐙 Push to GitHub</button><div className="dropdown-divider"/><button className="dropdown-item" onClick={()=>handleDeploy('both')}>▲ + 🐙 Both</button></div></div></div></>}
+        {showBottomBar&&<><div className="go-live-section"><span className="go-live-title"> Go Live<span className="go-live-badge">PRO</span></span><input type="text" className="domain-input" placeholder="yourdomain.com" value={domainInput} onChange={e=>setDomainInput(e.target.value)}/><button className="connect-btn" onClick={()=>toast('info','Connecting...',domainInput)}>Connect</button><span className="go-live-pricing"><strong>$9/mo</strong></span></div>
+        <div className="action-bar"><div className="dropdown"><button className="download-btn" onClick={e=>{e.stopPropagation();setDownloadMenuOpen(!downloadMenuOpen)}}>⬇ Download ▾</button><div className={'dropdown-menu bottom '+(downloadMenuOpen?'show':'')}><button className="dropdown-item" onClick={async()=>{setDownloadMenuOpen(false);try{const{downloadAsZip}=await import('@/lib/export');const files=preview.files.map(f=>({path:f.path,content:f.content,language:f.path.split('.').pop()}));await downloadAsZip(files,currentProjectName);toast('success','Downloaded','ZIP saved')}catch(e:any){toast('error','Download Failed',e.message)}}}> Download ZIP</button><button className="dropdown-item" onClick={async()=>{setDownloadMenuOpen(false);try{const{copyAllFilesAsText}=await import('@/lib/export');const files=preview.files.map(f=>({path:f.path,content:f.content}));await copyAllFilesAsText(files);toast('success','Copied','All files copied to clipboard')}catch(e:any){toast('error','Copy Failed',e.message)}}}> Copy All Code</button></div></div><div className="dropdown"><button className={'deploy-btn '+(isDeployed?'success':'')} onClick={e=>{e.stopPropagation();setDeployMenuOpen(!deployMenuOpen)}}>{isDeployed?'✓ Deployed':' Deploy ▾'}</button><div className={'dropdown-menu bottom '+(deployMenuOpen?'show':'')}><button className="dropdown-item" onClick={()=>handleDeploy('vercel')}>▲ Deploy to Vercel</button><button className="dropdown-item" onClick={()=>handleDeploy('github')}> Push to GitHub</button><div className="dropdown-divider"/><button className="dropdown-item" onClick={()=>handleDeploy('both')}>▲ +  Both</button></div></div></div></>}
       </aside>
       <footer className="status-bar"><div className="status-left"><span><span className="status-dot"/>Connected</span><span>Region: US-East</span><span className="preview-status">{statusText}</span></div><div className="status-right"><span>Keys: 6/6</span><span>v2.5.0</span></div></footer>
     </div>
-    <div className="toast-container">{toasts.map(t=><div key={t.id} className={'toast '+t.type}><span className="toast-icon">{t.type==='success'?'✅':t.type==='error'?'❌':'ℹ️'}</span><div className="toast-content"><div className="toast-title">{t.title}</div><div className="toast-message">{t.message}</div></div></div>)}</div>
+    <div className="toast-container">{toasts.map(t=><div key={t.id} className={'toast '+t.type}><span className="toast-icon">{t.type==='success'?'✓':t.type==='error'?'×':'ℹ'}</span><div className="toast-content"><div className="toast-title">{t.title}</div><div className="toast-message">{t.message}</div></div></div>)}</div>
     {/* Profile Modal */}
     {showProfileModal && (
       <div style={{position:'fixed',inset:0,zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.6)',backdropFilter:'blur(4px)'}} onClick={()=>setShowProfileModal(false)}>
@@ -1121,7 +1121,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
       <div style={{position:'fixed',inset:0,zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.6)',backdropFilter:'blur(4px)'}} onClick={() => setShowUrlImport(false)}>
          <div style={{width:'100%',maxWidth:'500px',background:'var(--bg-elevated)',border:'1px solid var(--border-default)',borderRadius:'var(--radius-xl)',overflow:'hidden',boxShadow:'0 24px 48px rgba(0,0,0,0.5)',animation:'scaleIn 0.2s ease'}} onClick={e=>e.stopPropagation()}>
            <div style={{padding:'16px 20px',borderBottom:'1px solid var(--border-subtle)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-             <span style={{fontSize:'16px',fontWeight:600}}>🔗 Import URL</span>
+             <span style={{fontSize:'16px',fontWeight:600}}> Import URL</span>
              <button style={{background:'transparent',border:'none',color:'var(--text-muted)',fontSize:'20px',cursor:'pointer'}} onClick={()=>setShowUrlImport(false)}>×</button>
            </div>
            <div style={{padding:'20px'}}>

@@ -66,20 +66,20 @@ interface ActivityFeedProps {
 // ============================================
 
 const TOOL_CONFIG: Record<ToolType, { icon: string; color: string; label: string }> = {
-  thinking: { icon: '🧠', color: '#a78bfa', label: 'Thinking' },
-  reading: { icon: '📖', color: '#60a5fa', label: 'Reading' },
-  writing: { icon: '✍️', color: '#34d399', label: 'Writing' },
-  analyzing: { icon: '🔍', color: '#fbbf24', label: 'Analyzing' },
-  validating: { icon: '✅', color: '#10b981', label: 'Validating' },
-  fixing: { icon: '🔧', color: '#f97316', label: 'Fixing' },
-  searching: { icon: '🔎', color: '#8b5cf6', label: 'Searching' },
-  generating: { icon: '⚡', color: '#06b6d4', label: 'Generating' },
-  parsing: { icon: '📋', color: '#ec4899', label: 'Parsing' },
-  deploying: { icon: '🚀', color: '#14b8a6', label: 'Deploying' },
-  uploading: { icon: '📤', color: '#3b82f6', label: 'Uploading' },
-  downloading: { icon: '📥', color: '#6366f1', label: 'Downloading' },
-  connecting: { icon: '🔌', color: '#8b5cf6', label: 'Connecting' },
-  executing: { icon: '▶️', color: '#22c55e', label: 'Executing' },
+  thinking: { icon: '', color: '#a78bfa', label: 'Thinking' },
+  reading: { icon: '', color: '#60a5fa', label: 'Reading' },
+  writing: { icon: '', color: '#34d399', label: 'Writing' },
+  analyzing: { icon: '', color: '#fbbf24', label: 'Analyzing' },
+  validating: { icon: '', color: '#10b981', label: 'Validating' },
+  fixing: { icon: '', color: '#f97316', label: 'Fixing' },
+  searching: { icon: '', color: '#8b5cf6', label: 'Searching' },
+  generating: { icon: '', color: '#06b6d4', label: 'Generating' },
+  parsing: { icon: '', color: '#ec4899', label: 'Parsing' },
+  deploying: { icon: '', color: '#14b8a6', label: 'Deploying' },
+  uploading: { icon: '', color: '#3b82f6', label: 'Uploading' },
+  downloading: { icon: '', color: '#6366f1', label: 'Downloading' },
+  connecting: { icon: '', color: '#8b5cf6', label: 'Connecting' },
+  executing: { icon: '▶', color: '#22c55e', label: 'Executing' },
 }
 
 // ============================================
@@ -112,7 +112,7 @@ function ActivityItem({
         padding: isChild ? '6px 10px 6px 24px' : '8px 12px',
         borderLeft: `3px solid ${activity.status === 'running' ? config.color : 'transparent'}`,
         background: activity.status === 'running' 
-          ? `linear-gradient(90deg, ${config.color}10, transparent)`
+          ? `var(--accent-bg)`
           : 'transparent',
         marginBottom: 2,
         borderRadius: isChild ? 0 : 'var(--radius-sm)',
@@ -128,7 +128,7 @@ function ActivityItem({
           }}
         >
           {activity.status === 'completed' ? '✓' : 
-           activity.status === 'failed' ? '✗' : 
+           activity.status === 'failed' ? '' : 
            config.icon}
         </span>
 
@@ -226,7 +226,7 @@ function ActivityItem({
           <span style={{
             fontSize: 9,
             padding: '2px 6px',
-            borderRadius: 10,
+            borderRadius: 12,
             background: activity.status === 'completed' ? 'var(--accent-primary)20' :
                        activity.status === 'failed' ? 'var(--accent-orange)20' :
                        activity.status === 'running' ? `${config.color}20` :
@@ -332,13 +332,13 @@ export function ActivityFeed({
         background: 'var(--bg-tertiary)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 14 }}>⚙️</span>
+          <span style={{ fontSize: 14 }}></span>
           <span style={{ fontSize: 12, fontWeight: 600 }}>Activity</span>
           {runningCount > 0 && (
             <span style={{
               fontSize: 10,
               padding: '2px 6px',
-              borderRadius: 10,
+              borderRadius: 12,
               background: 'var(--accent-primary)',
               color: 'var(--bg-primary)'
             }}>
@@ -577,7 +577,7 @@ export function ThinkingIndicator({
         fontSize: 12,
         color: 'var(--text-secondary)'
       }}>
-        <span style={{ animation: 'pulse 1.5s infinite' }}>🧠</span>
+        <span style={{ animation: 'pulse 1.5s infinite' }}></span>
         <span>{text}</span>
       </div>
     )
@@ -589,12 +589,12 @@ export function ThinkingIndicator({
       alignItems: 'center',
       gap: 12,
       padding: '12px 16px',
-      background: 'linear-gradient(90deg, rgba(167, 139, 250, 0.1), transparent)',
+      background: 'var(--accent-primary), transparent)',
       border: '1px solid rgba(167, 139, 250, 0.2)',
       borderRadius: 'var(--radius-md)',
       marginBottom: 12
     }}>
-      <span style={{ fontSize: 20, animation: 'pulse 1.5s infinite' }}>🧠</span>
+      <span style={{ fontSize: 20, animation: 'pulse 1.5s infinite' }}></span>
       <div>
         <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{text}</div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>

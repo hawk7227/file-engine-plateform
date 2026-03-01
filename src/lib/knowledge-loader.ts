@@ -805,7 +805,7 @@ error patterns:
       fix: Check if the URL is reachable directly. Check browser network tab for the actual error.
   platform specific:
     creating file failed:
-      symptom: Agent Activity shows 'Creating file ✕ Failed'
+      symptom: Agent Activity shows 'Creating file  Failed'
       root cause: Token limit caused the create_file tool call JSON to be truncated. The AI ran out of tokens while writing the file content, resulting in invalid JSON that couldn't be parsed.
       evidence: Look for: stopReason=max_tokens in server logs, or [Tool Parse Error] in logs
       fix: Reduce explanation text before the code. Strategy: 1 sentence intro → full code. Or split into smaller files. Or use code block fallback instead of create_file tool.

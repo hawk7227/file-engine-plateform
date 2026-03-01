@@ -708,7 +708,7 @@ function ConnectedAccount({
     <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-zinc-700 rounded-lg flex items-center justify-center">
-          {provider === 'Google' ? '🔵' : '⚫'}
+          {provider === 'Google' ? '' : ''}
         </div>
         <div>
           <div className="font-medium">{provider}</div>
@@ -757,7 +757,7 @@ function ConnectorCard({
     <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-zinc-700 rounded-lg flex items-center justify-center text-lg">
-          {name === 'GitHub' ? '⚫' : name === 'Vercel' ? '▲' : name === 'Supabase' ? '⚡' : '🎨'}
+          {name === 'GitHub' ? '' : name === 'Vercel' ? '▲' : name === 'Supabase' ? '' : ''}
         </div>
         <div>
           <div className="font-medium">{name}</div>

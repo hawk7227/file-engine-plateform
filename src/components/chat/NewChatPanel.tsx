@@ -63,7 +63,7 @@ export function NewChatPanel({
     {
       id: 'tpl_component',
       category: 'component',
-      icon: '🧩',
+      icon: '',
       color: '#6366F1',
       name: 'Create Component',
       description: 'Build a new React component with TypeScript and Tailwind',
@@ -74,7 +74,7 @@ export function NewChatPanel({
     {
       id: 'tpl_api',
       category: 'api',
-      icon: '🔌',
+      icon: '',
       color: '#F59E0B',
       name: 'Build API Route',
       description: 'Create a Next.js API route with validation',
@@ -85,7 +85,7 @@ export function NewChatPanel({
     {
       id: 'tpl_form',
       category: 'component',
-      icon: '📝',
+      icon: '',
       color: '#10B981',
       name: 'Form with Validation',
       description: 'Create a form with React Hook Form and Zod',
@@ -96,7 +96,7 @@ export function NewChatPanel({
     {
       id: 'tpl_auth',
       category: 'api',
-      icon: '🔐',
+      icon: '',
       color: '#8B5CF6',
       name: 'Authentication Flow',
       description: 'Implement auth with login, signup, and session',
@@ -107,7 +107,7 @@ export function NewChatPanel({
     {
       id: 'tpl_dashboard',
       category: 'component',
-      icon: '📊',
+      icon: '',
       color: '#EC4899',
       name: 'Dashboard Layout',
       description: 'Build a dashboard with sidebar and cards',
@@ -118,7 +118,7 @@ export function NewChatPanel({
     {
       id: 'tpl_table',
       category: 'component',
-      icon: '📋',
+      icon: '',
       color: '#14B8A6',
       name: 'Data Table',
       description: 'Sortable, filterable table with pagination',
@@ -129,7 +129,7 @@ export function NewChatPanel({
     {
       id: 'tpl_modal',
       category: 'component',
-      icon: '🪟',
+      icon: '',
       color: '#F97316',
       name: 'Modal Dialog',
       description: 'Accessible modal with animations',
@@ -140,7 +140,7 @@ export function NewChatPanel({
     {
       id: 'tpl_test',
       category: 'testing',
-      icon: '🧪',
+      icon: '',
       color: '#22C55E',
       name: 'Write Tests',
       description: 'Generate tests for existing code',
@@ -151,7 +151,7 @@ export function NewChatPanel({
     {
       id: 'tpl_fix',
       category: 'fix',
-      icon: '🔧',
+      icon: '',
       color: '#EF4444',
       name: 'Fix Bug',
       description: 'Debug and fix an error',
@@ -162,7 +162,7 @@ export function NewChatPanel({
     {
       id: 'tpl_refactor',
       category: 'fix',
-      icon: '♻️',
+      icon: '',
       color: '#3B82F6',
       name: 'Refactor Code',
       description: 'Clean up and improve existing code',
@@ -173,7 +173,7 @@ export function NewChatPanel({
     {
       id: 'tpl_style',
       category: 'styling',
-      icon: '🎨',
+      icon: '',
       color: '#D946EF',
       name: 'Style Component',
       description: 'Add styling with Tailwind CSS',
@@ -184,7 +184,7 @@ export function NewChatPanel({
     {
       id: 'tpl_animate',
       category: 'styling',
-      icon: '✨',
+      icon: '',
       color: '#FBBF24',
       name: 'Add Animations',
       description: 'Add smooth animations and transitions',
@@ -195,12 +195,12 @@ export function NewChatPanel({
   ]
   
   const quickPrompts = [
-    { icon: '📖', label: 'Explain this code', prompt: 'Explain this code step by step' },
-    { icon: '🔧', label: 'Fix this error', prompt: 'Fix this error' },
-    { icon: '✨', label: 'Improve this', prompt: 'Suggest improvements for this code' },
-    { icon: '🧪', label: 'Write tests', prompt: 'Write tests for this code' },
-    { icon: '📝', label: 'Add docs', prompt: 'Add documentation to this code' },
-    { icon: '📘', label: 'Add types', prompt: 'Add TypeScript types to this code' }
+    { icon: '', label: 'Explain this code', prompt: 'Explain this code step by step' },
+    { icon: '', label: 'Fix this error', prompt: 'Fix this error' },
+    { icon: '', label: 'Improve this', prompt: 'Suggest improvements for this code' },
+    { icon: '', label: 'Write tests', prompt: 'Write tests for this code' },
+    { icon: '', label: 'Add docs', prompt: 'Add documentation to this code' },
+    { icon: '', label: 'Add types', prompt: 'Add TypeScript types to this code' }
   ]
   
   const filteredTemplates = useMemo(() => {
@@ -375,10 +375,10 @@ function NotificationCard({
   onClick: () => void
 }) {
   const typeConfig: Record<string, { color: string; bg: string; icon: string }> = {
-    welcome: { color: 'border-l-green-500', bg: 'bg-green-500/10', icon: '👋' },
-    continue_project: { color: 'border-l-blue-500', bg: 'bg-blue-500/10', icon: '▶️' },
-    suggested_task: { color: 'border-l-yellow-500', bg: 'bg-yellow-500/10', icon: '💡' },
-    daily_prompt: { color: 'border-l-purple-500', bg: 'bg-purple-500/10', icon: '✨' }
+    welcome: { color: 'border-l-green-500', bg: 'bg-green-500/10', icon: '' },
+    continue_project: { color: 'border-l-blue-500', bg: 'bg-blue-500/10', icon: '▶' },
+    suggested_task: { color: 'border-l-yellow-500', bg: 'bg-yellow-500/10', icon: '' },
+    daily_prompt: { color: 'border-l-purple-500', bg: 'bg-purple-500/10', icon: '' }
   }
   
   const config = typeConfig[notification.type] || typeConfig.welcome

@@ -301,7 +301,7 @@ export function PreviewPanelV2({
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-                <div className="text-4xl mb-4">👁️</div>
+                <div className="text-4xl mb-4"></div>
                 <div className="text-sm">Preview will appear here</div>
               </div>
             )}
@@ -313,7 +313,7 @@ export function PreviewPanelV2({
           <div className="h-full overflow-auto p-4 space-y-2">
             {files.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-                <div className="text-4xl mb-4">📄</div>
+                <div className="text-4xl mb-4"></div>
                 <div className="text-sm">No files generated yet</div>
               </div>
             ) : (
@@ -394,7 +394,7 @@ export function PreviewPanelV2({
           {/* Go Live - Custom Domain */}
           <div className="flex items-center gap-2 px-3 py-2 border-t border-zinc-800" style={{ background: 'rgba(139,92,246,0.05)' }}>
             <span className="text-[10px] font-semibold text-purple-400 whitespace-nowrap flex items-center gap-1">
-              🌐 Go Live
+               Go Live
               <span className="text-[8px] px-1 py-px bg-purple-500 text-white rounded">PRO</span>
             </span>
             <input
@@ -424,7 +424,7 @@ export function PreviewPanelV2({
           )}
           {domainStatus === 'error' && domainError && (
             <div className="px-3 py-1.5 text-[10px] text-red-400 bg-red-500/10 border-t border-zinc-800">
-              ✗ {domainError}
+               {domainError}
             </div>
           )}
         </>

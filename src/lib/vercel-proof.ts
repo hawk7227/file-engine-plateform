@@ -905,11 +905,11 @@ export function vercelProofValidate(files: FileContent[]): ValidationResult {
   // Generate summary
   let summary = ''
   if (allErrors.length === 0 && allWarnings.length === 0) {
-    summary = '✅ All checks passed! Safe to deploy to Vercel.'
+    summary = ' All checks passed! Safe to deploy to Vercel.'
   } else if (allErrors.length === 0) {
-    summary = `⚠️ ${allWarnings.length} warning(s) found. Build will succeed but review recommended.`
+    summary = ` ${allWarnings.length} warning(s) found. Build will succeed but review recommended.`
   } else {
-    summary = `❌ ${allErrors.length} error(s) found. Build will fail on Vercel. Fix before pushing.`
+    summary = ` ${allErrors.length} error(s) found. Build will fail on Vercel. Fix before pushing.`
   }
 
   return {

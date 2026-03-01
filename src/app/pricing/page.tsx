@@ -15,8 +15,8 @@ const PLANS = [
     description: `Try ${BRAND_NAME} with no commitment`,
     features: [
       '10 generations per day',
-      'Fast model (⚡)',
-      'Pro model (🚀)',
+      'Fast model ()',
+      'Pro model ()',
       '3 concurrent builds',
       'Basic validation',
       '1 project'
@@ -33,8 +33,8 @@ const PLANS = [
     features: [
       '50 generations per day',
       'Fast + Pro models',
-      '20 Pro requests/day (🚀)',
-      '2 Premium requests/day (💎)',
+      '20 Pro requests/day ()',
+      '2 Premium requests/day ()',
       '5 concurrent builds',
       'Standard validation',
       'Private projects'
@@ -51,8 +51,8 @@ const PLANS = [
     features: [
       '200 generations per day',
       'All models included',
-      '60 Pro requests/day (🚀)',
-      '5 Premium requests/day (💎)',
+      '60 Pro requests/day ()',
+      '5 Premium requests/day ()',
       '10 concurrent builds',
       'Full validation + AI fixing',
       'Priority queue',
@@ -72,8 +72,8 @@ const PLANS = [
     features: [
       '500 generations per day',
       'All models included',
-      '100 Pro requests/day (🚀)',
-      '15 Premium requests/day (💎)',
+      '100 Pro requests/day ()',
+      '15 Premium requests/day ()',
       '15 concurrent builds',
       'Full validation + AI fixing',
       'Priority queue',
@@ -94,8 +94,8 @@ const PLANS = [
     features: [
       '1,000 generations per day',
       'All models included',
-      '25 Premium requests/day (💎)',
-      '150 Pro requests/day (🚀)',
+      '25 Premium requests/day ()',
+      '150 Pro requests/day ()',
       '20 concurrent builds',
       'All Max features',
       'Unlimited team members',
@@ -306,7 +306,7 @@ export default function PricingPage() {
           padding: 8px 16px;
           background: var(--accent-primary);
           color: white;
-          border-radius: 6px;
+          border-radius: 8px;
           text-decoration: none;
           font-size: 14px;
           font-weight: 500;

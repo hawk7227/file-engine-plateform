@@ -93,7 +93,7 @@ const CSS = `
 /* Sidebar */
 .admin-side{width:230px;background:#050507;border-right:1px solid #27272a;padding:20px 12px;flex-shrink:0;display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
 .admin-side-hdr{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid #27272a;margin-bottom:16px}
-.admin-side-logo{width:32px;height:32px;background:linear-gradient(135deg,#22c55e,#3b82f6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;box-shadow:0 0 20px rgba(34,197,94,0.3)}
+.admin-side-logo{width:32px;height:32px;background:var(--accent-primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;box-shadow:0 0 20px rgba(34,197,94,0.3)}
 .admin-side-name{font-size:15px;font-weight:700}
 .admin-side-sub{font-size:10px;color:#71717a;margin-top:1px}
 .admin-side-nav{display:flex;flex-direction:column;gap:2px;flex:1}
@@ -159,7 +159,7 @@ const CSS = `
 
 /* Progress */
 .prog{height:6px;background:#27272a;border-radius:3px;overflow:hidden;margin-top:8px}
-.prog-fill{height:100%;border-radius:3px;background:linear-gradient(135deg,#22c55e,#3b82f6);transition:width 0.3s}
+.prog-fill{height:100%;border-radius:3px;background:var(--accent-primary);transition:width 0.3s}
 
 /* Alert */
 .alert{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:12px;margin-bottom:20px;font-size:13px}
@@ -169,7 +169,7 @@ const CSS = `
 
 /* Buttons */
 .btn{padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s}
-.btn-p{background:linear-gradient(135deg,#22c55e,#3b82f6);color:#000}
+.btn-p{background:var(--accent-primary);color:#000}
 .btn-p:hover{box-shadow:0 0 20px rgba(34,197,94,0.3)}
 .btn-p:disabled{opacity:0.5;cursor:not-allowed}
 .btn-g{background:transparent;color:#71717a;border:1px solid #27272a}
@@ -194,7 +194,7 @@ const CSS = `
 .state-box .desc{font-size:14px;color:#71717a;max-width:400px;margin-bottom:20px}
 
 /* Skeleton */
-.skel{background:linear-gradient(90deg,#18181b,#27272a,#18181b);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:20px;margin-bottom:8px}
+.skel{background:var(--accent-primary);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:20px;margin-bottom:8px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* User row */
@@ -228,7 +228,7 @@ const CSS = `
 .key-btn{padding:4px 10px;font-size:10px;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;transition:all 0.12s}
 .key-btn-edit{background:#18181b;color:#a1a1aa;border:1px solid #27272a}
 .key-btn-edit:hover{color:#fafafa;border-color:#3f3f46}
-.key-btn-save{background:linear-gradient(135deg,#22c55e,#3b82f6);color:#000}
+.key-btn-save{background:var(--accent-primary);color:#000}
 .key-btn-del{background:rgba(239,68,68,0.06);color:#ef4444}
 .key-input-row{margin-top:10px;display:flex;gap:8px;align-items:center}
 .key-input{flex:1;padding:9px 12px;background:#18181b;border:1px solid #27272a;border-radius:8px;color:#fafafa;font-size:11px;font-family:'JetBrains Mono',monospace}
@@ -301,19 +301,19 @@ const CSS = `
 // =====================================================
 
 const NAV_ITEMS: { id: AdminTab; label: string; icon: string; section?: string }[] = [
-  { id: 'economics', label: 'Unit Economics', icon: '📈', section: 'Business' },
-  { id: 'brand', label: 'Rebrand It', icon: '🎨', section: 'Overview' },
-  { id: 'overview', label: 'Dashboard', icon: '📊' },
-  { id: 'cost', label: 'Cost Optimization', icon: '💰', section: 'AI Controls' },
-  { id: 'models', label: 'Model Routing', icon: '🤖' },
-  { id: 'keys', label: 'API Key Pool', icon: '🔑' },
-  { id: 'users', label: 'Users', icon: '👥', section: 'Platform' },
-  { id: 'permissions', label: 'Permissions', icon: '🔐' },
-  { id: 'builds', label: 'Builds', icon: '🔧' },
-  { id: 'billing', label: 'Billing', icon: '💳' },
-  { id: 'pages', label: 'Page Manager', icon: '🖼️' },
-  { id: 'health', label: 'System Health', icon: '🩺', section: 'Diagnostics' },
-  { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'economics', label: 'Unit Economics', icon: '', section: 'Business' },
+  { id: 'brand', label: 'Rebrand It', icon: '', section: 'Overview' },
+  { id: 'overview', label: 'Dashboard', icon: '' },
+  { id: 'cost', label: 'Cost Optimization', icon: '', section: 'AI Controls' },
+  { id: 'models', label: 'Model Routing', icon: '' },
+  { id: 'keys', label: 'API Key Pool', icon: '' },
+  { id: 'users', label: 'Users', icon: '', section: 'Platform' },
+  { id: 'permissions', label: 'Permissions', icon: '' },
+  { id: 'builds', label: 'Builds', icon: '' },
+  { id: 'billing', label: 'Billing', icon: '' },
+  { id: 'pages', label: 'Page Manager', icon: '' },
+  { id: 'health', label: 'System Health', icon: '', section: 'Diagnostics' },
+  { id: 'settings', label: 'Settings', icon: '' },
 ]
 
 // =====================================================
@@ -398,7 +398,7 @@ const ALL_EDITABLE_KEYS: EditableKey[] = [
 // =====================================================
 
 const HEALTH_CHECKS: HealthGroup[] = [
-  { group: 'Environment Variables', icon: '🔑', checks: [
+  { group: 'Environment Variables', icon: '', checks: [
     { n: 'NEXT_PUBLIC_SUPABASE_URL', crit: true, ok: true },
     { n: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', crit: true, ok: true },
     { n: 'SUPABASE_SERVICE_ROLE_KEY', crit: true, ok: true },
@@ -413,7 +413,7 @@ const HEALTH_CHECKS: HealthGroup[] = [
     { n: 'GITHUB_TOKEN', crit: false, ok: false },
     { n: 'NEXT_PUBLIC_APP_URL', crit: false, ok: true },
   ]},
-  { group: 'Media & Provider Keys', icon: '🎬', checks: [
+  { group: 'Media & Provider Keys', icon: '', checks: [
     { n: 'GOOGLE_AI_API_KEY (Gemini 2.0)', crit: false, ok: false },
     { n: 'GOOGLE_VEO_API_KEY (Google Veo)', crit: false, ok: false },
     { n: 'ELEVENLABS_API_KEY (TTS + SFX)', crit: false, ok: false },
@@ -428,7 +428,7 @@ const HEALTH_CHECKS: HealthGroup[] = [
     { n: 'MEDIA_VOICE_KEY_1 (ORACLE)', crit: false, ok: false },
     { n: 'MEDIA_3D_KEY_1 (FORGE)', crit: false, ok: false },
   ]},
-  { group: 'API Routes (29)', icon: '🔌', checks: [
+  { group: 'API Routes (29)', icon: '', checks: [
     { n: '/api/status', crit: true, ok: true },
     { n: '/api/admin/settings', crit: true, ok: true },
     { n: '/api/chat', crit: true, ok: true },
@@ -438,7 +438,7 @@ const HEALTH_CHECKS: HealthGroup[] = [
     { n: '/api/media', crit: false, ok: true },
     { n: '/api/webhook/stripe', crit: true, ok: true },
   ]},
-  { group: 'Supabase Tables', icon: '🗄️', checks: [
+  { group: 'Supabase Tables', icon: '', checks: [
     { n: 'profiles', crit: true, ok: true },
     { n: 'projects', crit: true, ok: true },
     { n: 'builds', crit: true, ok: true },
@@ -449,7 +449,7 @@ const HEALTH_CHECKS: HealthGroup[] = [
     { n: 'daily_token_usage', crit: false, ok: true },
     { n: 'media_usage', crit: false, ok: true },
   ]},
-  { group: 'brand.ts Wiring', icon: '🎨', checks: [
+  { group: 'brand.ts Wiring', icon: '', checks: [
     { n: 'AdminDashboard.tsx → brand.ts', crit: true, ok: true },
     { n: '/projects/[id] → brand.ts', crit: false, ok: true },
     { n: 'layout.tsx → brand.ts (2 refs)', crit: true, ok: false },
@@ -458,7 +458,7 @@ const HEALTH_CHECKS: HealthGroup[] = [
     { n: 'ai-config.ts → brand.ts (63 refs)', crit: true, ok: false },
     { n: 'smart-context.ts → brand.ts (2 refs)', crit: true, ok: false },
   ]},
-  { group: 'Build & Deploy', icon: '🚀', checks: [
+  { group: 'Build & Deploy', icon: '', checks: [
     { n: 'npx next build passes clean', crit: true, ok: true },
     { n: 'No TypeScript errors', crit: true, ok: true },
     { n: 'No duplicate exports (SWC)', crit: true, ok: true },
@@ -468,7 +468,7 @@ const HEALTH_CHECKS: HealthGroup[] = [
   ]},
 ]
 
-const MEDIA_TYPE_ICONS: Record<string, string> = { video: '🎬', audio: '🎵', voice: '🗣️', image: '🖼️', '3d': '🧊' }
+const MEDIA_TYPE_ICONS: Record<string, string> = { video: '', audio: '', voice: '', image: '', '3d': '' }
 
 // =====================================================
 // PAGE REGISTRY — All 24 screens
@@ -525,20 +525,20 @@ const PAGE_REGISTRY: PageEntry[] = [
 
 const BRAND_PRESETS: { name: string; colors: [string, string]; config: Partial<BrandConfig> }[] = [
   {
-    name: 'File Engine', colors: ['#00ff88', '#0088ff'],
-    config: { name: 'File Engine', shortName: 'FE', tagline: 'Build Anything. No Limits.', colors: { primary: '#00ff88', secondary: '#0088ff', purple: '#8a2be2', orange: '#ff6622', yellow: '#ffc800', glow: 'rgba(0,255,136,0.3)' }, ai: { name: 'File Engine', personality: 'your AI coding assistant', avatar: '⚡', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
+    name: 'File Engine', colors: ['var(--accent-primary)', 'var(--accent-primary)'],
+    config: { name: 'File Engine', shortName: 'FE', tagline: 'Build Anything. No Limits.', colors: { primary: 'var(--accent-primary)', secondary: 'var(--accent-primary)', purple: 'var(--accent-primary)', orange: '#ff6622', yellow: '#ffc800', glow: 'rgba(16,185,129,0.3)' }, ai: { name: 'File Engine', personality: 'your AI coding assistant', avatar: '', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
   },
   {
     name: 'Acme Builder', colors: ['#ff6b35', '#ff2d55'],
-    config: { name: 'Acme Builder', shortName: 'AB', tagline: 'Ship Faster. Build Smarter.', colors: { primary: '#ff6b35', secondary: '#ff2d55', purple: '#9b59b6', orange: '#ff6622', yellow: '#f1c40f', glow: 'rgba(255,107,53,0.3)' }, ai: { name: 'Acme Builder', personality: 'your AI development partner', avatar: '🚀', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
+    config: { name: 'Acme Builder', shortName: 'AB', tagline: 'Ship Faster. Build Smarter.', colors: { primary: '#ff6b35', secondary: '#ff2d55', purple: '#9b59b6', orange: '#ff6622', yellow: '#f1c40f', glow: 'rgba(255,107,53,0.3)' }, ai: { name: 'Acme Builder', personality: 'your AI development partner', avatar: '', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
   },
   {
     name: 'Nova Code', colors: ['#a855f7', '#6366f1'],
-    config: { name: 'Nova Code', shortName: 'NC', tagline: 'Code at Light Speed.', colors: { primary: '#a855f7', secondary: '#6366f1', purple: '#7c3aed', orange: '#f97316', yellow: '#eab308', glow: 'rgba(168,85,247,0.3)' }, ai: { name: 'Nova Code', personality: 'your AI code architect', avatar: '🌟', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
+    config: { name: 'Nova Code', shortName: 'NC', tagline: 'Code at Light Speed.', colors: { primary: '#a855f7', secondary: '#6366f1', purple: '#7c3aed', orange: '#f97316', yellow: '#eab308', glow: 'rgba(168,85,247,0.3)' }, ai: { name: 'Nova Code', personality: 'your AI code architect', avatar: '', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
   },
   {
     name: 'Zen Studio', colors: ['#06b6d4', '#0891b2'],
-    config: { name: 'Zen Studio', shortName: 'ZS', tagline: 'Effortless Creation.', colors: { primary: '#06b6d4', secondary: '#0891b2', purple: '#8b5cf6', orange: '#f97316', yellow: '#fbbf24', glow: 'rgba(6,182,212,0.3)' }, ai: { name: 'Zen Studio', personality: 'your calm AI builder', avatar: '🧘', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
+    config: { name: 'Zen Studio', shortName: 'ZS', tagline: 'Effortless Creation.', colors: { primary: '#06b6d4', secondary: '#0891b2', purple: '#8b5cf6', orange: '#f97316', yellow: '#fbbf24', glow: 'rgba(6,182,212,0.3)' }, ai: { name: 'Zen Studio', personality: 'your calm AI builder', avatar: '', neverMention: ['Claude','GPT','OpenAI','Anthropic','Google','Gemini','Copilot','ChatGPT'] } }
   },
 ]
 
@@ -619,9 +619,9 @@ const BRAND: BrandConfig = {
   },
 
   gradients: {
-    logo: 'linear-gradient(135deg, ${b.primaryColor}, ${b.secondaryColor})',
-    button: 'linear-gradient(135deg, ${b.primaryColor}, ${b.secondaryColor})',
-    avatar: 'linear-gradient(135deg, ${b.purpleColor}, ${b.secondaryColor})',
+    logo: 'var(--accent-primary)',
+    button: 'var(--accent-primary)',
+    avatar: 'var(--accent-primary)',
   },
 
   ai: {
@@ -670,14 +670,14 @@ const BRAND: BrandConfig = {
   )
   const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 13, outline: 'none', fontFamily: 'inherit' } as const
   const labelStyle = { fontSize: 11, color: '#71717a', marginBottom: 4, display: 'block' } as const
-  const colorDot = (c: string) => <span style={{ width: 20, height: 20, borderRadius: 6, background: c, display: 'inline-block', border: '2px solid rgba(255,255,255,0.1)' }} />
+  const colorDot = (c: string) => <span style={{ width: 20, height: 20, borderRadius: 8, background: c, display: 'inline-block', border: '2px solid rgba(255,255,255,0.1)' }} />
 
   return (
     <>
       {/* Toggle bar */}
       <div style={{ display: 'flex', gap: 4, padding: '8px 20px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <button onClick={() => setViewMode('editor')} style={{ padding: '6px 16px', borderRadius: 6, border: 'none', background: viewMode === 'editor' ? 'rgba(0,255,136,0.15)' : 'transparent', color: viewMode === 'editor' ? '#00ff88' : '#71717a', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Admin + Brand Panel</button>
-        <button onClick={() => setViewMode('fullwidth')} style={{ padding: '6px 16px', borderRadius: 6, border: 'none', background: viewMode === 'fullwidth' ? 'rgba(0,255,136,0.15)' : 'transparent', color: viewMode === 'fullwidth' ? '#00ff88' : '#71717a', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Admin Full Width</button>
+        <button onClick={() => setViewMode('editor')} style={{ padding: '6px 16px', borderRadius: 8, border: 'none', background: viewMode === 'editor' ? 'rgba(16,185,129,0.15)' : 'transparent', color: viewMode === 'editor' ? 'var(--accent-primary)' : '#71717a', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Admin + Brand Panel</button>
+        <button onClick={() => setViewMode('fullwidth')} style={{ padding: '6px 16px', borderRadius: 8, border: 'none', background: viewMode === 'fullwidth' ? 'rgba(16,185,129,0.15)' : 'transparent', color: viewMode === 'fullwidth' ? 'var(--accent-primary)' : '#71717a', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Admin Full Width</button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: viewMode === 'editor' ? '1fr 1fr' : '1fr', gap: 0, height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
@@ -686,7 +686,7 @@ const BRAND: BrandConfig = {
           {/* Header */}
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-              <span style={{ fontSize: 22 }}>🎨</span>
+              <span style={{ fontSize: 22 }}></span>
               <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>brand.ts — Live Editor</span>
             </div>
             <div style={{ fontSize: 12, color: '#71717a' }}>Change values — entire admin UI updates instantly</div>
@@ -694,7 +694,7 @@ const BRAND: BrandConfig = {
 
           {/* Identity */}
           <div style={sectionStyle}>
-            {sectionTitle('✏️', 'Identity')}
+            {sectionTitle('', 'Identity')}
             <div style={{ display: 'grid', gap: 12 }}>
               <div><label style={labelStyle}>name</label><input style={inputStyle} value={editBrand.name} onChange={e => updateField('name', e.target.value)} /></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -707,7 +707,7 @@ const BRAND: BrandConfig = {
 
           {/* Colors */}
           <div style={sectionStyle}>
-            {sectionTitle('🎨', 'Colors')}
+            {sectionTitle('', 'Colors')}
             <div style={{ display: 'grid', gap: 10 }}>
               {[
                 { key: 'primaryColor', label: 'primary' },
@@ -725,7 +725,7 @@ const BRAND: BrandConfig = {
 
           {/* AI Identity */}
           <div style={sectionStyle}>
-            {sectionTitle('🤖', 'AI Identity')}
+            {sectionTitle('', 'AI Identity')}
             <div style={{ display: 'grid', gap: 12 }}>
               <div>
                 <label style={labelStyle}>ai.avatar (emoji)</label>
@@ -737,10 +737,10 @@ const BRAND: BrandConfig = {
 
           {/* Quick Presets */}
           <div style={sectionStyle}>
-            {sectionTitle('⚡', 'Quick Presets')}
+            {sectionTitle('', 'Quick Presets')}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {BRAND_PRESETS.map(p => (
-                <button key={p.name} onClick={() => applyPreset(p)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, cursor: 'pointer', transition: 'all 0.15s' }}>
+                <button key={p.name} onClick={() => applyPreset(p)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, cursor: 'pointer', transition: 'all 0.15s' }}>
                   <div style={{ display: 'flex', gap: 3 }}>
                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: p.colors[0] }} />
                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: p.colors[1] }} />
@@ -753,7 +753,7 @@ const BRAND: BrandConfig = {
 
           {/* Domain & Contact */}
           <div style={sectionStyle}>
-            {sectionTitle('🌐', 'Domain & Contact')}
+            {sectionTitle('', 'Domain & Contact')}
             <div style={{ display: 'grid', gap: 12 }}>
               <div><label style={labelStyle}>domain</label><input style={inputStyle} value={editBrand.domain} onChange={e => updateField('domain', e.target.value)} /></div>
               <div><label style={labelStyle}>supportEmail</label><input style={inputStyle} value={editBrand.supportEmail} onChange={e => updateField('supportEmail', e.target.value)} /></div>
@@ -763,7 +763,7 @@ const BRAND: BrandConfig = {
 
           {/* Legal */}
           <div style={sectionStyle}>
-            {sectionTitle('⚖️', 'Legal')}
+            {sectionTitle('', 'Legal')}
             <div style={{ display: 'grid', gap: 12 }}>
               <div><label style={labelStyle}>companyFull</label><input style={inputStyle} value={editBrand.companyFull} onChange={e => updateField('companyFull', e.target.value)} /></div>
               <div><label style={labelStyle}>jurisdiction</label><input style={inputStyle} value={editBrand.jurisdiction} onChange={e => updateField('jurisdiction', e.target.value)} /></div>
@@ -772,7 +772,7 @@ const BRAND: BrandConfig = {
 
           {/* Social Links */}
           <div style={sectionStyle}>
-            {sectionTitle('🔗', 'Social Links')}
+            {sectionTitle('', 'Social Links')}
             <div style={{ display: 'grid', gap: 12 }}>
               <div><label style={labelStyle}>docs</label><input style={inputStyle} value={editBrand.docsUrl} onChange={e => updateField('docsUrl', e.target.value)} /></div>
               <div><label style={labelStyle}>github</label><input style={inputStyle} value={editBrand.githubUrl} onChange={e => updateField('githubUrl', e.target.value)} /></div>
@@ -782,14 +782,14 @@ const BRAND: BrandConfig = {
           </div>
 
           {/* Generate */}
-          <button onClick={generateBrandCode} style={{ width: '100%', padding: '14px 24px', background: `linear-gradient(135deg, ${editBrand.primaryColor}, ${editBrand.secondaryColor})`, border: 'none', borderRadius: 10, color: '#000', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
-            <span>🔧</span> Generate Code
+          <button onClick={generateBrandCode} style={{ width: '100%', padding: '14px 24px', background: `var(--accent-primary)`, border: 'none', borderRadius: 12, color: '#000', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+            <span></span> Generate Code
           </button>
 
           {genCode && (
             <div style={{ position: 'relative', marginBottom: 32 }}>
-              <button onClick={copyCode} style={{ position: 'absolute', top: 8, right: 8, padding: '4px 10px', background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.3)', borderRadius: 6, color: '#00ff88', fontSize: 11, cursor: 'pointer', zIndex: 2 }}>Copy</button>
-              <pre style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: 16, fontSize: 11, color: '#a1a1aa', overflow: 'auto', maxHeight: 400, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>{genCode}</pre>
+              <button onClick={copyCode} style={{ position: 'absolute', top: 8, right: 8, padding: '4px 10px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, color: 'var(--accent-primary)', fontSize: 11, cursor: 'pointer', zIndex: 2 }}>Copy</button>
+              <pre style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, fontSize: 11, color: '#a1a1aa', overflow: 'auto', maxHeight: 400, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>{genCode}</pre>
             </div>
           )}
         </div>
@@ -801,7 +801,7 @@ const BRAND: BrandConfig = {
 
             {/* Logo preview */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: `linear-gradient(135deg, ${editBrand.primaryColor}, ${editBrand.secondaryColor})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#000' }}>{editBrand.shortName}</div>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: `var(--accent-primary)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#000' }}>{editBrand.shortName}</div>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{editBrand.name}</div>
                 <div style={{ fontSize: 11, color: '#71717a' }}>{editBrand.version}</div>
@@ -809,47 +809,47 @@ const BRAND: BrandConfig = {
             </div>
 
             {/* System prompt preview */}
-            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 10, color: '#71717a', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>System prompt:</div>
               <div style={{ fontSize: 12, color: '#a1a1aa', lineHeight: 1.5 }}>&quot;You are {editBrand.name}, {editBrand.aiPersonality}.&quot;</div>
             </div>
 
             {/* Model tiers preview */}
-            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 10, color: '#71717a', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Model tiers:</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {['Fast', 'Pro', 'Premium'].map(tier => (
-                  <span key={tier} style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 6, fontSize: 11, color: '#d4d4d8', border: '1px solid rgba(255,255,255,0.06)' }}>{editBrand.shortName} {tier}</span>
+                  <span key={tier} style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 8, fontSize: 11, color: '#d4d4d8', border: '1px solid rgba(255,255,255,0.06)' }}>{editBrand.shortName} {tier}</span>
                 ))}
               </div>
             </div>
 
             {/* Color palette preview */}
-            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 10, color: '#71717a', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Color palette:</div>
               <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
                 {[editBrand.primaryColor, editBrand.secondaryColor, editBrand.purpleColor].map((c, i) => (
-                  <div key={i} style={{ width: 48, height: 48, borderRadius: 10, background: c }} />
+                  <div key={i} style={{ width: 48, height: 48, borderRadius: 12, background: c }} />
                 ))}
               </div>
-              <div style={{ height: 6, borderRadius: 3, background: `linear-gradient(90deg, ${editBrand.primaryColor}, ${editBrand.secondaryColor}, ${editBrand.purpleColor})` }} />
+              <div style={{ height: 6, borderRadius: 3, background: `var(--accent-primary)` }} />
             </div>
 
             {/* Button preview */}
-            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 10, color: '#71717a', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Button styles:</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <button style={{ padding: '8px 20px', background: `linear-gradient(135deg, ${editBrand.primaryColor}, ${editBrand.secondaryColor})`, border: 'none', borderRadius: 8, color: '#000', fontSize: 12, fontWeight: 600 }}>Primary</button>
+                <button style={{ padding: '8px 20px', background: `var(--accent-primary)`, border: 'none', borderRadius: 8, color: '#000', fontSize: 12, fontWeight: 600 }}>Primary</button>
                 <button style={{ padding: '8px 20px', background: 'transparent', border: `1px solid ${editBrand.primaryColor}`, borderRadius: 8, color: editBrand.primaryColor, fontSize: 12, fontWeight: 600 }}>Secondary</button>
-                <button style={{ padding: '8px 20px', background: `linear-gradient(135deg, ${editBrand.purpleColor}, ${editBrand.secondaryColor})`, border: 'none', borderRadius: 8, color: '#fff', fontSize: 12, fontWeight: 600 }}>Accent</button>
+                <button style={{ padding: '8px 20px', background: `var(--accent-primary)`, border: 'none', borderRadius: 8, color: '#fff', fontSize: 12, fontWeight: 600 }}>Accent</button>
               </div>
             </div>
 
             {/* Chat preview */}
-            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ marginBottom: 20, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 10, color: '#71717a', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Chat preview:</div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: 12, background: 'rgba(0,0,0,0.2)', borderRadius: 8 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${editBrand.primaryColor}, ${editBrand.secondaryColor})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{editBrand.aiAvatar}</div>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: `var(--accent-primary)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{editBrand.aiAvatar}</div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginBottom: 4 }}>{editBrand.name}</div>
                   <div style={{ fontSize: 12, color: '#a1a1aa', lineHeight: 1.5 }}>I&apos;ll build that landing page for you. Let me set up the project structure first...</div>
@@ -858,7 +858,7 @@ const BRAND: BrandConfig = {
             </div>
 
             {/* Tagline preview */}
-            <div style={{ padding: 20, background: `linear-gradient(135deg, ${editBrand.primaryColor}11, ${editBrand.secondaryColor}11)`, borderRadius: 12, border: `1px solid ${editBrand.primaryColor}22`, textAlign: 'center' }}>
+            <div style={{ padding: 20, background: `var(--accent-primary)`, borderRadius: 12, border: `1px solid ${editBrand.primaryColor}22`, textAlign: 'center' }}>
               <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 4 }}>{editBrand.name}</div>
               <div style={{ fontSize: 13, color: '#a1a1aa' }}>{editBrand.tagline}</div>
             </div>
@@ -1002,7 +1002,7 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
                                 <button
                                   onClick={() => grantPermission(feat.id, { plan, enabled: !enabled })}
                                   style={{
-                                    width: 28, height: 28, borderRadius: 6, border: 'none', cursor: 'pointer',
+                                    width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer',
                                     background: enabled ? 'rgba(34,197,94,.15)' : 'rgba(113,113,122,.1)',
                                     color: enabled ? '#34d399' : '#52525b',
                                     fontSize: 14, fontWeight: 700,
@@ -1025,7 +1025,7 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
                 <div>
                   <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>Target</div>
-                  <select value={grantMode} onChange={e => setGrantMode(e.target.value as any)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12 }}>
+                  <select value={grantMode} onChange={e => setGrantMode(e.target.value as any)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 8, color: '#d4d4d8', fontSize: 12 }}>
                     <option value="plan">Plan Tier</option>
                     <option value="user">Specific User</option>
                   </select>
@@ -1033,19 +1033,19 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
                 {grantMode === 'plan' ? (
                   <div>
                     <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>Plan</div>
-                    <select value={grantPlan} onChange={e => setGrantPlan(e.target.value)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12 }}>
+                    <select value={grantPlan} onChange={e => setGrantPlan(e.target.value)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 8, color: '#d4d4d8', fontSize: 12 }}>
                       {PLAN_TIERS.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                   </div>
                 ) : (
                   <div>
                     <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>User ID</div>
-                    <input value={grantUserId} onChange={e => setGrantUserId(e.target.value)} placeholder="UUID" style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12, width: 240 }} />
+                    <input value={grantUserId} onChange={e => setGrantUserId(e.target.value)} placeholder="UUID" style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 8, color: '#d4d4d8', fontSize: 12, width: 240 }} />
                   </div>
                 )}
                 <div>
                   <div style={{ fontSize: 10, color: '#71717a', marginBottom: 4 }}>Feature</div>
-                  <select value={grantFeature} onChange={e => setGrantFeature(e.target.value)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#d4d4d8', fontSize: 12 }}>
+                  <select value={grantFeature} onChange={e => setGrantFeature(e.target.value)} style={{ padding: '6px 10px', background: '#18181b', border: '1px solid #27272a', borderRadius: 8, color: '#d4d4d8', fontSize: 12 }}>
                     <option value="">Select...</option>
                     {ALL_FEATURES.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
                   </select>
@@ -1065,9 +1065,9 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
               <div style={{ marginTop: 24 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a1a1aa', marginBottom: 12 }}>User Overrides</div>
                 {permissions.filter(p => p.user_id).map(p => (
-                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#0a0a0f', borderRadius: 6, marginBottom: 4, border: '1px solid #18181b' }}>
+                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#0a0a0f', borderRadius: 8, marginBottom: 4, border: '1px solid #18181b' }}>
                     <div>
-                      <span style={{ color: p.enabled ? '#34d399' : '#ef4444', fontWeight: 600, fontSize: 12 }}>{p.enabled ? '✓' : '✕'} {p.feature}</span>
+                      <span style={{ color: p.enabled ? '#34d399' : '#ef4444', fontWeight: 600, fontSize: 12 }}>{p.enabled ? '✓' : ''} {p.feature}</span>
                       <span style={{ color: '#52525b', fontSize: 11, marginLeft: 8 }}>→ {p.user_id?.slice(0, 8)}...</span>
                     </div>
                     <button onClick={() => revokePermission(p.id)} style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.2)', borderRadius: 4, color: '#ef4444', fontSize: 11, padding: '4px 8px', cursor: 'pointer' }}>Revoke</button>
@@ -1081,7 +1081,7 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
               <div style={{ marginTop: 24 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a1a1aa', marginBottom: 12 }}>Permission Groups</div>
                 {groups.map(g => (
-                  <div key={g.id} style={{ padding: '10px 12px', background: '#0a0a0f', borderRadius: 6, marginBottom: 4, border: '1px solid #18181b' }}>
+                  <div key={g.id} style={{ padding: '10px 12px', background: '#0a0a0f', borderRadius: 8, marginBottom: 4, border: '1px solid #18181b' }}>
                     <div style={{ fontWeight: 600, fontSize: 13, color: '#d4d4d8' }}>{g.name}</div>
                     <div style={{ fontSize: 11, color: '#71717a' }}>{g.description}</div>
                   </div>
@@ -1101,10 +1101,10 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
 
 const PLAN_ECONOMICS = [
   { plan: 'Free', price: 0, gensDay: 10, proDay: 5, premDay: 0, worstCost: 0.08, margin: null, color: '#71717a', icon: '🆓' },
-  { plan: 'Starter', price: 9, gensDay: 50, proDay: 20, premDay: 2, worstCost: 0.85, margin: 90.6, color: '#f59e0b', icon: '🌱' },
-  { plan: 'Pro', price: 19, gensDay: 200, proDay: 60, premDay: 5, worstCost: 1.87, margin: 90.2, color: '#3b82f6', icon: '🚀' },
-  { plan: 'Max', price: 49, gensDay: 500, proDay: 100, premDay: 15, worstCost: 4.80, margin: 90.2, color: '#8b5cf6', icon: '💎' },
-  { plan: 'Enterprise', price: 149, gensDay: 1000, proDay: 150, premDay: 25, worstCost: 14.70, margin: 90.1, color: '#ec4899', icon: '🏢' },
+  { plan: 'Starter', price: 9, gensDay: 50, proDay: 20, premDay: 2, worstCost: 0.85, margin: 90.6, color: '#f59e0b', icon: '' },
+  { plan: 'Pro', price: 19, gensDay: 200, proDay: 60, premDay: 5, worstCost: 1.87, margin: 90.2, color: '#3b82f6', icon: '' },
+  { plan: 'Max', price: 49, gensDay: 500, proDay: 100, premDay: 15, worstCost: 4.80, margin: 90.2, color: '#8b5cf6', icon: '' },
+  { plan: 'Enterprise', price: 149, gensDay: 1000, proDay: 150, premDay: 25, worstCost: 14.70, margin: 90.1, color: '#ec4899', icon: '' },
 ]
 
 const MODEL_COSTS = [
@@ -1115,97 +1115,97 @@ const MODEL_COSTS = [
 
 const AI_INSIGHTS = [
   {
-    icon: '⚡',
+    icon: '',
     title: 'Cascading Downgrade = Your Margin Shield',
     body: 'When users hit their Pro or Premium daily cap, requests silently route to the next cheaper tier. Premium → Pro → Fast. Users still get responses — just from the lighter model. This is exactly how Claude.ai and ChatGPT handle their own limits. The user experience stays smooth while your costs stay locked.',
     tag: 'ARCHITECTURE'
   },
   {
-    icon: '🧠',
+    icon: '',
     title: 'How Claude.ai Prices ($17-$100/mo)',
     body: 'Anthropic charges $17/mo (Pro) for ~45 Opus messages + unlimited Sonnet, and $100/mo (Max) for 5-20x more. Their cost per Opus request is ~$0.02 — same as yours. The difference: they lose money on heavy users and make it back on light users. Your per-tier caps eliminate that risk entirely.',
     tag: 'COMPETITIVE INTEL'
   },
   {
-    icon: '💡',
+    icon: '',
     title: 'OpenAI\'s Strategy: Default to Cheap',
     body: 'ChatGPT defaults all users to GPT-4o-mini (their cheapest model) and gates o1/o1-pro behind Plus ($20/mo) with strict limits. Your Fast-tier default does the same thing — 65%+ of requests cost you $0.0002. This is the single biggest margin lever. Never change the default away from Fast.',
     tag: 'STRATEGY'
   },
   {
-    icon: '📊',
+    icon: '',
     title: 'Smart Routing Saves You 80% Automatically',
     body: 'Your classifyIntent system routes "what is X?" and simple questions to Fast tier, and only sends code generation to Pro. In practice, ~65% of requests go Fast ($0.0002), ~30% go Pro ($0.003), and <5% go Premium ($0.02). Without smart routing, every request would cost $0.003+ — 15x more.',
     tag: 'COST OPTIMIZATION'
   },
   {
-    icon: '🔒',
+    icon: '',
     title: 'Why Pro-Tier Caps Matter More Than Premium',
     body: 'Premium (Opus/o1) at $0.02/req gets all the attention, but Pro (Sonnet/GPT-4o) at $0.003/req is the real margin killer at scale. 150 Pro requests/day × 30 days = $13.50/mo. Without the Pro cap, a heavy Enterprise user doing 500 Pro/day would cost $45/mo — eating 30% of your $149 revenue.',
     tag: 'INSIGHT'
   },
   {
-    icon: '🌍',
+    icon: '',
     title: 'API Pricing Drops Every 6 Months',
     body: 'Anthropic and OpenAI consistently cut prices by 30-50% every major release. Haiku went from $1.25→$0.80/1M input. When next-gen models launch, your margins automatically improve because your subscription prices stay fixed while API costs drop. Don\'t lower plan prices — pocket the savings.',
     tag: 'TREND'
   },
   {
-    icon: '🎯',
+    icon: '',
     title: 'Your $19 Pro Plan vs Claude Pro at $17',
     body: 'Claude Pro at $17/mo gives ~45 Opus messages and unlimited Sonnet. Your Pro at $19/mo gives 200 gens/day, 60 Pro, and 5 Premium. You\'re offering 4x more volume for $2 more. The value prop is strong — especially since you include code execution, file generation, and deployment.',
     tag: 'POSITIONING'
   },
   {
-    icon: '📈',
+    icon: '',
     title: 'Revenue Projection: 100 Users',
     body: 'If you hit 100 paid users with a typical mix (40 Starter, 35 Pro, 20 Max, 5 Enterprise): Revenue = $360 + $665 + $980 + $745 = $2,750/mo. At 90%+ margins, that\'s ~$2,475/mo profit. API costs: ~$275/mo. Infrastructure (Vercel/Supabase): ~$50/mo. Net profit: ~$2,425/mo.',
     tag: 'PROJECTION'
   },
   {
-    icon: '🏆',
+    icon: '',
     title: 'What We Have That Claude.ai Doesn\'t',
     body: 'Claude.ai is a chat-only interface — no file system, no code execution, no deployment, no project persistence. We offer: agentic file creation/editing, live code execution via run_command, one-click Vercel deployment, persistent projects with version history, GitHub/NPM search, vision analysis, media generation (video/audio/3D), smart model routing, and team collaboration. Claude.ai just talks — we build.',
     tag: 'COMPETITIVE EDGE'
   },
   {
-    icon: '⚔️',
+    icon: '',
     title: 'What We Have That ChatGPT Doesn\'t',
     body: 'ChatGPT has Code Interpreter (sandbox only, no real deployment) and DALL-E (images only). We have: 10+ tool agentic loop with self-correction, real project file system, Vercel deployment, GitHub search, NPM search, multi-provider failover (their models + Anthropic), media generation across 6+ providers (video, audio, 3D, voice), white-label rebranding, and team billing. ChatGPT can\'t deploy a single line of code to production.',
     tag: 'COMPETITIVE EDGE'
   },
   {
-    icon: '🎯',
+    icon: '',
     title: 'What We Have That Cursor/Windsurf Don\'t',
     body: 'Cursor ($20/mo) and Windsurf are IDE extensions — they require VS Code, local dev environment, and developer expertise. We\'re a zero-setup web app: open browser, describe what you want, get deployed code. No IDE, no terminal, no git knowledge needed. Plus we offer media generation, web search, vision analysis, and one-click deploy. Our audience is 10x larger because we don\'t require dev tools.',
     tag: 'COMPETITIVE EDGE'
   },
   {
-    icon: '🔥',
+    icon: '',
     title: 'What We Have That Bolt.new / v0 Don\'t',
     body: 'Bolt.new and v0 generate UI components but can\'t: run backend code, search the web, search GitHub/NPM, generate media (video/audio/3D), analyze images, self-correct with multi-turn tool loops, or persist full projects. They\'re single-shot generators. We\'re a full agentic platform with 10+ tools, iterative refinement, and deployment. They generate a component — we ship a product.',
     tag: 'COMPETITIVE EDGE'
   },
   {
-    icon: '🧩',
+    icon: '',
     title: 'What We Have That Replit Don\'t',
     body: 'Replit Agent ($25/mo) runs in their proprietary cloud IDE. We\'re provider-agnostic with dual-provider failover (Anthropic + OpenAI), white-label rebranding, Stripe billing you control, team management, permission gating, media generation, and 90%+ margins. Replit locks you into their ecosystem. File Engine is YOUR platform — rebrand it, set your prices, keep the profits.',
     tag: 'COMPETITIVE EDGE'
   },
   {
-    icon: '💰',
+    icon: '',
     title: 'The White-Label Advantage Nobody Else Has',
     body: 'Claude.ai, ChatGPT, Cursor, Bolt, v0, Replit — none of them can be rebranded and resold. File Engine can be instantly rebranded (name, colors, logo, AI personality) and sold as YOUR product. Change one config object and you\'re "Acme Builder" or "Nova Code". Your users never see Anthropic or OpenAI. You own the customer relationship, the billing, and the brand.',
     tag: 'MOAT'
   },
   {
-    icon: '🔄',
+    icon: '',
     title: 'Dual-Provider Failover: Zero Downtime',
     body: 'When Anthropic goes down (happens ~2x/month for 10-30min), Claude.ai users get nothing. When OpenAI has issues, ChatGPT users wait. Your platform automatically fails over to the other provider with round-robin key rotation. Users never notice. This alone is a selling point no single-provider platform can match.',
     tag: 'ARCHITECTURE'
   },
   {
-    icon: '🎬',
+    icon: '',
     title: 'Media Generation: Our Secret Weapon',
     body: 'No AI coding platform offers video (Sora, Runway, Pika), audio (Suno), voice (ElevenLabs), and 3D generation alongside code. This is unique. A user can say "build me a landing page with a hero video and background music" and get it all in one conversation. Bolt can\'t do this. Cursor can\'t do this. Claude definitely can\'t do this.',
     tag: 'FEATURE GAP'
@@ -1239,14 +1239,14 @@ function UnitEconomicsTab() {
             {p.margin !== null ? (
               <div style={s({
                 display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px',
-                background: 'rgba(34,197,94,0.15)', borderRadius: 6, fontSize: 13, fontWeight: 700, color: '#22c55e'
+                background: 'rgba(34,197,94,0.15)', borderRadius: 8, fontSize: 13, fontWeight: 700, color: '#22c55e'
               })}>
                 {p.margin}% margin
               </div>
             ) : (
               <div style={s({
                 display: 'inline-flex', padding: '3px 8px',
-                background: 'rgba(113,113,122,0.15)', borderRadius: 6, fontSize: 12, color: '#71717a'
+                background: 'rgba(113,113,122,0.15)', borderRadius: 8, fontSize: 12, color: '#71717a'
               })}>Lead gen</div>
             )}
             <div style={s({ fontSize: 11, color: '#52525b', marginTop: 8 })}>
@@ -1259,7 +1259,7 @@ function UnitEconomicsTab() {
       {/* ── PLAN DETAILS TABLE ── */}
       <div style={s({ background: '#18181b', border: '1px solid #27272a', borderRadius: 12, overflow: 'hidden', marginBottom: 24 })}>
         <div style={s({ padding: '16px 20px', borderBottom: '1px solid #27272a' })}>
-          <h3 style={s({ fontSize: 16, fontWeight: 700, color: '#f4f4f5', margin: 0 })}>📊 Plan Limits & Caps</h3>
+          <h3 style={s({ fontSize: 16, fontWeight: 700, color: '#f4f4f5', margin: 0 })}> Plan Limits & Caps</h3>
           <p style={s({ color: '#71717a', fontSize: 12, margin: '2px 0 0' })}>Caps enforce margin protection. Over-limit requests cascade to cheaper tiers automatically.</p>
         </div>
         <table style={s({ width: '100%', borderCollapse: 'collapse', fontSize: 13 })}>
@@ -1279,7 +1279,7 @@ function UnitEconomicsTab() {
                 <td style={s({ padding: '12px 16px', color: p.color, fontWeight: 700 })}>{p.price === 0 ? '$0' : `$${p.price}`}</td>
                 <td style={s({ padding: '12px 16px', color: '#d4d4d8' })}>{p.gensDay.toLocaleString()}</td>
                 <td style={s({ padding: '12px 16px', color: '#d4d4d8' })}>{p.proDay}</td>
-                <td style={s({ padding: '12px 16px', color: p.premDay === 0 ? '#ef4444' : '#d4d4d8' })}>{p.premDay === 0 ? '✗ Blocked' : p.premDay}</td>
+                <td style={s({ padding: '12px 16px', color: p.premDay === 0 ? '#ef4444' : '#d4d4d8' })}>{p.premDay === 0 ? ' Blocked' : p.premDay}</td>
                 <td style={s({ padding: '12px 16px', color: '#71717a', fontFamily: "'JetBrains Mono', monospace" })}>${p.worstCost.toFixed(2)}</td>
                 <td style={s({ padding: '12px 16px' })}>
                   {p.margin !== null ? (
@@ -1297,7 +1297,7 @@ function UnitEconomicsTab() {
       {/* ── MODEL COST BREAKDOWN ── */}
       <div style={s({ background: '#18181b', border: '1px solid #27272a', borderRadius: 12, overflow: 'hidden', marginBottom: 24 })}>
         <div style={s({ padding: '16px 20px', borderBottom: '1px solid #27272a' })}>
-          <h3 style={s({ fontSize: 16, fontWeight: 700, color: '#f4f4f5', margin: 0 })}>💸 Model Cost per Request</h3>
+          <h3 style={s({ fontSize: 16, fontWeight: 700, color: '#f4f4f5', margin: 0 })}> Model Cost per Request</h3>
           <p style={s({ color: '#71717a', fontSize: 12, margin: '2px 0 0' })}>What you actually pay the AI providers per API call. Fast tier is nearly free.</p>
         </div>
         <table style={s({ width: '100%', borderCollapse: 'collapse', fontSize: 13 })}>
@@ -1311,7 +1311,7 @@ function UnitEconomicsTab() {
           <tbody>
             {MODEL_COSTS.map(m => (
               <tr key={m.tier} style={s({ borderBottom: '1px solid #1f1f23' })}>
-                <td style={s({ padding: '12px 16px', fontWeight: 700, color: m.color })}>{m.tier === 'Fast' ? '⚡' : m.tier === 'Pro' ? '🚀' : '💎'} {m.tier}</td>
+                <td style={s({ padding: '12px 16px', fontWeight: 700, color: m.color })}>{m.tier === 'Fast' ? '' : m.tier === 'Pro' ? '' : ''} {m.tier}</td>
                 <td style={s({ padding: '12px 16px', color: '#a1a1aa', fontFamily: "'JetBrains Mono', monospace", fontSize: 11 })}>{m.models}</td>
                 <td style={s({ padding: '12px 16px', color: '#d4d4d8', fontFamily: "'JetBrains Mono', monospace" })}>{m.inputPer1M}</td>
                 <td style={s({ padding: '12px 16px', color: '#d4d4d8', fontFamily: "'JetBrains Mono', monospace" })}>{m.outputPer1M}</td>
@@ -1324,18 +1324,18 @@ function UnitEconomicsTab() {
 
       {/* ── CASCADING DOWNGRADE VISUAL ── */}
       <div style={s({ background: '#18181b', border: '1px solid #27272a', borderRadius: 12, padding: 24, marginBottom: 32 })}>
-        <h3 style={s({ fontSize: 16, fontWeight: 700, color: '#f4f4f5', margin: '0 0 16px' })}>🛡️ Margin Protection: Cascading Downgrade</h3>
+        <h3 style={s({ fontSize: 16, fontWeight: 700, color: '#f4f4f5', margin: '0 0 16px' })}> Margin Protection: Cascading Downgrade</h3>
         <div style={s({ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' })}>
           <div style={s({ padding: '10px 18px', background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 8, color: '#a855f7', fontWeight: 600, fontSize: 13 })}>
-            💎 Premium ($0.02/req)
+             Premium ($0.02/req)
           </div>
           <div style={s({ color: '#52525b', fontSize: 18 })}>→ cap hit →</div>
           <div style={s({ padding: '10px 18px', background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 8, color: '#3b82f6', fontWeight: 600, fontSize: 13 })}>
-            🚀 Pro ($0.003/req)
+             Pro ($0.003/req)
           </div>
           <div style={s({ color: '#52525b', fontSize: 18 })}>→ cap hit →</div>
           <div style={s({ padding: '10px 18px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 8, color: '#22c55e', fontWeight: 600, fontSize: 13 })}>
-            ⚡ Fast ($0.0002/req)
+             Fast ($0.0002/req)
           </div>
           <div style={s({ color: '#52525b', fontSize: 18 })}>← unlimited</div>
         </div>
@@ -1348,7 +1348,7 @@ function UnitEconomicsTab() {
 
       {/* ── AI BUSINESS INTELLIGENCE ── */}
       <div style={s({ marginBottom: 20 })}>
-        <h3 style={s({ fontSize: 18, fontWeight: 700, color: '#f4f4f5', margin: '0 0 4px' })}>🤖 AI Business Intelligence</h3>
+        <h3 style={s({ fontSize: 18, fontWeight: 700, color: '#f4f4f5', margin: '0 0 4px' })}> AI Business Intelligence</h3>
         <p style={s({ color: '#71717a', fontSize: 13, margin: '0 0 16px' })}>How the AI industry works, how your competitors price, and how to maximize your profit.</p>
       </div>
 
@@ -1527,8 +1527,8 @@ export default function AdminDashboard() {
               <div className="key-row-sub">{k.label} — {k.active ? (masked || 'Configured') + ' · healthy' : 'Not configured'}</div>
             </div>
             <div className="key-row-actions">
-              <button className="key-btn key-btn-edit" onClick={() => toggleKeyEdit(k.id)}>✏️ Edit</button>
-              {isEditing && <button className="key-btn key-btn-save" onClick={() => saveKeyValue(k.id)}>💾 Save</button>}
+              <button className="key-btn key-btn-edit" onClick={() => toggleKeyEdit(k.id)}> Edit</button>
+              {isEditing && <button className="key-btn key-btn-save" onClick={() => saveKeyValue(k.id)}> Save</button>}
             </div>
           </div>
           {isEditing && (
@@ -1541,8 +1541,8 @@ export default function AdminDashboard() {
                 onChange={e => setKeyInputValues(prev => ({ ...prev, [k.id]: e.target.value }))}
                 autoFocus
               />
-              <button className="key-btn key-btn-edit" onClick={() => toggleKeyReveal(k.id)}>👁️</button>
-              <button className="key-btn key-btn-del" onClick={() => clearKeyValue(k.id)}>🗑️</button>
+              <button className="key-btn key-btn-edit" onClick={() => toggleKeyReveal(k.id)}></button>
+              <button className="key-btn key-btn-del" onClick={() => clearKeyValue(k.id)}></button>
             </div>
           )}
         </div>
@@ -1765,7 +1765,7 @@ export default function AdminDashboard() {
         <div className="admin-root">
           <div className="admin-main">
             <div className="state-box">
-              <div className="ico">🔒</div>
+              <div className="ico"></div>
               <div className="title">Admin Access Required</div>
               <div className="desc">
                 You need owner or admin role to access the {BRAND_NAME} admin panel.
@@ -1787,7 +1787,7 @@ export default function AdminDashboard() {
         <div className="admin-root">
           <div className="admin-main">
             <div className="state-box">
-              <div className="ico">⚠️</div>
+              <div className="ico"></div>
               <div className="title">Failed to Load</div>
               <div className="desc">{errorMsg || 'An unexpected error occurred while loading admin settings.'}</div>
               <div style={{ display: 'flex', gap: 8 }}>
@@ -1843,7 +1843,7 @@ export default function AdminDashboard() {
           </nav>
 
           <div className="admin-side-back">
-            <a href="/admin/workplace" style={{ color: '#34d399', fontWeight: 600 }}>🖥 Workplace IDE</a>
+            <a href="/admin/workplace" style={{ color: '#34d399', fontWeight: 600 }}> Workplace IDE</a>
             <a href="/dashboard">← Back to {BRAND_NAME}</a>
           </div>
         </div>
@@ -1865,10 +1865,10 @@ export default function AdminDashboard() {
               </div>
               <div className="admin-body">
                 <div className="st-grid">
-                  <div className="st-card"><div className="ico">👥</div><div className="val">{stats?.totalUsers ?? 0}</div><div className="lbl">Total Users</div></div>
-                  <div className="st-card"><div className="ico">⚡</div><div className="val">{stats?.activeBuilds ?? 0}/20</div><div className="lbl">Active Builds</div><div className="chg">{20 - (stats?.activeBuilds ?? 0)} slots available</div></div>
-                  <div className="st-card"><div className="ico">🔑</div><div className="val">{activeKeyCount}/6</div><div className="lbl">API Keys Active</div><div className="chg">{activeKeyCount === 6 ? 'All healthy' : `${6 - activeKeyCount} missing`}</div></div>
-                  <div className="st-card"><div className="ico">💰</div><div className="val">${costDollars}</div><div className="lbl">{"Today's API Cost"}</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{stats?.totalUsers ?? 0}</div><div className="lbl">Total Users</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{stats?.activeBuilds ?? 0}/20</div><div className="lbl">Active Builds</div><div className="chg">{20 - (stats?.activeBuilds ?? 0)} slots available</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{activeKeyCount}/6</div><div className="lbl">API Keys Active</div><div className="chg">{activeKeyCount === 6 ? 'All healthy' : `${6 - activeKeyCount} missing`}</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">${costDollars}</div><div className="lbl">{"Today's API Cost"}</div></div>
                 </div>
 
                 <div className="sec-title"><span className="dot" /> Token Usage Today</div>
@@ -1891,7 +1891,7 @@ export default function AdminDashboard() {
                       <div className="desc">{new Date(b.created_at).toLocaleString()}</div>
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 600, color: b.status === 'completed' ? '#22c55e' : b.status === 'running' ? '#eab308' : b.status === 'failed' ? '#ef4444' : '#71717a' }}>
-                      {b.status === 'completed' ? '✓ Complete' : b.status === 'running' ? '● Building' : b.status === 'failed' ? '✕ Failed' : b.status}
+                      {b.status === 'completed' ? '✓ Complete' : b.status === 'running' ? '● Building' : b.status === 'failed' ? ' Failed' : b.status}
                     </span>
                   </div>
                 ))}
@@ -1909,7 +1909,7 @@ export default function AdminDashboard() {
               <div className="admin-body">
                 {usage && usage.estimatedCostCents > 0 && (
                   <div className="alert">
-                    <span className="ico">💡</span>
+                    <span className="ico"></span>
                     <span className="txt">Smart routing saved an estimated <strong>${((usage.estimatedCostCents * 0.23) / 100).toFixed(2)}</strong> this month by routing simple queries to faster models.</span>
                   </div>
                 )}
@@ -1998,15 +1998,15 @@ export default function AdminDashboard() {
                 <div className="sec-title"><span className="dot" /> Tier → Model Mapping</div>
                 <div className="s-card col">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div><div className="lbl">⚡ {BRAND_NAME} Fast</div><div className="desc">Quick iterations, simple tasks</div></div>
+                    <div><div className="lbl"> {BRAND_NAME} Fast</div><div className="desc">Quick iterations, simple tasks</div></div>
                     <div style={{ textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#71717a' }}>claude-haiku-4-5 / gpt-4o-mini</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div><div className="lbl">🚀 {BRAND_NAME} Pro</div><div className="desc">Balanced speed &amp; quality (default)</div></div>
+                    <div><div className="lbl"> {BRAND_NAME} Pro</div><div className="desc">Balanced speed &amp; quality (default)</div></div>
                     <div style={{ textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#71717a' }}>claude-sonnet-4 / gpt-4o</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div><div className="lbl">💎 {BRAND_NAME} Premium</div><div className="desc">Maximum quality, complex projects</div></div>
+                    <div><div className="lbl"> {BRAND_NAME} Premium</div><div className="desc">Maximum quality, complex projects</div></div>
                     <div style={{ textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#71717a' }}>claude-opus-4 / o1</div>
                   </div>
                 </div>
@@ -2027,8 +2027,8 @@ export default function AdminDashboard() {
               <div className="admin-hdr">
                 <div><div className="admin-hdr-title">API Key Pool</div><div className="admin-hdr-sub">All provider keys — editable, testable, with auto-failover</div></div>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <button className="btn btn-g" onClick={testAllKeyValues}>🧪 Test All</button>
-                  <button className="btn btn-p" onClick={saveAllKeyValues}>💾 Save All</button>
+                  <button className="btn btn-g" onClick={testAllKeyValues}> Test All</button>
+                  <button className="btn btn-p" onClick={saveAllKeyValues}> Save All</button>
                 </div>
               </div>
               <div className="admin-body">
@@ -2090,9 +2090,9 @@ export default function AdminDashboard() {
               </div>
               <div className="admin-body">
                 <div className="st-grid col3">
-                  <div className="st-card"><div className="ico">👥</div><div className="val">{stats?.totalUsers ?? 0}</div><div className="lbl">Total Users</div></div>
-                  <div className="st-card"><div className="ico">⚡</div><div className="val">{stats?.proUsers ?? 0}</div><div className="lbl">Pro Subscribers</div></div>
-                  <div className="st-card"><div className="ico">🏢</div><div className="val">{stats?.enterpriseUsers ?? 0}</div><div className="lbl">Enterprise Teams</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{stats?.totalUsers ?? 0}</div><div className="lbl">Total Users</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{stats?.proUsers ?? 0}</div><div className="lbl">Pro Subscribers</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{stats?.enterpriseUsers ?? 0}</div><div className="lbl">Enterprise Teams</div></div>
                 </div>
                 {users.length === 0 && <div style={{ color: '#71717a', fontSize: 13, padding: '20px 0' }}>No users found</div>}
                 {users.map(u => (
@@ -2120,7 +2120,7 @@ export default function AdminDashboard() {
               </div>
               <div className="admin-body">
                 <div className="st-grid col3">
-                  <div className="st-card"><div className="ico">🔧</div><div className="val">{stats?.activeBuilds ?? 0}</div><div className="lbl">Active</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{stats?.activeBuilds ?? 0}</div><div className="lbl">Active</div></div>
                   <div className="st-card"><div className="ico">⏳</div><div className="val">{stats?.queuedBuilds ?? 0}</div><div className="lbl">Queued</div></div>
                   <div className="st-card"><div className="ico">✓</div><div className="val">{stats?.completedBuilds ?? 0}</div><div className="lbl">Completed</div></div>
                 </div>
@@ -2132,7 +2132,7 @@ export default function AdminDashboard() {
                       <div className="desc">{new Date(b.created_at).toLocaleString()}</div>
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 600, color: b.status === 'completed' ? '#22c55e' : b.status === 'running' ? '#eab308' : b.status === 'failed' ? '#ef4444' : '#71717a' }}>
-                      {b.status === 'completed' ? '✓ Complete' : b.status === 'running' ? '● Building' : b.status === 'failed' ? '✕ Failed' : b.status}
+                      {b.status === 'completed' ? '✓ Complete' : b.status === 'running' ? '● Building' : b.status === 'failed' ? ' Failed' : b.status}
                     </span>
                   </div>
                 ))}
@@ -2148,9 +2148,9 @@ export default function AdminDashboard() {
               </div>
               <div className="admin-body">
                 <div className="st-grid col3">
-                  <div className="st-card"><div className="ico">💰</div><div className="val">${costDollars}</div><div className="lbl">{"Today's API Cost"}</div></div>
-                  <div className="st-card"><div className="ico">📊</div><div className="val">{usage?.totalRequests ?? 0}</div><div className="lbl">Requests This Month</div></div>
-                  <div className="st-card"><div className="ico">🏷️</div><div className="val">{(usage?.totalTokens ?? 0) > 1000000 ? `${((usage?.totalTokens ?? 0) / 1000000).toFixed(1)}M` : `${((usage?.totalTokens ?? 0) / 1000).toFixed(0)}K`}</div><div className="lbl">Tokens This Month</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">${costDollars}</div><div className="lbl">{"Today's API Cost"}</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{usage?.totalRequests ?? 0}</div><div className="lbl">Requests This Month</div></div>
+                  <div className="st-card"><div className="ico"></div><div className="val">{(usage?.totalTokens ?? 0) > 1000000 ? `${((usage?.totalTokens ?? 0) / 1000000).toFixed(1)}M` : `${((usage?.totalTokens ?? 0) / 1000).toFixed(0)}K`}</div><div className="lbl">Tokens This Month</div></div>
                 </div>
 
                 {usage && (
@@ -2159,15 +2159,15 @@ export default function AdminDashboard() {
                     <div className="sec-title"><span className="dot" /> Tier Breakdown</div>
                     <div className="s-card col">
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 12 }}>⚡ Fast</span>
+                        <span style={{ fontSize: 12 }}> Fast</span>
                         <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>{usage.tierBreakdown.fast} requests</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 12 }}>🚀 Pro</span>
+                        <span style={{ fontSize: 12 }}> Pro</span>
                         <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>{usage.tierBreakdown.pro} requests</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 12 }}>💎 Premium</span>
+                        <span style={{ fontSize: 12 }}> Premium</span>
                         <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>{usage.tierBreakdown.premium} requests</span>
                       </div>
                     </div>
@@ -2208,22 +2208,22 @@ export default function AdminDashboard() {
                 {/* Stats */}
                 <div className="st-grid">
                   <div className="st-card">
-                    <div className="ico">📄</div>
+                    <div className="ico"></div>
                     <div className="val">{PAGE_REGISTRY.filter(p => p.category === 'page').length}</div>
                     <div className="lbl">URL Routes</div>
                   </div>
                   <div className="st-card">
-                    <div className="ico">🪟</div>
+                    <div className="ico"></div>
                     <div className="val">{PAGE_REGISTRY.filter(p => p.category === 'modal').length}</div>
                     <div className="lbl">Modals/Overlays</div>
                   </div>
                   <div className="st-card">
-                    <div className="ico">⚙️</div>
+                    <div className="ico"></div>
                     <div className="val">{PAGE_REGISTRY.filter(p => p.category === 'system').length}</div>
                     <div className="lbl">System Pages</div>
                   </div>
                   <div className="st-card">
-                    <div className="ico">🎨</div>
+                    <div className="ico"></div>
                     <div className="val">{PAGE_REGISTRY.filter(p => p.brandRefs > 0).length}</div>
                     <div className="lbl">Need brand.ts Wiring</div>
                     <div className="chg" style={{ color: '#eab308' }}>
@@ -2268,7 +2268,7 @@ export default function AdminDashboard() {
                     <div className="pg-drawer-hdr">
                       <div>
                         <div className="pg-drawer-title">
-                          🖼️ Live Preview
+                           Live Preview
                           <span className="pg-drawer-route">{selectedPage.route}</span>
                         </div>
                       </div>
@@ -2338,7 +2338,7 @@ export default function AdminDashboard() {
                           }
                         }}
                       >
-                        {aiEditLoading ? '⏳' : '✨'} {aiEditLoading ? 'Working...' : 'Send to AI'}
+                        {aiEditLoading ? '⏳' : ''} {aiEditLoading ? 'Working...' : 'Send to AI'}
                       </button>
                     </div>
                   </div>
@@ -2348,7 +2348,7 @@ export default function AdminDashboard() {
                 {selectedPage && (selectedPage.category !== 'page' || selectedPage.route.includes('[')) && (
                   <div className="pg-drawer" style={{ padding: 24, textAlign: 'center' }}>
                     <div style={{ fontSize: 40, marginBottom: 12 }}>
-                      {selectedPage.category === 'modal' ? '🪟' : selectedPage.category === 'system' ? '⚙️' : '📄'}
+                      {selectedPage.category === 'modal' ? '' : selectedPage.category === 'system' ? '' : ''}
                     </div>
                     <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{selectedPage.name}</div>
                     <div style={{ fontSize: 12, color: '#71717a', marginBottom: 16 }}>{selectedPage.desc}</div>
@@ -2361,7 +2361,7 @@ export default function AdminDashboard() {
                     </div>
                     {selectedPage.brandRefs > 0 && (
                       <div style={{ marginTop: 16, padding: '10px 16px', background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)', borderRadius: 8, fontSize: 12, color: '#eab308' }}>
-                        ⚠ {selectedPage.brandRefs} hardcoded brand references need wiring to brand.ts
+                         {selectedPage.brandRefs} hardcoded brand references need wiring to brand.ts
                       </div>
                     )}
                   </div>
@@ -2390,13 +2390,13 @@ export default function AdminDashboard() {
               <div className="admin-body">
                 {!healthRan && !healthLoading && (
                   <div style={{ textAlign: 'center', padding: 50, color: '#71717a' }}>
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>🩺</div>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}></div>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>Click &quot;Run All Checks&quot; to diagnose your system</div>
                   </div>
                 )}
                 {healthLoading && (
                   <div style={{ textAlign: 'center', padding: 50, color: '#71717a' }}>
-                    <div style={{ fontSize: 36, marginBottom: 12 }}>🔍</div>
+                    <div style={{ fontSize: 36, marginBottom: 12 }}></div>
                     <div style={{ fontSize: 14 }}>Running live checks against your environment...</div>
                   </div>
                 )}
@@ -2416,7 +2416,7 @@ export default function AdminDashboard() {
                         <div style={{ fontSize: 48, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -2, color: score >= 80 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444' }}>{score}%</div>
                         <div style={{ fontSize: 13, color: '#71717a', marginTop: 4 }}>{passCount} passed · {warnCount} warnings · {failCount} failed — {totalChecks} total {healthData ? '(live)' : '(static)'}</div>
                         <div style={{ marginTop: 12, height: 8, background: '#27272a', borderRadius: 4, overflow: 'hidden', maxWidth: 400, marginLeft: 'auto', marginRight: 'auto' }}>
-                          <div style={{ height: '100%', borderRadius: 4, background: score >= 80 ? 'linear-gradient(135deg,#22c55e,#3b82f6)' : score >= 50 ? '#eab308' : '#ef4444', width: `${score}%`, transition: 'width 1s' }} />
+                          <div style={{ height: '100%', borderRadius: 4, background: score >= 80 ? 'var(--accent-primary)' : score >= 50 ? '#eab308' : '#ef4444', width: `${score}%`, transition: 'width 1s' }} />
                         </div>
                       </div>
                       {groups.map(g => {
@@ -2434,7 +2434,7 @@ export default function AdminDashboard() {
                               const d = (c as any).detail || (c.ok ? 'OK ✓' : c.crit ? 'MISSING' : 'Not configured')
                               return (
                                 <div className="hc-item" key={c.n}>
-                                  <div className={`hc-icon ${s}`}>{s === 'pass' ? '✓' : s === 'fail' ? '✕' : '⚠'}</div>
+                                  <div className={`hc-icon ${s}`}>{s === 'pass' ? '✓' : s === 'fail' ? '' : ''}</div>
                                   <div className="hc-label">{c.n}{c.crit && <span style={{ color: '#ef4444', fontSize: 8, fontWeight: 800, verticalAlign: 'middle', marginLeft: 6 }}>CRITICAL</span>}</div>
                                   <div className="hc-detail">{d}</div>
                                 </div>
@@ -2495,7 +2495,7 @@ export default function AdminDashboard() {
         <div className="toast-wrap">
           {toasts.map(t => (
             <div className={`toast ${t.type}`} key={t.id}>
-              <span className="t-ico">{t.type === 'success' ? '✓' : t.type === 'error' ? '✕' : 'ℹ'}</span>
+              <span className="t-ico">{t.type === 'success' ? '✓' : t.type === 'error' ? '' : 'ℹ'}</span>
               <div><div className="t-title">{t.title}</div><div className="t-msg">{t.message}</div></div>
             </div>
           ))}

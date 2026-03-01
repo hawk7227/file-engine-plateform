@@ -119,7 +119,7 @@ function renderMarkdown(content: string): string {
 
   // Code blocks
   html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => 
-    `<pre style="background: var(--bg-tertiary); padding: 12px; border-radius: 6px; overflow-x: auto;"><code>${code.trim()}</code></pre>`
+    `<pre style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; overflow-x: auto;"><code>${code.trim()}</code></pre>`
   )
 
   // Inline code
@@ -554,7 +554,7 @@ export function UniversalPreviewer({
         color: 'var(--text-muted)'
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📁</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}></div>
           <p>No files to preview</p>
         </div>
       </div>
@@ -653,7 +653,7 @@ export function UniversalPreviewer({
             }}
             title="Copy to clipboard"
           >
-            {copyFeedback ? '✓' : '📋'}
+            {copyFeedback ? '✓' : ''}
           </button>
           <button
             onClick={downloadFile}
@@ -668,7 +668,7 @@ export function UniversalPreviewer({
             }}
             title="Download file"
           >
-            ⬇️
+            ⬇
           </button>
         </div>
       </div>
@@ -708,24 +708,24 @@ export function UniversalPreviewer({
 
 function getFileIcon(fileType: string): string {
   const icons: Record<string, string> = {
-    html: '🌐',
-    css: '🎨',
-    javascript: '🟨',
-    typescript: '🔷',
-    react: '⚛️',
-    json: '📋',
-    csv: '📊',
-    markdown: '📝',
-    sql: '🗄️',
-    image: '🖼️',
-    svg: '🎭',
-    pdf: '📕',
-    yaml: '⚙️',
-    env: '🔐',
-    mermaid: '📈',
-    code: '📄',
+    html: '',
+    css: '',
+    javascript: '',
+    typescript: '',
+    react: '',
+    json: '',
+    csv: '',
+    markdown: '',
+    sql: '',
+    image: '',
+    svg: '',
+    pdf: '',
+    yaml: '',
+    env: '',
+    mermaid: '',
+    code: '',
   }
-  return icons[fileType] || '📄'
+  return icons[fileType] || ''
 }
 
 export { getFileType, getFileIcon }

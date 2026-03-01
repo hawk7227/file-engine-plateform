@@ -20,8 +20,8 @@ const WorkplaceLayout = dynamic(() => import('@/components/workplace/WorkplaceLa
     }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{
-          width: 40, height: 40, borderRadius: 10,
-          background: 'linear-gradient(135deg, #34d399, #60a5fa)',
+          width: 40, height: 40, borderRadius: 12,
+          background: '#10b981',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 14, fontWeight: 900, color: '#000',
           margin: '0 auto 12px', animation: 'pulse 1.5s infinite',

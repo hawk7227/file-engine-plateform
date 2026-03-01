@@ -49,7 +49,7 @@ export interface UserPreferences {
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 'welcome',
-    title: `Welcome to ${BRAND_NAME}! 🚀`,
+    title: `Welcome to ${BRAND_NAME}! `,
     description: 'Build complete projects by describing what you want. No boilerplate, no setup - just results.',
     position: 'center'
   },
@@ -89,7 +89,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: 'complete',
-    title: 'You\'re ready! 🎉',
+    title: 'You\'re ready! ',
     description: 'Start building. We\'ll show helpful tips as you go.',
     position: 'center'
   }
@@ -174,27 +174,27 @@ export const SMART_PROMPTS = {
 
 export const CONTEXTUAL_TIPS = {
   empty_project: {
-    title: '💡 Quick Start',
+    title: ' Quick Start',
     message: 'Try clicking one of the project cards below, or type your own description.',
     dismissable: true
   },
   first_generation: {
-    title: '✨ Pro Tip',
+    title: ' Pro Tip',
     message: 'Be specific! Instead of "make a website", try "create a landing page for a fitness app with pricing table".',
     dismissable: true
   },
   validation_errors: {
-    title: '🔧 Don\'t worry!',
+    title: ' Don\'t worry!',
     message: `${BRAND_NAME} automatically fixes most errors. Watch the activity feed to see fixes happening.`,
     dismissable: true
   },
   large_project: {
-    title: '📁 Complex Project',
+    title: ' Complex Project',
     message: 'For large projects, break them into parts. Start with the core feature, then iterate.',
     dismissable: true
   },
   file_upload: {
-    title: '📎 Context Helps',
+    title: ' Context Helps',
     message: 'Uploading existing code helps the AI match your style and understand your project structure.',
     dismissable: true
   },
@@ -204,7 +204,7 @@ export const CONTEXTUAL_TIPS = {
     dismissable: true
   },
   keyboard_shortcuts: {
-    title: '⌨️ Power User Tip',
+    title: '⌨ Power User Tip',
     message: 'Press Cmd+Enter to send, Cmd+K for command palette, Cmd+/ for shortcuts.',
     dismissable: true
   }
@@ -393,7 +393,7 @@ export function OnboardingModal({
                 className={`skill-option ${skillLevel === 'beginner' ? 'active' : ''}`}
                 onClick={() => onSetSkillLevel('beginner')}
               >
-                <span className="skill-icon">🌱</span>
+                <span className="skill-icon"></span>
                 <span className="skill-label">Beginner</span>
                 <span className="skill-desc">New to coding or AI tools</span>
               </button>
@@ -401,7 +401,7 @@ export function OnboardingModal({
                 className={`skill-option ${skillLevel === 'intermediate' ? 'active' : ''}`}
                 onClick={() => onSetSkillLevel('intermediate')}
               >
-                <span className="skill-icon">🚀</span>
+                <span className="skill-icon"></span>
                 <span className="skill-label">Intermediate</span>
                 <span className="skill-desc">Comfortable with code</span>
               </button>
@@ -409,7 +409,7 @@ export function OnboardingModal({
                 className={`skill-option ${skillLevel === 'expert' ? 'active' : ''}`}
                 onClick={() => onSetSkillLevel('expert')}
               >
-                <span className="skill-icon">⚡</span>
+                <span className="skill-icon"></span>
                 <span className="skill-label">Expert</span>
                 <span className="skill-desc">Professional developer</span>
               </button>
@@ -536,7 +536,7 @@ export function OnboardingModal({
 
         .skill-option.active {
           border-color: var(--accent-primary);
-          background: rgba(0, 255, 136, 0.05);
+          background: rgba(16, 185, 129, 0.05);
         }
 
         .skill-icon {
@@ -627,8 +627,8 @@ export function ContextualTip({ tipId, onDismiss }: ContextualTipProps) {
           align-items: flex-start;
           gap: 12px;
           padding: 12px 16px;
-          background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 136, 255, 0.1));
-          border: 1px solid rgba(0, 255, 136, 0.2);
+          background: var(--accent-primary), rgba(0, 136, 255, 0.1));
+          border: 1px solid rgba(16, 185, 129, 0.2);
           border-radius: var(--radius-md);
           margin-bottom: 12px;
           animation: tipSlide 0.3s ease;

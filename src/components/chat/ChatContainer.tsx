@@ -31,22 +31,22 @@ interface ChatContainerProps {
 function WelcomeScreen({ onSuggestionClick }: { onSuggestionClick: (text: string) => void }) {
   const suggestions = [
     {
-      icon: '🚀',
+      icon: '',
       title: 'Build a landing page',
       prompt: 'Create a modern landing page for a SaaS product with hero section, features, pricing, and footer'
     },
     {
-      icon: '📊',
+      icon: '',
       title: 'Create a dashboard',
       prompt: 'Build a dashboard with charts, stats cards, and a data table using React and Tailwind'
     },
     {
-      icon: '🔐',
+      icon: '',
       title: 'Add authentication',
       prompt: 'Create a login and signup form with email/password and social auth using Supabase'
     },
     {
-      icon: '🛒',
+      icon: '',
       title: 'Build an e-commerce cart',
       prompt: 'Create a shopping cart component with add/remove items, quantity controls, and total calculation'
     }

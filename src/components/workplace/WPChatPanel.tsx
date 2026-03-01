@@ -7,7 +7,7 @@ const S = {
   wrap: { display: 'flex', flexDirection: 'column' as const, height: '100%' },
   msgs: { flex: 1, overflowY: 'auto' as const, padding: 8 },
   msg: { display: 'flex', gap: 8, padding: 8, marginBottom: 2 },
-  avt: { width: 20, height: 20, borderRadius: 6, display: 'flex', alignItems: 'center' as const, justifyContent: 'center' as const, fontSize: 9, flexShrink: 0, marginTop: 2 },
+  avt: { width: 20, height: 20, borderRadius: 8, display: 'flex', alignItems: 'center' as const, justifyContent: 'center' as const, fontSize: 9, flexShrink: 0, marginTop: 2 },
   avtAi: { background: 'var(--wp-accent-dim)', border: '1px solid rgba(52,211,153,.15)' },
   avtU: { background: 'var(--wp-bg-4)' },
   role: { fontSize: 7, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '.5px', marginBottom: 2 },
@@ -19,7 +19,7 @@ const S = {
   btn: { padding: '3px 8px', borderRadius: 5, fontSize: 7, fontWeight: 700, border: '1px solid rgba(52,211,153,.15)', color: 'var(--wp-accent)', background: 'none', cursor: 'pointer', fontFamily: 'var(--wp-font)' },
   inputWrap: { padding: 8, borderTop: '1px solid var(--wp-border)', display: 'flex', gap: 6, alignItems: 'center', background: 'var(--wp-bg-3)', borderRadius: 8, margin: 8 },
   input: { flex: 1, background: 'none', border: 'none', fontSize: 11, color: 'var(--wp-text-1)', outline: 'none', fontFamily: 'var(--wp-font)' },
-  send: { width: 24, height: 24, borderRadius: 6, background: 'linear-gradient(135deg, var(--wp-accent), var(--wp-blue))', border: 'none', color: '#000', fontWeight: 900, fontSize: 10, cursor: 'pointer', flexShrink: 0 },
+  send: { width: 24, height: 24, borderRadius: 8, background: 'var(--accent-primary), var(--wp-blue))', border: 'none', color: '#000', fontWeight: 900, fontSize: 10, cursor: 'pointer', flexShrink: 0 },
   streaming: { display: 'inline-block', animation: 'wp-blink 1s infinite' },
 }
 
@@ -54,7 +54,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
       <div style={S.msgs} ref={msgsRef}>
         {chat.messages.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--wp-text-4)' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
+            <div style={{ fontSize: 40, marginBottom: 12 }}></div>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--wp-text-2)' }}>Start building</div>
             <div style={{ fontSize: 11 }}>Describe what you want to create</div>
           </div>
@@ -62,7 +62,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
         {chat.messages.map((m, i) => (
           <div key={m.id || i} style={S.msg}>
             <div style={{ ...S.avt, ...(m.role === 'assistant' ? S.avtAi : S.avtU) }}>
-              {m.role === 'assistant' ? '⚡' : '👤'}
+              {m.role === 'assistant' ? '' : ''}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ ...S.role, ...(m.role === 'assistant' ? S.roleAi : S.roleU) }}>
@@ -75,7 +75,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
               {m.files && m.files.length > 0 && (
                 <div style={S.acts}>
                   <button style={S.pill} onClick={() => { onExpandBottom(); onSwitchBottomTab('code') }}>
-                    📄 View Code → Code Panel
+                     View Code → Code Panel
                   </button>
                   <button style={S.btn} onClick={() => toast('Preview', 'Loading on device', 'nfo')}>
                     ▶ Preview

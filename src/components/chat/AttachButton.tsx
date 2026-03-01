@@ -49,22 +49,22 @@ export function AttachButton({
   }
 
   function getFileIcon(type: UploadedFile['type'], name: string): string {
-    if (type === 'image') return '🖼️'
+    if (type === 'image') return ''
     if (type === 'document') {
-      if (name.endsWith('.pdf')) return '📕'
-      if (name.endsWith('.csv') || name.endsWith('.xlsx')) return '📊'
-      return '📄'
+      if (name.endsWith('.pdf')) return ''
+      if (name.endsWith('.csv') || name.endsWith('.xlsx')) return ''
+      return ''
     }
     if (type === 'code') {
-      if (name.endsWith('.ts') || name.endsWith('.tsx')) return '🔷'
-      if (name.endsWith('.js') || name.endsWith('.jsx')) return '🟨'
-      if (name.endsWith('.py')) return '🐍'
-      if (name.endsWith('.html')) return '🌐'
-      if (name.endsWith('.css')) return '🎨'
-      if (name.endsWith('.json')) return '📋'
-      return '📝'
+      if (name.endsWith('.ts') || name.endsWith('.tsx')) return ''
+      if (name.endsWith('.js') || name.endsWith('.jsx')) return ''
+      if (name.endsWith('.py')) return ''
+      if (name.endsWith('.html')) return ''
+      if (name.endsWith('.css')) return ''
+      if (name.endsWith('.json')) return ''
+      return ''
     }
-    return '📁'
+    return ''
   }
 
   return (
@@ -85,7 +85,7 @@ export function AttachButton({
         title={files.length > 0 ? `${files.length} files attached` : 'Attach files'}
         style={files.length > 0 ? { borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)', position: 'relative' } : { position: 'relative' }}
       >
-        {uploading ? '⏳' : '📎'}
+        {uploading ? '⏳' : ''}
         {files.length > 0 && (
           <span style={{
             position: 'absolute',
@@ -203,7 +203,7 @@ export function AttachButton({
                     fontSize: 12
                   }}
                 >
-                  ✕
+                  
                 </button>
               </div>
             ))}
@@ -213,7 +213,7 @@ export function AttachButton({
             <div style={{ height: 3, background: 'var(--bg-tertiary)', margin: '0 8px 8px', borderRadius: 2, overflow: 'hidden' }}>
               <div style={{ 
                 height: '100%', 
-                background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-blue))',
+                background: 'var(--accent-primary), var(--accent-blue))',
                 width: `${progress}%`,
                 transition: 'width 0.3s'
               }} />

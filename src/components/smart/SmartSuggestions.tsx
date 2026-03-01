@@ -311,8 +311,8 @@ export function SuggestionsDropdown({ suggestions, onSelect, visible }: Suggesti
         >
           <div className="suggestion-icon">
             {suggestion.type === 'completion' ? '→' :
-             suggestion.type === 'improvement' ? '💡' :
-             suggestion.type === 'template' ? '📋' : '✨'}
+             suggestion.type === 'improvement' ? '' :
+             suggestion.type === 'template' ? '' : ''}
           </div>
           <div className="suggestion-content">
             <div className="suggestion-text">{suggestion.text}</div>
@@ -424,7 +424,7 @@ export function EnhancementPreview({ enhancement, onAccept, onDismiss }: Enhance
   return (
     <div className="enhancement-preview">
       <div className="enhancement-header">
-        <span className="enhancement-icon">✨</span>
+        <span className="enhancement-icon"></span>
         <span className="enhancement-title">Improved prompt</span>
         <button className="enhancement-dismiss" onClick={onDismiss}>×</button>
       </div>
@@ -465,7 +465,7 @@ export function EnhancementPreview({ enhancement, onAccept, onDismiss }: Enhance
           align-items: center;
           gap: 8px;
           padding: 10px 16px;
-          background: rgba(0, 255, 136, 0.1);
+          background: rgba(16, 185, 129, 0.1);
           border-bottom: 1px solid var(--border-subtle);
         }
 

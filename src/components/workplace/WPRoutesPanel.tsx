@@ -2,19 +2,19 @@
 
 const ROUTES = [
   { group: 'File Engine App', items: [
-    { name: 'Landing Page', path: 'page.tsx', status: 'live', icon: '📄' },
-    { name: 'Pricing', path: 'pricing/page.tsx', status: 'live', icon: '📄' },
-    { name: 'Dashboard', path: 'dashboard/page.tsx', status: 'live', icon: '📄' },
-    { name: 'Login', path: 'auth/login', status: 'live', icon: '📄' },
+    { name: 'Landing Page', path: 'page.tsx', status: 'live', icon: '' },
+    { name: 'Pricing', path: 'pricing/page.tsx', status: 'live', icon: '' },
+    { name: 'Dashboard', path: 'dashboard/page.tsx', status: 'live', icon: '' },
+    { name: 'Login', path: 'auth/login', status: 'live', icon: '' },
   ]},
   { group: 'API Routes', items: [
-    { name: 'Chat SSE', path: 'api/chat', status: 'live', icon: '⚡' },
-    { name: 'Deploy', path: 'api/deploy', status: 'live', icon: '⚡' },
-    { name: 'Generate', path: 'api/generate', status: 'warn', icon: '⚡' },
+    { name: 'Chat SSE', path: 'api/chat', status: 'live', icon: '' },
+    { name: 'Deploy', path: 'api/deploy', status: 'live', icon: '' },
+    { name: 'Generate', path: 'api/generate', status: 'warn', icon: '' },
   ]},
   { group: 'Admin', items: [
-    { name: 'Workplace (this)', path: 'admin/workplace', status: 'live', icon: '📄' },
-    { name: 'Settings', path: 'admin/settings', status: 'live', icon: '📄' },
+    { name: 'Workplace (this)', path: 'admin/workplace', status: 'live', icon: '' },
+    { name: 'Settings', path: 'admin/settings', status: 'live', icon: '' },
   ]},
 ]
 
@@ -44,7 +44,7 @@ export function WPRoutesPanel({ toast }: Props) {
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = ''; (e.currentTarget as HTMLDivElement).style.color = 'var(--wp-text-2)' }}
             >
               <span style={{ ...S.dot, background: r.status === 'live' ? 'var(--wp-accent)' : 'var(--wp-yellow)', boxShadow: r.status === 'live' ? '0 0 4px rgba(52,211,153,.4)' : '0 0 4px rgba(251,191,36,.4)' }} />
-              {r.icon || '📄'} <span style={{ flex: 1 }}>{r.name}</span>
+              {r.icon || ''} <span style={{ flex: 1 }}>{r.name}</span>
               <span style={S.path}>{r.path}</span>
             </div>
           ))}

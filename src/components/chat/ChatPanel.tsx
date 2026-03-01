@@ -107,12 +107,12 @@ export function ChatPanel({
   }
   
   const quickActions = [
-    { icon: '📖', label: 'Explain this', prompt: 'Explain this code step by step' },
-    { icon: '🔧', label: 'Fix error', prompt: 'Fix this error' },
-    { icon: '✨', label: 'Improve', prompt: 'Suggest improvements' },
-    { icon: '🧪', label: 'Add tests', prompt: 'Write tests for this' },
-    { icon: '📝', label: 'Add docs', prompt: 'Add documentation' },
-    { icon: '⚡', label: 'Optimize', prompt: 'Optimize performance' }
+    { icon: '', label: 'Explain this', prompt: 'Explain this code step by step' },
+    { icon: '', label: 'Fix error', prompt: 'Fix this error' },
+    { icon: '', label: 'Improve', prompt: 'Suggest improvements' },
+    { icon: '', label: 'Add tests', prompt: 'Write tests for this' },
+    { icon: '', label: 'Add docs', prompt: 'Add documentation' },
+    { icon: '', label: 'Optimize', prompt: 'Optimize performance' }
   ]
   
   return (
@@ -395,12 +395,12 @@ function FileCard({
   const [isHovered, setIsHovered] = useState(false)
   
   const languageIcons: Record<string, string> = {
-    typescript: '📘',
-    javascript: '📒',
-    css: '🎨',
-    html: '🌐',
-    json: '📋',
-    markdown: '📝'
+    typescript: '',
+    javascript: '',
+    css: '',
+    html: '',
+    json: '',
+    markdown: ''
   }
   
   const statusColors = {
@@ -430,7 +430,7 @@ function FileCard({
           <div>
             <div className="font-medium text-sm">{file.path}</div>
             <div className="text-xs text-zinc-500">
-              {languageIcons[file.language] || '📄'} {file.language} · {lines} lines
+              {languageIcons[file.language] || ''} {file.language} · {lines} lines
             </div>
           </div>
         </div>

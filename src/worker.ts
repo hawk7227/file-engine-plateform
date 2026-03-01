@@ -12,7 +12,7 @@
 
 import { createBuildWorker } from './lib/queue'
 
-console.log('🚀 Starting File Engine Build Worker...')
+console.log(' Starting File Engine Build Worker...')
 console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 5}`)
 console.log(`   Redis: ${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`)
 
@@ -31,4 +31,4 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
-console.log('✅ Worker started and listening for jobs')
+console.log(' Worker started and listening for jobs')

@@ -249,7 +249,7 @@ export function PreviewPanel({ file, onClose }: PreviewPanelProps) {
           {validationResult.warnings.length > 0 && (
             <div className="mt-2 space-y-1">
               {validationResult.warnings.map((warning, i) => (
-                <div key={i} className="text-xs text-yellow-400">⚠ {warning}</div>
+                <div key={i} className="text-xs text-yellow-400"> {warning}</div>
               ))}
             </div>
           )}

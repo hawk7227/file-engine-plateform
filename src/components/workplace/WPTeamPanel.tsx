@@ -2,7 +2,7 @@
 
 import type { TeamMember } from '@/hooks/useWorkspaceRealtime'
 
-const COLORS = ['linear-gradient(135deg,#34d399,#60a5fa)', 'linear-gradient(135deg,#a78bfa,#ec4899)', 'linear-gradient(135deg,#fbbf24,#fb923c)', 'linear-gradient(135deg,#22d3ee,#3b82f6)', 'linear-gradient(135deg,#f87171,#ef4444)']
+const COLORS = ['var(--accent-primary)', 'var(--accent-primary)', 'var(--accent-primary)', 'var(--accent-primary)', 'var(--red)']
 
 const S = {
   header: { padding: '8px 14px', fontSize: 8, fontWeight: 700, color: 'var(--wp-text-3)', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--wp-border)' },
@@ -38,7 +38,7 @@ export function WPTeamPanel({ currentUserId, teamMembers, onWatch, toast }: Prop
   return (
     <div>
       <div style={S.header}>
-        <span>👥 TEAM</span>
+        <span> TEAM</span>
         <span style={{ color: 'var(--wp-accent)' }}>{onlineMembers.length} online{offlineCount > 0 ? ` / ${teamMembers.length}` : ''}</span>
       </div>
 
@@ -51,7 +51,7 @@ export function WPTeamPanel({ currentUserId, teamMembers, onWatch, toast }: Prop
       {teamMembers.map((m, i) => {
         const isYou = m.user_id === currentUserId
         const isOnline = m.action !== 'idle' || isYou
-        const actionIcon = m.action === 'editing' ? '✏️' : m.action === 'viewing' ? '👁️' : '💤'
+        const actionIcon = m.action === 'editing' ? '' : m.action === 'viewing' ? '' : ''
         const actionText = m.action === 'editing'
           ? `Editing${m.current_line ? ` · line ${m.current_line}` : ''}`
           : m.action === 'viewing' ? 'Viewing' : 'Idle'
@@ -70,11 +70,11 @@ export function WPTeamPanel({ currentUserId, teamMembers, onWatch, toast }: Prop
                 {m.user_name || 'Unknown'} {isYou && <span style={S.you}>YOU</span>}
               </div>
               {m.current_file && (
-                <div style={S.file}>📄 {m.current_file}</div>
+                <div style={S.file}> {m.current_file}</div>
               )}
               <div style={S.action}>
                 {actionIcon} {actionText}
-                {m.device_preview && ` · 🖥 ${m.device_preview}`}
+                {m.device_preview && ` ·  ${m.device_preview}`}
               </div>
               {m.status_message && (
                 <div style={{ fontSize: 8, color: 'var(--wp-blue)', marginTop: 2, fontStyle: 'italic' }}>
@@ -84,15 +84,15 @@ export function WPTeamPanel({ currentUserId, teamMembers, onWatch, toast }: Prop
               <div style={S.btns}>
                 {isYou ? (
                   <button style={S.btn} onClick={() => toast('Sharing', 'Your screen is now visible', 'nfo')}>
-                    📺 Share
+                     Share
                   </button>
                 ) : isOnline ? (
                   <>
                     <button style={S.watchBtn} onClick={() => { onWatch(m.user_id); toast('Watching', `${m.user_name}'s workspace`, 'nfo') }}>
-                      👁 Watch
+                       Watch
                     </button>
                     <button style={S.btn} onClick={() => toast('Message', `Opening DM with ${m.user_name}`, 'nfo')}>
-                      💬 Message
+                       Message
                     </button>
                   </>
                 ) : null}
@@ -104,10 +104,10 @@ export function WPTeamPanel({ currentUserId, teamMembers, onWatch, toast }: Prop
 
       {locks.length > 0 && (
         <div style={S.lockSection}>
-          <div style={S.lockLabel}>🔒 Active Locks</div>
+          <div style={S.lockLabel}> Active Locks</div>
           {locks.map(m => (
             <div key={m.user_id + '-lock'} style={S.lockItem}>
-              🔒 <span style={{ fontFamily: 'var(--wp-mono)' }}>{m.current_file?.split('/').pop()}</span>
+               <span style={{ fontFamily: 'var(--wp-mono)' }}>{m.current_file?.split('/').pop()}</span>
               — <span style={{ color: m.user_id === currentUserId ? 'var(--wp-accent)' : 'var(--wp-purple)' }}>{m.user_name}</span>
             </div>
           ))}

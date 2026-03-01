@@ -16,14 +16,14 @@ export interface BrandConfig {
 
   // ── Visual ──
   logo: {
-    emoji: string           // ⚡ — fallback when no image
+    emoji: string           //  — fallback when no image
     imageUrl: string | null // URL to logo image (null = use emoji)
     markText: string        // Text inside the logo mark circle ("FE")
   }
   colors: {
-    primary: string         // Main accent (#00ff88)
-    secondary: string       // Blue accent (#0088ff)
-    purple: string          // Purple accent (#8a2be2)
+    primary: string         // Main accent (var(--accent-primary))
+    secondary: string       // Blue accent (var(--accent-primary))
+    purple: string          // Purple accent (var(--accent-primary))
     orange: string          // Warning/cancel (#ff6622)
     yellow: string          // Building/queue (#ffc800)
     glow: string            // Glow effect rgba
@@ -38,7 +38,7 @@ export interface BrandConfig {
   ai: {
     name: string            // "File Engine" — what the AI calls itself
     personality: string     // "your AI coding assistant"
-    avatar: string          // Emoji in chat: ⚡
+    avatar: string          // Emoji in chat: 
     neverMention: string[]  // Provider names to NEVER say
   }
 
@@ -81,30 +81,30 @@ const BRAND: BrandConfig = {
   companyName: 'File Engine Inc.',
 
   logo: {
-    emoji: '⚡',
+    emoji: '',           // §2: No emoji in product UI
     imageUrl: null,
     markText: 'FE',
   },
 
   colors: {
-    primary: '#00ff88',
-    secondary: '#0088ff',
-    purple: '#8a2be2',
-    orange: '#ff6622',
-    yellow: '#ffc800',
-    glow: 'rgba(0, 255, 136, 0.3)',
+    primary: '#10b981',    // §6: Single accent (emerald-500)
+    secondary: '#10b981',  // §6: Maximum one accent color — unified
+    purple: '#10b981',     // §6: No multi-accent — map to primary
+    orange: '#ef4444',     // Destructive actions only
+    yellow: '#eab308',     // Warning states only
+    glow: 'rgba(16, 185, 129, 0.12)', // §6: Subtle, not intense
   },
 
   gradients: {
-    logo: 'linear-gradient(135deg, #00ff88, #0088ff)',
-    button: 'linear-gradient(135deg, #00ff88, #0088ff)',
-    avatar: 'linear-gradient(135deg, #8a2be2, #0088ff)',
+    logo: 'none',          // §6: No gradient-heavy marketing UI in product
+    button: 'none',        // §6: Solid colors only
+    avatar: 'none',        // §6: Solid colors only
   },
 
   ai: {
     name: 'File Engine',
     personality: 'your AI coding assistant',
-    avatar: '⚡',
+    avatar: '',            // §2: No emoji in product UI
     neverMention: ['Claude', 'GPT', 'OpenAI', 'Anthropic', 'Google', 'Gemini', 'Copilot', 'ChatGPT'],
   },
 
@@ -157,14 +157,11 @@ export const BRAND_SUPPORT_EMAIL = BRAND.supportEmail
 export function getBrandCSSVars(): string {
   return `
     --brand-primary: ${BRAND.colors.primary};
-    --brand-secondary: ${BRAND.colors.secondary};
-    --brand-purple: ${BRAND.colors.purple};
-    --brand-orange: ${BRAND.colors.orange};
-    --brand-yellow: ${BRAND.colors.yellow};
+    --brand-secondary: ${BRAND.colors.primary};
+    --brand-accent: ${BRAND.colors.primary};
+    --brand-destructive: ${BRAND.colors.orange};
+    --brand-warning: ${BRAND.colors.yellow};
     --brand-glow: ${BRAND.colors.glow};
-    --brand-gradient-logo: ${BRAND.gradients.logo};
-    --brand-gradient-button: ${BRAND.gradients.button};
-    --brand-gradient-avatar: ${BRAND.gradients.avatar};
   `
 }
 

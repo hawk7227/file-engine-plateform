@@ -110,19 +110,19 @@ export function NotificationProvider({
   }, [defaultDuration, maxNotifications])
 
   const success = useCallback((title: string, message?: string) => {
-    return toast({ type: 'success', title, message, icon: '✅' })
+    return toast({ type: 'success', title, message, icon: '' })
   }, [toast])
 
   const error = useCallback((title: string, message?: string) => {
-    return toast({ type: 'error', title, message, icon: '❌', duration: 0 })
+    return toast({ type: 'error', title, message, icon: '', duration: 0 })
   }, [toast])
 
   const warning = useCallback((title: string, message?: string) => {
-    return toast({ type: 'warning', title, message, icon: '⚠️' })
+    return toast({ type: 'warning', title, message, icon: '' })
   }, [toast])
 
   const info = useCallback((title: string, message?: string) => {
-    return toast({ type: 'info', title, message, icon: 'ℹ️' })
+    return toast({ type: 'info', title, message, icon: 'ℹ' })
   }, [toast])
 
   const progress = useCallback((title: string, progressValue: number, message?: string) => {
@@ -222,7 +222,7 @@ function NotificationItem({ notification, onDismiss }: NotificationItemProps) {
   const { type, title, message, icon, progress, actions, dismissable } = notification
 
   const typeStyles = {
-    success: { bg: 'rgba(0, 255, 136, 0.1)', border: 'var(--accent-primary)', color: 'var(--accent-primary)' },
+    success: { bg: 'rgba(16, 185, 129, 0.1)', border: 'var(--accent-primary)', color: 'var(--accent-primary)' },
     error: { bg: 'rgba(255, 102, 34, 0.1)', border: 'var(--accent-orange)', color: 'var(--accent-orange)' },
     warning: { bg: 'rgba(255, 200, 0, 0.1)', border: '#ffc800', color: '#ffc800' },
     info: { bg: 'rgba(0, 136, 255, 0.1)', border: 'var(--accent-blue)', color: 'var(--accent-blue)' },
@@ -240,7 +240,7 @@ function NotificationItem({ notification, onDismiss }: NotificationItemProps) {
       }}
     >
       <div className="notification-icon" style={{ color: style.color }}>
-        {icon || '📢'}
+        {icon || ''}
       </div>
       <div className="notification-content">
         <div className="notification-title">{title}</div>

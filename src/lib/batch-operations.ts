@@ -435,7 +435,7 @@ export async function batchCreateFiles(
     deleted,
     failed,
     duration,
-    summary: `${success ? '✅' : '⚠️'} Created ${created} files, updated ${updated}, deleted ${deleted}${failed > 0 ? `, ${failed} failed` : ''} in ${duration}ms`
+    summary: `${success ? '' : ''} Created ${created} files, updated ${updated}, deleted ${deleted}${failed > 0 ? `, ${failed} failed` : ''} in ${duration}ms`
   }
 }
 

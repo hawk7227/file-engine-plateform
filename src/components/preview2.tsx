@@ -97,7 +97,7 @@ export default function PreviewLabPage() {
     {role:'ai',text:'Here\'s the query joining appointments with Stripe payments:',
       code:{lang:'SQL',content:`SELECT p.full_name, p.email,\n  a.status AS appt_status,\n  CASE s.status\n    WHEN 'succeeded' THEN 'Paid'\n    WHEN 'pending' THEN 'Pending'\n    ELSE COALESCE(s.status,'N/A')\n  END AS payment\nFROM appointments a\nJOIN patients p ON p.id = a.patient_id\nLEFT JOIN stripe_payments s ON s.appointment_id = a.id\nWHERE a.scheduled_at::date = CURRENT_DATE;`},
       actions:[
-        {label:'🗄️ Run SQL',onClick:()=>setLeftTab('sql')},
+        {label:' Run SQL',onClick:()=>setLeftTab('sql')},
         {label:'▶ Execute',onClick:()=>toast('Executed','8 rows · 23ms','success')},
       ]},
   ])
@@ -286,7 +286,7 @@ export default function PreviewLabPage() {
         </div>
         {/* Tabs */}
         <div className="flex border-b border-zinc-800" style={{scrollbarWidth:'none'}}>
-          {([['chat','💬'],['routes','📄'],['video','🎬'],['images','🖼️'],['sql','🗄️'],['code','📝']] as [LeftTab,string][]).map(([id,icon])=>(
+          {([['chat',''],['routes',''],['video',''],['images',''],['sql',''],['code','']] as [LeftTab,string][]).map(([id,icon])=>(
             <button key={id} onClick={()=>setLeftTab(id as LeftTab)} className={`flex-1 py-1.5 text-center border-b-2 text-[7px] font-bold uppercase tracking-widest cursor-pointer transition-all ${leftTab===id?'text-emerald-400 border-emerald-400 bg-emerald-400/[.03]':'text-zinc-600 border-transparent hover:text-zinc-400'}`}>{icon} {id}</button>
           ))}
         </div>
@@ -299,7 +299,7 @@ export default function PreviewLabPage() {
               <div className="flex-1 overflow-y-auto p-2 space-y-1">
                 {chatMsgs.map((m,i)=>(
                   <div key={i} className="flex gap-2 p-2">
-                    <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[9px] shrink-0 mt-0.5 ${m.role==='ai'?'bg-emerald-500/10 border border-emerald-500/20':'bg-zinc-800'}`}>{m.role==='ai'?'⚡':'👤'}</div>
+                    <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[9px] shrink-0 mt-0.5 ${m.role==='ai'?'bg-emerald-500/10 border border-emerald-500/20':'bg-zinc-800'}`}>{m.role==='ai'?'':''}</div>
                     <div className="flex-1 min-w-0">
                       <div className={`text-[7px] font-bold uppercase tracking-wider mb-0.5 ${m.role==='ai'?'text-emerald-400':'text-zinc-500'}`}>{m.role==='ai'?'File Engine':'Marcus'}</div>
                       <div className="text-[11px] leading-relaxed text-zinc-300">{m.text}</div>
@@ -334,7 +334,7 @@ export default function PreviewLabPage() {
                 {sec.items.map((r,j)=>(
                   <button key={j} onClick={()=>{setCurrentRoute(r.route);toast('Navigate',r.route,'info')}}
                     className={`w-full flex items-center gap-2 px-3 py-1.5 text-left text-[10px] transition-colors ${currentRoute===r.route?'bg-emerald-500/5 text-emerald-400 font-semibold':'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'}`}>
-                    <span className="text-[9px]">📄</span>
+                    <span className="text-[9px]"></span>
                     <span className="flex-1 truncate">{r.label}</span>
                     <span className="text-[7px] text-zinc-600 font-mono truncate max-w-[70px]">{r.file}</span>
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${r.status==='live'?'bg-emerald-400 shadow-sm shadow-emerald-400/50':'bg-yellow-400 shadow-sm shadow-yellow-400/50'}`}/>
@@ -352,8 +352,8 @@ export default function PreviewLabPage() {
                   <span className={lblCls}>Now Playing</span>
                   <video src={playerUrl} controls className="w-full rounded-lg border border-zinc-800"/>
                   <div className="flex gap-1 mt-1.5">
-                    <a href={playerUrl} download className="flex-1 text-center px-2 py-1 rounded-lg text-[8px] font-bold border border-zinc-800 text-zinc-400 hover:border-zinc-600">💾 Download</a>
-                    <button onClick={()=>{navigator.clipboard.writeText(playerUrl);toast('Copied','','success')}} className="flex-1 px-2 py-1 rounded-lg text-[8px] font-bold border border-zinc-800 text-zinc-400 hover:border-zinc-600">🔗 Copy</button>
+                    <a href={playerUrl} download className="flex-1 text-center px-2 py-1 rounded-lg text-[8px] font-bold border border-zinc-800 text-zinc-400 hover:border-zinc-600"> Download</a>
+                    <button onClick={()=>{navigator.clipboard.writeText(playerUrl);toast('Copied','','success')}} className="flex-1 px-2 py-1 rounded-lg text-[8px] font-bold border border-zinc-800 text-zinc-400 hover:border-zinc-600"> Copy</button>
                   </div>
                 </div>
               )}
@@ -363,27 +363,27 @@ export default function PreviewLabPage() {
               <div className={secCls}>
                 <span className={lblCls}>Reference Media</span>
                 <div className="mb-2">
-                  <div className="text-[8px] text-zinc-400 mb-1">📷 Image (first frame / character)</div>
+                  <div className="text-[8px] text-zinc-400 mb-1"> Image (first frame / character)</div>
                   {refImagePrev?(
                     <div className="relative inline-block">
                       <img src={refImagePrev} className="w-16 h-16 object-cover rounded-lg border border-zinc-700"/>
-                      <button onClick={()=>{setRefImage(null);setRefImagePrev('')}} className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[7px] text-white flex items-center justify-center">✕</button>
+                      <button onClick={()=>{setRefImage(null);setRefImagePrev('')}} className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[7px] text-white flex items-center justify-center"></button>
                     </div>
                   ):(
                     <label className="flex items-center gap-2 px-2 py-1.5 bg-zinc-900 border border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-500 text-[9px] text-zinc-400">
-                      📎 Upload image<input type="file" accept="image/*" onChange={e=>{const f=e.target.files?.[0];if(!f)return;setRefImage(f);setRefImagePrev(URL.createObjectURL(f))}} className="hidden"/>
+                       Upload image<input type="file" accept="image/*" onChange={e=>{const f=e.target.files?.[0];if(!f)return;setRefImage(f);setRefImagePrev(URL.createObjectURL(f))}} className="hidden"/>
                     </label>
                   )}
                 </div>
                 <div className="mb-2">
-                  <div className="text-[8px] text-zinc-400 mb-1">🎥 Video (character performance / style)</div>
+                  <div className="text-[8px] text-zinc-400 mb-1"> Video (character performance / style)</div>
                   {refVideoName?(
                     <div className="flex items-center gap-2 px-2 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-[9px] text-zinc-300">
-                      🎬 {refVideoName}<button onClick={()=>{setRefVideo(null);setRefVideoName('');setCharMode(false)}} className="text-red-400 text-[7px] ml-auto">Remove</button>
+                       {refVideoName}<button onClick={()=>{setRefVideo(null);setRefVideoName('');setCharMode(false)}} className="text-red-400 text-[7px] ml-auto">Remove</button>
                     </div>
                   ):(
                     <label className="flex items-center gap-2 px-2 py-1.5 bg-zinc-900 border border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-500 text-[9px] text-zinc-400">
-                      📎 Upload video<input type="file" accept="video/*" onChange={e=>{const f=e.target.files?.[0];if(!f)return;setRefVideo(f);setRefVideoName(f.name)}} className="hidden"/>
+                       Upload video<input type="file" accept="video/*" onChange={e=>{const f=e.target.files?.[0];if(!f)return;setRefVideo(f);setRefVideoName(f.name)}} className="hidden"/>
                     </label>
                   )}
                 </div>
@@ -410,7 +410,7 @@ export default function PreviewLabPage() {
               <div className={secCls}>
                 <button onClick={runVideoPipeline} disabled={videoRunning||!videoPrompt.trim()}
                   className={`w-full py-2.5 rounded-xl text-[11px] font-black transition-all ${videoRunning?'bg-zinc-800 text-zinc-500 cursor-wait':'bg-gradient-to-r from-emerald-500 to-blue-500 text-black hover:shadow-lg hover:shadow-emerald-500/20'}`}>
-                  {videoRunning?'⏳ Generating...':'🚀 Generate Video'}
+                  {videoRunning?'⏳ Generating...':' Generate Video'}
                 </button>
               </div>
               {videoJobs.length>0&&(
@@ -449,7 +449,7 @@ export default function PreviewLabPage() {
               <div className={secCls}>
                 <button onClick={runImageGen} disabled={imgRunning||!imgPrompt.trim()}
                   className={`w-full py-2.5 rounded-xl text-[11px] font-black transition-all ${imgRunning?'bg-zinc-800 text-zinc-500 cursor-wait':'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/20'}`}>
-                  {imgRunning?'⏳ Generating...': `✨ Generate ${imgBatch>1?`${imgBatch} Images`:'Image'}`}
+                  {imgRunning?'⏳ Generating...': ` Generate ${imgBatch>1?`${imgBatch} Images`:'Image'}`}
                 </button>
               </div>
               {genImgs.length>0&&(
@@ -523,7 +523,7 @@ export default function PreviewLabPage() {
         {/* Toolbar */}
         <div className="flex items-center gap-1.5 px-2 py-1 border-b border-zinc-800 bg-[#0d0d10] flex-wrap shrink-0" style={{minHeight:36}}>
           <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex-1 max-w-[260px] min-w-[100px]">
-            <span className="px-2 text-[9px] text-emerald-400">🔒</span>
+            <span className="px-2 text-[9px] text-emerald-400"></span>
             <input value={`${baseUrl.replace('https://','')}`+currentRoute} readOnly className="flex-1 bg-transparent text-[9px] text-zinc-400 font-mono py-1 outline-none min-w-[60px]"/>
           </div>
           <div className="w-px h-4 bg-zinc-800"/>
@@ -555,11 +555,11 @@ export default function PreviewLabPage() {
                     <div style={{width:10,height:10,borderRadius:'50%',background:'#1a1a2e',border:'1px solid #2a2a3e'}}/>
                   </div>
                   <div className="flex flex-col" style={{width:screenW,height:screenH,borderRadius:38,overflow:'hidden'}}>
-                    <div className="flex items-end justify-between shrink-0 text-white" style={{height:d.safeT,background:'#0a0e12',padding:'0 28px 6px',fontSize:12,fontWeight:600}}><span>9:41</span><span style={{fontSize:10}}>●●●● 🔋</span></div>
+                    <div className="flex items-end justify-between shrink-0 text-white" style={{height:d.safeT,background:'#0a0e12',padding:'0 28px 6px',fontSize:12,fontWeight:600}}><span>9:41</span><span style={{fontSize:10}}>●●●● </span></div>
                     <div className="flex items-center shrink-0" style={{height:44,background:'#f8f8f8',borderBottom:'1px solid #e0e0e0',padding:'0 8px',gap:6}}>
                       <div className="flex gap-2 shrink-0" style={{fontSize:13,color:'#888'}}><span style={{opacity:.3}}>◀</span><span>▶</span></div>
                       <div className="flex-1 flex items-center" style={{background:'#fff',border:'1px solid #d0d0d0',borderRadius:20,padding:'5px 12px',fontSize:11,color:'#555',gap:4,minWidth:0,fontFamily:'sans-serif'}}>
-                        <span style={{fontSize:10,color:'#22c55e'}}>🔒</span><span className="truncate">{baseUrl.replace('https://','')}{currentRoute}</span>
+                        <span style={{fontSize:10,color:'#22c55e'}}></span><span className="truncate">{baseUrl.replace('https://','')}{currentRoute}</span>
                       </div>
                       <span style={{border:'1.5px solid #888',borderRadius:3,padding:'0 3px',fontSize:9,fontWeight:700,color:'#888'}}>2</span>
                       <span style={{fontSize:14,color:'#888'}}>⋯</span>
@@ -567,7 +567,7 @@ export default function PreviewLabPage() {
                     <div className="flex-1 overflow-hidden bg-white">
                       {previewMode==='live'?<iframe src={fullUrl} className="w-full h-full border-0" style={{pointerEvents:isDragging?'none':'auto'}} sandbox="allow-scripts allow-same-origin allow-forms allow-popups" title="Preview"/>:<div className="w-full h-full flex items-center justify-center bg-zinc-100 text-zinc-500 text-sm">{previewMode} mode</div>}
                     </div>
-                    <div className="flex items-center justify-around shrink-0" style={{height:44,background:'#f8f8f8',borderTop:'1px solid #e0e0e0',fontSize:16,color:'#888'}}>◁ ○ ☐</div>
+                    <div className="flex items-center justify-around shrink-0" style={{height:44,background:'#f8f8f8',borderTop:'1px solid #e0e0e0',fontSize:16,color:'#888'}}>◁ ○ </div>
                   </div>
                   <div className="absolute z-20" style={{width:134,height:5,borderRadius:3,background:'rgba(255,255,255,.15)',bottom:8,left:'50%',transform:'translateX(-50%)'}}/>
                 </div>
@@ -579,7 +579,7 @@ export default function PreviewLabPage() {
                 <div style={{width:screenW,height:screenH,border:'2px solid #222',borderRadius:10,background:'#111',overflow:'hidden',boxShadow:'0 20px 50px rgba(0,0,0,.5)'}}>
                   <div className="flex items-center" style={{height:30,background:'#1a1a1a',borderBottom:'1px solid #333',padding:'0 12px',gap:8}}>
                     <div className="flex gap-1.5">{['#ff5f57','#febc2e','#28c840'].map(c=><div key={c} style={{width:10,height:10,borderRadius:'50%',background:c}}/>)}</div>
-                    <div className="flex-1 bg-[#0d0d0d] rounded-md px-3 py-1 text-[9px] text-zinc-500 font-mono mx-3">🔒 {baseUrl.replace('https://','')}{currentRoute}</div>
+                    <div className="flex-1 bg-[#0d0d0d] rounded-md px-3 py-1 text-[9px] text-zinc-500 font-mono mx-3"> {baseUrl.replace('https://','')}{currentRoute}</div>
                   </div>
                   <div style={{width:screenW,height:screenH-30,overflow:'hidden'}}><iframe src={fullUrl} className="w-full h-full border-0" style={{pointerEvents:isDragging?'none':'auto'}} sandbox="allow-scripts allow-same-origin allow-forms allow-popups" title="Preview"/></div>
                 </div>
@@ -624,7 +624,7 @@ export default function PreviewLabPage() {
       {rightOpen&&(
       <div className="w-[300px] bg-[#0d0d10] border-l border-zinc-800 flex flex-col shrink-0">
         <div className="flex border-b border-zinc-800 shrink-0">
-          {([['inspect','🔍'],['measure','📏'],['shots','📸'],['a11y','♿']] as [string,string][]).map(([id,icon])=>(
+          {([['inspect',''],['measure',''],['shots',''],['a11y','']] as [string,string][]).map(([id,icon])=>(
             <button key={id} onClick={()=>setRightTab(id as RightTab)} className={`flex-1 py-1.5 text-center border-b-2 text-[7px] font-bold uppercase tracking-widest cursor-pointer transition-all ${rightTab===id?'text-purple-400 border-purple-400 bg-purple-400/[.02]':'text-zinc-600 border-transparent hover:text-zinc-400'}`}>{icon} {id}</button>
           ))}
         </div>
@@ -692,7 +692,7 @@ export default function PreviewLabPage() {
                   <div><div className="text-[9px] font-bold text-zinc-200">{m.n}</div><div className="text-[7px] text-zinc-500 font-mono">W:{m.w} H:{m.h} Y:{m.y}</div></div>
                 </div>
               ))}
-              <button onClick={()=>toast('Scanned','4 sections found','success')} className="w-full py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg text-[8px] font-bold text-purple-400 mt-2">📐 Auto-Scan</button>
+              <button onClick={()=>toast('Scanned','4 sections found','success')} className="w-full py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg text-[8px] font-bold text-purple-400 mt-2"> Auto-Scan</button>
             </div>
           )}
 
@@ -700,13 +700,13 @@ export default function PreviewLabPage() {
           {rightTab==='shots'&&(
             <div className="p-2.5">
               <div className="flex gap-1 mb-2">
-                <button onClick={()=>toast('Captured','Screenshot saved','success')} className="flex-1 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg text-[8px] font-bold text-purple-400">📸 Capture</button>
+                <button onClick={()=>toast('Captured','Screenshot saved','success')} className="flex-1 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg text-[8px] font-bold text-purple-400"> Capture</button>
                 <button className="flex-1 py-1.5 border border-zinc-800 rounded-lg text-[8px] font-bold text-zinc-500">Batch All</button>
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {[{n:'Checkout',d:'iPhone 15 Pro',t:'Now'},{n:'Checkout',d:'iPhone SE',t:'2m',diff:'2.4%',bad:true},{n:'Landing',d:'iPhone 15',t:'5m'},{n:'Success',d:'Desktop',t:'10m',diff:'0.1%',bad:false}].map((s,i)=>(
                   <div key={i} className="p-1.5 bg-zinc-900 border border-zinc-800 rounded-lg">
-                    <div className="w-full h-12 bg-zinc-800 rounded flex items-center justify-center text-zinc-600 text-[12px] relative">📄
+                    <div className="w-full h-12 bg-zinc-800 rounded flex items-center justify-center text-zinc-600 text-[12px] relative">
                       {s.diff&&<span className={`absolute top-0.5 right-0.5 text-[5px] font-bold px-1 rounded ${s.bad?'bg-red-500/10 text-red-400':'bg-emerald-500/10 text-emerald-400'}`}>{s.diff}</span>}
                     </div>
                     <div className="text-[8px] font-bold text-zinc-300 mt-1">{s.n}</div>
@@ -756,7 +756,7 @@ export default function PreviewLabPage() {
             background:t.type==='success'?'rgba(34,197,94,.1)':t.type==='error'?'rgba(239,68,68,.1)':'rgba(59,130,246,.1)',
             borderColor:t.type==='success'?'rgba(34,197,94,.2)':t.type==='error'?'rgba(239,68,68,.2)':'rgba(59,130,246,.2)',
             color:t.type==='success'?'#4ade80':t.type==='error'?'#f87171':'#60a5fa'}}>
-            {t.type==='success'?'✓':t.type==='error'?'✗':'ℹ'} {t.title} <span className="font-normal text-zinc-400 ml-1">{t.msg}</span>
+            {t.type==='success'?'✓':t.type==='error'?'':'ℹ'} {t.title} <span className="font-normal text-zinc-400 ml-1">{t.msg}</span>
           </div>
         ))}
       </div>

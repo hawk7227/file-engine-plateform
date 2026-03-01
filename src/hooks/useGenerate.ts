@@ -213,8 +213,8 @@ export function useGenerate() {
                   ...prev,
                   phase: 'complete',
                   phaseMessage: validation.isClean 
-                    ? '✅ Code validated successfully!' 
-                    : `⚠️ Completed with ${validation.errors.length} issues`,
+                    ? ' Code validated successfully!' 
+                    : ` Completed with ${validation.errors.length} issues`,
                   files: data.files,
                   validation,
                   isGenerating: false

@@ -56,7 +56,7 @@ export function UrlImportButton({ projectId, onImport }: UrlImportButtonProps) {
         onClick={() => setOpen(true)}
         title="Import URL"
       >
-        🔗
+        
       </button>
       
       {open && (

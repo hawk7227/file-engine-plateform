@@ -53,7 +53,7 @@ export const DEVICES: DevicePreset[] = [
 ]
 
 export const BROWSER_PRESET: DevicePreset = {
-  id: 'chrome', name: 'Chrome Browser', label: 'Web', cssViewport: { width: 1280, height: 800 }, dpr: 2, screenSize: '13-15"', frameType: 'browser', borderRadius: 10,
+  id: 'chrome', name: 'Chrome Browser', label: 'Web', cssViewport: { width: 1280, height: 800 }, dpr: 2, screenSize: '13-15"', frameType: 'browser', borderRadius: 12,
 }
 
 // ============================================
@@ -64,12 +64,12 @@ type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed'
 type BottomTab = 'sql' | 'md' | 'doc' | 'git' | 'diff' | 'logs'
 
 const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
-  { id: 'chat', icon: '💬', label: 'Chat' },
-  { id: 'routes', icon: '📄', label: 'Routes' },
-  { id: 'video', icon: '🎬', label: 'Video' },
-  { id: 'images', icon: '🖼', label: 'Imgs' },
-  { id: 'team', icon: '👥', label: 'Team' },
-  { id: 'feed', icon: '📡', label: 'Feed' },
+  { id: 'chat', icon: '', label: 'Chat' },
+  { id: 'routes', icon: '', label: 'Routes' },
+  { id: 'video', icon: '', label: 'Video' },
+  { id: 'images', icon: '', label: 'Imgs' },
+  { id: 'team', icon: '', label: 'Team' },
+  { id: 'feed', icon: '', label: 'Feed' },
 ]
 
 // ============================================
@@ -86,7 +86,7 @@ const CSS = `
 .wp-main{flex:1;display:flex;overflow:hidden}
 .wp-left{width:300px;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);display:flex;flex-direction:column;flex-shrink:0}
 .wp-lheader{padding:12px 14px;border-bottom:1px solid var(--wp-border);display:flex;align-items:center;gap:10px}
-.wp-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--wp-accent),var(--wp-blue));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#000;flex-shrink:0;box-shadow:0 4px 16px rgba(52,211,153,.15)}
+.wp-logo{width:28px;height:28px;border-radius:8px;background:var(--accent-primary),var(--wp-blue));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#000;flex-shrink:0;box-shadow:0 4px 16px rgba(52,211,153,.15)}
 .wp-ltitle{font-size:13px;font-weight:800;letter-spacing:-.3px}
 .wp-lsub{font-size:7px;color:var(--wp-text-3);font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
 .wp-gh{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:7px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.15);color:var(--wp-accent);transition:background .15s}.wp-gh:hover{background:rgba(52,211,153,.12)}
@@ -98,7 +98,7 @@ const CSS = `
 .wp-bottom{display:flex;border-top:2px solid var(--wp-border);flex-shrink:0;position:relative;transition:height .25s ease;overflow:hidden}
 .wp-bottom-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--wp-border);min-width:0;overflow:hidden}
 .wp-bottom-right{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-.wp-resize-v{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:20}.wp-resize-v:hover{background:linear-gradient(90deg,transparent,rgba(52,211,153,.15),transparent)}
+.wp-resize-v{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:20}.wp-resize-v:hover{background:var(--accent-bg),transparent)}
 .wp-pbar{display:flex;align-items:center;justify-content:space-between;padding:0 8px;height:26px;background:var(--wp-bg-3);border-bottom:1px solid var(--wp-border);flex-shrink:0}
 .wp-pbar-t{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--wp-text-3);display:flex;align-items:center;gap:4px}
 .wp-pbar-t .dot{width:5px;height:5px;border-radius:50%}
@@ -106,7 +106,7 @@ const CSS = `
 .wp-footer{display:flex;gap:12px;padding:3px 10px;border-top:1px solid var(--wp-border);background:var(--wp-bg-1);font-size:7px;font-family:var(--wp-mono);color:var(--wp-text-4);flex-shrink:0;align-items:center}
 .wp-footer span span{color:var(--wp-text-2)}
 .wp-tb{padding:3px 6px;border-radius:6px;font-size:8px;font-weight:700;border:1px solid var(--wp-border);background:none;color:var(--wp-text-4);cursor:pointer;transition:all .1s;font-family:var(--wp-font)}.wp-tb:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
-.wp-tb-primary{background:linear-gradient(135deg,var(--wp-accent),var(--wp-blue));color:#000;border:none;font-weight:800;padding:4px 10px}.wp-tb-primary:hover{box-shadow:0 0 12px rgba(52,211,153,.2)}
+.wp-tb-primary{background:var(--accent-primary),var(--wp-blue));color:#000;border:none;font-weight:800;padding:4px 10px}.wp-tb-primary:hover{box-shadow:0 0 12px rgba(52,211,153,.2)}
 .wp-tsep{width:1px;height:16px;background:var(--wp-border);flex-shrink:0}
 .wp-avstack{display:flex;align-items:center}.wp-avt{width:18px;height:18px;border-radius:50%;border:2px solid var(--wp-bg-1);margin-left:-6px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0}.wp-avt:first-child{margin-left:0}
 .wp-avcount{font-size:7px;color:var(--wp-text-3);margin-left:6px;font-weight:700}
@@ -261,7 +261,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
             {realtime.teamMembers.slice(0, 4).map((m, i) => (
               <div key={m.user_id} className="wp-avt" style={{
                 background: m.user_id === user.id
-                  ? 'linear-gradient(135deg,var(--wp-accent),var(--wp-blue))'
+                  ? 'var(--accent-primary),var(--wp-blue))'
                   : `hsl(${(i * 90 + 260) % 360}, 70%, 65%)`,
                 color: m.user_id === user.id ? '#000' : '#fff',
               }}>
@@ -271,12 +271,12 @@ export default function WorkplaceLayout({ user, profile }: Props) {
             <span className="wp-avcount">{onlineCount} online</span>
           </div>
           <div className="wp-tsep" style={{ margin: '0 4px' }} />
-          <button className="wp-tb wp-tb-primary" onClick={handleDeploy}>🚀 Deploy</button>
+          <button className="wp-tb wp-tb-primary" onClick={handleDeploy}> Deploy</button>
           <button className="wp-tb" onClick={() => {
             toast('Pushed', 'Files → master', 'ok')
             realtime.logActivity('git_push', { branch: 'master' })
           }}>⬆ Push</button>
-          <button className="wp-tb">⚙️</button>
+          <button className="wp-tb"></button>
         </div>
 
         {/* ═══ MAIN ═══ */}
@@ -289,7 +289,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 <div className="wp-ltitle">File Engine</div>
                 <div className="wp-lsub">Workplace IDE</div>
               </div>
-              <div className="wp-gh">⚡ hawk7227</div>
+              <div className="wp-gh"> hawk7227</div>
             </div>
             <div className="wp-tbar">
               {LEFT_TABS.map(t => (
@@ -373,7 +373,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                     <button className="wp-pbtn" onClick={() => {
                       const code = generatedFiles.map(f => `// ${f.path}\n${f.content}`).join('\n\n')
                       navigator.clipboard.writeText(code).then(() => toast('Copied', 'Code copied', 'ok'))
-                    }}>📋</button>
+                    }}></button>
                   </div>
                 </div>
                 <WPCodeOutput files={generatedFiles} />
@@ -399,7 +399,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
           <span>DPR: <span>{activeDevice.dpr}x</span></span>
           <span>Env: <span style={{ color: 'var(--wp-yellow)' }}>STAGING</span></span>
           <span>Build: <span style={{ color: preview.phase === 'error' ? 'var(--wp-red)' : 'var(--wp-accent)' }}>
-            {preview.phase === 'error' ? '❌ FAIL' : preview.phase === 'previewing' ? '✅ PASS' : preview.phase === 'idle' ? '—' : '⏳'}
+            {preview.phase === 'error' ? ' FAIL' : preview.phase === 'previewing' ? ' PASS' : preview.phase === 'idle' ? '—' : '⏳'}
           </span></span>
           <span style={{ marginLeft: 'auto' }}>Team: <span style={{ color: 'var(--wp-accent)' }}>{onlineCount} online</span></span>
         </div>
