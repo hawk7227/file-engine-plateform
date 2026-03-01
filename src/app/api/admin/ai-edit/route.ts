@@ -54,6 +54,8 @@ const PAGE_FILE_MAP: Record<string, string> = {
     '/admin': 'src/app/admin/page.tsx',
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: NextRequest) {
     try {
         const profile = await getAuthUser(req)

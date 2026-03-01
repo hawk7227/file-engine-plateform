@@ -18,6 +18,7 @@ interface AutoFixRequest {
     path: string;
     content: string;
   }>;
+
   errorLogs: string;
   attemptNumber?: number;
 }
@@ -25,6 +26,8 @@ interface AutoFixRequest {
 // ============================================
 // ROUTE HANDLER
 // ============================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

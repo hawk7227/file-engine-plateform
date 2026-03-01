@@ -6,6 +6,7 @@
 import { NextRequest } from 'next/server'
 import Stripe from 'stripe'
 import {
+
   verifyWebhookSignature,
   handleCheckoutCompleted,
   handleSubscriptionUpdated,
@@ -13,6 +14,8 @@ import {
   handleInvoicePaid,
   handleInvoiceFailed
 } from '@/lib/stripe-billing'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

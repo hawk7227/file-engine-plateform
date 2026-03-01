@@ -11,6 +11,7 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypt
 // =====================================================
 
 // ── Auth helper (same as /api/admin/settings) ──
+
 async function getAuthUser(req: NextRequest) {
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -85,6 +86,8 @@ const VALID_KEYS = [
 ]
 
 // ── GET — List all keys (masked, never raw) ──
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
     try {
         const profile = await getAuthUser(req)

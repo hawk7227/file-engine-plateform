@@ -20,6 +20,7 @@ interface VerifyBuildRequest {
     path: string;
     content: string;
   }>;
+
   framework?: string;
   userId?: string;
   projectId?: string;
@@ -29,6 +30,8 @@ interface VerifyBuildRequest {
 // ============================================
 // ROUTE HANDLER
 // ============================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

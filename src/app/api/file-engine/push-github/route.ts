@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BRAND_NAME } from '@/lib/brand'
 import { 
+
   createRepoAndPush, 
   pushFiles, 
   checkRepoExists,
@@ -25,6 +26,7 @@ interface PushGitHubRequest {
     path: string;
     content: string;
   }>;
+
   repoOwner?: string;
   repoName: string;
   branch?: string;
@@ -37,6 +39,8 @@ interface PushGitHubRequest {
 // ============================================
 // ROUTE HANDLER
 // ============================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

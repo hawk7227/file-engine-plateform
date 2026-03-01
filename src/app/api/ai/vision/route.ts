@@ -7,11 +7,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BRAND_NAME } from '@/lib/brand'
 import { 
+
   FILE_ENGINE_VISION_PROMPT, 
   sanitizeResponse, 
   selectProvider,
   getActualModelId 
 } from '@/lib/ai-config'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

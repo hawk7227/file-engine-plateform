@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUser, getSubscription, supabase } from '@/lib/supabase'
 import { 
+
   getProjectTeam, 
   inviteTeamMember, 
   removeTeamMember, 
@@ -10,6 +11,8 @@ import {
 } from '@/lib/team'
 
 // GET /api/team?projectId=xxx - Get team members
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const user = await getUser()

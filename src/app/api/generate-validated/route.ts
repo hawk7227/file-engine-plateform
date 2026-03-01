@@ -7,7 +7,6 @@ import { getKeyWithFailover, markRateLimited } from '@/lib/key-pool'
 import { checkUsageAndRateLimit, recordUsage } from '@/lib/usage-limits'
 
 export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
 export const maxDuration = 120 // 2 minutes for complex validations
 
 /**
@@ -21,6 +20,8 @@ export const maxDuration = 120 // 2 minutes for complex validations
  * 5. Re-validate until clean
  * 6. Only deliver error-free code
  */
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {

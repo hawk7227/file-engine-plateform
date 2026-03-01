@@ -8,6 +8,8 @@ const PLAN_LIMITS = {
 }
 
 // POST - Create build (queue for processing)
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: NextRequest) {
   try {
     const user = await getUser()

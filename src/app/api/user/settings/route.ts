@@ -21,6 +21,8 @@ async function getUserId(request: NextRequest): Promise<string | null> {
   return user?.id || null
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   const userId = await getUserId(request)
   if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })

@@ -1,4 +1,5 @@
 'use client'
+
 import { BRAND_NAME } from '@/lib/brand'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -6,6 +7,7 @@ import Link from 'next/link'
 import { verifyEmailOtp, verifyPasswordResetOtp, sendPasswordResetOtp } from '@/lib/supabase'
 
 const TOTAL = 8
+
 
 export default function VerifyOtpPage() {
   const router = useRouter()

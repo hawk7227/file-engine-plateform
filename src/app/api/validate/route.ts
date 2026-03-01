@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { 
+
   vercelProofValidate, 
   generateQuickFixes,
   type FileContent,
@@ -15,6 +16,8 @@ import {
 // =====================================================
 // POST - Run full Vercel-proof validation
 // =====================================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

@@ -30,6 +30,7 @@ import {
   Twitter
 } from 'lucide-react'
 
+
 export default function LandingPage() {
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)

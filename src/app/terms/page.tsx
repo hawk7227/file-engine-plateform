@@ -7,6 +7,8 @@ export const metadata = {
   description: `Terms of Service for ${BRAND_NAME} AI code generation platform`
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">

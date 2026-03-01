@@ -18,6 +18,7 @@ interface SystemStatus {
   uptime: number
 }
 
+
 export default function SystemStatusPage() {
   const [data, setData] = useState<SystemStatus | null>(null)
   const [error, setError] = useState<string | null>(null)

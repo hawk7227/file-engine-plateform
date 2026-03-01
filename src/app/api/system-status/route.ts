@@ -34,6 +34,8 @@ async function checkService(
   }
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const checks: ServiceCheck[] = []
 

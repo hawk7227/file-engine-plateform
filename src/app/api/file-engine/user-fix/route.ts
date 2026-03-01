@@ -18,6 +18,7 @@ interface UserFixRequest {
     path: string;
     content: string;
   }>;
+
   userFeedback: string;
   previewUrl?: string;
   voiceTranscript?: string | null;
@@ -26,6 +27,8 @@ interface UserFixRequest {
 // ============================================
 // ROUTE HANDLER
 // ============================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

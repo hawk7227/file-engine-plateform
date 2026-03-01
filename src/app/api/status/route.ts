@@ -6,6 +6,8 @@
 import { NextRequest } from 'next/server'
 import { getPoolStatus, estimateConcurrentCapacity } from '@/lib/key-pool'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   const poolStatus = getPoolStatus()
   const capacity = estimateConcurrentCapacity()

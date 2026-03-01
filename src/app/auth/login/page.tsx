@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { login, loginWithOAuth } from '@/lib/supabase'
 import { BRAND_SHORT, BRAND_NAME } from '@/lib/brand'
 
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')

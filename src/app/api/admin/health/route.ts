@@ -63,6 +63,8 @@ async function checkTable(supabase: any, name: string, critical: boolean): Promi
     }
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
     try {
         const profile = await getAuthUser(req)

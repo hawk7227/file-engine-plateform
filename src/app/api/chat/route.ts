@@ -639,6 +639,8 @@ function buildOpenAIVisionBlocks(text: string, attachments?: Attachment[]): any[
 // MAIN HANDLER
 // =====================================================
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const body: ChatRequest = await request.json()

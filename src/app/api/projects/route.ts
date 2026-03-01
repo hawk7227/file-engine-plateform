@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase, getUser } from '@/lib/supabase'
 
 // GET - List user projects
+
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const user = await getUser()

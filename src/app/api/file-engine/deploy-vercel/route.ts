@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { 
+
   createProductionDeployment, 
   waitForDeployment 
 } from '@/lib/file-engine/vercel-api';
@@ -22,6 +23,7 @@ interface DeployVercelRequest {
     path: string;
     content: string;
   }>;
+
   projectName: string;
   userId?: string;
   vercelToken?: string; // From user's connected account
@@ -31,6 +33,8 @@ interface DeployVercelRequest {
 // ============================================
 // ROUTE HANDLER
 // ============================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
     try {
         const authHeader = request.headers.get('Authorization')
@@ -38,5 +40,4 @@ export async function GET(request: NextRequest) {
         return new Response(JSON.stringify({ error: error.message }), { status: 500 })
     }
 }
-
 

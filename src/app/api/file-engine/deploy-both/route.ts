@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BRAND_NAME } from '@/lib/brand'
 import { 
+
   createProductionDeployment, 
   waitForDeployment 
 } from '@/lib/file-engine/vercel-api';
@@ -29,6 +30,7 @@ interface DeployBothRequest {
     path: string;
     content: string;
   }>;
+
   projectName: string;
   github: {
     repoOwner?: string;
@@ -46,6 +48,8 @@ interface DeployBothRequest {
 // ============================================
 // ROUTE HANDLER
 // ============================================
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

@@ -7,6 +7,8 @@ import { NextRequest } from 'next/server'
 import { getUser } from '@/lib/supabase'
 import { getUsageStats, checkUsageAlerts, canUserGenerate } from '@/lib/usage-limits'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const user = await getUser()

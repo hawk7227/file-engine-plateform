@@ -9,6 +9,9 @@ import { createClient } from '@supabase/supabase-js'
 import { generateMedia, getPublicTools, getToolByCodename } from '@/lib/media-tools'
 
 // GET — List available tools (codenames only, no provider info)
+
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   const tools = getPublicTools()
   return NextResponse.json({ tools })

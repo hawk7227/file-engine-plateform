@@ -6,6 +6,8 @@
 import { NextRequest } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { name, email, company, subject, message } = await request.json()

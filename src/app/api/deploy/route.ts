@@ -3,6 +3,9 @@ import { getUser, getSubscription, supabase } from '@/lib/supabase'
 import { deployToVercel, getDeploymentStatus, setCustomDomain } from '@/lib/deploy'
 
 // POST /api/deploy - Create new deployment
+
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: NextRequest) {
   try {
     const user = await getUser()

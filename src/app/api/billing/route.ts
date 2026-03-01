@@ -7,6 +7,8 @@ import { NextRequest } from 'next/server'
 import { getUser } from '@/lib/supabase'
 import { createPortalSession, getSubscriptionInfo, cancelSubscription, resumeSubscription } from '@/lib/stripe-billing'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const user = await getUser()

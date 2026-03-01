@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Sparkles, Mail, MessageSquare, Building, Send, CheckCircle } from 'lucide-react'
 import { brand, BRAND_NAME } from '@/lib/brand'
 
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',

@@ -32,6 +32,7 @@ const WorkplaceLayout = dynamic(() => import('@/components/workplace/WorkplaceLa
   ),
 })
 
+
 export default function AdminWorkplacePage() {
   // AUTH BYPASS FOR TESTING — remove when going to production
   const mockUser = { id: 'test-user', email: 'test@fileengine.com' } as User

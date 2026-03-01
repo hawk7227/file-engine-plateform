@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 // Service role client for admin operations (bypasses RLS)
+
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -52,6 +53,8 @@ async function verifyAdmin(request: NextRequest): Promise<{ userId: string } | R
 }
 
 // ── GET: List permissions ────────────────────────────
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   const auth = await verifyAdmin(request)
   if (auth instanceof Response) return auth

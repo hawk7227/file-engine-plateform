@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { supabase, getUser } from '@/lib/supabase'
 
 // GET /api/queue/stats - Get queue statistics
+
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const user = await getUser()

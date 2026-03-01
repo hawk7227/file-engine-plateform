@@ -12,6 +12,7 @@ concurrency:
 
 env:
   NODE_VERSION: '20'
+  NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
   ci:
@@ -31,18 +32,22 @@ jobs:
 
       - name: Install (lockfile-only)
         run: npm ci
+        env:
+          NODE_ENV: development
 
       - name: Lint
         run: npm run lint
 
       - name: Typecheck
-        run: npm run type-check
+        run: npm run typecheck
 
       - name: Unit Tests
-        run: npm test --if-present
+        run: npm test
 
       - name: Production Build
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Generate Build Report
         if: success()
@@ -81,12 +86,16 @@ jobs:
 
       - name: Install
         run: npm ci
+        env:
+          NODE_ENV: development
 
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
 
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Run E2E
         run: npx playwright test

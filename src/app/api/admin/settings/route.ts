@@ -41,6 +41,8 @@ function isAdmin(role: string): boolean {
 }
 
 // GET — Fetch current settings
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const profile = await getAuthUser(req)

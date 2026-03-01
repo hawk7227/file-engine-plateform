@@ -108,6 +108,7 @@ const PLANS = [
   }
 ]
 
+
 export default function PricingPage() {
   const router = useRouter()
   const { user } = useAuth()
