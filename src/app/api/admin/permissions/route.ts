@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { validationErrorResponse } from '@/lib/schemas'
 
 // Service role client for admin operations (bypasses RLS)
 
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
   const auth = await verifyAdmin(request)
   if (auth instanceof Response) return auth
 
-  const body = await request.json()
+  const body = await request.json() as Record<string, any>
   const { feature, user_id, group_id, plan, enabled, limit_value, limit_period, expires_at, reason } = body
 
   // Validate

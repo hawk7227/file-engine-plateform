@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUser, getSubscription, supabase } from '@/lib/supabase'
 import { deployToVercel, getDeploymentStatus, setCustomDomain } from '@/lib/deploy'
+import { parseBody, parseDeployRequest, validationErrorResponse } from '@/lib/schemas'
 
 // POST /api/deploy - Create new deployment
 
@@ -13,7 +14,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { projectId, production = false, customDomain } = await req.json()
+    const parsed = await parseBody(req, parseDeployRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { projectId, production = false, customDomain } = parsed.data
 
     if (!projectId) {
       return NextResponse.json({ error: 'projectId is required' }, { status: 400 })

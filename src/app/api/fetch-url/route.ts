@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { parseBody, parseFetchUrlRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { url } = await req.json()
+    const parsed = await parseBody(req, parseFetchUrlRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { url } = parsed.data
     
     if (!url || typeof url !== 'string') {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })

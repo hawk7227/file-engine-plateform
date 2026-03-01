@@ -5,6 +5,7 @@ import { validateAndFix, ValidationResult } from '@/lib/validation'
 import { fixWithAI, FixResult } from '@/lib/ai-fixer'
 import { getKeyWithFailover, markRateLimited } from '@/lib/key-pool'
 import { checkUsageAndRateLimit, recordUsage } from '@/lib/usage-limits'
+import { parseBody, parseGenerateValidatedRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120 // 2 minutes for complex validations
@@ -46,14 +47,14 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const { 
-      prompt, 
+    const parsed = await parseBody(req, parseGenerateValidatedRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { prompt, 
       projectId, 
       buildId, 
       model = 'claude-sonnet-4',
       strictMode = false,
-      maxFixIterations = 3
-    } = await req.json()
+      maxFixIterations = 3 } = parsed.data
 
     if (!prompt) {
       return new Response(JSON.stringify({ error: 'Prompt is required' }), { 

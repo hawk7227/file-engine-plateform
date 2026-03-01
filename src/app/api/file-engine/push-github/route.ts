@@ -16,6 +16,7 @@ import {
   getCurrentUser
 } from '@/lib/file-engine/github-api';
 import { supabase } from '@/lib/supabase';
+import { validationErrorResponse } from '@/lib/schemas'
 
 // ============================================
 // TYPES
@@ -44,7 +45,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body: PushGitHubRequest = await request.json();
+    const body = await request.json() as Record<string, any>;
     
     // Validate request
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {

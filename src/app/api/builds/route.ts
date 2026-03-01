@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase, getUser } from '@/lib/supabase'
+import { parseBody, parseBuildsRequest, validationErrorResponse } from '@/lib/schemas'
 
 const PLAN_LIMITS = {
   free: { concurrent: 3, daily: 10 },
@@ -17,7 +18,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { project_id, prompt } = await req.json()
+    const parsed = await parseBody(req, parseBuildsRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { project_id, prompt } = parsed.data
 
     if (!project_id || !prompt) {
       return NextResponse.json({ error: 'project_id and prompt required' }, { status: 400 })

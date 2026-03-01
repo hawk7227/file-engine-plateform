@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { validationErrorResponse } from '@/lib/schemas'
 
 // =====================================================
 // GET /api/admin/settings — Fetch team cost settings
@@ -134,7 +135,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const body = await req.json()
+    const body = await req.json() as Record<string, any>
     const teamId = profile.team_id
     if (!teamId) {
       return NextResponse.json({ error: 'No team configured' }, { status: 400 })

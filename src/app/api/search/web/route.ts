@@ -4,12 +4,15 @@
 // =====================================================
 
 import { NextRequest, NextResponse } from 'next/server'
+import { parseBody, parseSearchWebRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { query, maxResults = 10, dateRange = 'all' } = await request.json()
+    const parsed = await parseBody(request, parseSearchWebRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { query, maxResults = 10, dateRange = 'all' } = parsed.data
     
     if (!query) {
       return NextResponse.json(

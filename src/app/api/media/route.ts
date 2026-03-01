@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateMedia, getPublicTools, getToolByCodename } from '@/lib/media-tools'
+import { validationErrorResponse } from '@/lib/schemas'
 
 // GET — List available tools (codenames only, no provider info)
 
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser(token)
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json() as Record<string, any>
     const { toolCodename, prompt, params, inputFile } = body
 
     if (!toolCodename || !prompt) {

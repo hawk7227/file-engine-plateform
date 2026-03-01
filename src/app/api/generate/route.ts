@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { getUser, getProfile, supabase } from '@/lib/supabase'
 import { generate, parseCodeBlocks, AIModel } from '@/lib/ai'
+import { parseBody, parseGenerateRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const runtime = 'nodejs'
 
@@ -17,7 +18,9 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const { prompt, projectId, buildId, model = 'claude-sonnet-4' } = await req.json()
+    const parsed = await parseBody(req, parseGenerateRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { prompt, projectId, buildId, model = 'claude-sonnet-4' } = parsed.data
 
     if (!prompt) {
       return new Response(JSON.stringify({ error: 'Prompt is required' }), { 

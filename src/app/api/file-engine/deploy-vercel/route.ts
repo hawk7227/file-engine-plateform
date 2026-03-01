@@ -13,6 +13,7 @@ import {
   waitForDeployment 
 } from '@/lib/file-engine/vercel-api';
 import { supabase } from '@/lib/supabase';
+import { validationErrorResponse } from '@/lib/schemas'
 
 // ============================================
 // TYPES
@@ -38,7 +39,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body: DeployVercelRequest = await request.json();
+    const body = await request.json() as Record<string, any>;
     
     // Validate request
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {

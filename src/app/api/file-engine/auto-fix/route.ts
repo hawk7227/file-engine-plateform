@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { autoFixErrors } from '@/lib/file-engine/auto-fix-engine';
+import { parseBody, parseAutoFixRequest, validationErrorResponse } from '@/lib/schemas'
 
 // ============================================
 // TYPES
@@ -31,7 +32,9 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body: AutoFixRequest = await request.json();
+    const parsed = await parseBody(request, parseAutoFixRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const body = parsed.data;
     
     // Validate request
     if (!body.originalFiles || !Array.isArray(body.originalFiles)) {

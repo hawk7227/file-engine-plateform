@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { projectId, command, timeout = 60000, files } = await request.json()
+    const { projectId, command, timeout = 60000, files } = await request.json() as Record<string, any>
     
     if (!projectId || !command) {
       return NextResponse.json(

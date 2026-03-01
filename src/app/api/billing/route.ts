@@ -6,6 +6,7 @@
 import { NextRequest } from 'next/server'
 import { getUser } from '@/lib/supabase'
 import { createPortalSession, getSubscriptionInfo, cancelSubscription, resumeSubscription } from '@/lib/stripe-billing'
+import { parseBody, parseBillingRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,7 +44,9 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const { action } = await request.json()
+    const parsed = await parseBody(request, parseBillingRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { action } = parsed.data
     const origin = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || 'http://localhost:3000'
 
     switch (action) {

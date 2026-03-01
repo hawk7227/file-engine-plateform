@@ -12,6 +12,7 @@ import {
   type ValidationResult,
   type QuickFix
 } from '@/lib/vercel-proof'
+import { validationErrorResponse } from '@/lib/schemas'
 
 // =====================================================
 // POST - Run full Vercel-proof validation
@@ -21,7 +22,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as Record<string, any>
     const { files, autoFix = false } = body
     
     if (!files || !Array.isArray(files)) {

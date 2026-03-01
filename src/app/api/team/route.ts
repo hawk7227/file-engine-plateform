@@ -7,8 +7,10 @@ import {
   removeTeamMember, 
   updateMemberRole,
   checkProjectPermission,
-  getProjectActivity
+  getProjectActivity,
+  type TeamRole
 } from '@/lib/team'
+import { parseBody, parseTeamRequest, validationErrorResponse } from '@/lib/schemas'
 
 // GET /api/team?projectId=xxx - Get team members
 export const dynamic = 'force-dynamic'
@@ -56,7 +58,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { projectId, email, role = 'editor' } = await req.json()
+    const parsed = await parseBody(req, parseTeamRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { projectId, email, role = 'editor' } = parsed.data
 
     if (!projectId || !email) {
       return NextResponse.json({ error: 'projectId and email are required' }, { status: 400 })
@@ -87,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Invite member
-    const result = await inviteTeamMember(projectId, user.id, email, role)
+    const result = await inviteTeamMember(projectId, user.id, email, role as TeamRole)
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })

@@ -6,6 +6,7 @@
 import { NextRequest } from 'next/server'
 import { getUser, getProfile } from '@/lib/supabase'
 import { createCheckoutSession } from '@/lib/stripe-billing'
+import { parseBody, parseCheckoutRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,7 +20,9 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const { plan, interval = 'monthly' } = await request.json()
+    const parsed = await parseBody(request, parseCheckoutRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { plan, interval = 'monthly' } = parsed.data
 
     if (!plan || !['pro', 'enterprise'].includes(plan)) {
       return new Response(JSON.stringify({ error: 'Invalid plan' }), {
@@ -41,7 +44,7 @@ export async function POST(request: NextRequest) {
     const checkoutUrl = await createCheckoutSession({
       userId: user.id,
       email: user.email || '',
-      plan,
+      plan: plan as 'pro' | 'enterprise',
       interval,
       successUrl: `${origin}/dashboard?upgrade=success`,
       cancelUrl: `${origin}/pricing?upgrade=canceled`

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase, getUser } from '@/lib/supabase'
+import { parseBody, parseProjectsRequest, validationErrorResponse } from '@/lib/schemas'
 
 // GET - List user projects
 
@@ -37,7 +38,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { name, type } = await req.json()
+    const parsed = await parseBody(req, parseProjectsRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { name, type } = parsed.data
 
     if (!name || !type) {
       return NextResponse.json({ error: 'Name and type required' }, { status: 400 })

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as Record<string, any>
     const { files, projectName, autoFix = false } = body
     
     if (!files || typeof files !== 'object') {

@@ -13,12 +13,15 @@ import {
   selectProvider,
   getActualModelId 
 } from '@/lib/ai-config'
+import { parseBody, parseAIVisionRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { image, prompt, maxTokens = 4096 } = await request.json()
+    const parsed = await parseBody(request, parseAIVisionRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { image, prompt, maxTokens = 4096 } = parsed.data
     
     if (!image) {
       return NextResponse.json(

@@ -5,12 +5,15 @@
 
 import { NextRequest } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { parseBody, parseContactRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, company, subject, message } = await request.json()
+    const parsed = await parseBody(request, parseContactRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { name, email, company, subject, message } = parsed.data
 
     // Validate required fields
     if (!name || !email || !message) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto'
+import { parseBody, parseAdminKeysRequest, validationErrorResponse } from '@/lib/schemas'
 
 // =====================================================
 // /api/admin/keys — Manage API keys
@@ -155,7 +156,9 @@ export async function PUT(req: NextRequest) {
         if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         if (!isAdmin(profile.role)) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
-        const { key_name, value } = await req.json()
+        const parsed = await parseBody(req, parseAdminKeysRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { key_name, value } = parsed.data
 
         if (!key_name || !VALID_KEYS.includes(key_name)) {
             return NextResponse.json({ error: `Invalid key name: ${key_name}` }, { status: 400 })

@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { parseBody, parseUserSettingsRequest, validationErrorResponse } from '@/lib/schemas'
 
 function getClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -50,7 +51,9 @@ export async function POST(request: NextRequest) {
   const userId = await getUserId(request)
   if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
-  const { model, primaryKey, secondaryKey } = await request.json()
+  const parsed = await parseBody(request, parseUserSettingsRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const { model, primaryKey, secondaryKey } = parsed.data
 
   const sb = getClient()
   const updates: Record<string, any> = {}

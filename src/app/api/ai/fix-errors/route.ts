@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { files, errors, iteration = 1 } = await request.json()
+    const { files, errors, iteration = 1 } = await request.json() as Record<string, any>
     
     if (!files || !errors) {
       return NextResponse.json(

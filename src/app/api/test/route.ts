@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { parseBody, parseTestRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +10,9 @@ export async function POST(request: NextRequest) {
     logs.push('1. Route hit')
     
     // Test: can we read the request?
-    const body = await request.json()
+    const parsed = await parseBody(request, parseTestRequest)
+    if (!parsed.success) return validationErrorResponse(parsed.error)
+    const body = parsed.data
     logs.push('2. Body parsed: ' + JSON.stringify(Object.keys(body)))
     
     // Test: can we access env vars?
