@@ -9,14 +9,21 @@ import type { DevicePreset } from './WorkplaceLayout'
 
 const CANVAS_CSS = `
 .wp-canvas{flex:1;position:relative;overflow:hidden;background:var(--wp-bg-0);background-image:radial-gradient(circle at 50% 40%,rgba(18,28,18,.3),var(--wp-bg-0) 70%)}
-.wp-device{position:absolute;cursor:grab;transition:filter .15s;z-index:2}.wp-device:active{cursor:grabbing}.wp-device:hover{filter:none}
-.wp-phone{position:relative;border:14px solid #1c1c1e;border-radius:55px;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column}
+.wp-device{position:absolute;cursor:grab;transition:filter .15s;z-index:2}.wp-device:active{cursor:grabbing}
+.wp-phone{position:relative;border:14px solid #1c1c1e;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column}
 .wp-phone-di{position:absolute;z-index:10;width:126px;height:37px;background:#000;border-radius:20px;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
 .wp-phone-di .cam{width:10px;height:10px;border-radius:50%;background:#1a1a2e;border:1px solid #2a2a3e}
-.wp-phone-screen{flex:1;border-radius:41px;overflow:hidden;position:relative;background:#000}
+.wp-phone-hb{position:absolute;z-index:10;width:58px;height:58px;border:4px solid #3a3a3c;border-radius:50%;bottom:8px;left:50%;transform:translateX(-50%)}
+.wp-phone-screen{flex:1;overflow:hidden;position:relative;background:#000}
 .wp-phone-iframe{width:100%;height:100%;border:none;background:#fff}
 .wp-hindicator{position:absolute;z-index:20;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.15);bottom:8px;left:50%;transform:translateX(-50%)}
 .wp-dlabel{text-align:center;margin-top:8px;font-family:var(--wp-mono);font-size:9px;color:var(--wp-text-4)}
+.wp-empty-preview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--wp-text-4);font-size:11px;gap:8px;text-align:center;padding:24px}
+.wp-empty-preview .ep-icon{font-size:32px;opacity:.3;margin-bottom:4px}
+.wp-empty-preview .ep-title{font-size:12px;font-weight:700;color:var(--wp-text-3)}
+.wp-refresh-badge{position:absolute;top:6px;right:6px;z-index:30;padding:2px 8px;border-radius:6px;font-size:8px;font-weight:700;font-family:var(--wp-mono);backdrop-filter:blur(8px);animation:wp-si .25s ease}
+.wp-refresh-badge.live{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.2);color:var(--wp-accent)}
+.wp-refresh-badge.loading{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);color:var(--wp-blue)}
 .wp-browser{position:absolute;cursor:grab;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);background:var(--wp-bg-2);display:flex;flex-direction:column;z-index:3}
 .wp-browser:active{cursor:grabbing}
 .wp-browser-tb{display:flex;align-items:center;height:38px;background:#1e1e24;padding:0 12px;gap:10px;flex-shrink:0;cursor:grab;user-select:none}
@@ -32,7 +39,7 @@ const CANVAS_CSS = `
 `
 
 // ============================================
-// DRAGGABLE MIXIN
+// DRAGGABLE HOOK
 // ============================================
 
 function useDraggable(ref: React.RefObject<HTMLDivElement | null>, handleSelector?: string) {
@@ -42,32 +49,26 @@ function useDraggable(ref: React.RefObject<HTMLDivElement | null>, handleSelecto
   useEffect(() => {
     const el = ref.current
     if (!el) return
-
     const handle = handleSelector ? el.querySelector(handleSelector) as HTMLElement : el
 
     const onDown = (e: MouseEvent) => {
-      // Don't drag from iframes or interactive elements
-      if ((e.target as HTMLElement).tagName === 'IFRAME' || (e.target as HTMLElement).tagName === 'INPUT') return
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'IFRAME' || tag === 'INPUT' || tag === 'BUTTON') return
       dragging.current = true
       offset.current = { x: e.clientX - el.offsetLeft, y: e.clientY - el.offsetTop }
       e.preventDefault()
     }
-
     const onMove = (e: MouseEvent) => {
       if (!dragging.current) return
       el.style.left = (e.clientX - offset.current.x) + 'px'
       el.style.top = (e.clientY - offset.current.y) + 'px'
       el.style.transform = 'none'
     }
-
     const onUp = () => { dragging.current = false }
 
-    if (handle) {
-      handle.addEventListener('mousedown', onDown)
-    }
+    if (handle) handle.addEventListener('mousedown', onDown)
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
-
     return () => {
       if (handle) handle.removeEventListener('mousedown', onDown)
       document.removeEventListener('mousemove', onMove)
@@ -85,16 +86,40 @@ interface Props {
   showBrowser: boolean
   zoom: number
   previewUrl: string | null
+  previewHtml?: string | null
   onCloseBrowser: () => void
 }
 
-export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, onCloseBrowser }: Props) {
+export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, previewHtml, onCloseBrowser }: Props) {
   const phoneRef = useRef<HTMLDivElement>(null)
   const browserRef = useRef<HTMLDivElement>(null)
+  const phoneIframeRef = useRef<HTMLIFrameElement>(null)
+  const browserIframeRef = useRef<HTMLIFrameElement>(null)
   const [browserSize, setBrowserSize] = useState({ w: 640, h: 440 })
+  const [iframeStatus, setIframeStatus] = useState<'empty' | 'loading' | 'live'>('empty')
 
   useDraggable(phoneRef)
   useDraggable(browserRef, '.wp-browser-tb')
+
+  // Auto-refresh iframes when previewHtml changes (code generated)
+  useEffect(() => {
+    if (!previewHtml) {
+      setIframeStatus('empty')
+      return
+    }
+    setIframeStatus('loading')
+    const frames = [phoneIframeRef.current, browserIframeRef.current].filter(Boolean)
+    frames.forEach(frame => {
+      if (frame) frame.srcdoc = previewHtml
+    })
+    const timer = setTimeout(() => setIframeStatus('live'), 500)
+    return () => clearTimeout(timer)
+  }, [previewHtml])
+
+  // Also handle URL-based preview
+  useEffect(() => {
+    if (previewUrl) setIframeStatus('live')
+  }, [previewUrl])
 
   // Browser resize
   const resizeRef = useRef(false)
@@ -110,9 +135,10 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
 
     const onMove = (ev: MouseEvent) => {
       if (!resizeRef.current) return
-      const nw = Math.max(320, startSize.current.w + (ev.clientX - startMouse.current.x))
-      const nh = Math.max(240, startSize.current.h + (ev.clientY - startMouse.current.y))
-      setBrowserSize({ w: nw, h: nh })
+      setBrowserSize({
+        w: Math.max(320, startSize.current.w + (ev.clientX - startMouse.current.x)),
+        h: Math.max(240, startSize.current.h + (ev.clientY - startMouse.current.y)),
+      })
     }
     const onUp = () => {
       resizeRef.current = false
@@ -123,8 +149,11 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
     document.addEventListener('mouseup', onUp)
   }, [browserSize])
 
-  const iframeSrc = previewUrl || 'about:blank'
+  const iframeSrc = previewUrl || undefined
   const { width: vw, height: vh } = activeDevice.cssViewport
+  const hasContent = !!(previewUrl || previewHtml)
+  const phoneRadius = activeDevice.borderRadius || 55
+  const screenRadius = Math.max(0, phoneRadius - 14)
 
   return (
     <>
@@ -136,20 +165,42 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
           className="wp-device"
           style={{ left: '50%', top: '50%', transform: `translate(-50%, -50%) scale(${zoom})` }}
         >
-          <div className="wp-phone" style={{ width: vw, height: vh, borderRadius: 55 }}>
+          <div className="wp-phone" style={{ width: vw, height: vh, borderRadius: phoneRadius }}>
             {activeDevice.frameType === 'phone-dynamic-island' && (
               <div className="wp-phone-di"><div className="cam" /></div>
             )}
-            <div className="wp-phone-screen">
-              <iframe
-                className="wp-phone-iframe"
-                src={iframeSrc}
-                style={{ width: vw, height: vh }}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                title="Mobile Preview"
-              />
+            {activeDevice.frameType === 'phone-home-button' && (
+              <div className="wp-phone-hb" />
+            )}
+            <div className="wp-phone-screen" style={{ borderRadius: screenRadius }}>
+              {hasContent ? (
+                <>
+                  <iframe
+                    ref={phoneIframeRef}
+                    className="wp-phone-iframe"
+                    src={iframeSrc}
+                    srcDoc={!previewUrl ? (previewHtml || undefined) : undefined}
+                    style={{ width: vw, height: vh, pointerEvents: 'auto' }}
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                    title="Mobile Preview"
+                  />
+                  {iframeStatus !== 'empty' && (
+                    <div className={`wp-refresh-badge ${iframeStatus}`}>
+                      {iframeStatus === 'loading' ? '⏳ Loading' : '● Live'}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="wp-empty-preview">
+                  <div className="ep-icon">📱</div>
+                  <div className="ep-title">No preview loaded</div>
+                  <div>Generate code in Chat to see it here</div>
+                </div>
+              )}
             </div>
-            <div className="wp-hindicator" />
+            {activeDevice.frameType !== 'phone-home-button' && (
+              <div className="wp-hindicator" />
+            )}
           </div>
           <div className="wp-dlabel">
             {activeDevice.name} · {vw}×{vh} · @{activeDevice.dpr}x
@@ -163,7 +214,7 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
             className="wp-browser"
             style={{ left: '60%', top: '8%', width: browserSize.w, height: browserSize.h }}
           >
-            <div className="wp-browser-close" onClick={onCloseBrowser}></div>
+            <div className="wp-browser-close" onClick={onCloseBrowser}>✕</div>
             <div className="wp-browser-tb">
               <div className="wp-traffic">
                 <span className="t-r" onClick={onCloseBrowser} />
@@ -174,16 +225,26 @@ export function WPPreviewCanvas({ activeDevice, showBrowser, zoom, previewUrl, o
                 <span style={{ opacity: .4 }}>‹</span> › ⟳
               </div>
               <div className="wp-browser-url">
-                <span className="lk"></span>
-                {previewUrl || 'staging.fileengine.com'}
+                <span className="lk">🔒</span>
+                {previewUrl || 'about:blank'}
               </div>
             </div>
-            <iframe
-              className="wp-browser-iframe"
-              src={iframeSrc}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              title="Desktop Preview"
-            />
+            {hasContent ? (
+              <iframe
+                ref={browserIframeRef}
+                className="wp-browser-iframe"
+                src={iframeSrc}
+                srcDoc={!previewUrl ? (previewHtml || undefined) : undefined}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                title="Desktop Preview"
+                style={{ pointerEvents: 'auto' }}
+              />
+            ) : (
+              <div className="wp-empty-preview" style={{ background: '#fff', color: '#999' }}>
+                <div className="ep-icon">🌐</div>
+                <div className="ep-title" style={{ color: '#666' }}>No content</div>
+              </div>
+            )}
             <div className="wp-browser-resize" onMouseDown={onBrowserResizeDown}>⌟</div>
           </div>
         )}

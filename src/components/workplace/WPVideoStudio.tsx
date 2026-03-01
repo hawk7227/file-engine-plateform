@@ -8,7 +8,7 @@ const S = {
   inp: { width: '100%', background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)', borderRadius: 8, padding: '8px 12px', fontSize: 11, color: 'var(--wp-text-1)', fontFamily: 'var(--wp-font)', outline: 'none' },
   chips: { display: 'flex', gap: 4 },
   chip: (on: boolean) => ({ flex: 1, padding: '6px 4px', borderRadius: 8, fontSize: 8, fontWeight: 700, border: `1px solid ${on ? 'rgba(52,211,153,.2)' : 'var(--wp-border)'}`, background: on ? 'var(--wp-accent-dim)' : 'var(--wp-bg-3)', color: on ? 'var(--wp-accent)' : 'var(--wp-text-3)', cursor: 'pointer', textAlign: 'center' as const, fontFamily: 'var(--wp-font)' }),
-  gbtn: { width: '100%', padding: 10, borderRadius: 12, fontSize: 11, fontWeight: 900, border: 'none', cursor: 'pointer', fontFamily: 'var(--wp-font)', background: 'var(--accent-primary),var(--wp-blue))', color: '#000' },
+  gbtn: { width: '100%', padding: 10, borderRadius: 12, fontSize: 11, fontWeight: 900, border: 'none', cursor: 'pointer', fontFamily: 'var(--wp-font)', background: 'var(--wp-accent)', color: '#000' },
   pipe: { padding: 10, background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)', borderRadius: 12, marginBottom: 6 },
 }
 
@@ -54,7 +54,7 @@ export function WPVideoStudio({ toast, logActivity }: Props) {
             <span style={{ fontSize: 6, fontWeight: 700, padding: '2px 6px', borderRadius: 20, background: 'rgba(96,165,250,.1)', color: 'var(--wp-blue)' }}>RENDERING</span>
           </div>
           <div style={{ height: 4, background: 'var(--wp-bg-4)', borderRadius: 4, overflow: 'hidden', marginTop: 6 }}>
-            <div style={{ width: '68%', height: '100%', borderRadius: 4, background: 'var(--accent-primary),var(--wp-accent))' }} />
+            <div style={{ width: '68%', height: '100%', borderRadius: 4, background: 'var(--wp-accent)' }} />
           </div>
         </div>
         <div style={S.pipe}>

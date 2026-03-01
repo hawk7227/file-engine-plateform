@@ -64,12 +64,12 @@ type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed'
 type BottomTab = 'sql' | 'md' | 'doc' | 'git' | 'diff' | 'logs'
 
 const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
-  { id: 'chat', icon: '', label: 'Chat' },
-  { id: 'routes', icon: '', label: 'Routes' },
-  { id: 'video', icon: '', label: 'Video' },
-  { id: 'images', icon: '', label: 'Imgs' },
-  { id: 'team', icon: '', label: 'Team' },
-  { id: 'feed', icon: '', label: 'Feed' },
+  { id: 'chat', icon: '💬', label: 'Chat' },
+  { id: 'routes', icon: '🗂', label: 'Routes' },
+  { id: 'video', icon: '🎬', label: 'Video' },
+  { id: 'images', icon: '🖼', label: 'Imgs' },
+  { id: 'team', icon: '👥', label: 'Team' },
+  { id: 'feed', icon: '📡', label: 'Feed' },
 ]
 
 // ============================================
@@ -86,7 +86,7 @@ const CSS = `
 .wp-main{flex:1;display:flex;overflow:hidden}
 .wp-left{width:300px;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);display:flex;flex-direction:column;flex-shrink:0}
 .wp-lheader{padding:12px 14px;border-bottom:1px solid var(--wp-border);display:flex;align-items:center;gap:10px}
-.wp-logo{width:28px;height:28px;border-radius:8px;background:var(--accent-primary),var(--wp-blue));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#000;flex-shrink:0;box-shadow:0 4px 16px rgba(52,211,153,.15)}
+.wp-logo{width:28px;height:28px;border-radius:8px;background:var(--wp-accent);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#000;flex-shrink:0;box-shadow:0 4px 16px rgba(52,211,153,.15)}
 .wp-ltitle{font-size:13px;font-weight:800;letter-spacing:-.3px}
 .wp-lsub{font-size:7px;color:var(--wp-text-3);font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
 .wp-gh{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:7px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.15);color:var(--wp-accent);transition:background .15s}.wp-gh:hover{background:rgba(52,211,153,.12)}
@@ -98,7 +98,7 @@ const CSS = `
 .wp-bottom{display:flex;border-top:2px solid var(--wp-border);flex-shrink:0;position:relative;transition:height .25s ease;overflow:hidden}
 .wp-bottom-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--wp-border);min-width:0;overflow:hidden}
 .wp-bottom-right{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-.wp-resize-v{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:20}.wp-resize-v:hover{background:var(--accent-bg),transparent)}
+.wp-resize-v{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:20}.wp-resize-v:hover{background:transparent}
 .wp-pbar{display:flex;align-items:center;justify-content:space-between;padding:0 8px;height:26px;background:var(--wp-bg-3);border-bottom:1px solid var(--wp-border);flex-shrink:0}
 .wp-pbar-t{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--wp-text-3);display:flex;align-items:center;gap:4px}
 .wp-pbar-t .dot{width:5px;height:5px;border-radius:50%}
@@ -106,7 +106,7 @@ const CSS = `
 .wp-footer{display:flex;gap:12px;padding:3px 10px;border-top:1px solid var(--wp-border);background:var(--wp-bg-1);font-size:7px;font-family:var(--wp-mono);color:var(--wp-text-4);flex-shrink:0;align-items:center}
 .wp-footer span span{color:var(--wp-text-2)}
 .wp-tb{padding:3px 6px;border-radius:6px;font-size:8px;font-weight:700;border:1px solid var(--wp-border);background:none;color:var(--wp-text-4);cursor:pointer;transition:all .1s;font-family:var(--wp-font)}.wp-tb:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
-.wp-tb-primary{background:var(--accent-primary),var(--wp-blue));color:#000;border:none;font-weight:800;padding:4px 10px}.wp-tb-primary:hover{box-shadow: 0 4px 14px rgba(0,0,0,0.06)}
+.wp-tb-primary{background:var(--wp-accent);color:#000;border:none;font-weight:800;padding:4px 10px}.wp-tb-primary:hover{box-shadow: 0 4px 14px rgba(0,0,0,0.06)}
 .wp-tsep{width:1px;height:16px;background:var(--wp-border);flex-shrink:0}
 .wp-avstack{display:flex;align-items:center}.wp-avt{width:18px;height:18px;border-radius:50%;border:2px solid var(--wp-bg-1);margin-left:-6px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0}.wp-avt:first-child{margin-left:0}
 .wp-avcount{font-size:7px;color:var(--wp-text-3);margin-left:6px;font-weight:700}
@@ -138,6 +138,40 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [zoom, setZoom] = useState(0.7)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([])
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null)
+
+  // ── Build preview HTML from generated files ──
+  useEffect(() => {
+    if (!generatedFiles.length) {
+      setPreviewHtml(null)
+      return
+    }
+    // Find HTML file first, then try to build from JSX/TSX
+    const htmlFile = generatedFiles.find(f => f.path.endsWith('.html'))
+    if (htmlFile) {
+      setPreviewHtml(htmlFile.content)
+      return
+    }
+    // Assemble preview from all generated files
+    const cssFiles = generatedFiles.filter(f => f.path.endsWith('.css'))
+    const jsFiles = generatedFiles.filter(f => f.path.endsWith('.js') || f.path.endsWith('.ts'))
+    const cssContent = cssFiles.map(f => f.content).join('\n')
+    const jsContent = jsFiles.map(f => f.content).join('\n')
+    const assembled = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif}${cssContent}</style>
+</head><body>
+<div id="root"></div>
+<script>${jsContent}</script>
+<script>
+// If React files were generated, try to render
+if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
+  try{ReactDOM.render(React.createElement(App||function(){return React.createElement('div','No App component')}),document.getElementById('root'))}catch(e){document.body.innerHTML='<pre style="padding:16px;color:#f87171">'+e.message+'</pre>'}
+}
+</script>
+</body></html>`
+    setPreviewHtml(assembled)
+  }, [generatedFiles])
 
   // ── Refs ──
   const toastRef = useRef<HTMLDivElement>(null)
@@ -261,7 +295,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
             {realtime.teamMembers.slice(0, 4).map((m, i) => (
               <div key={m.user_id} className="wp-avt" style={{
                 background: m.user_id === user.id
-                  ? 'var(--accent-primary),var(--wp-blue))'
+                  ? 'var(--wp-accent)'
                   : `hsl(${(i * 90 + 260) % 360}, 70%, 65%)`,
                 color: m.user_id === user.id ? '#000' : '#fff',
               }}>
@@ -271,12 +305,12 @@ export default function WorkplaceLayout({ user, profile }: Props) {
             <span className="wp-avcount">{onlineCount} online</span>
           </div>
           <div className="wp-tsep" style={{ margin: '0 4px' }} />
-          <button className="wp-tb wp-tb-primary" onClick={handleDeploy}> Deploy</button>
+          <button className="wp-tb wp-tb-primary" onClick={handleDeploy}>▶ Deploy</button>
           <button className="wp-tb" onClick={() => {
             toast('Pushed', 'Files → master', 'ok')
             realtime.logActivity('git_push', { branch: 'master' })
           }}>⬆ Push</button>
-          <button className="wp-tb"></button>
+          <button className="wp-tb" onClick={() => toast('Settings', 'Coming soon', 'nfo')}>⚙</button>
         </div>
 
         {/* ═══ MAIN ═══ */}
@@ -356,6 +390,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 showBrowser={showBrowser}
                 zoom={zoom}
                 previewUrl={previewUrl || preview.previewUrl}
+                previewHtml={previewHtml}
                 onCloseBrowser={() => setShowBrowser(false)}
               />
             </div>

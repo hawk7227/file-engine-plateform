@@ -2,7 +2,7 @@
 
 import type { TeamMember } from '@/hooks/useWorkspaceRealtime'
 
-const COLORS = ['var(--accent-primary)', 'var(--accent-primary)', 'var(--accent-primary)', 'var(--accent-primary)', 'var(--red)']
+const COLORS = ['var(--wp-accent)', 'var(--wp-purple)', 'var(--wp-blue)', 'var(--wp-cyan)', 'var(--wp-yellow)']
 
 const S = {
   header: { padding: '8px 14px', fontSize: 8, fontWeight: 700, color: 'var(--wp-text-3)', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--wp-border)' },

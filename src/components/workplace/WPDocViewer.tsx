@@ -32,7 +32,7 @@ const S = {
   },
   sqlRun: {
     padding: '2px 8px', borderRadius: 4, fontSize: 7, fontWeight: 700,
-    background: 'var(--accent-primary), var(--wp-blue))',
+    background: 'var(--wp-accent)',
     color: '#000', border: 'none', cursor: 'pointer', fontFamily: 'var(--wp-font)',
   },
   th: {
