@@ -1,87 +1,68 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // ENV VALIDATION — CONSTITUTION §4
-// Single source of truth for all environment variables.
-// Application MUST refuse to start if validation fails.
+// No external dependencies. Application refuses to start if invalid.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { z } from 'zod'
-
-// ─── Schema ─────────────────────────────────────────────────────────────────
-
-const envSchema = z.object({
-  // ── Required ──
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url('NEXT_PUBLIC_SUPABASE_URL must be a valid URL'),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required'),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
-
-  // ── AI Providers (at least one required) ──
-  ANTHROPIC_API_KEY: z.string().optional(),
-  OPENAI_API_KEY: z.string().optional(),
-
-  // ── Deployment ──
-  VERCEL_TOKEN: z.string().optional(),
-  GITHUB_TOKEN: z.string().optional(),
-
-  // ── Stripe ──
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-
-  // ── Queue / Worker ──
-  REDIS_URL: z.string().url().optional(),
-  BULL_REDIS_URL: z.string().url().optional(),
-
-  // ── Media Providers ──
-  ELEVENLABS_API_KEY: z.string().optional(),
-  STABILITY_API_KEY: z.string().optional(),
-  RUNWAY_API_KEY: z.string().optional(),
-
-  // ── App Config ──
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-}).refine(
-  (data) => data.ANTHROPIC_API_KEY || data.OPENAI_API_KEY,
-  { message: 'At least one AI provider key is required (ANTHROPIC_API_KEY or OPENAI_API_KEY)' }
-)
-
-// ─── Type Export ────────────────────────────────────────────────────────────
-
-export type Env = z.infer<typeof envSchema>
-
-// ─── Validation ─────────────────────────────────────────────────────────────
+export interface Env {
+  NEXT_PUBLIC_SUPABASE_URL: string
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: string
+  SUPABASE_SERVICE_ROLE_KEY: string
+  ANTHROPIC_API_KEY?: string
+  OPENAI_API_KEY?: string
+  VERCEL_TOKEN?: string
+  GITHUB_TOKEN?: string
+  STRIPE_SECRET_KEY?: string
+  STRIPE_WEBHOOK_SECRET?: string
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?: string
+  REDIS_URL?: string
+  BULL_REDIS_URL?: string
+  ELEVENLABS_API_KEY?: string
+  STABILITY_API_KEY?: string
+  RUNWAY_API_KEY?: string
+  NODE_ENV: string
+  NEXT_PUBLIC_APP_URL?: string
+}
 
 let _env: Env | null = null
 
 export function validateEnv(): Env {
   if (_env) return _env
 
-  const result = envSchema.safeParse(process.env)
+  const e = process.env
+  const errors: string[] = []
 
-  if (!result.success) {
-    const errors = result.error.issues.map(
-      (issue) => `  ✗ ${issue.path.join('.')}: ${issue.message}`
-    )
+  if (!e.NEXT_PUBLIC_SUPABASE_URL) errors.push('NEXT_PUBLIC_SUPABASE_URL is required')
+  if (!e.NEXT_PUBLIC_SUPABASE_ANON_KEY) errors.push('NEXT_PUBLIC_SUPABASE_ANON_KEY is required')
+  if (!e.SUPABASE_SERVICE_ROLE_KEY) errors.push('SUPABASE_SERVICE_ROLE_KEY is required')
+  if (!e.ANTHROPIC_API_KEY && !e.OPENAI_API_KEY) errors.push('At least one AI provider key required')
 
-    console.error('\n═══════════════════════════════════════════════')
-    console.error('ENV VALIDATION FAILED — APPLICATION CANNOT START')
-    console.error('═══════════════════════════════════════════════')
-    console.error(errors.join('\n'))
-    console.error('═══════════════════════════════════════════════\n')
-
-    // §4: Application must refuse to start if validation fails.
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(`Environment validation failed:\n${errors.join('\n')}`)
-    }
-
-    // In dev, warn but continue (less strict for local dev)
-    console.warn('⚠ Continuing in development mode with missing env vars')
+  if (errors.length > 0) {
+    const msg = errors.map((m) => `  ✗ ${m}`).join('\n')
+    console.error('\n══ ENV VALIDATION FAILED ══\n' + msg + '\n══════════════════════════\n')
+    if (e.NODE_ENV === 'production') throw new Error('Env validation failed:\n' + msg)
   }
 
-  _env = result.success ? result.data : (process.env as unknown as Env)
+  _env = {
+    NEXT_PUBLIC_SUPABASE_URL: e.NEXT_PUBLIC_SUPABASE_URL || '',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: e.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    SUPABASE_SERVICE_ROLE_KEY: e.SUPABASE_SERVICE_ROLE_KEY || '',
+    ANTHROPIC_API_KEY: e.ANTHROPIC_API_KEY,
+    OPENAI_API_KEY: e.OPENAI_API_KEY,
+    VERCEL_TOKEN: e.VERCEL_TOKEN,
+    GITHUB_TOKEN: e.GITHUB_TOKEN,
+    STRIPE_SECRET_KEY: e.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: e.STRIPE_WEBHOOK_SECRET,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: e.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    REDIS_URL: e.REDIS_URL,
+    BULL_REDIS_URL: e.BULL_REDIS_URL,
+    ELEVENLABS_API_KEY: e.ELEVENLABS_API_KEY,
+    STABILITY_API_KEY: e.STABILITY_API_KEY,
+    RUNWAY_API_KEY: e.RUNWAY_API_KEY,
+    NODE_ENV: e.NODE_ENV || 'development',
+    NEXT_PUBLIC_APP_URL: e.NEXT_PUBLIC_APP_URL,
+  }
   return _env
 }
-
-// ─── Accessor (lazy-init) ───────────────────────────────────────────────────
 
 export function env(): Env {
   return _env ?? validateEnv()

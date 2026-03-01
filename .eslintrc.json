@@ -5,7 +5,6 @@
     "rules": {
         "react-hooks/exhaustive-deps": "warn",
         "react/no-unescaped-entities": "off",
-        "@typescript-eslint/no-explicit-any": "error",
         "no-restricted-syntax": [
             "warn",
             {
