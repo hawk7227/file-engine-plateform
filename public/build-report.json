@@ -1,0 +1,9 @@
+{
+  "version": "0.0.0",
+  "commit": "local",
+  "branch": "main",
+  "timestamp": "1970-01-01T00:00:00Z",
+  "node": "unknown",
+  "status": "pending",
+  "note": "This file is overwritten by CI on every successful build. If you see this, CI has not run yet."
+}

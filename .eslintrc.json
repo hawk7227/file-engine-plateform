@@ -1,7 +1,17 @@
 {
-    "extends": "next/core-web-vitals",
+    "extends": [
+        "next/core-web-vitals"
+    ],
     "rules": {
         "react-hooks/exhaustive-deps": "warn",
-        "react/no-unescaped-entities": "off"
+        "react/no-unescaped-entities": "off",
+        "@typescript-eslint/no-explicit-any": "error",
+        "no-restricted-syntax": [
+            "warn",
+            {
+                "selector": "JSXAttribute[name.name='style'][value.type='JSXExpressionContainer']",
+                "message": "Inline styles are forbidden in feature code (Constitution §2). Use CSS classes."
+            }
+        ]
     }
 }
