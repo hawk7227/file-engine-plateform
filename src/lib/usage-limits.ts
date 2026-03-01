@@ -208,7 +208,7 @@ export async function canUserGenerate(userId: string): Promise<CanGenerateResult
     .eq('user_id', userId)
     .gte('date', monthStart)
   
-  const monthlyCount = monthlyUsage?.reduce((sum, r) => sum + (r.generations_count || 0), 0) || 0
+  const monthlyCount = monthlyUsage?.reduce((sum: number, r: any) => sum + (r.generations_count || 0), 0) || 0
   
   // Check monthly limit
   if (monthlyCount >= limits.generationsPerMonth) {
@@ -326,9 +326,9 @@ export async function getUsageStats(userId: string): Promise<UsageStats> {
     errorsEncountered: r.errors_count || 0
   }))
   
-  const totalGenerations = monthlyBreakdown.reduce((sum, r) => sum + r.generationsCount, 0)
-  const totalTokens = monthlyBreakdown.reduce((sum, r) => sum + r.tokensUsed, 0)
-  const totalFiles = monthlyBreakdown.reduce((sum, r) => sum + r.filesGenerated, 0)
+  const totalGenerations = monthlyBreakdown.reduce((sum: number, r: any) => sum + r.generationsCount, 0)
+  const totalTokens = monthlyBreakdown.reduce((sum: number, r: any) => sum + r.tokensUsed, 0)
+  const totalFiles = monthlyBreakdown.reduce((sum: number, r: any) => sum + r.filesGenerated, 0)
   
   return {
     today: todayUsage,

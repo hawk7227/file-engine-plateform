@@ -19,6 +19,7 @@ import { useState, useCallback, useRef } from 'react';
 export interface GeneratedFile {
   path: string;
   content: string;
+  language?: string;
 }
 
 export type PreviewPhase = 

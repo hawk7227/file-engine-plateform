@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
 
   // Check that user has an active recovery session
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (!session) {
         // No session — redirect back to forgot password
         router.replace('/auth/forgot-password')

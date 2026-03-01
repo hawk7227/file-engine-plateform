@@ -4,12 +4,8 @@ const nextConfig = {
   images: {
     domains: ['*.supabase.co'],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // §5: NO ignoreDuringBuilds. NO ignoreBuildErrors.
+  // Lint and typecheck are enforced. Build fails on error.
 }
 
 module.exports = nextConfig

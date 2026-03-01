@@ -108,7 +108,7 @@ export function useProjects(): UseProjectsReturn {
       }
 
       // Step 2: Query projects table
-      const { data, error: queryError } = await withTimeout(
+      const { data, error: queryError } = await withTimeout<{ data: any; error: any }>(
         supabase
           .from('projects')
           .select('*')
@@ -161,7 +161,7 @@ export function useProjects(): UseProjectsReturn {
     const user = await withTimeout(getUser(), QUERY_TIMEOUT_MS, 'Auth check')
     if (!user) throw new Error('Not authenticated')
 
-    const { data, error } = await withTimeout(
+    const { data, error } = await withTimeout<{ data: any; error: any }>(
       supabase
         .from('projects')
         .insert({ user_id: user.id, name, type, status: 'draft' })
@@ -185,7 +185,7 @@ export function useProjects(): UseProjectsReturn {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } as Project : p))
 
     try {
-      const { data, error } = await withTimeout(
+      const { data, error } = await withTimeout<{ data: any; error: any }>(
         supabase
           .from('projects')
           .update(updates)
@@ -215,7 +215,7 @@ export function useProjects(): UseProjectsReturn {
     setProjects(prev => prev.filter(p => p.id !== id))
 
     try {
-      const { error } = await withTimeout(
+      const { error } = await withTimeout<{ data: any; error: any }>(
         supabase.from('projects').delete().eq('id', id),
         QUERY_TIMEOUT_MS,
         'Delete project'
@@ -233,7 +233,7 @@ export function useProjects(): UseProjectsReturn {
   const getProjectFiles = useCallback(async (projectId: string): Promise<ProjectFile[]> => {
     setLoadingFiles(true)
     try {
-      const { data: { session } } = await withTimeout(
+      const { data: { session } } = await withTimeout<{ data: { session: any } }>(
         supabase.auth.getSession(),
         QUERY_TIMEOUT_MS,
         'Session check'
@@ -274,7 +274,7 @@ export function useProjects(): UseProjectsReturn {
   // ── Get file content ──────────────────────────────
   const getFileContent = useCallback(async (projectId: string, filePath: string): Promise<string | null> => {
     try {
-      const { data: { session } } = await withTimeout(
+      const { data: { session } } = await withTimeout<{ data: { session: any } }>(
         supabase.auth.getSession(),
         QUERY_TIMEOUT_MS,
         'Session check'

@@ -668,7 +668,7 @@ export async function POST(request: NextRequest) {
       .gte('confidence', 0.5)
       .limit(10)
       .then(r => r.data)
-      .catch(() => null) : Promise.resolve(null)
+      .then(d => d, () => null) : Promise.resolve(null)
 
     const teamId = await teamIdPromise
     const [adminSettings, memories] = await Promise.all([

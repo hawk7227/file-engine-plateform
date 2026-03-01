@@ -952,7 +952,7 @@ export default function FileEngineApp({ initialChatId }: { initialChatId?: strin
                     <div style={{display:'inline-flex',alignItems:'center',marginTop:'4px',padding:'2px 7px',borderRadius:'4px',fontSize:'10px',fontWeight:700,textTransform:'uppercase',letterSpacing:'.5px',background:`${planColor}22`,color:planColor}}>{planLabel}</div>
                   </div>
                 </div>
-                {planLimits.generations_per_day!==999999&&<div style={{padding:'10px 16px',borderBottom:'1px solid var(--border-subtle)'}}>
+                {(planLimits.generations_per_day as number)!==999999&&<div style={{padding:'10px 16px',borderBottom:'1px solid var(--border-subtle)'}}>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'11px',color:'var(--text-muted)',marginBottom:'6px'}}><span>Generations today</span><span style={{fontWeight:600,color:'var(--text-primary)'}}>{usageToday}/{planLimits.generations_per_day}</span></div>
                   <div style={{height:'4px',background:'var(--border-default)',borderRadius:'2px',overflow:'hidden'}}><div style={{height:'100%',borderRadius:'2px',background:usageToday>=planLimits.generations_per_day?'var(--accent-red)':usageToday>=planLimits.generations_per_day*.8?'var(--accent-yellow)':'var(--accent-green)',width:`${Math.min(100,(usageToday/planLimits.generations_per_day)*100)}%`,transition:'width .3s'}}/></div>
                 </div>}

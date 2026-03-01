@@ -384,7 +384,7 @@ export async function buildSmartContext(options: ContextOptions): Promise<Contex
         .eq('key', 'default')
         .single()
         .then(
-          ({ data }) => { codingStyle = data?.value },
+          ({ data }: { data: any }) => { codingStyle = data?.value },
           () => { /* non-blocking */ }
         )
     )
@@ -400,7 +400,7 @@ export async function buildSmartContext(options: ContextOptions): Promise<Contex
         .eq('key', 'default')
         .single()
         .then(
-          ({ data }) => { preferences = data?.value },
+          ({ data }: { data: any }) => { preferences = data?.value },
           () => { /* non-blocking */ }
         )
     )
@@ -414,7 +414,7 @@ export async function buildSmartContext(options: ContextOptions): Promise<Contex
         .eq('project_id', projectId)
         .limit(budget.maxProjectFiles)
         .then(
-          ({ data }) => { projectFiles = data || [] },
+          ({ data }: { data: any }) => { projectFiles = data || [] },
           () => { /* non-blocking */ }
         )
     )
@@ -430,7 +430,7 @@ export async function buildSmartContext(options: ContextOptions): Promise<Contex
         .order('updated_at', { ascending: false })
         .limit(budget.maxCorrections)
         .then(
-          ({ data }) => { corrections = (data || []).map(d => d.value) },
+          ({ data }: { data: any }) => { corrections = (data || []).map((d: any) => d.value) },
           () => { /* non-blocking */ }
         )
     )

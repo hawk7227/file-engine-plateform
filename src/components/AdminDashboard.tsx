@@ -1649,11 +1649,11 @@ export default function AdminDashboard() {
       const { data: subs } = await supabase
         .from('subscriptions')
         .select('user_id, plan')
-        .in('user_id', profiles.map(p => p.id))
+        .in('user_id', profiles.map((p: any) => p.id))
 
-      const subMap = new Map((subs || []).map(s => [s.user_id, s.plan]))
+      const subMap = new Map((subs || []).map((s: any) => [s.user_id, s.plan]))
 
-      setUsers(profiles.map(p => ({
+      setUsers(profiles.map((p: any) => ({
         ...p,
         plan: subMap.get(p.id) || 'free',
       })))
@@ -1672,7 +1672,7 @@ export default function AdminDashboard() {
         .limit(20)
 
       if (data) {
-        setBuilds(data.map(b => ({
+        setBuilds(data.map((b: any) => ({
           ...b,
           user_email: b.user_id?.slice(0, 8) + '...',
         })))

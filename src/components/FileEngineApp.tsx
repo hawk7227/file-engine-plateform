@@ -1828,7 +1828,7 @@ export function FileEngineApp() {
               }
             }}> Deploy</button>
             {/* Generation Usage Bar (free plan) */}
-            {authUser && planLimits.generations_per_day !== 999999 && (
+            {authUser && (planLimits.generations_per_day as number) !== 999999 && (
               <div className="usage-bar-wrap" title={`${usageToday} of ${planLimits.generations_per_day} generations used today`}>
                 <span className="usage-bar-label">Gens</span>
                 <div className="usage-bar-track">

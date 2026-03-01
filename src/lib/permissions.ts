@@ -302,7 +302,7 @@ export interface UserFeature {
 
 export async function getUserFeatures(userId: string): Promise<UserFeature[]> {
   try {
-    const { data, error } = await withTimeout(
+    const { data, error } = await withTimeout<{ data: any; error: any }>(
       supabase.rpc('get_user_features', { p_user_id: userId }),
       'get_user_features RPC'
     )
@@ -319,7 +319,7 @@ export async function getUserFeatures(userId: string): Promise<UserFeature[]> {
 // ── Internal: Load and cache all features ────────────
 
 async function loadUserFeatures(userId: string): Promise<Set<string>> {
-  const { data, error } = await withTimeout(
+  const { data, error } = await withTimeout<{ data: any; error: any }>(
     supabase.rpc('get_user_features', { p_user_id: userId }),
     'get_user_features RPC'
   )

@@ -88,7 +88,7 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
 
     try {
       // Step 1: Get authenticated user (with timeout)
-      const { data: { user }, error: authError } = await withTimeout(
+      const { data: { user }, error: authError } = await withTimeout<{ data: { user: any }; error: any }>(
         supabase.auth.getUser(),
         QUERY_TIMEOUT_MS,
         'Auth check'
@@ -118,7 +118,7 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
         query = query.eq('project_id', projectId)
       }
 
-      const { data, error: queryError } = await withTimeout(
+      const { data, error: queryError } = await withTimeout<{ data: any; error: any }>(
         query,
         QUERY_TIMEOUT_MS,
         'Chats query'
@@ -173,7 +173,7 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
     setChats(prev => prev.filter(c => c.id !== id))
 
     try {
-      const { error } = await withTimeout(
+      const { error } = await withTimeout<{ data: any; error: any }>(
         supabase.from('chats').delete().eq('id', id),
         QUERY_TIMEOUT_MS,
         'Delete chat'
@@ -196,7 +196,7 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
     setChats(prev => prev.map(c => c.id === id ? { ...c, title: newTitle } : c))
 
     try {
-      const { error } = await withTimeout(
+      const { error } = await withTimeout<{ data: any; error: any }>(
         supabase.from('chats').update({ title: newTitle }).eq('id', id),
         QUERY_TIMEOUT_MS,
         'Rename chat'
