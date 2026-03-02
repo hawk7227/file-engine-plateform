@@ -71,14 +71,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [supabase])
 
-  useEffect(() => {
+useEffect(() => {
     loadUser()
 
-    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
+    const listener = supabase.auth.onAuthStateChange(
+      async (event: string, session: unknown) => {
         setSession(session)
 
-        if (event === 'SIGNED_IN' && session?.user) {
+        if (event === 'SIGNED_IN' && session) {
           await loadUser()
         } else if (event === 'SIGNED_OUT') {
           setUser(null)
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     )
 
-    return () => authSub.unsubscribe()
+    return () => { listener?.data?.subscription?.unsubscribe() }
   }, [loadUser, supabase])
 
   const plan = (subscription?.plan ?? 'free') as 'free' | 'pro' | 'enterprise'
