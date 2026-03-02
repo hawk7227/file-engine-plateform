@@ -12,9 +12,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/types'
-import type { Message, GeneratedFile } from '@/hooks/useChat'
+import type { GeneratedFile } from '@/hooks/useChat'
 import { useChat } from '@/hooks/useChat'
 import { useFileEnginePreview } from '@/hooks/useFileEnginePreview'
+import { assemblePreviewHtml } from '@/lib/preview-assembler'
 import { useWorkspaceRealtime } from '@/hooks/useWorkspaceRealtime'
 import { WPChatPanel } from './WPChatPanel'
 import { WPRoutesPanel } from './WPRoutesPanel'
@@ -159,31 +160,9 @@ export default function WorkplaceLayout({ user, profile }: Props) {
       return
     }
     debounceRef.current = setTimeout(() => {
-      const htmlFile = generatedFiles.find(f => f.path.endsWith('.html'))
-      if (htmlFile) {
-        setPreviewHtml(htmlFile.content)
-        setRefreshKey(k => k + 1)
-        return
-      }
-      const cssFiles = generatedFiles.filter(f => f.path.endsWith('.css'))
-      const jsFiles = generatedFiles.filter(f => f.path.endsWith('.js') || f.path.endsWith('.ts'))
-      const cssContent = cssFiles.map(f => f.content).join('\n')
-      const jsContent = jsFiles.map(f => f.content).join('\n')
-      const assembled = `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif}${cssContent}</style>
-</head><body>
-<div id="root"></div>
-<script>${jsContent}<\/script>
-<script>
-if(typeof React!=='undefined'&&typeof ReactDOM!=='undefined'){
-  try{ReactDOM.render(React.createElement(App||function(){return React.createElement('div','No App component')}),document.getElementById('root'))}catch(e){document.body.innerHTML='<pre style="padding:16px;color:#f87171">'+e.message+'</pre>'}
-}
-window.onerror=function(msg){window.parent.postMessage({type:'wp-iframe-error',message:String(msg)},'*')}
-<\/script>
-</body></html>`
-      setPreviewHtml(assembled)
-      setRefreshKey(k => k + 1)
+      const html = assemblePreviewHtml(generatedFiles)
+      setPreviewHtml(html)
+      if (html) setRefreshKey(k => k + 1)
     }, 150)
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [generatedFiles])
