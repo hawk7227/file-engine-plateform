@@ -33,10 +33,16 @@ export function createClient() {
         })
     }
 
-   return createBrowserClient(url, key, {
-        auth: {
-            storageKey: 'fe-auth-token',
-            flowType: 'pkce',
-        }
-    })
-}
+  return createBrowserClient(url, key, {
+    auth: {
+        storageKey: 'fe-auth-token-v2',
+        flowType: 'pkce',
+        detectSessionInUrl: true,
+        persistSession: true,
+    },
+    global: {
+        headers: {
+            'X-Client-Info': 'file-engine',
+        },
+    },
+})
