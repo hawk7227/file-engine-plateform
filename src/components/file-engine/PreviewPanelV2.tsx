@@ -199,9 +199,9 @@ export function PreviewPanelV2({
       }
 
       setDomainStatus('connected');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setDomainStatus('error');
-      setDomainError(err.message || 'Connection failed');
+      setDomainError((err instanceof Error ? err.message : String(err)) || 'Connection failed');
     }
   }, [domainInput, projectName]);
 

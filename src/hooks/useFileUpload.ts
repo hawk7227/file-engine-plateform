@@ -364,9 +364,9 @@ export function useFileUpload(options: UseFileUploadOptions) {
       onUploadComplete?.(uploaded)
       return uploaded
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[Upload Error]', err)
-      onError?.(`Upload failed: ${file.name} — ${err.message}`)
+      onError?.(`Upload failed: ${file.name} — ${(err instanceof Error ? err.message : String(err))}`)
       return null
     }
   }, [projectId, maxSizeBytes, allowedTypes, getFileCategory, readAsText, readAsBase64, readAsArrayBuffer, extractZip, getImageDimensions, onUploadComplete, onError])

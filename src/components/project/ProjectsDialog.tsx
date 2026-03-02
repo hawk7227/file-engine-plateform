@@ -115,9 +115,9 @@ export function ProjectsDialog({ isOpen, onClose, onSelectProject, currentProjec
       onSelectProject(project)
       setNewProjectName('')
       onClose()
-    } catch (err: any) {
-      console.error('Failed to create project:', err.message)
-      setCreateError(err.message || 'Failed to create project')
+    } catch (err: unknown) {
+      console.error('Failed to create project:', (err instanceof Error ? err.message : String(err)))
+      setCreateError((err instanceof Error ? err.message : String(err)) || 'Failed to create project')
     } finally {
       setIsCreating(false)
     }
@@ -133,8 +133,8 @@ export function ProjectsDialog({ isOpen, onClose, onSelectProject, currentProjec
     setDeletingId(projectId)
     try {
       await deleteProject(projectId)
-    } catch (err: any) {
-      console.error('Delete failed:', err.message)
+    } catch (err: unknown) {
+      console.error('Delete failed:', (err instanceof Error ? err.message : String(err)))
     } finally {
       setDeletingId(null)
     }

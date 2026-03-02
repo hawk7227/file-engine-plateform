@@ -144,11 +144,11 @@ export function usePermissions(): UsePermissionsReturn {
       setDetails(entries)
       setError(null)
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (!mountedRef.current) return
 
-      console.error('[usePermissions] Failed:', err.message)
-      setError(err.message)
+      console.error('[usePermissions] Failed:', (err instanceof Error ? err.message : String(err)))
+      setError((err instanceof Error ? err.message : String(err)))
       // Fail closed — empty feature set (deny all gated features)
       setFeatures(new Set())
       setDetails([])

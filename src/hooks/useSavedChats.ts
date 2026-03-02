@@ -135,13 +135,13 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
       setError(null)
       setRetryCount(0)
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (!mountedRef.current) return
 
       // Don't set error for abort (component unmounted or new request started)
-      if (err.name === 'AbortError') return
+      if ((err instanceof Error ? err.name : "") === 'AbortError') return
 
-      console.error(`[useSavedChats] Attempt ${attempt + 1} failed:`, err.message)
+      console.error(`[useSavedChats] Attempt ${attempt + 1} failed:`, (err instanceof Error ? err.message : String(err)))
 
       // Retry with backoff
       if (attempt < MAX_RETRIES) {
@@ -156,7 +156,7 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
       }
 
       // All retries exhausted — show error
-      setError(err.message || 'Failed to load chats')
+      setError((err instanceof Error ? err.message : String(err)) || 'Failed to load chats')
       setRetryCount(attempt + 1)
 
     } finally {
@@ -181,11 +181,11 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
 
       if (error) throw error
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on failure
-      console.error('[useSavedChats] Delete failed:', err.message)
+      console.error('[useSavedChats] Delete failed:', (err instanceof Error ? err.message : String(err)))
       setChats(previousChats)
-      throw new Error(`Failed to delete chat: ${err.message}`)
+      throw new Error(`Failed to delete chat: ${(err instanceof Error ? err.message : String(err))}`)
     }
   }, [chats])
 
@@ -204,11 +204,11 @@ export function useSavedChats(projectId?: string): UseSavedChatsReturn {
 
       if (error) throw error
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on failure
-      console.error('[useSavedChats] Rename failed:', err.message)
+      console.error('[useSavedChats] Rename failed:', (err instanceof Error ? err.message : String(err)))
       setChats(previousChats)
-      throw new Error(`Failed to rename chat: ${err.message}`)
+      throw new Error(`Failed to rename chat: ${(err instanceof Error ? err.message : String(err))}`)
     }
   }, [chats])
 

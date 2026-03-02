@@ -917,8 +917,8 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
       const d = await r.json()
       setPermissions(d.permissions || [])
       setGroups(d.groups || [])
-    } catch (e: any) {
-      addToast('error', 'Load Failed', e.message)
+    } catch (e: unknown) {
+      addToast('error', 'Load Failed', (e instanceof Error ? e.message : String(e)))
     } finally {
       setLoading(false)
     }
@@ -937,8 +937,8 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
       if (!r.ok) { const e = await r.json(); throw new Error(e.error) }
       addToast('success', 'Permission Updated', `${feature} → ${opts.plan || opts.user_id}`)
       fetchPerms()
-    } catch (e: any) {
-      addToast('error', 'Failed', e.message)
+    } catch (e: unknown) {
+      addToast('error', 'Failed', (e instanceof Error ? e.message : String(e)))
     }
   }
 
@@ -952,8 +952,8 @@ function PermissionsTab({ addToast }: { addToast: (type: 'success' | 'error' | '
       if (!r.ok) throw new Error('Revoke failed')
       addToast('success', 'Revoked', 'Permission removed')
       fetchPerms()
-    } catch (e: any) {
-      addToast('error', 'Failed', e.message)
+    } catch (e: unknown) {
+      addToast('error', 'Failed', (e instanceof Error ? e.message : String(e)))
     }
   }
 

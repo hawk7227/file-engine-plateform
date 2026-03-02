@@ -129,11 +129,11 @@ export function useProjects(): UseProjectsReturn {
       setError(null)
       setRetryCount(0)
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (!mountedRef.current) return
-      if (err.name === 'AbortError') return
+      if ((err instanceof Error ? err.name : "") === 'AbortError') return
 
-      console.error(`[useProjects] Attempt ${attempt + 1} failed:`, err.message)
+      console.error(`[useProjects] Attempt ${attempt + 1} failed:`, (err instanceof Error ? err.message : String(err)))
 
       if (attempt < MAX_RETRIES) {
         const delay = RETRY_DELAY_MS * Math.pow(2, attempt)
@@ -146,7 +146,7 @@ export function useProjects(): UseProjectsReturn {
         return
       }
 
-      setError(err.message || 'Failed to load projects')
+      setError((err instanceof Error ? err.message : String(err)) || 'Failed to load projects')
       setRetryCount(attempt + 1)
 
     } finally {
@@ -202,10 +202,10 @@ export function useProjects(): UseProjectsReturn {
       setProjects(prev => prev.map(p => p.id === id ? project : p))
       return project
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on failure
       setProjects(previousProjects)
-      throw new Error(`Failed to update project: ${err.message}`)
+      throw new Error(`Failed to update project: ${(err instanceof Error ? err.message : String(err))}`)
     }
   }, [projects])
 
@@ -223,9 +223,9 @@ export function useProjects(): UseProjectsReturn {
 
       if (error) throw error
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       setProjects(previousProjects)
-      throw new Error(`Failed to delete project: ${err.message}`)
+      throw new Error(`Failed to delete project: ${(err instanceof Error ? err.message : String(err))}`)
     }
   }, [projects])
 
@@ -257,11 +257,11 @@ export function useProjects(): UseProjectsReturn {
       setProjectFiles(result)
       return result
 
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err: unknown) {
+      if ((err instanceof Error ? err.name : "") === 'AbortError') {
         console.error('[useProjects] Files request timed out')
       } else {
-        console.error('[useProjects] Failed to load files:', err.message)
+        console.error('[useProjects] Failed to load files:', (err instanceof Error ? err.message : String(err)))
       }
       return []
     } finally {
@@ -299,8 +299,8 @@ export function useProjects(): UseProjectsReturn {
       const { content } = await res.json()
       return content
 
-    } catch (err: any) {
-      console.error('[useProjects] Failed to load file content:', err.message)
+    } catch (err: unknown) {
+      console.error('[useProjects] Failed to load file content:', (err instanceof Error ? err.message : String(err)))
       return null
     }
   }, [])

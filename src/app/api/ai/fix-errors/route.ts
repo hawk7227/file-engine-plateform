@@ -83,10 +83,10 @@ Return ONLY valid JSON, no markdown code blocks.`
         error: 'Failed to parse fix response'
       })
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Fix API Error]', err)
     return NextResponse.json(
-      { error: `${BRAND_NAME} fix failed: ` + + err.message, fixes: [], fixedFiles: [] },
+      { error: `${BRAND_NAME} fix failed: ` + + (err instanceof Error ? err.message : String(err)), fixes: [], fixedFiles: [] },
       { status: 500 }
     )
   }

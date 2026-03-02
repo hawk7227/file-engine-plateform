@@ -1250,8 +1250,8 @@ export function FileEngineApp() {
 
       // Clear attachments after send
       setAttachedFiles([]);
-    } catch (error: any) {
-      showNotification("error", "Send failed", error.message || "Failed to send message");
+    } catch (error: unknown) {
+      showNotification("error", "Send failed", (error instanceof Error ? error.message : String(error)) || "Failed to send message");
     }
   };
 
@@ -1438,7 +1438,7 @@ export function FileEngineApp() {
       setPromptValue(newVal);
       setShowEnhanceBtn(true);
       showNotification("success", "URL Imported", `Reference to ${title} added`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Fallback to basic reference if fetch fails
       const currentValue = promptValue.trim();
       const reference = `[Reference: ${hostname}]`;
@@ -1824,7 +1824,7 @@ export function FileEngineApp() {
                   const data = await res.json(); 
                   if (res.ok) { showNotification("success", "Deployed!", data.url || "Deployment started"); } 
                   else { showNotification("error", "Deploy failed", data.error); } 
-                } catch (err: any) { showNotification("error", "Deploy failed", err.message); }
+                } catch (err: unknown) { showNotification("error", "Deploy failed", (err instanceof Error ? err.message : String(err))); }
               }
             }}> Deploy</button>
             {/* Generation Usage Bar (free plan) */}
@@ -2204,7 +2204,7 @@ export function FileEngineApp() {
                     ))}
                     <div className="quick-actions-bar">
                       <button className="quick-action" onClick={async () => { showNotification("info", "Export", "Preparing ZIP..."); try { const res = await fetch(`/api/builds/${currentProjectId}/export`); if (res.ok) { const blob = await res.blob(); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "project.zip"; a.click(); showNotification("success", "Export", "Download started"); } else { showNotification("error", "Export", "Export failed"); } } catch { showNotification("info", "Export", "Export feature coming soon"); } }}> Export</button>
-                      <button className="quick-action primary" onClick={async () => { if (!currentProjectId) { showNotification("info", "Deploy", "No project selected"); return; } showNotification("info", "Deploy", "Starting deployment..."); try { const res = await fetch("/api/deploy", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: currentProjectId }) }); const data = await res.json(); if (res.ok) { showNotification("success", "Deployed!", data.url || "Deployment started"); } else { showNotification("error", "Deploy failed", data.error); } } catch (err: any) { showNotification("error", "Deploy failed", err.message); } }}> Deploy</button>
+                      <button className="quick-action primary" onClick={async () => { if (!currentProjectId) { showNotification("info", "Deploy", "No project selected"); return; } showNotification("info", "Deploy", "Starting deployment..."); try { const res = await fetch("/api/deploy", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: currentProjectId }) }); const data = await res.json(); if (res.ok) { showNotification("success", "Deployed!", data.url || "Deployment started"); } else { showNotification("error", "Deploy failed", data.error); } } catch (err: unknown) { showNotification("error", "Deploy failed", (err instanceof Error ? err.message : String(err))); } }}> Deploy</button>
                       <button className="quick-action" onClick={() => { if (typeof navigator !== "undefined" && navigator.clipboard) { navigator.clipboard.writeText(window.location.href); showNotification("success", "Copied", "Link copied"); } }}> Share</button>
                       <button className="quick-action" onClick={() => { const content = generateHook.files.map((f: any) => `// ${f.path || f.filepath}\n${f.content}`).join("\n\n"); if (typeof navigator !== "undefined" && navigator.clipboard) { navigator.clipboard.writeText(content); showNotification("success", "Copied", `${files.length} files copied to clipboard`); } }}> Copy</button>
                     </div>
@@ -2464,7 +2464,7 @@ export function FileEngineApp() {
             <div className="modal-section">
               <div className="modal-section-title">Account</div>
               <div className="form-group"><label className="form-label">Email</label><input type="email" className="form-input" defaultValue={authUser?.email || ""} disabled /></div>
-              <div className="form-group"><label className="form-label">Name</label><input type="text" className="form-input" value={profileFormName} onChange={(e) => setProfileFormName(e.target.value)} onBlur={async () => { if (authUser) { try { await supabase.from("profiles").update({ full_name: profileFormName }).eq("id", authUser.id); showNotification("success", "Profile updated"); } catch (err: any) { showNotification("error", "Save failed", err.message || "Could not update profile"); } } }} /></div>
+              <div className="form-group"><label className="form-label">Name</label><input type="text" className="form-input" value={profileFormName} onChange={(e) => setProfileFormName(e.target.value)} onBlur={async () => { if (authUser) { try { await supabase.from("profiles").update({ full_name: profileFormName }).eq("id", authUser.id); showNotification("success", "Profile updated"); } catch (err: unknown) { showNotification("error", "Save failed", (err instanceof Error ? err.message : String(err)) || "Could not update profile"); } } }} /></div>
             </div>
             <div className="modal-section">
               <div className="modal-section-title">Subscription</div>
@@ -2572,8 +2572,8 @@ export function FileEngineApp() {
             <div className="modal-section">
               <div className="modal-section-title">API Keys (Optional)</div>
               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Add your own API keys for unlimited generation. {BRAND_NAME} will use them automatically.</div>
-              <div className="form-group"><label className="form-label">Primary API Key</label><input type="password" className="form-input" placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (authUser) { try { const key = apiKeySlot1.trim(); await supabase.from("profiles").update({ claude_api_key: key || null }).eq("id", authUser.id); showNotification("success", "API key saved"); } catch (err: any) { showNotification("error", "Save failed", err.message); } } }} /></div>
-              <div className="form-group"><label className="form-label">Secondary API Key</label><input type="password" className="form-input" placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (authUser) { try { const key = apiKeySlot2.trim(); await supabase.from("profiles").update({ openai_api_key: key || null }).eq("id", authUser.id); showNotification("success", "API key saved"); } catch (err: any) { showNotification("error", "Save failed", err.message); } } }} /></div>
+              <div className="form-group"><label className="form-label">Primary API Key</label><input type="password" className="form-input" placeholder="sk-..." value={apiKeySlot1} onChange={(e) => setApiKeySlot1(e.target.value)} onBlur={async () => { if (authUser) { try { const key = apiKeySlot1.trim(); await supabase.from("profiles").update({ claude_api_key: key || null }).eq("id", authUser.id); showNotification("success", "API key saved"); } catch (err: unknown) { showNotification("error", "Save failed", (err instanceof Error ? err.message : String(err))); } } }} /></div>
+              <div className="form-group"><label className="form-label">Secondary API Key</label><input type="password" className="form-input" placeholder="sk-..." value={apiKeySlot2} onChange={(e) => setApiKeySlot2(e.target.value)} onBlur={async () => { if (authUser) { try { const key = apiKeySlot2.trim(); await supabase.from("profiles").update({ openai_api_key: key || null }).eq("id", authUser.id); showNotification("success", "API key saved"); } catch (err: unknown) { showNotification("error", "Save failed", (err instanceof Error ? err.message : String(err))); } } }} /></div>
             </div>
             {/* Admin-Only: Cost Optimization Settings */}
             {isAdmin && (

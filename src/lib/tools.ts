@@ -114,8 +114,8 @@ const builtInTools: Tool[] = [
         const sandbox = createSandbox('default')
         const result = await sandbox.execute(params.command)
         return { success: result.success, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -151,8 +151,8 @@ const builtInTools: Tool[] = [
         const { webSearch } = await import('./search')
         const results = await webSearch(params.query, { maxResults: params.maxResults || 5 })
         return { success: true, data: results }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -167,8 +167,8 @@ const builtInTools: Tool[] = [
         const { searchNpmPackages } = await import('./search')
         const results = await searchNpmPackages(params.query)
         return { success: true, data: results }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -183,8 +183,8 @@ const builtInTools: Tool[] = [
         const { getPackageInfo } = await import('./search')
         const info = await getPackageInfo(params.name)
         return { success: true, data: info }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -200,8 +200,8 @@ const builtInTools: Tool[] = [
         const { analyzeImage } = await import('./vision')
         const result = await analyzeImage(params.imageData, { framework: params.framework })
         return { success: true, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -221,8 +221,8 @@ const builtInTools: Tool[] = [
           height: params.height || 800 
         })
         return { success: true, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -239,8 +239,8 @@ const builtInTools: Tool[] = [
         const sandbox = createSandbox(params.projectId)
         const result = await sandbox.execute(params.command)
         return { success: result.success, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -255,8 +255,8 @@ const builtInTools: Tool[] = [
         const { analyzeCode } = await import('./semantic')
         const result = await analyzeCode(params.files)
         return { success: true, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -271,8 +271,8 @@ const builtInTools: Tool[] = [
         const { getRelevantMemories } = await import('./memory')
         const memories = await getRelevantMemories(params.userId, {})
         return { success: true, data: memories }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -290,8 +290,8 @@ const builtInTools: Tool[] = [
         const filesMap = new Map<string, string>(Object.entries(params.files))
         const result = await auditProject(filesMap)
         return { success: true, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -306,8 +306,8 @@ const builtInTools: Tool[] = [
         const { batchCreateFiles } = await import('./batch-operations')
         const result = await batchCreateFiles(params.operations)
         return { success: result.success, data: result }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -324,8 +324,8 @@ const builtInTools: Tool[] = [
         const scaffold = createProjectScaffold(params.name, params.type || 'nextjs')
         const result = await batchCreateFiles(scaffold.files)
         return { success: result.success, data: { scaffold, result } }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -350,8 +350,8 @@ const builtInTools: Tool[] = [
             operations: result 
           } 
         }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -367,8 +367,8 @@ const builtInTools: Tool[] = [
         const { searchConversations } = await import('./memory')
         const results = await searchConversations(params.userId, params.query)
         return { success: true, data: results }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   },
@@ -387,8 +387,8 @@ const builtInTools: Tool[] = [
         })
         const data = await response.json()
         return { success: true, data }
-      } catch (err: any) {
-        return { success: false, error: err.message }
+      } catch (err: unknown) {
+        return { success: false, error: (err instanceof Error ? err.message : String(err)) }
       }
     }
   }
@@ -491,8 +491,8 @@ class ToolRegistry {
     
     try {
       return await tool.handler(params)
-    } catch (err: any) {
-      return { success: false, error: err.message }
+    } catch (err: unknown) {
+      return { success: false, error: (err instanceof Error ? err.message : String(err)) }
     }
   }
   

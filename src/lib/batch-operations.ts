@@ -413,12 +413,12 @@ export async function batchCreateFiles(
             timestamp: new Date().toISOString()
           })
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       failed++
       results.push({
         operation: op,
         success: false,
-        error: err.message,
+        error: (err instanceof Error ? err.message : String(err)),
         timestamp: new Date().toISOString()
       })
     }

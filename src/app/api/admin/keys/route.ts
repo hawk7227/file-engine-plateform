@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
         })
 
         return NextResponse.json({ keys })
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Admin Keys GET]', error)
         return NextResponse.json({ error: 'Failed to fetch keys' }, { status: 500 })
     }
@@ -193,7 +193,7 @@ export async function PUT(req: NextRequest) {
             saved: true,
             key: { id: key_name, active: true, masked: maskKey(value.trim()), source: 'database' }
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Admin Keys PUT]', error)
         return NextResponse.json({ error: 'Failed to save key' }, { status: 500 })
     }
@@ -227,7 +227,7 @@ export async function DELETE(req: NextRequest) {
             .eq('key_name', key_name)
 
         return NextResponse.json({ deleted: true, key: { id: key_name, active: false } })
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Admin Keys DELETE]', error)
         return NextResponse.json({ error: 'Failed to delete key' }, { status: 500 })
     }

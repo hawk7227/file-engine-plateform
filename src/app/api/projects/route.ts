@@ -24,9 +24,9 @@ export async function GET() {
     }
 
     return NextResponse.json(data)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('GET /api/projects error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: (err instanceof Error ? err.message : String(err)) || 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(data)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('POST /api/projects error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: (err instanceof Error ? err.message : String(err)) || 'Internal server error' }, { status: 500 })
   }
 }

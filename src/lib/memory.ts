@@ -236,7 +236,7 @@ export class MemoryManager {
           last_used: new Date().toISOString()
         })
         .eq('id', memoryId)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[Memory] Failed to update usage:', err)
     }
   }

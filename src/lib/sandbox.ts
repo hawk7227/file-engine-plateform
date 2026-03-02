@@ -249,11 +249,11 @@ export class SandboxExecutor {
         executionTime: Date.now() - startTime,
         exitCode: allErrors.length === 0 ? 0 : 1
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
         output,
-        errors: [{ type: 'runtime', message: err.message }],
+        errors: [{ type: 'runtime', message: (err instanceof Error ? err.message : String(err)) }],
         warnings: allWarnings,
         executionTime: Date.now() - startTime,
         exitCode: 1
@@ -291,11 +291,11 @@ export class SandboxExecutor {
         executionTime: Date.now() - startTime,
         exitCode: result.exitCode || 0
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        output: err.message,
-        errors: [{ type: 'runtime', message: err.message }],
+        output: (err instanceof Error ? err.message : String(err)),
+        errors: [{ type: 'runtime', message: (err instanceof Error ? err.message : String(err)) }],
         warnings: [],
         executionTime: Date.now() - startTime,
         exitCode: 1

@@ -388,10 +388,10 @@ export class Orchestrator {
           if (result.response) response = result.response
 
           this.log(task.type, { task: task.description, result: 'success' }, Date.now() - taskStart)
-        } catch (err: any) {
+        } catch (err: unknown) {
           task.status = 'failed'
-          task.error = err.message
-          this.log(task.type, { task: task.description, error: err.message }, Date.now() - taskStart)
+          task.error = (err instanceof Error ? err.message : String(err))
+          this.log(task.type, { task: task.description, error: (err instanceof Error ? err.message : String(err)) }, Date.now() - taskStart)
         }
       }
 
@@ -403,11 +403,11 @@ export class Orchestrator {
         actions: this.actionLog
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        response: `I encountered an error: ${err.message}`,
-        error: err.message,
+        response: `I encountered an error: ${(err instanceof Error ? err.message : String(err))}`,
+        error: (err instanceof Error ? err.message : String(err)),
         actions: this.actionLog
       }
     }

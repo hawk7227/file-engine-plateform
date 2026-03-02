@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
 
     try {
       event = verifyWebhookSignature(body, signature)
-    } catch (err: any) {
-      console.error('Webhook signature verification failed:', err.message)
+    } catch (err: unknown) {
+      console.error('Webhook signature verification failed:', (err instanceof Error ? err.message : String(err)))
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -78,9 +78,9 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ received: true }), {
       headers: { 'Content-Type': 'application/json' }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Webhook error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: (error instanceof Error ? error.message : String(error)) }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })

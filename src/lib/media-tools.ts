@@ -286,9 +286,9 @@ export async function generateMedia(req: MediaGenerationRequest): Promise<MediaG
       default:
         return { success: false, error: `Unknown tool type: ${tool.type}` }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(`[Media ${tool.codename}] Error:`, err)
-    return { success: false, error: `Generation failed: ${err.message}` }
+    return { success: false, error: `Generation failed: ${(err instanceof Error ? err.message : String(err))}` }
   }
 }
 

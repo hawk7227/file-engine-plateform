@@ -213,9 +213,9 @@ export default function PreviewLabPage() {
           }
         } catch{}
       },5000)
-    } catch(err:any) {
+    } catch (err: unknown) {
       setVideoJobs(p=>p.map(j=>j.id===job.id?{...j,status:'failed'}:j))
-      setVideoRunning(false); toast('Error',err.message,'error')
+      setVideoRunning(false); toast('Error',(err instanceof Error ? err.message : String(err)),'error')
     }
   }
 
@@ -234,9 +234,9 @@ export default function PreviewLabPage() {
         return [...fresh,...clean]
       })
       toast('Generated',`${results.filter((r:any)=>r.status==='success').length} images`,'success')
-    } catch(err:any) {
+    } catch (err: unknown) {
       setGenImgs(p=>p.filter(img=>!phs.find(ph=>ph.id===img.id)))
-      toast('Error',err.message,'error')
+      toast('Error',(err instanceof Error ? err.message : String(err)),'error')
     } finally { setImgRunning(false) }
   }
 
@@ -248,7 +248,7 @@ export default function PreviewLabPage() {
       setSqlCols(data.columns||(data.rows?.[0]?Object.keys(data.rows[0]):[]))
       setSqlRows(data.rows||[])
       toast('SQL',`${(data.rows||[]).length} rows`,'success')
-    } catch(err:any) { toast('SQL Error',err.message,'error') }
+    } catch (err: unknown) { toast('SQL Error',(err instanceof Error ? err.message : String(err)),'error') }
     finally { setSqlRunning(false) }
   }
 
@@ -260,7 +260,7 @@ export default function PreviewLabPage() {
     try {
       const data = await apiCall('chat',{messages:[...chatMsgs,msg].map(m=>({role:m.role==='ai'?'assistant':'user',content:m.text}))})
       setChatMsgs(p=>[...p,{role:'ai',text:data.content||data.message||'No response'}])
-    } catch(err:any) { setChatMsgs(p=>[...p,{role:'ai',text:`Error: ${err.message}`}]) }
+    } catch (err: unknown) { setChatMsgs(p=>[...p,{role:'ai',text:`Error: ${(err instanceof Error ? err.message : String(err))}`}]) }
   }
 
   // Styles

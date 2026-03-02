@@ -162,8 +162,8 @@ REQUIREMENTS:
         framework
       }
     }
-  } catch (err: any) {
-    throw new Error(`Image analysis failed: ${err.message}`)
+  } catch (err: unknown) {
+    throw new Error(`Image analysis failed: ${(err instanceof Error ? err.message : String(err))}`)
   }
 }
 
@@ -258,8 +258,8 @@ export async function codeToImage(
       height: height * scale,
       format
     }
-  } catch (err: any) {
-    throw new Error(`Code to image failed: ${err.message}`)
+  } catch (err: unknown) {
+    throw new Error(`Code to image failed: ${(err instanceof Error ? err.message : String(err))}`)
   }
 }
 
@@ -306,8 +306,8 @@ export async function generatePreviewImage(
       height: viewport.height,
       format: 'png'
     }
-  } catch (err: any) {
-    throw new Error(`Preview generation failed: ${err.message}`)
+  } catch (err: unknown) {
+    throw new Error(`Preview generation failed: ${(err instanceof Error ? err.message : String(err))}`)
   }
 }
 
@@ -363,8 +363,8 @@ export async function analyzePDF(
     }
     
     return await response.json()
-  } catch (err: any) {
-    throw new Error(`PDF analysis failed: ${err.message}`)
+  } catch (err: unknown) {
+    throw new Error(`PDF analysis failed: ${(err instanceof Error ? err.message : String(err))}`)
   }
 }
 

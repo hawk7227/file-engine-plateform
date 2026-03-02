@@ -68,7 +68,7 @@ export async function webSearch(
 
     const data = await response.json()
     return data.results || []
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Web search error:', err)
     return []
   }
@@ -109,7 +109,7 @@ export async function searchNpmPackages(
       keywords: obj.package.keywords || [],
       license: obj.package.license || 'Unknown'
     }))
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('NPM search error:', err)
     return []
   }
@@ -141,7 +141,7 @@ export async function getPackageInfo(packageName: string): Promise<PackageInfo |
       keywords: data.keywords || [],
       license: data.license || 'Unknown'
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Package info error:', err)
     return null
   }
@@ -179,7 +179,7 @@ export async function searchGitHub(
 
     const data = await response.json()
     return data.items || []
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('GitHub search error:', err)
     return []
   }
@@ -214,7 +214,7 @@ export async function searchStackOverflow(
 
     const data = await response.json()
     return data.items || []
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Stack Overflow search error:', err)
     return []
   }
@@ -245,7 +245,7 @@ export async function fetchDocumentation(
     }
 
     return await response.json()
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Documentation fetch error:', err)
     return null
   }

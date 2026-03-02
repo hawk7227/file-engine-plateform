@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
     const results = await searchWeb(query, maxResults)
     
     return NextResponse.json({ results })
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Search API Error]', err)
     return NextResponse.json(
-      { error: 'Search failed: ' + err.message, results: [] },
+      { error: 'Search failed: ' + (err instanceof Error ? err.message : String(err)), results: [] },
       { status: 500 }
     )
   }

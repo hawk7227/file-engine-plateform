@@ -380,11 +380,11 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
             if (parsed.error) {
               throw new Error(parsed.error)
             }
-          } catch (e: any) {
-            if (e.message && !e.message.includes('JSON')) {
+          } catch (e: unknown) {
+            if ((e instanceof Error ? e.message : String(e)) && !(e instanceof Error ? e.message : String(e)).includes('JSON')) {
               throw e // Re-throw real errors
             } else {
-              console.warn('[useChat] SSE parse error:', e.message, 'data:', data?.slice(0, 100))
+              console.warn('[useChat] SSE parse error:', (e instanceof Error ? e.message : String(e)), 'data:', data?.slice(0, 100))
             }
           }
         }
@@ -459,13 +459,13 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
             }
           }
         }
-      } catch (saveErr: any) {
-        console.error('[useChat] Auto-save failed:', saveErr.message)
+      } catch (saveErr: unknown) {
+        console.error('[useChat] Auto-save failed:', (saveErr instanceof Error ? saveErr.message : String(saveErr)))
         // Non-fatal — chat still works, just not persisted
       }
 
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err: unknown) {
+      if ((err instanceof Error ? err.name : "") === 'AbortError') {
         setMessages(prev => {
           const updated = [...prev]
           const last = updated.length - 1
@@ -480,15 +480,15 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
         })
       } else {
         console.error('[useChat] Error:', err)
-        setError(err.message)
-        onError?.(err)
+        setError((err instanceof Error ? err.message : String(err)))
+        onError?.(err instanceof Error ? err : new Error(String(err)))
         setMessages(prev => {
           const updated = [...prev]
           const last = updated.length - 1
           if (updated[last]?.role === 'assistant') {
             updated[last] = {
               ...updated[last],
-              content: `Error: ${err.message}`,
+              content: `Error: ${(err instanceof Error ? err.message : String(err))}`,
               status: 'error'
             }
           }

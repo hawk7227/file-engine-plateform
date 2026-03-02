@@ -53,8 +53,8 @@ export async function createGitHubRepo(
 
     const repo = await res.json()
     return { repo, error: null }
-  } catch (err: any) {
-    return { repo: null, error: err.message }
+  } catch (err: unknown) {
+    return { repo: null, error: (err instanceof Error ? err.message : String(err)) }
   }
 }
 
@@ -186,8 +186,8 @@ export async function pushToGitHub(
     )
 
     return { success: true, error: null }
-  } catch (err: any) {
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (err instanceof Error ? err.message : String(err)) }
   }
 }
 

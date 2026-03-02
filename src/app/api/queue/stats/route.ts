@@ -77,9 +77,9 @@ export async function GET() {
         avgDurationFormatted: formatDuration(avgDuration)
       }
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('GET /api/queue/stats error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: (err instanceof Error ? err.message : String(err)) || 'Internal server error' }, { status: 500 })
   }
 }
 

@@ -262,7 +262,7 @@ function validateSyntax(file: ParsedFile): ValidationError[] {
       const Parser = acorn.Parser.extend((acornJsx as any)())
       Parser.parse(content, { ecmaVersion: 2022, sourceType: 'module' })
     }
-  } catch (e: any) {
+  } catch (e: unknown) {
     const error = parseSyntaxError(e, filepath, content)
     errors.push(error)
   }
@@ -833,15 +833,15 @@ function validateJSON(file: ParsedFile): ValidationError[] {
 
   try {
     JSON.parse(content)
-  } catch (e: any) {
-    const match = e.message.match(/position (\d+)/)
+  } catch (e: unknown) {
+    const match = (e instanceof Error ? e.message : String(e)).match(/position (\d+)/)
     const position = match ? parseInt(match[1]) : 0
     const { line, column } = getLineAndColumn(content, position)
 
     errors.push({
       type: 'error',
       code: 'INVALID_JSON',
-      message: e.message,
+      message: (e instanceof Error ? e.message : String(e)),
       file: filepath,
       line,
       column,

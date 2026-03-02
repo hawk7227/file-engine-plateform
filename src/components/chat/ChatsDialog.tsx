@@ -135,8 +135,8 @@ export function ChatsDialog({ isOpen, onClose, onSelectChat, projectId }: ChatsD
     setDeletingId(chatId)
     try {
       await deleteChat(chatId)
-    } catch (err: any) {
-      console.error('Delete failed:', err.message)
+    } catch (err: unknown) {
+      console.error('Delete failed:', (err instanceof Error ? err.message : String(err)))
     } finally {
       setDeletingId(null)
     }

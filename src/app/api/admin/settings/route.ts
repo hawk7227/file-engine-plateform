@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
       isDefault: !settings
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Admin Settings GET]', error)
     return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
   }
@@ -175,7 +175,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ settings: data, updated: true })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Admin Settings PUT]', error)
     return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
   }

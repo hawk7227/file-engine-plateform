@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       tool: toolCodename // Only codename, never provider
     })
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Media API Error]', err)
     return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
   }

@@ -61,10 +61,10 @@ export async function POST(request: NextRequest) {
       fix: fixResult
     })
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Audit API Error]', error)
     return NextResponse.json(
-      { error: error.message || 'Audit failed' },
+      { error: (error instanceof Error ? error.message : String(error)) || 'Audit failed' },
       { status: 500 }
     )
   }
@@ -96,10 +96,10 @@ export async function GET(request: NextRequest) {
       ...result
     })
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Quick Audit Error]', error)
     return NextResponse.json(
-      { error: error.message || 'Quick audit failed' },
+      { error: (error instanceof Error ? error.message : String(error)) || 'Quick audit failed' },
       { status: 500 }
     )
   }

@@ -256,8 +256,8 @@ export async function hasFeature(userId: string, feature: string): Promise<boole
     const features = await loadUserFeatures(userId)
     return features.has(feature)
 
-  } catch (err: any) {
-    console.error(`[permissions] hasFeature(${feature}) failed:`, err.message)
+  } catch (err: unknown) {
+    console.error(`[permissions] hasFeature(${feature}) failed:`, (err instanceof Error ? err.message : String(err)))
     // Fail CLOSED — deny on error (security-first)
     return false
   }
@@ -279,8 +279,8 @@ export async function hasFeatures(
     }
     return result
 
-  } catch (err: any) {
-    console.error('[permissions] hasFeatures failed:', err.message)
+  } catch (err: unknown) {
+    console.error('[permissions] hasFeatures failed:', (err instanceof Error ? err.message : String(err)))
     // Fail closed — deny all
     const result: Record<string, boolean> = {}
     for (const f of features) {
@@ -310,8 +310,8 @@ export async function getUserFeatures(userId: string): Promise<UserFeature[]> {
     if (error) throw error
     return (data as UserFeature[]) || []
 
-  } catch (err: any) {
-    console.error('[permissions] getUserFeatures failed:', err.message)
+  } catch (err: unknown) {
+    console.error('[permissions] getUserFeatures failed:', (err instanceof Error ? err.message : String(err)))
     return []
   }
 }
@@ -401,9 +401,9 @@ export async function grantFeature(params: {
 
     return { success: true }
 
-  } catch (err: any) {
-    console.error('[permissions] grantFeature failed:', err.message)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    console.error('[permissions] grantFeature failed:', (err instanceof Error ? err.message : String(err)))
+    return { success: false, error: (err instanceof Error ? err.message : String(err)) }
   }
 }
 
@@ -435,8 +435,8 @@ export async function revokeFeature(params: {
 
     return { success: true }
 
-  } catch (err: any) {
-    console.error('[permissions] revokeFeature failed:', err.message)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    console.error('[permissions] revokeFeature failed:', (err instanceof Error ? err.message : String(err)))
+    return { success: false, error: (err instanceof Error ? err.message : String(err)) }
   }
 }

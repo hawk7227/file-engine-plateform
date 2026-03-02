@@ -24,10 +24,10 @@ export async function POST(request: NextRequest) {
     const result = await executeInSandbox(projectId, command, files, timeout)
     
     return NextResponse.json(result)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Sandbox API Error]', err)
     return NextResponse.json(
-      { error: err.message, output: '', exitCode: 1 },
+      { error: (err instanceof Error ? err.message : String(err)), output: '', exitCode: 1 },
       { status: 500 }
     )
   }
@@ -100,8 +100,8 @@ async function executeInSandbox(
     if (path.endsWith('.json')) {
       try {
         JSON.parse(content)
-      } catch (e: any) {
-        issues.push(`${path}: SyntaxError: Invalid JSON - ${e.message}`)
+      } catch (e: unknown) {
+        issues.push(`${path}: SyntaxError: Invalid JSON - ${(e instanceof Error ? e.message : String(e))}`)
         exitCode = 1
       }
     }

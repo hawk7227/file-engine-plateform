@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ success: true }), {
       headers: { 'Content-Type': 'application/json' }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Contact form error:', error)
     return new Response(JSON.stringify({ error: 'Failed to submit form' }), {
       status: 500,

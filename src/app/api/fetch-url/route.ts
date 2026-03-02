@@ -71,10 +71,10 @@ export async function POST(req: NextRequest) {
       hostname: parsedUrl.hostname,
       statusCode: res.status
     })
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
+  } catch (error: unknown) {
+    if ((error instanceof Error ? error.name : "") === 'AbortError') {
       return NextResponse.json({ title: '', description: '', content: '', error: 'Request timed out' }, { status: 408 })
     }
-    return NextResponse.json({ title: '', description: '', content: '', error: error.message })
+    return NextResponse.json({ title: '', description: '', content: '', error: (error instanceof Error ? error.message : String(error)) })
   }
 }

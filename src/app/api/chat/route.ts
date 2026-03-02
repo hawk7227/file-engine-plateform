@@ -374,8 +374,8 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
             analysisResult = data.choices?.[0]?.message?.content || 'No analysis returned'
           }
           return { success: true, result: analysisResult }
-        } catch (visionErr: any) {
-          return { success: false, result: `Vision analysis failed: ${sanitizeResponse(visionErr.message)}` }
+        } catch (visionErr: unknown) {
+          return { success: false, result: `Vision analysis failed: ${sanitizeResponse((visionErr instanceof Error ? visionErr.message : String(visionErr)))}` }
         }
       }
       case 'think':
@@ -385,16 +385,16 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
           const result = await generateMedia({ toolCodename: input.tool_codename, prompt: input.prompt, params: input.params })
           if (!result.success) return { success: false, result: result.error || 'Generation failed' }
           return { success: true, result: `Media generated: ${result.url}\nType: ${result.mimeType || 'unknown'}${result.duration ? `\nDuration: ${result.duration}s` : ''}` }
-        } catch (err: any) {
-          return { success: false, result: `Media generation error: ${err.message}` }
+        } catch (err: unknown) {
+          return { success: false, result: `Media generation error: ${(err instanceof Error ? err.message : String(err))}` }
         }
       }
       default:
         return { success: false, result: `Unknown tool: ${name}` }
     }
-  } catch (err: any) {
-    console.error(`[execTool ERROR] name=${name} error=${err.message} stack=${err.stack?.slice(0, 300)}`)
-    return { success: false, result: `Tool error: ${err.message}` }
+  } catch (err: unknown) {
+    console.error(`[execTool ERROR] name=${name} error=${(err instanceof Error ? err.message : String(err))} stack=${(err instanceof Error ? err.stack : undefined)?.slice(0, 300)}`)
+    return { success: false, result: `Tool error: ${(err instanceof Error ? err.message : String(err))}` }
   }
 }
 
@@ -498,7 +498,7 @@ async function runSandbox(command: string, files: { path: string; content: strin
 
     // ── JSON validation ──
     if (path.endsWith('.json')) {
-      try { JSON.parse(content) } catch (e: any) { issues.push(`${path}: SyntaxError: ${e.message}`) }
+      try { JSON.parse(content) } catch (e: unknown) { issues.push(`${path}: SyntaxError: ${(e instanceof Error ? e.message : String(e))}`) }
     }
   }
   
@@ -560,8 +560,8 @@ async function runNpmSearch(query: string): Promise<{ success: boolean; result: 
     if (!r.ok) return { success: false, result: 'NPM search failed' }
     const d = await r.json()
     return { success: true, result: d.objects.map((o: any, i: number) => `${i + 1}. ${o.package.name} v${o.package.version}\n   ${o.package.description || ''}`).join('\n\n') || 'No packages found' }
-  } catch (e: any) {
-    return { success: false, result: `NPM error: ${e.message}` }
+  } catch (e: unknown) {
+    return { success: false, result: `NPM error: ${(e instanceof Error ? e.message : String(e))}` }
   }
 }
 
@@ -586,8 +586,8 @@ async function runGitHubSearch(query: string, max: number): Promise<{ success: b
     return { success: true, result: (d.items || []).slice(0, max).map((i: any, idx: number) =>
       `${idx + 1}. ${i.full_name} ⭐${i.stargazers_count}\n   ${i.description || '(no description)'}\n   ${i.html_url}`
     ).join('\n\n') || 'No repos found' }
-  } catch (e: any) {
-    return { success: false, result: `GitHub search error: ${e.message}` }
+  } catch (e: unknown) {
+    return { success: false, result: `GitHub search error: ${(e instanceof Error ? e.message : String(e))}` }
   }
 }
 
@@ -827,9 +827,9 @@ export async function POST(request: NextRequest) {
       return agentStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx, enableThinking, attachments, intent)
     }
     return simpleStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, attachments)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Chat API Error]', error)
-    return new Response(JSON.stringify({ error: `${BRAND_NAME} encountered an error`, details: sanitizeResponse(error.message || 'Unknown error') }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: `${BRAND_NAME} encountered an error`, details: sanitizeResponse((error instanceof Error ? error.message : String(error)) || 'Unknown error') }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 
@@ -1031,9 +1031,9 @@ async function agentStream(
 
         ctrl.enqueue(enc.encode('data: [DONE]\n\n'))
         ctrl.close()
-      } catch (err: any) {
-        if (err.message?.includes('rate') || err.status === 429) markRateLimited(apiKey, 60000)
-        ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse(err.message || `${BRAND_NAME} error`) })}\n\n`))
+      } catch (err: unknown) {
+        if ((err instanceof Error ? err.message : String(err))?.includes('rate') || ((err as Record<string, unknown>).status) === 429) markRateLimited(apiKey, 60000)
+        ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse((err instanceof Error ? err.message : String(err)) || `${BRAND_NAME} error`) })}\n\n`))
         ctrl.close()
       }
     }
@@ -1264,9 +1264,9 @@ async function simpleStream(
         }
         ctrl.enqueue(enc.encode('data: [DONE]\n\n'))
         ctrl.close()
-      } catch (err: any) {
-        if (err.message?.includes('rate') || err.status === 429) markRateLimited(apiKey, 60000)
-        ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse(err.message) })}\n\n`))
+      } catch (err: unknown) {
+        if ((err instanceof Error ? err.message : String(err))?.includes('rate') || ((err as Record<string, unknown>).status) === 429) markRateLimited(apiKey, 60000)
+        ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ error: sanitizeResponse((err instanceof Error ? err.message : String(err))) })}\n\n`))
         ctrl.close()
       }
     }

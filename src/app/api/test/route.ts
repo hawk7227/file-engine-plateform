@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     try {
       const { BRAND_NAME } = await import('@/lib/brand')
       logs.push('4. Brand loaded: ' + BRAND_NAME)
-    } catch (e: any) {
-      logs.push('4. BRAND IMPORT FAILED: ' + e.message)
+    } catch (e: unknown) {
+      logs.push('4. BRAND IMPORT FAILED: ' + (e instanceof Error ? e.message : String(e)))
     }
     
     // Test: can we import ai-config?
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       const { getActualModelId } = await import('@/lib/ai-config')
       const model = getActualModelId('auto', 'anthropic')
       logs.push('5. ai-config loaded, auto→' + model)
-    } catch (e: any) {
-      logs.push('5. AI-CONFIG IMPORT FAILED: ' + e.message)
+    } catch (e: unknown) {
+      logs.push('5. AI-CONFIG IMPORT FAILED: ' + (e instanceof Error ? e.message : String(e)))
     }
     
     // Test: can we import key-pool?
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
       const { getKeyWithFailover } = await import('@/lib/key-pool')
       const result = getKeyWithFailover()
       logs.push(`6. key-pool: ${result ? result.provider + ' key found' : 'NO KEYS'}`)
-    } catch (e: any) {
-      logs.push('6. KEY-POOL IMPORT FAILED: ' + e.message)
+    } catch (e: unknown) {
+      logs.push('6. KEY-POOL IMPORT FAILED: ' + (e instanceof Error ? e.message : String(e)))
     }
     
     // Test: can we import smart-context?
@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
       const { classifyIntent } = await import('@/lib/smart-context')
       const intent = classifyIntent('hello')
       logs.push('7. smart-context loaded, intent=' + intent)
-    } catch (e: any) {
-      logs.push('7. SMART-CONTEXT IMPORT FAILED: ' + e.message)
+    } catch (e: unknown) {
+      logs.push('7. SMART-CONTEXT IMPORT FAILED: ' + (e instanceof Error ? e.message : String(e)))
     }
     
     // Test: can we call Anthropic?
@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
       } else {
         logs.push('8. No ANTHROPIC_API_KEY')
       }
-    } catch (e: any) {
-      logs.push('8. Anthropic call FAILED: ' + e.message)
+    } catch (e: unknown) {
+      logs.push('8. Anthropic call FAILED: ' + (e instanceof Error ? e.message : String(e)))
     }
     
     return new Response(JSON.stringify({ status: 'diagnostic', logs }), {
@@ -82,8 +82,8 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' }
     })
     
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message, logs }), {
+  } catch (e: unknown) {
+    return new Response(JSON.stringify({ error: (e instanceof Error ? e.message : String(e)), logs }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })

@@ -58,8 +58,8 @@ async function checkTable(supabase: any, name: string, critical: boolean): Promi
             return { n: name, crit: critical, ok: false, detail: error.message }
         }
         return { n: name, crit: critical, ok: true, detail: 'Exists ✓' }
-    } catch (e: any) {
-        return { n: name, crit: critical, ok: false, detail: e.message || 'Connection failed' }
+    } catch (e: unknown) {
+        return { n: name, crit: critical, ok: false, detail: (e instanceof Error ? e.message : String(e)) || 'Connection failed' }
     }
 }
 
@@ -186,7 +186,7 @@ export async function GET(req: NextRequest) {
             groups,
             checkedAt: new Date().toISOString(),
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Admin Health GET]', error)
         return NextResponse.json({ error: 'Health check failed' }, { status: 500 })
     }

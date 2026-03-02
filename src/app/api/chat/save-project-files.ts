@@ -122,9 +122,9 @@ export async function saveProjectFiles(
             }
 
             saved.push(file.path)
-        } catch (err: any) {
-            console.error(`[SaveFiles] Error saving ${file.path}:`, err.message)
-            errors.push(`${file.path}: ${err.message}`)
+        } catch (err: unknown) {
+            console.error(`[SaveFiles] Error saving ${file.path}:`, (err instanceof Error ? err.message : String(err)))
+            errors.push(`${file.path}: ${(err instanceof Error ? err.message : String(err))}`)
         }
     }
 

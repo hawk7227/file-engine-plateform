@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
       }
     })
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Vercel-Proof Validation Error]', error)
     return NextResponse.json(
-      { error: error.message || 'Validation failed' },
+      { error: (error instanceof Error ? error.message : String(error)) || 'Validation failed' },
       { status: 500 }
     )
   }

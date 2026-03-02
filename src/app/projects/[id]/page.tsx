@@ -88,8 +88,8 @@ export default function ProjectPage() {
 
       setBuilds(buildsData || [])
 
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError((err instanceof Error ? err.message : String(err)))
     } finally {
       setLoading(false)
     }
@@ -114,8 +114,8 @@ export default function ProjectPage() {
 
       if (error) throw error
       router.push('/dashboard')
-    } catch (err: any) {
-      alert('Failed to delete project: ' + err.message)
+    } catch (err: unknown) {
+      alert('Failed to delete project: ' + (err instanceof Error ? err.message : String(err)))
     }
   }
 
@@ -136,8 +136,8 @@ export default function ProjectPage() {
 
       alert('Deployment started! URL: ' + data.url)
       loadProject()
-    } catch (err: any) {
-      alert('Deploy failed: ' + err.message)
+    } catch (err: unknown) {
+      alert('Deploy failed: ' + (err instanceof Error ? err.message : String(err)))
     }
   }
 
