@@ -9,13 +9,13 @@ import type { DevicePreset } from './WorkplaceLayout'
 
 const CANVAS_CSS = `
 .wp-canvas{flex:1;position:relative;overflow:hidden;background:var(--wp-bg-0);background-image:radial-gradient(circle at 50% 40%,rgba(18,28,18,.3),var(--wp-bg-0) 70%)}
-.wp-device{position:absolute;cursor:grab;z-index:2}.wp-device:active{cursor:grabbing}
-.wp-phone{position:relative;border:14px solid #1c1c1e;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column;transition:width .22s ease,height .22s ease}
+.wp-device{position:absolute;cursor:grab;z-index:2;will-change:transform}.wp-device:active{cursor:grabbing}
+.wp-phone{position:relative;border:14px solid #1c1c1e;box-shadow:inset 0 0 0 2px #3a3a3c,0 0 0 2px #3a3a3c,0 30px 60px rgba(0,0,0,.5);background:#000;overflow:hidden;display:flex;flex-direction:column;transition:width .22s ease,height .22s ease;will-change:transform}
 .wp-phone-di{position:absolute;z-index:10;width:126px;height:37px;background:#000;border-radius:20px;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
 .wp-phone-di .cam{width:10px;height:10px;border-radius:50%;background:#1a1a2e;border:1px solid #2a2a3e}
 .wp-phone-hb{position:absolute;z-index:10;width:58px;height:58px;border:4px solid #3a3a3c;border-radius:50%;bottom:8px;left:50%;transform:translateX(-50%)}
 .wp-phone-screen{flex:1;overflow:hidden;position:relative;background:#000}
-.wp-phone-iframe{width:100%;height:100%;border:none}
+.wp-phone-iframe{width:100%;height:100%;border:none;will-change:transform}
 .wp-hindicator{position:absolute;z-index:20;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.15);bottom:8px;left:50%;transform:translateX(-50%)}
 .wp-dlabel{text-align:center;margin-top:8px;font-family:var(--wp-mono);font-size:9px;color:var(--wp-text-4)}
 .wp-empty-preview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--wp-text-4);font-size:11px;gap:8px;text-align:center;padding:24px}
@@ -28,7 +28,8 @@ const CANVAS_CSS = `
 .wp-iframe-error{position:absolute;inset:0;z-index:25;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.85);color:var(--wp-red);font-size:11px;padding:20px;text-align:center;gap:8px;backdrop-filter:blur(4px)}
 .wp-iframe-error .err-title{font-size:13px;font-weight:700}
 .wp-iframe-error .err-msg{font-size:10px;color:var(--wp-text-3);font-family:var(--wp-mono);max-width:280px;word-break:break-word}
-.wp-iframe-error button{padding:4px 12px;border-radius:6px;font-size:9px;font-weight:700;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--wp-red);cursor:pointer;font-family:var(--wp-font)}
+.wp-iframe-error button{padding:4px 12px;border-radius:6px;font-size:9px;font-weight:700;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--wp-red);cursor:pointer;font-family:var(--wp-font);margin:0 3px}
+.wp-iframe-error .err-code{padding:4px 12px;border-radius:6px;font-size:9px;font-weight:700;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);color:var(--wp-blue);cursor:pointer;font-family:var(--wp-font)}
 .wp-browser{position:absolute;cursor:grab;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);background:var(--wp-bg-2);display:flex;flex-direction:column;z-index:3}
 .wp-browser:active{cursor:grabbing}
 .wp-browser-tb{display:flex;align-items:center;height:38px;background:#1e1e24;padding:0 12px;gap:10px;flex-shrink:0;cursor:grab;user-select:none}
@@ -41,6 +42,16 @@ const CANVAS_CSS = `
 .wp-browser-close{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:4px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--wp-red);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;z-index:5}
 .wp-browser:hover .wp-browser-close{opacity:1}
 .wp-browser-resize{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:nwse-resize;z-index:5;display:flex;align-items:flex-end;justify-content:flex-end;color:var(--wp-text-4);font-size:10px;padding:1px 3px}
+.wp-statusbar{position:absolute;top:0;left:0;right:0;z-index:15;height:47px;display:flex;align-items:flex-start;justify-content:space-between;padding:14px 24px 0;pointer-events:none;font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;letter-spacing:-.2px}
+.wp-statusbar.sb-dark{color:#fff}.wp-statusbar.sb-light{color:#000}
+.wp-sb-left{display:flex;align-items:center;gap:1px}
+.wp-sb-right{display:flex;align-items:center;gap:5px}
+.wp-sb-signal{display:flex;gap:1px;align-items:flex-end}.wp-sb-signal span{width:3px;border-radius:1px;background:currentColor}
+.wp-sb-batt{width:22px;height:10px;border:1px solid currentColor;border-radius:2px;position:relative;display:flex;align-items:center;padding:1px}
+.wp-sb-batt::after{content:'';position:absolute;right:-3px;top:2px;width:2px;height:5px;background:currentColor;border-radius:0 1px 1px 0;opacity:.4}
+.wp-sb-batt-fill{flex:1;height:100%;border-radius:1px;background:currentColor}
+.wp-close-preview{position:absolute;top:4px;left:4px;z-index:30;width:22px;height:22px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+@media(max-width:768px){.wp-close-preview{display:flex}}
 @keyframes wp-si{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
 `
 
@@ -106,11 +117,13 @@ interface Props {
   theme: 'dark' | 'light'
   refreshKey: number
   onCloseBrowser: () => void
+  onClosePreview?: () => void
+  onFallbackToCode?: () => void
 }
 
 export function WPPreviewCanvas({
   activeDevice, showBrowser, zoom, previewUrl, previewHtml,
-  rotated, theme, refreshKey, onCloseBrowser,
+  rotated, theme, refreshKey, onCloseBrowser, onClosePreview, onFallbackToCode,
 }: Props) {
   const phoneRef = useRef<HTMLDivElement>(null)
   const browserRef = useRef<HTMLDivElement>(null)
@@ -208,21 +221,50 @@ export function WPPreviewCanvas({
     document.addEventListener('mouseup', onUp)
   }, [browserSize])
 
+  // §44.6+§44.13: Simulated status bar clock
+  const [clockTime, setClockTime] = useState('')
+  useEffect(() => {
+    const tick = () => setClockTime(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))
+    tick()
+    const id = setInterval(tick, 30000)
+    return () => clearInterval(id)
+  }, [])
+
   const hasContent = !!(previewUrl || previewHtml)
   const iframeSrc = previewUrl || undefined
   const showDI = activeDevice.frameType === 'phone-dynamic-island' && !rotated
   const showHB = activeDevice.frameType === 'phone-home-button' && !rotated
   const showHomeInd = activeDevice.frameType !== 'phone-home-button'
+  const showStatusBar = !rotated && activeDevice.frameType !== 'phone-home-button'
+  const sbColorClass = theme === 'dark' ? 'sb-dark' : 'sb-light'
 
   return (
     <>
       <style>{CANVAS_CSS}</style>
       <div className="wp-canvas">
+        {/* §45.3: Mobile close button */}
+        {onClosePreview && (
+          <button className="wp-close-preview" onClick={onClosePreview} title="Minimize preview">✕</button>
+        )}
+
         {/* PHONE DEVICE */}
         <div ref={phoneRef} className="wp-device" style={{ left: '50%', top: '50%', transform: `translate(-50%, -50%) scale(${zoom})` }}>
           <div className="wp-phone" style={{ width: vw, height: vh, borderRadius: phoneRadius }}>
             {showDI && <div className="wp-phone-di"><div className="cam" /></div>}
             {showHB && <div className="wp-phone-hb" />}
+            {/* §44.6+§44.13: Simulated iOS status bar */}
+            {showStatusBar && (
+              <div className={`wp-statusbar ${sbColorClass}`}>
+                <div className="wp-sb-left">{clockTime}</div>
+                <div className="wp-sb-right">
+                  <div className="wp-sb-signal">
+                    <span style={{ height: 4 }} /><span style={{ height: 6 }} /><span style={{ height: 8 }} /><span style={{ height: 10 }} />
+                  </div>
+                  <span style={{ fontSize: 10 }}>5G</span>
+                  <div className="wp-sb-batt"><div className="wp-sb-batt-fill" style={{ width: '80%' }} /></div>
+                </div>
+              </div>
+            )}
             <div className="wp-phone-screen" style={{ borderRadius: screenRadius }}>
               {hasContent ? (
                 <>
@@ -240,11 +282,17 @@ export function WPPreviewCanvas({
                       {iframeStatus === 'loading' ? '⏳ Loading' : iframeStatus === 'error' ? '✕ Error' : '● Live'}
                     </div>
                   )}
+                  {/* §34.3+§34.4: Error boundary with code fallback */}
                   {iframeStatus === 'error' && iframeError && (
                     <div className="wp-iframe-error">
                       <div className="err-title">Preview Error</div>
                       <div className="err-msg">{iframeError}</div>
-                      <button onClick={() => { setIframeError(null); setIframeStatus('loading') }}>Retry</button>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={() => { setIframeError(null); setIframeStatus('loading'); if (phoneIframeRef.current && themedHtml) { phoneIframeRef.current.srcdoc = themedHtml } }}>Retry</button>
+                        {onFallbackToCode && (
+                          <button className="err-code" onClick={onFallbackToCode}>View Code</button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </>

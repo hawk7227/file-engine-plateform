@@ -82,6 +82,7 @@ const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
 :root{--wp-bg-0:#040406;--wp-bg-1:#08080c;--wp-bg-2:#0c0c12;--wp-bg-3:#111118;--wp-bg-4:#18181f;--wp-border:#1e1e28;--wp-border-2:#2a2a38;--wp-text-1:#f0f0f4;--wp-text-2:#a0a0b0;--wp-text-3:#606070;--wp-text-4:#404050;--wp-accent:#34d399;--wp-accent-dim:rgba(52,211,153,.08);--wp-purple:#a78bfa;--wp-purple-dim:rgba(167,139,250,.08);--wp-blue:#60a5fa;--wp-red:#f87171;--wp-yellow:#fbbf24;--wp-cyan:#22d3ee;--wp-font:'DM Sans',-apple-system,sans-serif;--wp-mono:'Geist Mono','JetBrains Mono',monospace}
+[data-wp-theme="light"]{--wp-bg-0:#f8f8fa;--wp-bg-1:#f0f0f4;--wp-bg-2:#e8e8ee;--wp-bg-3:#e0e0e8;--wp-bg-4:#d8d8e0;--wp-border:#d0d0da;--wp-border-2:#c0c0cc;--wp-text-1:#111118;--wp-text-2:#44445a;--wp-text-3:#707088;--wp-text-4:#9090a4;--wp-accent:#059669;--wp-accent-dim:rgba(5,150,105,.06)}
 .wp-root{display:flex;flex-direction:column;height:100vh;background:var(--wp-bg-0);color:var(--wp-text-1);font-family:var(--wp-font);-webkit-font-smoothing:antialiased;overflow:hidden}
 .wp-root *{margin:0;padding:0;box-sizing:border-box}
 .wp-root ::-webkit-scrollbar{width:4px;height:4px}.wp-root ::-webkit-scrollbar-track{background:transparent}.wp-root ::-webkit-scrollbar-thumb{background:var(--wp-border-2);border-radius:4px}
@@ -119,9 +120,10 @@ const CSS = `
 .wp-toast.err{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.15);color:#f87171}
 .wp-toast.nfo{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.15);color:#60a5fa}
 @keyframes wp-si{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
-@media(max-width:768px){.wp-left{position:fixed;left:0;top:36px;bottom:28px;z-index:50;width:280px;transform:translateX(-100%);transition:transform .22s ease}.wp-left.open{transform:none}.wp-mobile-toggle{display:flex}.wp-center{width:100%}.wp-bottom{height:48px!important}}
+@media(max-width:768px){.wp-left{position:fixed;left:0;top:36px;bottom:28px;z-index:50;width:280px;transform:translateX(-100%);transition:transform .22s ease}.wp-left.open{transform:none}.wp-mobile-toggle{display:flex}.wp-center{width:100%}.wp-bottom{height:48px!important}.wp-main{flex-direction:column}.wp-canvas-area{min-height:340px;max-height:50vh}.wp-footer{flex-wrap:wrap;gap:6px}}
 @media(min-width:769px){.wp-mobile-toggle{display:none}.wp-left{transform:none!important}}
-@media(max-width:480px){.wp-topbar{padding:0 6px;gap:4px}.wp-topbar .wp-tb{font-size:7px;padding:2px 5px}}
+@media(min-width:769px) and (max-width:1024px){.wp-left{width:240px}.wp-canvas-area{min-height:300px}}
+@media(max-width:480px){.wp-topbar{padding:0 6px;gap:4px}.wp-topbar .wp-tb{font-size:7px;padding:2px 5px}.wp-footer{font-size:6px}.wp-lheader{padding:8px 10px}.wp-ltitle{font-size:11px}}
 `
 
 // ============================================
@@ -145,8 +147,34 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([])
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('wp-theme')
+      if (saved === 'light' || saved === 'dark') return saved
+      if (window.matchMedia?.('(prefers-color-scheme: light)').matches) return 'light'
+    }
+    return 'dark'
+  })
   const [rotated, setRotated] = useState(false)
+
+  // §8: Persist theme to localStorage + set data attribute for CSS
+  useEffect(() => {
+    localStorage.setItem('wp-theme', theme)
+    document.documentElement.setAttribute('data-wp-theme', theme)
+    return () => { document.documentElement.removeAttribute('data-wp-theme') }
+  }, [theme])
+
+  // §8: Listen for system preference changes
+  useEffect(() => {
+    const mq = window.matchMedia?.('(prefers-color-scheme: light)')
+    if (!mq) return
+    const handler = (e: MediaQueryListEvent) => {
+      const saved = localStorage.getItem('wp-theme')
+      if (!saved) setTheme(e.matches ? 'light' : 'dark')
+    }
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
   const [refreshKey, setRefreshKey] = useState(0)
   const [diffProposal, setDiffProposal] = useState<DiffProposal | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -408,6 +436,8 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 theme={theme}
                 refreshKey={refreshKey}
                 onCloseBrowser={() => setShowBrowser(false)}
+                onClosePreview={() => { setGeneratedFiles([]); setPreviewHtml(null) }}
+                onFallbackToCode={() => { toggleBottomExpand(); setBottomTab('sql') }}
               />
             </div>
             <div className="wp-bottom" style={{ height: bottomHeight }}>
