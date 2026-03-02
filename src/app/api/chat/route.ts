@@ -44,7 +44,7 @@ interface ContentBlock {
   source?: { type: string; media_type: string; data: string }
   id?: string
   name?: string
-  input?: Record<string, any>
+  input?: Record<string, unknown>
   tool_use_id?: string
   content?: string
   thinking?: string
@@ -154,7 +154,7 @@ const TOOLS: ToolDef[] = [
 ]
 
 // Convert to Anthropic format
-function toAnthropicTools(): any[] {
+function toAnthropicTools(): Record<string, unknown>[] {
   return TOOLS.map(t => ({
     name: t.name,
     description: t.description,
@@ -169,7 +169,7 @@ function toAnthropicTools(): any[] {
 }
 
 // Convert to OpenAI format
-function toOpenAITools(): any[] {
+function toOpenAITools(): Record<string, unknown>[] {
   return TOOLS.map(t => ({
     type: 'function',
     function: {
@@ -293,46 +293,48 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-async function execTool(name: string, input: Record<string, any>, ctx: ToolContext): Promise<{ success: boolean; result: string }> {
+async function execTool(name: string, input: Record<string, unknown>, ctx: ToolContext): Promise<{ success: boolean; result: string }> {
+  const s = (key: string, fallback = ''): string => String(input[key] ?? fallback)
+  const n = (key: string, fallback = 0): number => Number(input[key] ?? fallback)
   console.log(`[execTool] name=${name} inputKeys=[${Object.keys(input || {}).join(',')}] inputSize=${JSON.stringify(input || {}).length}`)
   try {
     switch (name) {
       case 'create_file': {
-        const filePath = input.path || input.filepath || input.file_path || input.filename || 'index.html'
-        const fileContent = input.content || input.code || input.file_content || ''
+        const filePath = s('path') || s('filepath') || s('file_path') || s('filename') || 'index.html'
+        const fileContent = s('content') || s('code') || s('file_content')
         if (!fileContent) return { success: false, result: `No content provided for ${filePath}` }
         ctx.files[filePath] = fileContent
-        return { success: true, result: `Created ${filePath} (${fileContent.split('\n').length} lines)${input.description ? ' — ' + input.description : ''}` }
+        return { success: true, result: `Created ${filePath} (${fileContent.split('\n').length} lines)${s('description') ? ' — ' + s('description') : ''}` }
       }
       case 'edit_file': {
-        const file = ctx.files[input.path]
-        if (!file) return { success: false, result: `File not found: ${input.path}` }
-        const n = (file.match(new RegExp(escapeRegex(input.old_str), 'g')) || []).length
-        if (n === 0) return { success: false, result: `String not found in ${input.path}. Use view_file to check.` }
-        if (n > 1) return { success: false, result: `String appears ${n} times in ${input.path}. Must be unique.` }
-        ctx.files[input.path] = file.replace(input.old_str, input.new_str)
-        return { success: true, result: `Edited ${input.path}${input.description ? ' — ' + input.description : ''}` }
+        const file = ctx.files[s('path')]
+        if (!file) return { success: false, result: `File not found: ${s('path')}` }
+        const cnt = (file.match(new RegExp(escapeRegex(s('old_str')), 'g')) || []).length
+        if (cnt === 0) return { success: false, result: `String not found in ${s('path')}. Use view_file to check.` }
+        if (cnt > 1) return { success: false, result: `String appears ${cnt} times in ${s('path')}. Must be unique.` }
+        ctx.files[s('path')] = file.replace(s('old_str'), s('new_str'))
+        return { success: true, result: `Edited ${s('path')}${s('description') ? ' — ' + s('description') : ''}` }
       }
       case 'view_file': {
-        const c = ctx.files[input.path]
-        if (!c) return { success: false, result: `File not found: ${input.path}\n\nAvailable:\n  ${Object.keys(ctx.files).join('\n  ') || '(none)'}` }
-        return { success: true, result: c.split('\n').map((l, i) => `${String(i + 1).padStart(4)} | ${l}`).join('\n') }
+        const fc = ctx.files[s('path')]
+        if (!fc) return { success: false, result: `File not found: ${s('path')}\n\nAvailable:\n  ${Object.keys(ctx.files).join('\n  ') || '(none)'}` }
+        return { success: true, result: fc.split('\n').map((l: string, i: number) => `${String(i + 1).padStart(4)} | ${l}`).join('\n') }
       }
       case 'run_command':
-        return await runSandbox(input.command, Object.entries(ctx.files).map(([p, c]) => ({ path: p, content: c })))
+        return await runSandbox(s('command'), Object.entries(ctx.files).map(([p, c]) => ({ path: p, content: c })))
       case 'search_web':
-        return await runWebSearch(input.query, input.max_results || 5)
+        return await runWebSearch(s('query'), n('max_results') || 5)
       case 'search_github':
-        return await runGitHubSearch(input.query, input.max_results || 5)
+        return await runGitHubSearch(s('query'), n('max_results') || 5)
       case 'search_npm':
-        return await runNpmSearch(input.query)
+        return await runNpmSearch(s('query'))
       case 'analyze_image': {
-        const att = ctx.attachments?.[input.image_index || 0]
+        const att = ctx.attachments?.[n('image_index')]
         if (!att || att.type !== 'image') return { success: false, result: 'No image found at that index' }
         try {
           const keyResult = getKeyWithFailover()
           if (!keyResult) return { success: false, result: 'No API key available for vision' }
-          const task = input.task || 'full'
+          const task = s('task') || 'full'
           const visionPrompt = task === 'layout' ? 'Analyze the layout structure, sections, and component hierarchy of this UI.'
             : task === 'colors' ? 'Extract the color palette: primary, secondary, accent, background, and text colors with hex codes.'
             : task === 'components' ? 'List all UI components visible: buttons, inputs, cards, navigation, modals, etc.'
@@ -379,10 +381,10 @@ async function execTool(name: string, input: Record<string, any>, ctx: ToolConte
         }
       }
       case 'think':
-        return { success: true, result: input.reasoning }
+        return { success: true, result: s('reasoning') }
       case 'generate_media': {
         try {
-          const result = await generateMedia({ toolCodename: input.tool_codename, prompt: input.prompt, params: input.params })
+          const result = await generateMedia({ toolCodename: s('tool_codename'), prompt: s('prompt'), params: input.params as Record<string, unknown> | undefined })
           if (!result.success) return { success: false, result: result.error || 'Generation failed' }
           return { success: true, result: `Media generated: ${result.url}\nType: ${result.mimeType || 'unknown'}${result.duration ? `\nDuration: ${result.duration}s` : ''}` }
         } catch (err: unknown) {
@@ -547,7 +549,7 @@ async function runWebSearch(query: string, max: number): Promise<{ success: bool
         const d = await r.json()
         const results = (d.organic || []).slice(0, max)
         if (results.length === 0) return { success: true, result: `No results for: "${query}"` }
-        return { success: true, result: results.map((x: any, i: number) => `${i + 1}. ${x.title}\n   ${x.link}\n   ${x.snippet}`).join('\n\n') }
+        return { success: true, result: results.map((x: { title: string; link: string; snippet: string }, i: number) => `${i + 1}. ${x.title}\n   ${x.link}\n   ${x.snippet}`).join('\n\n') }
       }
     } catch { }
   }
@@ -559,7 +561,7 @@ async function runNpmSearch(query: string): Promise<{ success: boolean; result: 
     const r = await fetch(`https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(query)}&size=5`)
     if (!r.ok) return { success: false, result: 'NPM search failed' }
     const d = await r.json()
-    return { success: true, result: d.objects.map((o: any, i: number) => `${i + 1}. ${o.package.name} v${o.package.version}\n   ${o.package.description || ''}`).join('\n\n') || 'No packages found' }
+    return { success: true, result: d.objects.map((o: { package: { name: string; version: string; description?: string } }, i: number) => `${i + 1}. ${o.package.name} v${o.package.version}\n   ${o.package.description || ''}`).join('\n\n') || 'No packages found' }
   } catch (e: unknown) {
     return { success: false, result: `NPM error: ${(e instanceof Error ? e.message : String(e))}` }
   }
@@ -578,12 +580,12 @@ async function runGitHubSearch(query: string, max: number): Promise<{ success: b
       const cr = await fetch(`https://api.github.com/search/code?q=${encodeURIComponent(query)}&per_page=${max}`, { headers })
       if (!cr.ok) return { success: false, result: 'GitHub search failed (rate limited?)' }
       const cd = await cr.json()
-      return { success: true, result: (cd.items || []).slice(0, max).map((i: any, idx: number) =>
+      return { success: true, result: (cd.items || []).slice(0, max).map((i: { repository?: { full_name: string }; path: string; html_url: string }, idx: number) =>
         `${idx + 1}. ${i.repository?.full_name}: ${i.path}\n   ${i.html_url}`
       ).join('\n\n') || 'No code found' }
     }
     const d = await r.json()
-    return { success: true, result: (d.items || []).slice(0, max).map((i: any, idx: number) =>
+    return { success: true, result: (d.items || []).slice(0, max).map((i: { full_name: string; description: string; html_url: string; language: string; stargazers_count: number }, idx: number) =>
       `${idx + 1}. ${i.full_name} ⭐${i.stargazers_count}\n   ${i.description || '(no description)'}\n   ${i.html_url}`
     ).join('\n\n') || 'No repos found' }
   } catch (e: unknown) {
@@ -596,8 +598,8 @@ async function runGitHubSearch(query: string, max: number): Promise<{ success: b
 // Both providers support vision equally
 // =====================================================
 
-function buildAnthropicVisionBlocks(text: string, attachments?: Attachment[]): any[] | string {
-  const blocks: any[] = []
+function buildAnthropicVisionBlocks(text: string, attachments?: Attachment[]): ContentBlock[] | string {
+  const blocks: Record<string, unknown>[] = []
   if (attachments) {
     for (const att of attachments) {
       if (att.type === 'image') {
@@ -613,11 +615,11 @@ function buildAnthropicVisionBlocks(text: string, attachments?: Attachment[]): a
     }
   }
   if (text) blocks.push({ type: 'text', text })
-  return (blocks.length > 0 ? blocks : text) as any
+  return (blocks.length > 0 ? blocks : text) as ContentBlock[] | string
 }
 
-function buildOpenAIVisionBlocks(text: string, attachments?: Attachment[]): any[] | string {
-  const blocks: any[] = []
+function buildOpenAIVisionBlocks(text: string, attachments?: Attachment[]): Record<string, unknown>[] | string {
+  const blocks: Record<string, unknown>[] = []
   if (attachments) {
     for (const att of attachments) {
       if (att.type === 'image') {
@@ -773,15 +775,15 @@ export async function POST(request: NextRequest) {
     // ── Build memory context from parallel-loaded memories ──
     let memoryContext = ''
     if (memories && memories.length > 0) {
-      const styleMemory = memories.find((m: any) => m.type === 'style' && m.key === 'default')
-      const prefMemory = memories.find((m: any) => m.type === 'preference' && m.key === 'default')
+      const styleMemory = memories.find((m: { type: string; key: string; value?: string }) => m.type === 'style' && m.key === 'default')
+      const prefMemory = memories.find((m: { type: string; key: string; value?: string }) => m.type === 'preference' && m.key === 'default')
       const parts: string[] = []
       if (styleMemory?.value) {
-        const s = styleMemory.value as Record<string, any>
+        const s = styleMemory.value as Record<string, unknown>
         parts.push(`USER CODING STYLE: ${s.preferredFramework || 'react'} + ${s.preferredStyling || 'tailwind'}, ${s.quotes || 'single'} quotes, ${s.indentation || 'spaces'}(${s.indentSize || 2}), ${s.componentStyle || 'functional'} components, ${s.semicolons ? 'with' : 'no'} semicolons`)
       }
       if (prefMemory?.value) {
-        const p = prefMemory.value as Record<string, any>
+        const p = prefMemory.value as Record<string, unknown>
         if (p.codeCommenting) parts.push(`Code comments: ${p.codeCommenting}`)
       }
       if (parts.length > 0) memoryContext = '\n\n' + parts.join('\n')
@@ -842,18 +844,19 @@ export async function POST(request: NextRequest) {
 interface ParsedResponse {
   text: string
   thinking: string
-  toolCalls: { id: string; name: string; input: Record<string, any> }[]
+  toolCalls: { id: string; name: string; input: Record<string, unknown> }[]
   stopReason: string // normalized: 'tool_use' | 'end' | 'max_tokens'
 }
 
-function parseAnthropicResponse(data: any): ParsedResponse {
+function parseAnthropicResponse(data: Record<string, unknown>): ParsedResponse {
   let text = '', thinking = ''
   const toolCalls: ParsedResponse['toolCalls'] = []
 
-  for (const block of data.content || []) {
+  const content = (data.content || []) as ContentBlock[]
+  for (const block of content) {
     if (block.type === 'thinking') thinking += block.thinking || ''
     else if (block.type === 'text') text += block.text || ''
-    else if (block.type === 'tool_use') toolCalls.push({ id: block.id, name: block.name, input: block.input || {} })
+    else if (block.type === 'tool_use') toolCalls.push({ id: block.id || '', name: block.name || '', input: (block.input || {}) as Record<string, unknown> })
   }
 
   // Normalize stop reason
@@ -863,8 +866,12 @@ function parseAnthropicResponse(data: any): ParsedResponse {
   return { text, thinking, toolCalls, stopReason }
 }
 
-function parseOpenAIResponse(data: any): ParsedResponse {
-  const choice = data.choices?.[0]
+function parseOpenAIResponse(data: Record<string, unknown>): ParsedResponse {
+  const choices = (data.choices || []) as Array<{
+    message?: { content?: string; reasoning_content?: string; refusal?: string; tool_calls?: Array<{ id: string; function: { name: string; arguments: string } }> }
+    finish_reason?: string
+  }>
+  const choice = choices[0]
   let text = choice?.message?.content || ''
   let thinking = ''
   const toolCalls: ParsedResponse['toolCalls'] = []
@@ -898,15 +905,15 @@ function parseOpenAIResponse(data: any): ParsedResponse {
 
 function appendToolResults(
   provider: 'anthropic' | 'openai',
-  apiMsgs: any[],
+  apiMsgs: Record<string, unknown>[],
   text: string,
   toolCalls: ParsedResponse['toolCalls'],
   results: { tool_use_id: string; content: string }[]
-): any[] {
+): Record<string, unknown>[] {
   const msgs = [...apiMsgs]
 
   if (provider === 'anthropic') {
-    const blocks: any[] = []
+    const blocks: ContentBlock[] = []
     if (text) blocks.push({ type: 'text', text })
     for (const tc of toolCalls) blocks.push({ type: 'tool_use', id: tc.id, name: tc.name, input: tc.input })
     msgs.push({ role: 'assistant', content: blocks })
@@ -982,9 +989,10 @@ async function agentStream(
           // Send all tool_call events first, then execute in parallel
           const toolMetas = parsed.toolCalls.map(tc => {
             const inp = tc.input || {}
-            const inputSummary = tc.name === 'create_file' ? { path: inp.path || inp.filepath || inp.filename || 'file', lines: (inp.content || inp.code || '').split?.('\n')?.length || 0 }
-              : tc.name === 'edit_file' ? { path: inp.path || inp.filepath || 'file', description: inp.description }
-                : tc.name === 'think' ? { reasoning: inp.reasoning?.slice(0, 300) }
+            const gs = (k: string) => String(inp[k] ?? '')
+            const inputSummary = tc.name === 'create_file' ? { path: gs('path') || gs('filepath') || gs('filename') || 'file', lines: (gs('content') || gs('code')).split?.('\n')?.length || 0 }
+              : tc.name === 'edit_file' ? { path: gs('path') || gs('filepath') || 'file', description: gs('description') }
+                : tc.name === 'think' ? { reasoning: gs('reasoning').slice(0, 300) }
                   : inp
             console.log(`[Tool Call] ${tc.name} input keys: [${Object.keys(inp).join(',')}]`)
             ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'tool_call', tool: tc.name, input: inputSummary })}\n\n`))
@@ -999,7 +1007,7 @@ async function agentStream(
           for (let i = 0; i < toolMetas.length; i++) {
             const tc = toolMetas[i]
             const r = settled[i].status === 'fulfilled'
-              ? (settled[i] as PromiseFulfilledResult<any>).value
+              ? (settled[i] as PromiseFulfilledResult<{ success: boolean; result: string; error?: string }>).value
               : { success: false, result: `Tool error: ${(settled[i] as PromiseRejectedResult).reason?.message || 'Unknown'}` }
             const resultStr = r?.result || r?.error || 'No result'
             console.log(`[Tool Result] ${tc.name} settled=${settled[i].status} success=${!!r?.success} resultLen=${String(resultStr).length}`)
@@ -1053,7 +1061,7 @@ async function agentStream(
 
 async function streamAgentTurn(
   provider: 'anthropic' | 'openai', model: string, sys: string,
-  msgs: any[], key: string, max: number, think: boolean,
+  msgs: Record<string, unknown>[], key: string, max: number, think: boolean,
   ctrl: ReadableStreamDefaultController, enc: TextEncoder,
   forceToolUse: boolean = false
 ): Promise<ParsedResponse | null> {
@@ -1181,14 +1189,14 @@ async function streamAgentTurn(
 // Streaming API call WITH tools (agent mode) — both providers
 async function callAIStreaming(
   provider: 'anthropic' | 'openai', model: string, sys: string,
-  msgs: any[], key: string, max: number, think: boolean,
+  msgs: Record<string, unknown>[], key: string, max: number, think: boolean,
   forceToolUse: boolean = false
 ): Promise<Response> {
   if (provider === 'anthropic') {
     // Note: tool_choice 'any' is incompatible with thinking mode
     const canForce = forceToolUse && !think
     const toolChoice = canForce ? { type: 'any' } : { type: 'auto' }
-    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: toolChoice, stream: true }
+    const body: Record<string, unknown> = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools(), tool_choice: toolChoice, stream: true }
     console.log(`[callAIStreaming] provider=anthropic model=${model} max=${max} forceToolUse=${forceToolUse} canForce=${canForce} toolChoice=${JSON.stringify(toolChoice)} toolCount=${toAnthropicTools().length}`)
     const headers: Record<string, string> = { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
@@ -1196,7 +1204,7 @@ async function callAIStreaming(
       body.tool_choice = { type: 'auto' }
       headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14'
       // Thinking requires higher max_tokens — budget counts against it
-      body.max_tokens = Math.max(max, body.thinking.budget_tokens + 8192)
+      body.max_tokens = Math.max(max, (body.thinking as { budget_tokens: number }).budget_tokens + 8192)
     }
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1205,7 +1213,7 @@ async function callAIStreaming(
     })
   } else {
     const oai = convertToOpenAIMessages(sys, msgs)
-    const body: any = { model, messages: oai, tools: toOpenAITools(), tool_choice: forceToolUse ? 'required' : 'auto', stream: true }
+    const body: Record<string, unknown> = { model, messages: oai, tools: toOpenAITools(), tool_choice: forceToolUse ? 'required' : 'auto', stream: true }
     if (model.startsWith('o1') || model.startsWith('o3')) {
       body.max_completion_tokens = max
       if (think) body.reasoning_effort = 'high'
@@ -1282,7 +1290,7 @@ async function simpleStream(
 // =====================================================
 
 // Build initial messages with vision support for BOTH providers
-function buildInitialMessages(provider: 'anthropic' | 'openai', messages: Message[], attachments?: Attachment[]): any[] {
+function buildInitialMessages(provider: 'anthropic' | 'openai', messages: Message[], attachments?: Attachment[]): Record<string, unknown>[] {
   return messages.map((m, idx) => {
     const isLast = idx === messages.length - 1
     const role = m.role === 'system' ? 'user' : m.role
@@ -1304,17 +1312,17 @@ function buildInitialMessages(provider: 'anthropic' | 'openai', messages: Messag
 // Non-streaming call with tools (agent mode)
 async function callAI(
   provider: 'anthropic' | 'openai', model: string, sys: string,
-  msgs: any[], key: string, max: number, think: boolean
+  msgs: Record<string, unknown>[], key: string, max: number, think: boolean
 ): Promise<Response> {
   if (provider === 'anthropic') {
-    const body: any = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools() }
+    const body: Record<string, unknown> = { model, max_tokens: max, system: sys, messages: msgs, tools: toAnthropicTools() }
     const headers: Record<string, string> = { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }
     // Extended thinking — Anthropic
     if (think && (model.includes('sonnet') || model.includes('opus'))) {
       body.thinking = { type: 'enabled', budget_tokens: Math.max(10000, Math.min(32000, Math.floor(max * 0.5))) }
       body.tool_choice = { type: 'auto' }
       headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14'
-      body.max_tokens = Math.max(max, body.thinking.budget_tokens + 8192)
+      body.max_tokens = Math.max(max, (body.thinking as { budget_tokens: number }).budget_tokens + 8192)
     }
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1323,7 +1331,7 @@ async function callAI(
     })
   } else {
     const oai = convertToOpenAIMessages(sys, msgs)
-    const body: any = { model, messages: oai, tools: toOpenAITools(), tool_choice: 'auto' }
+    const body: Record<string, unknown> = { model, messages: oai, tools: toOpenAITools(), tool_choice: 'auto' }
     // Max tokens — OpenAI uses max_completion_tokens for o1/o3, max_tokens for others
     if (model.startsWith('o1') || model.startsWith('o3')) {
       body.max_completion_tokens = max
@@ -1355,7 +1363,7 @@ async function callAIStream(
     })
   } else {
     const oai = [{ role: 'system', content: sys }, ...msgs]
-    const body: any = { model, messages: oai, stream: true }
+    const body: Record<string, unknown> = { model, messages: oai, stream: true }
     if (model.startsWith('o1') || model.startsWith('o3')) {
       body.max_completion_tokens = max
     } else {
@@ -1370,26 +1378,26 @@ async function callAIStream(
 }
 
 // Convert Anthropic-format conversation to OpenAI format
-function convertToOpenAIMessages(sys: string, msgs: any[]): any[] {
-  const oai: any[] = [{ role: 'system', content: sys }]
+function convertToOpenAIMessages(sys: string, msgs: Record<string, unknown>[]): Record<string, unknown>[] {
+  const oai: Record<string, unknown>[] = [{ role: 'system', content: sys }]
   for (const m of msgs) {
     if (Array.isArray(m.content)) {
-      const texts = m.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join('\n')
-      const trs = m.content.filter((b: any) => b.type === 'tool_result')
-      const tus = m.content.filter((b: any) => b.type === 'tool_use')
-      const imgs = m.content.filter((b: any) => b.type === 'image')
+      const texts = m.content.filter((b: ContentBlock) => b.type === 'text').map((b: ContentBlock) => b.text).join('\n')
+      const trs = m.content.filter((b: ContentBlock) => b.type === 'tool_result')
+      const tus = m.content.filter((b: ContentBlock) => b.type === 'tool_use')
+      const imgs = m.content.filter((b: ContentBlock) => b.type === 'image')
 
       if (trs.length > 0) {
         // Tool result messages
         for (const tr of trs) oai.push({ role: 'tool', content: typeof tr.content === 'string' ? tr.content : JSON.stringify(tr.content), tool_call_id: tr.tool_use_id })
       } else if (tus.length > 0) {
         // Assistant with tool calls
-        const am: any = { role: 'assistant', content: texts || null }
-        am.tool_calls = tus.map((t: any) => ({ id: t.id, type: 'function', function: { name: t.name, arguments: JSON.stringify(t.input) } }))
+        const am: Record<string, unknown> = { role: 'assistant', content: texts || null }
+        am.tool_calls = tus.map((t: ContentBlock) => ({ id: t.id, type: 'function', function: { name: t.name, arguments: JSON.stringify(t.input) } }))
         oai.push(am)
       } else if (imgs.length > 0) {
         // Vision: convert Anthropic image blocks to OpenAI format
-        const parts: any[] = imgs.map((img: any) => ({
+        const parts: Record<string, unknown>[] = imgs.map((img: ContentBlock) => ({
           type: 'image_url',
           image_url: { url: `data:${img.source?.media_type || 'image/png'};base64,${img.source?.data}`, detail: 'high' }
         }))
@@ -1409,8 +1417,8 @@ function convertToOpenAIMessages(sys: string, msgs: any[]): any[] {
 // CONTEXT COMPACTION (provider-agnostic)
 // =====================================================
 
-function compact(msgs: any[], maxTok: number): any[] {
-  const est = (ms: any[]) => ms.reduce((t, m) => t + Math.ceil((typeof m.content === 'string' ? m.content : JSON.stringify(m.content)).length / 4), 0)
+function compact(msgs: Record<string, unknown>[], maxTok: number): Record<string, unknown>[] {
+  const est = (ms: Record<string, unknown>[]) => ms.reduce((t, m) => t + Math.ceil((typeof m.content === 'string' ? m.content : JSON.stringify(m.content)).length / 4), 0)
   if (est(msgs) <= maxTok || msgs.length <= 4) return msgs
   const old = msgs.slice(0, -4)
   const recent = msgs.slice(-4)
@@ -1418,7 +1426,7 @@ function compact(msgs: any[], maxTok: number): any[] {
     if (typeof m.content === 'string' && m.content.length > 500)
       return { ...m, content: m.content.slice(0, 200) + '\n...[compacted]...\n' + m.content.slice(-100) }
     if (Array.isArray(m.content))
-      return { ...m, content: m.content.map((b: any) => b.type === 'tool_result' && typeof b.content === 'string' && b.content.length > 300 ? { ...b, content: b.content.slice(0, 150) + '\n[compacted]' } : b) }
+      return { ...m, content: m.content.map((b: ContentBlock) => b.type === 'tool_result' && typeof b.content === 'string' && b.content.length > 300 ? { ...b, content: b.content.slice(0, 150) + '\n[compacted]' } : b) }
     return m
   }), ...recent]
 }
