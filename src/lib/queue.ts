@@ -3,14 +3,13 @@
 
 export const queuesEnabled = false;
 
-// Keep the same named exports your app expects.
-// Adjust names if your app imports different ones.
-export const buildQueue = null;
+type AddFn = (name: string, data: unknown, opts?: unknown) => Promise<{ id: string }>;
 
-export type BuildJobData = unknown;
-export type BuildJobResult = unknown;
+const nullAdd: AddFn = async () => {
+  // Pretend job was enqueued so callers can proceed
+  return { id: `disabled-${Date.now()}` };
+};
 
-export async function enqueueBuildJob() {
-  console.warn("Queues disabled: enqueueBuildJob skipped");
-  return null;
-}
+export const buildQueue: { add: AddFn } = {
+  add: nullAdd,
+};
