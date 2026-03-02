@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import type { UseChatReturn } from '@/hooks/useChat'
+import type { UseChatReturn, GeneratedFile } from '@/hooks/useChat'
 
 const CSS = `
 .wpc-wrap{display:flex;flex-direction:column;height:100%}
@@ -62,11 +62,12 @@ interface Props {
   onExpandBottom: () => void
   onSwitchBottomTab: (tab: string) => void
   onToggleBrowser: () => void
+  onPreviewFiles: (files: GeneratedFile[]) => void
   toast: (t: string, m: string, type?: string) => void
   logActivity: (type: string, detail: Record<string, unknown>) => Promise<void>
 }
 
-export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleBrowser, toast, logActivity }: Props) {
+export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleBrowser, onPreviewFiles, toast, logActivity }: Props) {
   const [input, setInput] = useState('')
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([])
   const [dragging, setDragging] = useState(false)
@@ -158,7 +159,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
                   <div className="wpc-files-badge">📄 {m.files.length} file{m.files.length > 1 ? 's' : ''} generated</div>
                   <div className="wpc-acts">
                     <button className="wpc-pill" onClick={() => { onExpandBottom(); onSwitchBottomTab('code') }}>📄 View Code</button>
-                    <button className="wpc-btn" onClick={() => toast('Preview', 'Loading on device', 'nfo')}>▶ Preview</button>
+                    <button className="wpc-btn" onClick={() => { if (m.files) { onPreviewFiles(m.files); toast('Preview', 'Loaded on device', 'nfo') } }}>▶ Preview</button>
                     <button className="wpc-btn" onClick={onToggleBrowser}>🌐 Browser</button>
                   </div>
                 </>

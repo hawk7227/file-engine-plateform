@@ -60,7 +60,7 @@ export interface ChatOptions {
   files?: Record<string, string>
   onMessage?: (message: Message) => void
   onError?: (error: Error) => void
-  onComplete?: () => void
+  onComplete?: (files?: GeneratedFile[]) => void
   onToolCall?: (event: ToolCallEvent) => void
   onFilesUpdated?: (files: GeneratedFile[]) => void
   onThinking?: (text: string) => void
@@ -416,7 +416,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
         return updated
       })
 
-      onComplete?.()
+      onComplete?.(finalFiles.length > 0 ? finalFiles : undefined)
 
       // Fallback: if agent didn't produce files but code blocks exist in content, trigger onFilesUpdated
       if (agentFilesRef.current.length === 0 && finalFiles.length > 0) {

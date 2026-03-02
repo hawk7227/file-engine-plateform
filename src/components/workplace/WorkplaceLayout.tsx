@@ -196,14 +196,19 @@ window.onerror=function(msg){window.parent.postMessage({type:'wp-iframe-error',m
 
   // ── Hooks ──
   const chat = useChat({
-    onComplete: () => {
-      const lastMsg = chat.messages[chat.messages.length - 1]
-      if (lastMsg?.files?.length) {
-        setGeneratedFiles(lastMsg.files)
+    onComplete: (files) => {
+      if (files?.length) {
+        setGeneratedFiles(files)
         realtime.logActivity('chat_receive', {
-          files: lastMsg.files.map(f => f.path),
-          message_preview: lastMsg.content.substring(0, 100),
+          files: files.map(f => f.path),
+          message_preview: 'File generation complete',
         })
+      }
+    },
+    onFilesUpdated: (files) => {
+      // Real-time: update preview as soon as files stream in (before onComplete)
+      if (files?.length) {
+        setGeneratedFiles(files)
       }
     },
   })
@@ -249,6 +254,13 @@ window.onerror=function(msg){window.parent.postMessage({type:'wp-iframe-error',m
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
   }, [bottomHeight])
+
+  // ── Preview files from chat message ──
+  const handlePreviewFiles = useCallback((files: GeneratedFile[]) => {
+    if (files.length > 0) {
+      setGeneratedFiles(files)
+    }
+  }, [])
 
   const toggleBottomExpand = useCallback(() => {
     if (bottomExpanded) {
@@ -359,6 +371,7 @@ window.onerror=function(msg){window.parent.postMessage({type:'wp-iframe-error',m
                   onExpandBottom={toggleBottomExpand}
                   onSwitchBottomTab={(tab: string) => setBottomTab(tab as BottomTab)}
                   onToggleBrowser={() => setShowBrowser(p => !p)}
+                  onPreviewFiles={handlePreviewFiles}
                   toast={toast}
                   logActivity={realtime.logActivity}
                 />
