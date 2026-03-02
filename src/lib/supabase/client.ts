@@ -33,5 +33,9 @@ export function createClient() {
         })
     }
 
-    return createBrowserClient(url, key)
+    return createBrowserClient(url, key, {
+        auth: {
+            lock: false,
+        }
+    })
 }
