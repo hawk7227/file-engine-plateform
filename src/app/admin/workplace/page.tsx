@@ -31,10 +31,13 @@ const WorkplaceLayout = dynamic(() => import('@/components/workplace/WorkplaceLa
 })
 
 export default function AdminWorkplacePage() {
+  const mockUser = { id: 'temp-admin', email: 'admin@fileengine.dev' } as any
+  const mockProfile = { id: 'temp-admin', email: 'admin@fileengine.dev', role: 'owner', plan: 'enterprise', name: 'Admin' } as any
+
   return (
     <>
       <AdminNavPill />
-      <WorkplaceLayout user={null as any} profile={null as any} />
+      <WorkplaceLayout user={mockUser} profile={mockProfile} />
     </>
   )
 }
