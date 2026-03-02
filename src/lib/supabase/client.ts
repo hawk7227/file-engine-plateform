@@ -5,9 +5,6 @@ export function createClient() {
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!url || !key) {
-        // During build/SSG, env vars may not exist.
-        // Return a no-op proxy that won't crash at import time.
-        // Actual Supabase calls only happen client-side at runtime.
         return new Proxy({} as ReturnType<typeof createBrowserClient>, {
             get(_target, prop) {
                 if (prop === 'auth') {
@@ -33,16 +30,17 @@ export function createClient() {
         })
     }
 
-  return createBrowserClient(url, key, {
-    auth: {
-        storageKey: 'fe-auth-token-v2',
-        flowType: 'pkce',
-        detectSessionInUrl: true,
-        persistSession: true,
-    },
-    global: {
-        headers: {
-            'X-Client-Info': 'file-engine',
+    return createBrowserClient(url, key, {
+        auth: {
+            storageKey: 'fe-auth-token-v2',
+            flowType: 'pkce',
+            detectSessionInUrl: true,
+            persistSession: true,
         },
-    },
-})
+        global: {
+            headers: {
+                'X-Client-Info': 'file-engine',
+            },
+        },
+    })
+}
