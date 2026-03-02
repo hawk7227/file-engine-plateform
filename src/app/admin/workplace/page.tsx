@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { User } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
 import { AdminNavPill } from '@/components/AdminNavPill'
 
@@ -30,14 +33,84 @@ const WorkplaceLayout = dynamic(() => import('@/components/workplace/WorkplaceLa
   ),
 })
 
+interface Profile {
+  id: string
+  email: string
+  role: string
+  plan: string
+  name?: string
+  avatar_url?: string
+}
+
 export default function AdminWorkplacePage() {
-  const mockUser = { id: 'temp-admin', email: 'admin@fileengine.dev' } as any
-  const mockProfile = { id: 'temp-admin', email: 'admin@fileengine.dev', role: 'owner', plan: 'enterprise', name: 'Admin' } as any
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadAuth() {
+      const supabase = createClient()
+      try {
+        const { data: { user: authUser }, error: userError } = await supabase.auth.getUser()
+        if (userError || !authUser) {
+          setAuthError('Not authenticated. Redirecting...')
+          setTimeout(() => { window.location.href = '/auth/login?redirect=/admin/workplace' }, 1500)
+          return
+        }
+        setUser(authUser)
+
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single()
+
+        if (prof) {
+          setProfile(prof as Profile)
+          if (prof.role !== 'owner' && prof.role !== 'admin') {
+            setAuthError('Admin access required.')
+            setTimeout(() => { window.location.href = '/dashboard' }, 1500)
+            return
+          }
+        } else {
+          // No profile row — create one as owner for first user
+          const { data: newProf } = await supabase
+            .from('profiles')
+            .insert({ id: authUser.id, email: authUser.email, role: 'owner', plan: 'enterprise' })
+            .select()
+            .single()
+          if (newProf) setProfile(newProf as Profile)
+        }
+      } catch {
+        setAuthError('Auth check failed.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadAuth()
+  }, [])
+
+  if (loading) return null
+  if (authError) {
+    return (
+      <div style={{
+        height: '100vh', background: '#040406', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        color: '#f87171', fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+      }}>
+        {authError}
+      </div>
+    )
+  }
+  if (!user) return null
+
+  const safeProfile = profile || { id: user.id, email: user.email || '', role: 'owner', plan: 'enterprise', name: user.email || 'Admin' }
 
   return (
     <>
       <AdminNavPill />
-      <WorkplaceLayout user={mockUser} profile={mockProfile} />
+      <WorkplaceLayout user={user} profile={safeProfile as any} />
     </>
   )
 }
