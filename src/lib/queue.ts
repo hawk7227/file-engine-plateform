@@ -1,24 +1,16 @@
-// ═══════════════════════════════════════════════════════════════
-// QUEUE SYSTEM DISABLED
-// Redis is not configured. All background jobs are disabled.
-// ═══════════════════════════════════════════════════════════════
+// src/lib/queue.ts
+// QUEUES DISABLED — Redis not configured. BullMQ disabled.
 
 export const queuesEnabled = false;
 
-// Dummy queue placeholders so imports don't break
-export const aiQueue = null;
-export const imageQueue = null;
-export const videoQueue = null;
+// Keep the same named exports your app expects.
+// Adjust names if your app imports different ones.
+export const buildQueue = null;
 
-// Dummy helper functions (no-op)
-export async function addAIJob() {
-  console.warn("Queue disabled: addAIJob skipped");
-}
+export type BuildJobData = unknown;
+export type BuildJobResult = unknown;
 
-export async function addImageJob() {
-  console.warn("Queue disabled: addImageJob skipped");
-}
-
-export async function addVideoJob() {
-  console.warn("Queue disabled: addVideoJob skipped");
+export async function enqueueBuildJob() {
+  console.warn("Queues disabled: enqueueBuildJob skipped");
+  return null;
 }
