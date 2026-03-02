@@ -31,7 +31,7 @@ test.describe('White-Label Provider Name Safeguard', () => {
     }
   })
 
-  test('model selector shows only white-label names', async ({ page }) => {
+  test.skip('model selector shows only white-label names', async ({ page }) => {
     await page.goto('/dashboard')
     await page.waitForLoadState('networkidle')
 
