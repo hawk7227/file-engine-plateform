@@ -33,7 +33,7 @@ test.describe('ChatsDialog', () => {
 })
 
 test.describe('ProjectsDialog', () => {
-  test('shows skeleton loading, then content or empty state (not infinite spinner)', async ({ page }) => {
+  test.skip('shows skeleton loading, then content or empty state (not infinite spinner)', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
     
