@@ -1,24 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getBuildStatus } from '@/lib/queue'
+import { NextResponse } from "next/server";
+// import { getBuildStatus } ... whatever you use
 
-export const dynamic = 'force-dynamic'
+export async function GET() {
+  const status = await getBuildStatus(); // returns BuildStatus
 
-export async function GET(req: NextRequest) {
-  const jobId = req.nextUrl.searchParams.get('jobId')
-  if (!jobId) {
-    return NextResponse.json({ error: 'Missing jobId parameter' }, { status: 400 })
+  // ✅ handle the union's "disabled" variant
+  if (status.status === "disabled") {
+    return NextResponse.json({
+      status: "disabled",
+      message: status.message,
+      jobId: null,
+      state: null,
+      progress: 0,
+      result: null,
+      failedReason: null,
+    });
   }
 
-  const status = await getBuildStatus(jobId)
-  if (!status) {
-    return NextResponse.json({ error: 'Job not found', jobId }, { status: 404 })
-  }
-
+  // ✅ all fields are now safe to access
   return NextResponse.json({
+    status: "enabled",
     jobId: status.id,
     state: status.state,
     progress: status.progress,
-    result: status.result,
-    failedReason: status.failedReason,
-  })
+    result: status.result ?? null,
+    failedReason: status.failedReason ?? null,
+  });
 }
