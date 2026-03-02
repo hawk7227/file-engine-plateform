@@ -13,3 +13,10 @@ const nullAdd: AddFn = async () => {
 export const buildQueue: { add: AddFn } = {
   add: nullAdd,
 };
+export type BuildStatus =
+  | { status: "disabled"; message: string }
+  | { status: "queued" | "running" | "succeeded" | "failed"; progress?: number; result?: unknown; error?: string };
+
+export async function getBuildStatus(_buildId: string): Promise<BuildStatus> {
+  return { status: "disabled", message: "Queues are disabled (Redis not configured)." };
+}
