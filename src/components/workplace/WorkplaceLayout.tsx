@@ -537,7 +537,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
         {/* ═══ MAIN ═══ */}
         <div className="wp-main">
           {/* ═══ LEFT PANEL ═══ */}
-          <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`}>
+          <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`} style={{ width: leftWidth }}>
             {/* Sidebar toggle (shows when sidebar collapsed) */}
             {sidebarCollapsed && (
               <div className="wp-lheader">
@@ -604,6 +604,9 @@ export default function WorkplaceLayout({ user, profile }: Props) {
               </div>
             </div>
           </div>
+
+          {/* ═══ RESIZE HANDLE ═══ */}
+          <div className="wp-resize-h" onMouseDown={startResizeH} />
 
           {/* ═══ CENTER ═══ */}
           <div className="wp-center">
