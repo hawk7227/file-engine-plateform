@@ -14,21 +14,43 @@ import { parseBody, parseAdminKeysRequest, validationErrorResponse } from '@/lib
 // ── Auth helper (same as /api/admin/settings) ──
 
 async function getAuthUser(req: NextRequest) {
-    const supabase = createClient(
+    const token = req.headers.get('Authorization')?.replace('Bearer ', '')
+    if (!token) {
+        console.log('[Admin Keys] No Authorization header')
+        return null
+    }
+    console.log('[Admin Keys] Token present, length:', token.length)
+
+    // Use anon key to verify the JWT token
+    const anonClient = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
-    const token = req.headers.get('Authorization')?.replace('Bearer ', '')
-    if (!token) return null
+    const { data: { user }, error: authError } = await anonClient.auth.getUser(token)
+    if (authError || !user) {
+        console.log('[Admin Keys] getUser failed:', authError?.message || 'no user')
+        return null
+    }
+    console.log('[Admin Keys] User verified:', user.id, user.email)
 
-    const { data: { user } } = await supabase.auth.getUser(token)
-    if (!user) return null
+    // Use service role key to read profile (bypasses RLS)
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    console.log('[Admin Keys] Service role key:', serviceKey ? 'present' : 'MISSING')
+    const profileClient = serviceKey
+        ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
+        : anonClient
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await profileClient
         .from('profiles')
         .select('id, role, team_id')
         .eq('id', user.id)
         .single()
+
+    if (profileError) {
+        console.log('[Admin Keys] Profile query failed:', profileError.message)
+    } else {
+        console.log('[Admin Keys] Profile found:', profile?.role, 'team:', profile?.team_id)
+    }
 
     return profile
 }
