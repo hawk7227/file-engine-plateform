@@ -86,9 +86,25 @@ export function WPAdminKeysPanel({ toast }: Props) {
   const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
     try {
+      // Try getSession first
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`
+        return headers
+      }
+      // Fallback: read token from storage directly
+      const raw = typeof window !== 'undefined'
+        ? localStorage.getItem('fe-auth-v3')
+        : null
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw)
+          const token = parsed?.access_token || parsed?.currentSession?.access_token
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`
+            return headers
+          }
+        } catch { /* not valid JSON */ }
       }
     } catch { /* non-fatal */ }
     return headers
