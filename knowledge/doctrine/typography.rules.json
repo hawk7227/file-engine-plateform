@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "base": {
+    "font": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "sidebar": {
+    "section": {
+      "fontSizePx": 9,
+      "fontWeight": 700,
+      "color": "#52525b",
+      "transform": "uppercase"
+    },
+    "chatItem": {
+      "fontSizePx": 12,
+      "color": "#a1a1aa"
+    },
+    "chatItemActive": {
+      "background": "rgba(16,185,129,0.06)",
+      "color": "#10b981"
+    }
+  },
+  "chatHeader": {
+    "title": {
+      "fontSizePx": 12,
+      "fontWeight": 600
+    },
+    "tokenBar": {
+      "fontSizePx": 10,
+      "fontFamily": "JetBrains Mono",
+      "color": "#52525b"
+    }
+  },
+  "messages": {
+    "bubble": {
+      "fontSizePx": 13,
+      "lineHeight": 1.65,
+      "paddingPx": [
+        10,
+        14
+      ],
+      "radiusPx": 16,
+      "maxWidthPct": 75
+    },
+    "userBubble": {
+      "background": "linear-gradient(135deg,#10b981,#14b8a6)",
+      "color": "white",
+      "radiusOverrides": {
+        "bottomRightPx": 4
+      }
+    },
+    "aiBubble": {
+      "background": "#18181b",
+      "color": "#a1a1aa",
+      "border": "1px solid rgba(255,255,255,0.06)",
+      "radiusOverrides": {
+        "bottomLeftPx": 4
+      }
+    },
+    "timestamp": {
+      "fontSizePx": 9,
+      "color": "#52525b"
+    },
+    "inlineCode": {
+      "fontFamily": "JetBrains Mono",
+      "fontSizePx": 11,
+      "color": "#10b981"
+    },
+    "inlineHint": {
+      "fontSizePx": 11,
+      "color": "#52525b"
+    }
+  },
+  "input": {
+    "textarea": {
+      "fontSizePx": 13,
+      "color": "#fafafa",
+      "background": "#18181b",
+      "minHeightPx": 42,
+      "maxHeightPx": 120
+    },
+    "sendButton": {
+      "background": "#10b981",
+      "color": "white",
+      "fontSizePx": 12,
+      "fontWeight": 600
+    }
+  },
+  "previewPanel": {
+    "tab": {
+      "fontSizePx": 10,
+      "fontWeight": 500,
+      "color": "#52525b"
+    },
+    "tabOn": {
+      "background": "#10b981",
+      "color": "white"
+    },
+    "console": {
+      "fontFamily": "JetBrains Mono",
+      "fontSizePx": 10,
+      "color": "#52525b"
+    }
+  }
+}

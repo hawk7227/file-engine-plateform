@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "notes": "Seed library of known issues. Extend via validator failures + verified fixes.",
+  "items": [
+    {
+      "signature": "nextjs_dynamic_import_ssr_mismatch",
+      "symptoms": {
+        "includes": [
+          "Hydration failed",
+          "Text content does not match server-rendered HTML"
+        ]
+      },
+      "root_cause": "Client/server render mismatch due to dynamic content rendered on server.",
+      "fix_steps": [
+        "Wrap the problematic component with next/dynamic and disable SSR if needed.",
+        "Ensure deterministic rendering on server by gating browser-only APIs behind useEffect."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "signature": "supabase_rls_denied_select",
+      "symptoms": {
+        "includes": [
+          "permission denied for relation",
+          "new row violates row-level security policy"
+        ]
+      },
+      "root_cause": "RLS enabled without correct SELECT/INSERT policies for authenticated role.",
+      "fix_steps": [
+        "Create explicit RLS policies for the table for authenticated users.",
+        "Verify auth.uid() matches owner columns.",
+        "Test with Supabase SQL editor using auth.jwt() claims."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "signature": "stripe_webhook_signature_verification_failed",
+      "symptoms": {
+        "includes": [
+          "No signatures found matching the expected signature"
+        ]
+      },
+      "root_cause": "Wrong webhook secret or request body modified before verification.",
+      "fix_steps": [
+        "Ensure you use the endpoint's webhook signing secret (whsec_...).",
+        "Use raw request body for verification; disable JSON parsing before verification."
+      ],
+      "confidence": 0.9
+    }
+  ]
+}

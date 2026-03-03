@@ -16,6 +16,7 @@ import { createClient } from '@supabase/supabase-js'
 import { sanitizeResponse, getActualModelId, selectProvider } from '@/lib/ai-config'
 import { buildSmartContext, SYSTEM_PROMPT_COMPACT, INTENT_PROMPT_ADDITIONS, classifyIntent } from '@/lib/smart-context'
 import { getKeyWithFailover, markRateLimited } from '@/lib/key-pool'
+import { retrieveKnowledge, formatKnowledgeForPrompt, matchKnownFixes } from '@/lib/knowledge-retrieval'
 import { getTeamCostSettings, getUserTeamId } from '@/lib/admin-cost-settings'
 import { generateMedia } from '@/lib/media-tools'
 
@@ -1073,6 +1074,30 @@ export async function POST(request: NextRequest) {
     // Build intent-specific prompt addition
     let intentAddition = INTENT_PROMPT_ADDITIONS[intent] || ''
 
+    // ── Knowledge retrieval from DB (replaces external API dependency) ──
+    let knowledgeContext = ''
+    try {
+      const kResult = await retrieveKnowledge(msgText, projectId, 8)
+      if (kResult.chunks.length > 0) {
+        knowledgeContext = formatKnowledgeForPrompt(kResult.chunks)
+        console.log(`[Chat API] Knowledge: ${kResult.chunks.length} chunks from DB`)
+      }
+      // Check for known fixes if message looks like an error
+      if (/error|failed|crash|bug|broken|TypeError|Cannot|undefined/i.test(msgText)) {
+        const fixes = await matchKnownFixes(msgText, projectId)
+        if (fixes.length > 0) {
+          knowledgeContext += '\n<known_fixes>\n'
+          for (const f of fixes) {
+            knowledgeContext += `[${f.signature}] (confidence: ${f.confidence})\nCause: ${f.root_cause || 'unknown'}\nFix: ${f.fix_steps || 'no steps'}\n\n`
+          }
+          knowledgeContext += '</known_fixes>\n'
+          console.log(`[Chat API] Known fixes: ${fixes.length} matched`)
+        }
+      }
+    } catch (e) {
+      console.warn('[Chat API] Knowledge retrieval failed:', e instanceof Error ? e.message : String(e))
+    }
+
     // Fix #4: If user uploaded images, add explicit instruction to analyze them
     if (attachments?.some(a => a.type === 'image')) {
       intentAddition += `\n\nIMPORTANT: The user has uploaded ${attachments.filter(a => a.type === 'image').length} image(s). You MUST call analyze_image first (with image_index=0) to understand the design before generating any code. Recreate the design as closely as possible.`
@@ -1084,8 +1109,8 @@ export async function POST(request: NextRequest) {
     }
 
     const sysProm = needsAgent
-      ? (ctx ? `${AGENT_SYSTEM_PROMPT}\n${intentAddition}\n\n${ctx}${memoryContext}` : `${AGENT_SYSTEM_PROMPT}\n${intentAddition}${memoryContext}`)
-      : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}\n\n${ctx}${memoryContext}` : `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}${memoryContext}`)
+      ? (ctx ? `${AGENT_SYSTEM_PROMPT}\n${intentAddition}\n\n${ctx}${memoryContext}${knowledgeContext}` : `${AGENT_SYSTEM_PROMPT}\n${intentAddition}${memoryContext}${knowledgeContext}`)
+      : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}\n\n${ctx}${memoryContext}${knowledgeContext}` : `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}${memoryContext}${knowledgeContext}`)
     const toolCtx: ToolContext = { files: { ...files }, projectId, attachments }
 
     // Process uploads: extract ZIP/PDF/DOCX/XLSX, decode text files into toolCtx.files,

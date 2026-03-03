@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "breakpoints": {
+    "phoneMaxWidthPx": 430
+  },
+  "fontScaling": {
+    "desktopVar": "--streams-chat-scale",
+    "mobileVar": "--streams-chat-scale-mobile",
+    "desktopDefault": 1.0,
+    "mobileDefault": 0.98,
+    "min": 0.8,
+    "max": 1.35,
+    "step": 0.05
+  },
+  "mobileCompaction": {
+    "bubbleMaxWidthPct": 88,
+    "bubblePaddingPx": [
+      9,
+      12
+    ],
+    "headerHeightsPx": {
+      "normal": 42,
+      "shortViewport": 38
+    },
+    "msgsPaddingX": 12,
+    "shortViewportMaxHeightPx": 740
+  },
+  "principles": [
+    "Avoid fixed heights that clip content; prefer dynamic/scroll containers.",
+    "Treat iOS Safari visual viewport changes as first-class."
+  ]
+}

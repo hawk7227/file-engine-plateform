@@ -1,0 +1,91 @@
+{
+  "name": "global-offline",
+  "scope": "global",
+  "targets_size_gb": 2.0,
+  "chunking": {
+    "chunk_size": 900,
+    "chunk_overlap": 120
+  },
+  "sources": [
+    {
+      "id": "nextjs-docs",
+      "type": "web",
+      "pack": "framework",
+      "version_strategy": "date",
+      "seed_urls": [
+        "https://nextjs.org/docs"
+      ],
+      "include_patterns": [
+        "^https://nextjs\\.org/docs/"
+      ],
+      "exclude_patterns": [
+        ".*(privacy|terms|cookies).*"
+      ],
+      "max_pages": 2500
+    },
+    {
+      "id": "react-docs",
+      "type": "web",
+      "pack": "framework",
+      "version_strategy": "date",
+      "seed_urls": [
+        "https://react.dev/"
+      ],
+      "include_patterns": [
+        "^https://react\\.dev/"
+      ],
+      "exclude_patterns": [
+        ".*(privacy|terms).*"
+      ],
+      "max_pages": 1200
+    },
+    {
+      "id": "supabase-docs",
+      "type": "web",
+      "pack": "infra",
+      "version_strategy": "date",
+      "seed_urls": [
+        "https://supabase.com/docs"
+      ],
+      "include_patterns": [
+        "^https://supabase\\.com/docs/"
+      ],
+      "exclude_patterns": [
+        ".*(privacy|terms|cookies).*"
+      ],
+      "max_pages": 1800
+    },
+    {
+      "id": "stripe-docs",
+      "type": "web",
+      "pack": "infra",
+      "version_strategy": "date",
+      "seed_urls": [
+        "https://stripe.com/docs"
+      ],
+      "include_patterns": [
+        "^https://stripe\\.com/docs/"
+      ],
+      "exclude_patterns": [
+        ".*(privacy|terms|cookies).*"
+      ],
+      "max_pages": 1800
+    },
+    {
+      "id": "owasp-cheatsheets",
+      "type": "web",
+      "pack": "security",
+      "version_strategy": "date",
+      "seed_urls": [
+        "https://cheatsheetseries.owasp.org/"
+      ],
+      "include_patterns": [
+        "^https://cheatsheetseries\\.owasp\\.org/"
+      ],
+      "exclude_patterns": [
+        ".*(privacy|terms).*"
+      ],
+      "max_pages": 900
+    }
+  ]
+}

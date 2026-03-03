@@ -1,0 +1,42 @@
+name: KPB Knowledge Pack Build+Publish
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily 06:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  kpb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install KPB
+        run: |
+          cd tools/kpb
+          npm install
+
+      - name: Build packs
+        run: |
+          node tools/kpb/bin/kpb.mjs build --source tools/kpb/sources/global-offline.json --out .kpb-out
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
+      - name: Publish packs to Supabase
+        run: |
+          RUN_ID=$(ls -1 .kpb-out | tail -n 1)
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          node tools/kpb/bin/kpb.mjs publish --run-id $RUN_ID --out .kpb-out
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STORAGE_PROVIDER: supabase
+          SUPABASE_STORAGE_BUCKET: knowledge-packs

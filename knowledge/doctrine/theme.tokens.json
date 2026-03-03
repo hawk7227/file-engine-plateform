@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "name": "StreamsAI Dark",
+  "tokens": {
+    "bg": "#09090b",
+    "bg2": "#111114",
+    "bg3": "#18181b",
+    "bg4": "#27272a",
+    "border": "rgba(255,255,255,0.06)",
+    "border2": "rgba(255,255,255,0.12)",
+    "t1": "#fafafa",
+    "t2": "#a1a1aa",
+    "t3": "#52525b",
+    "brand": "#10b981",
+    "brand2": "#14b8a6",
+    "amber": "#f59e0b",
+    "red": "#ef4444",
+    "font": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "gradients": {
+    "brand": "linear-gradient(135deg,#10b981,#14b8a6)"
+  }
+}
