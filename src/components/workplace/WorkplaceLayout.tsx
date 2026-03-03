@@ -144,9 +144,10 @@ const CSS = `
 interface Props {
   user: User
   profile: Profile
+  accessToken?: string | null
 }
 
-export default function WorkplaceLayout({ user, profile }: Props) {
+export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   // ── State ──
   const [leftTab, setLeftTab] = useState<LeftTab>('chat')
   const [bottomTab, setBottomTab] = useState<BottomTab>('sql')
@@ -619,7 +620,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 />
               </div>
               <div className={`wp-tpane${leftTab === 'admin' ? ' show' : ''}`}>
-                <WPAdminKeysPanel toast={toast} />
+                <WPAdminKeysPanel toast={toast} accessToken={accessToken} />
               </div>
               <div className={`wp-tpane${leftTab === 'settings' ? ' show' : ''}`}>
                 <div style={{ padding: 16, color: 'var(--wp-text-3)', fontSize: 13 }}>

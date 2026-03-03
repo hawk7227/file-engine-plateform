@@ -24,6 +24,7 @@ export default function AdminWorkplacePage() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [accessToken, setAccessToken] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -62,6 +63,7 @@ export default function AdminWorkplacePage() {
         if (session?.user) {
           if (cancelled) return
           setUser(session.user)
+          setAccessToken(session.access_token)
           await loadProfile(session.user.id)
           setAuthState('authenticated')
           return
@@ -85,6 +87,7 @@ export default function AdminWorkplacePage() {
         if (cancelled) return
         console.log('[Workplace] Signed in as:', data.user.email)
         setUser(data.user)
+        setAccessToken(data.session?.access_token || null)
         await loadProfile(data.user.id)
         setAuthState('authenticated')
       } catch (err) {
@@ -141,5 +144,5 @@ export default function AdminWorkplacePage() {
     )
   }
 
-  return <WorkplaceLayout user={user} profile={profile} />
+  return <WorkplaceLayout user={user} profile={profile} accessToken={accessToken} />
 }

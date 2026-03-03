@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
 
 // =====================================================
 // WPAdminKeysPanel — API Key Management
@@ -72,9 +71,10 @@ const KEY_SECTIONS = [
 
 interface Props {
   toast: (title: string, message: string, type?: string) => void
+  accessToken?: string | null
 }
 
-export function WPAdminKeysPanel({ toast }: Props) {
+export function WPAdminKeysPanel({ toast, accessToken }: Props) {
   const [keys, setKeys] = useState<KeyInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -83,38 +83,19 @@ export function WPAdminKeysPanel({ toast }: Props) {
   const [editValue, setEditValue] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
+  const getAuthHeaders = useCallback((): Record<string, string> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    try {
-      // Try getSession first
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-        return headers
-      }
-      // Fallback: read token from storage directly
-      const raw = typeof window !== 'undefined'
-        ? localStorage.getItem('fe-auth-v3')
-        : null
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw)
-          const token = parsed?.access_token || parsed?.currentSession?.access_token
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`
-            return headers
-          }
-        } catch { /* not valid JSON */ }
-      }
-    } catch { /* non-fatal */ }
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
+    }
     return headers
-  }, [])
+  }, [accessToken])
 
   const loadKeys = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const headers = await getAuthHeaders()
+      const headers = getAuthHeaders()
       const res = await fetch('/api/admin/keys', { headers })
       if (!res.ok) {
         const data = await res.json()
@@ -140,7 +121,7 @@ export function WPAdminKeysPanel({ toast }: Props) {
     setError(null)
     setSuccess(null)
     try {
-      const headers = await getAuthHeaders()
+      const headers = getAuthHeaders()
       const res = await fetch('/api/admin/keys', {
         method: 'PUT',
         headers,
@@ -167,7 +148,7 @@ export function WPAdminKeysPanel({ toast }: Props) {
     setError(null)
     setSuccess(null)
     try {
-      const headers = await getAuthHeaders()
+      const headers = getAuthHeaders()
       const res = await fetch('/api/admin/keys', {
         method: 'DELETE',
         headers,
