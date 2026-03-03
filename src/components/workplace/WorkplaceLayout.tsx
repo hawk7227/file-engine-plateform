@@ -29,6 +29,7 @@ import { WPCodeOutput } from './WPCodeOutput'
 import { WPDocViewer } from './WPDocViewer'
 import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
 import { useConversation } from '@/hooks/useConversation'
+import { WPSidebar } from './WPSidebar'
 import { WPDiffPreview } from './WPDiffPreview'
 import type { DiffProposal } from './WPDiffPreview'
 
@@ -185,6 +186,13 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [refreshKey, setRefreshKey] = useState(0)
   const [diffProposal, setDiffProposal] = useState<DiffProposal | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('wp-sidebar-collapsed') === 'true'
+    }
+    return false
+  })
+  const [sidebarNav, setSidebarNav] = useState('chats')
 
   // ── Load conversation from URL on mount ──
   useEffect(() => {
@@ -330,6 +338,84 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   }, [bottomHeight])
 
   // ── Preview files from chat message ──
+  // ── Sidebar handlers ──
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed(prev => {
+      const next = !prev
+      localStorage.setItem('wp-sidebar-collapsed', String(next))
+      return next
+    })
+  }, [])
+
+  const handleNewChat = useCallback(() => {
+    chat.clearMessages()
+    setGeneratedFiles([])
+    setPreviewHtml(null)
+    // Clear URL param
+    const url = new URL(window.location.href)
+    url.searchParams.delete('chat')
+    window.history.replaceState({}, '', url.toString())
+  }, [chat])
+
+  const handleSelectChat = useCallback((id: string) => {
+    conv.loadConversation(id).then(messages => {
+      if (messages.length > 0) {
+        const restored = messages.map(m => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: m.created_at,
+          status: 'complete' as const,
+        }))
+        chat.setMessages(restored)
+        const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant' && m.files_json)
+        if (lastAssistant?.files_json && Array.isArray(lastAssistant.files_json)) {
+          const files = lastAssistant.files_json as { path: string; content: string; language?: string }[]
+          setGeneratedFiles(files.map(f => ({ path: f.path, content: f.content, language: f.language || 'text' })))
+        } else {
+          setGeneratedFiles([])
+        }
+      }
+    })
+    // Update URL
+    const url = new URL(window.location.href)
+    url.searchParams.set('chat', id)
+    window.history.replaceState({}, '', url.toString())
+    // Close mobile sidebar
+    setMobileSidebarOpen(false)
+  }, [conv, chat])
+
+  const handleRenameChat = useCallback((id: string, title: string) => {
+    conv.renameConversation(title).then(() => conv.loadRecentChats())
+  }, [conv])
+
+  const handleDeleteChat = useCallback((id: string) => {
+    conv.deleteConversation().then(() => {
+      conv.loadRecentChats()
+      if (conv.conversationId === id) {
+        handleNewChat()
+      }
+    })
+  }, [conv, handleNewChat])
+
+  const handleArchiveChat = useCallback((id: string) => {
+    conv.archiveConversation().then(() => conv.loadRecentChats())
+  }, [conv])
+
+  const handleSidebarSearch = useCallback((query: string) => {
+    if (query.length >= 2) {
+      conv.loadRecentChats({ search: query })
+    } else {
+      conv.loadRecentChats()
+    }
+  }, [conv])
+
+  // Load recent chats on mount
+  useEffect(() => {
+    conv.loadRecentChats()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handlePreviewFiles = useCallback((files: GeneratedFile[]) => {
     if (files.length > 0) {
       setGeneratedFiles(files)
@@ -414,6 +500,24 @@ export default function WorkplaceLayout({ user, profile }: Props) {
           }}>⬆ Push</button>
           <button className="wp-tb" onClick={() => toast('Settings', 'Coming soon', 'nfo')}>⚙</button>
         </div>
+
+        {/* ═══ SIDEBAR ═══ */}
+        <WPSidebar
+          collapsed={sidebarCollapsed}
+          onToggle={toggleSidebar}
+          recentChats={conv.recentChats}
+          activeChatId={conv.conversationId}
+          onNewChat={handleNewChat}
+          onSelectChat={handleSelectChat}
+          onRenameChat={handleRenameChat}
+          onDeleteChat={handleDeleteChat}
+          onArchiveChat={handleArchiveChat}
+          onSearch={handleSidebarSearch}
+          activeNav={sidebarNav}
+          onNavChange={setSidebarNav}
+          userName={profile.full_name || ''}
+          userEmail={user.email || ''}
+        />
 
         {/* ═══ MAIN ═══ */}
         <div className="wp-main">
