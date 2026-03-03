@@ -53,6 +53,18 @@ const CSS = `
 .wpc-thumb-img{width:100%;height:100%;object-fit:cover}
 .wpc-drop-zone{position:absolute;inset:0;z-index:50;background:rgba(16,185,129,.06);border:2px dashed var(--wp-accent);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--wp-accent);font-size:14px;font-weight:800;backdrop-filter:blur(4px)}
 @keyframes wp-blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+@keyframes wp-pulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes wp-dot-bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+.wpc-status{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:11px;font-weight:700;color:var(--wp-accent,#10b981)}
+.wpc-status-dots{display:inline-flex;gap:3px}
+.wpc-status-dots span{width:4px;height:4px;border-radius:50%;background:var(--wp-accent,#10b981);animation:wp-dot-bounce .6s ease-in-out infinite}
+.wpc-status-dots span:nth-child(2){animation-delay:.1s}
+.wpc-status-dots span:nth-child(3){animation-delay:.2s}
+.wpc-status-phase{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--wp-purple,#b44dff)}
+.wpc-status-msg{font-size:10px;color:var(--wp-text-3,#8888a8)}
+.wpc-error-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;margin:8px 12px;border-radius:10px;background:rgba(255,59,92,.06);border:1px solid rgba(255,59,92,.15);color:var(--wp-red,#ff3b5c);font-size:12px;font-weight:700}
+.wpc-error-retry{padding:4px 10px;border-radius:6px;background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.2);color:var(--wp-red,#ff3b5c);font-size:10px;font-weight:700;cursor:pointer;margin-left:auto;flex-shrink:0}
+.wpc-error-retry:hover{background:rgba(255,59,92,.15)}
 `
 
 function getFileIcon(name: string): string {
@@ -193,7 +205,15 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
                 </span>
               </div>
               {renderMarkdown(m.content)}
-              {m.status === 'streaming' && <span className="wpc-streaming">▊</span>}
+              {m.status === 'streaming' && !m.content && (
+                <div className="wpc-status">
+                  <div className="wpc-status-dots"><span /><span /><span /></div>
+                  {m.statusPhase && <span className="wpc-status-phase">{m.statusPhase}</span>}
+                  {m.statusMessage && <span className="wpc-status-msg">{m.statusMessage}</span>}
+                  {!m.statusPhase && !m.statusMessage && <span className="wpc-status-msg">Processing...</span>}
+                </div>
+              )}
+              {m.status === 'streaming' && m.content && <span className="wpc-streaming">▊</span>}
               {m.files && m.files.length > 0 && (
                 <>
                   <div className="wpc-files-badge">📄 {m.files.length} file{m.files.length > 1 ? 's' : ''} generated</div>
@@ -210,6 +230,13 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
         ))}
       </div>
       <input ref={fileRef} type="file" multiple accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.png,.jpg,.jpeg,.gif,.svg,.pdf" style={{ display: 'none' }} onChange={e => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = '' }} />
+      {chat.error && (
+        <div className="wpc-error-bar">
+          <span>⚠</span>
+          <span style={{ flex: 1 }}>{chat.error}</span>
+          <button className="wpc-error-retry" onClick={() => { const lastUser = [...chat.messages].reverse().find(m => m.role === 'user'); if (lastUser) chat.sendMessage(lastUser.content, lastUser.attachments) }}>Retry</button>
+        </div>
+      )}
       <div className="wpc-input-area">
         {selectedFiles.length > 0 && (
           <div className="wpc-file-thumbs">
@@ -235,6 +262,13 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
             {chat.isLoading ? '⏹' : '↑'}
           </button>
         </div>
+        {chat.isLoading && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', fontSize: 10, fontWeight: 700, color: 'var(--wp-accent,#10b981)' }}>
+            <div className="wpc-status-dots"><span /><span /><span /></div>
+            Generating response...
+            <button style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--wp-text-4)', fontSize: 9, cursor: 'pointer', fontWeight: 700 }} onClick={chat.stopGeneration}>Cancel</button>
+          </div>
+        )}
       </div>
     </div>
   )
