@@ -151,6 +151,23 @@ const TOOLS: ToolDef[] = [
       prompt: { type: 'string', description: 'Generation prompt', required: true },
       params: { type: 'object', description: 'Optional tool-specific params (size, duration, style, etc.)' }
     }
+  },
+  {
+    name: 'deploy_project',
+    description: 'Deploy the project to GitHub and/or Vercel. Creates repo if needed, pushes code, triggers production deploy. Use after build succeeds.',
+    params: {
+      target: { type: 'string', description: 'Deploy target: "github", "vercel", or "both" (default: both)', required: true },
+      project_name: { type: 'string', description: 'Project/repo name (lowercase, no spaces)', required: true },
+      description: { type: 'string', description: 'Project description for GitHub repo' }
+    }
+  },
+  {
+    name: 'install_packages',
+    description: 'Install npm packages in the sandbox. Creates package.json if needed. Use before run_command for build/dev.',
+    params: {
+      packages: { type: 'string', description: 'Space-separated package names (e.g. "react react-dom next")', required: true },
+      dev: { type: 'boolean', description: 'Install as devDependencies' }
+    }
   }
 ]
 
@@ -471,6 +488,83 @@ async function execTool(name: string, input: Record<string, unknown>, ctx: ToolC
         } catch (err: unknown) {
           return { success: false, result: `Media generation error: ${(err instanceof Error ? err.message : String(err))}` }
         }
+      }
+      case 'deploy_project': {
+        try {
+          const target = s('target') || 'both'
+          const projectName = s('project_name')
+          if (!projectName) return { success: false, result: 'Missing project_name' }
+
+          const fileEntries = Object.entries(ctx.files).map(([p, c]) => ({ path: p, content: c }))
+          if (fileEntries.length === 0) return { success: false, result: 'No files to deploy. Create files first.' }
+
+          const endpoint = target === 'github' ? '/api/file-engine/push-github'
+            : target === 'vercel' ? '/api/file-engine/deploy-vercel'
+            : '/api/file-engine/deploy-both'
+
+          // Use internal fetch to hit deploy routes — they handle token resolution
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
+          const resp = await fetch(`${baseUrl}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              files: fileEntries,
+              projectName,
+              repoName: projectName,
+              description: s('description') || `Deployed by File Engine`,
+              isPrivate: false,
+            })
+          })
+
+          const data = await resp.json() as Record<string, unknown>
+          if (!resp.ok || data.error) {
+            return { success: false, result: `Deploy failed: ${data.error || resp.statusText}` }
+          }
+
+          const parts: string[] = ['✓ Deployment successful']
+          if (data.githubUrl) parts.push(`GitHub: ${data.githubUrl}`)
+          if (data.vercelUrl || data.url) parts.push(`Live: ${data.vercelUrl || data.url}`)
+          if (data.inspectorUrl) parts.push(`Inspector: ${data.inspectorUrl}`)
+          return { success: true, result: parts.join('\n') }
+        } catch (err: unknown) {
+          return { success: false, result: `Deploy error: ${(err instanceof Error ? err.message : String(err))}` }
+        }
+      }
+      case 'install_packages': {
+        const packages = s('packages')
+        if (!packages) return { success: false, result: 'Missing packages parameter' }
+        const isDev = input.dev === true
+        const cmd = `npm install ${isDev ? '--save-dev ' : ''}${packages}`
+
+        // If real sandbox is active, execute there
+        if (useSandbox && ctx.sandboxId) {
+          try {
+            const provider = await getSandboxProvider()
+            const proc = await provider.exec(ctx.sandboxId, cmd, { timeoutMs: 120_000 })
+            const output = (proc.stdout + (proc.stderr ? '\n' + proc.stderr : '')).trim()
+            return { success: proc.exitCode === 0, result: output || `✓ Installed: ${packages}` }
+          } catch (sbErr: unknown) {
+            return { success: false, result: `Install failed: ${(sbErr instanceof Error ? sbErr.message : String(sbErr))}` }
+          }
+        }
+
+        // Fallback: update in-memory package.json
+        const existingPkg = ctx.files['package.json']
+        let pkg: Record<string, unknown> = {}
+        if (existingPkg) {
+          try { pkg = JSON.parse(existingPkg) } catch { pkg = { name: 'project', version: '1.0.0' } }
+        } else {
+          pkg = { name: 'project', version: '1.0.0', private: true }
+        }
+
+        const depKey = isDev ? 'devDependencies' : 'dependencies'
+        if (!pkg[depKey]) pkg[depKey] = {}
+        const deps = pkg[depKey] as Record<string, string>
+        for (const p of packages.split(/\s+/)) {
+          if (p.trim()) deps[p.trim()] = '*'
+        }
+        ctx.files['package.json'] = JSON.stringify(pkg, null, 2)
+        return { success: true, result: `✓ Added to ${depKey}: ${packages}\npackage.json updated.` }
       }
       default:
         return { success: false, result: `Unknown tool: ${name}` }
@@ -1126,7 +1220,8 @@ async function agentStream(
           console.log(`[Files Updated] ${fileList.length} files: ${fileList.map(f => `${f.path}(${f.content.length}b)`).join(', ')}`)
           ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
             type: 'files_updated',
-            files: fileList
+            files: fileList,
+            sandboxId: toolCtx.sandboxId || null
           })}\n\n`))
         } else {
           console.log(`[Files Updated] No files in toolCtx`)
