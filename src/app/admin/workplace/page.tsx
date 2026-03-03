@@ -2,7 +2,6 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { AdminNavPill } from '@/components/AdminNavPill'
 
 const WorkplaceLayout = dynamic(() => import('@/components/workplace/WorkplaceLayout'), { ssr: false })
 
@@ -12,7 +11,6 @@ export default function AdminWorkplacePage() {
 
   return (
     <>
-      <AdminNavPill />
       <WorkplaceLayout user={mockUser} profile={mockProfile} />
     </>
   )

@@ -4,59 +4,87 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import type { UseChatReturn, GeneratedFile } from '@/hooks/useChat'
 
 const CSS = `
-.wpc-wrap{display:flex;flex-direction:column;height:100%}
-.wpc-msgs{flex:1;overflow-y:auto;padding:8px}
-.wpc-msg{display:flex;gap:8px;padding:8px;margin-bottom:2px}
-.wpc-avt{width:20px;height:20px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:2px}
-.wpc-avt-ai{background:var(--wp-accent-dim);border:1px solid rgba(52,211,153,.15)}
-.wpc-avt-u{background:var(--wp-bg-4)}
-.wpc-role{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.wpc-role-ai{color:var(--wp-accent)}.wpc-role-u{color:var(--wp-text-3)}
-.wpc-txt{font-size:11px;line-height:1.55;color:var(--wp-text-2);white-space:pre-wrap;word-break:break-word}
-.wpc-acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.wpc-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:7px;font-weight:700;border:1px solid rgba(52,211,153,.15);color:var(--wp-accent);background:var(--wp-accent-dim);cursor:pointer;font-family:var(--wp-font);transition:background .15s}
-.wpc-pill:hover{background:rgba(52,211,153,.12)}
-.wpc-btn{padding:3px 8px;border-radius:5px;font-size:7px;font-weight:700;border:1px solid rgba(96,165,250,.15);color:var(--wp-blue);background:none;cursor:pointer;font-family:var(--wp-font);transition:background .15s}
-.wpc-btn:hover{background:rgba(96,165,250,.06)}
-.wpc-input-area{padding:8px;border-top:1px solid var(--wp-border);flex-shrink:0}
-.wpc-input-wrap{display:flex;gap:6px;align-items:center;background:var(--wp-bg-3);border-radius:8px;padding:6px 8px}
-.wpc-input{flex:1;background:none;border:none;font-size:11px;color:var(--wp-text-1);outline:none;font-family:var(--wp-font)}
-.wpc-input::placeholder{color:var(--wp-text-4)}
-.wpc-send{width:24px;height:24px;border-radius:8px;background:var(--wp-accent);border:none;color:#000;font-weight:900;font-size:10px;cursor:pointer;flex-shrink:0;transition:opacity .15s}
-.wpc-send:disabled{opacity:.3;cursor:not-allowed}
-.wpc-upload-btn{width:24px;height:24px;border-radius:6px;background:none;border:1px solid var(--wp-border);color:var(--wp-text-4);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.wpc-upload-btn:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
+.wpc-wrap{display:flex;flex-direction:column;height:100%;position:relative}
+.wpc-msgs{flex:1;overflow-y:auto;padding:16px 12px}
+.wpc-msg{margin-bottom:12px;display:flex;flex-direction:column}
+.wpc-msg[data-role="user"]{align-items:flex-end}
+.wpc-msg[data-role="assistant"]{align-items:flex-start}
+.wpc-bubble{padding:12px 16px;border-radius:16px;max-width:85%;font-size:14px;line-height:1.65;word-break:break-word;white-space:pre-wrap}
+.wpc-msg[data-role="user"] .wpc-bubble{background:linear-gradient(135deg,#10b981,#14b8a6);color:#fff;border-bottom-right-radius:4px}
+.wpc-msg[data-role="assistant"] .wpc-bubble{background:var(--wp-bg-3,#18181b);color:var(--wp-text-2,#c8c8d8);border:1px solid rgba(255,255,255,.06);border-bottom-left-radius:4px}
+.wpc-bubble-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.wpc-avt{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-weight:800}
+.wpc-avt-ai{background:var(--wp-accent-dim,rgba(16,185,129,.08));border:1px solid rgba(16,185,129,.15);color:var(--wp-accent,#10b981)}
+.wpc-avt-u{background:rgba(255,255,255,.1);color:#fff}
+.wpc-role{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.wpc-role-ai{color:var(--wp-accent,#10b981)}
+.wpc-role-u{color:rgba(255,255,255,.7)}
+.wpc-time{font-size:9px;color:var(--wp-text-4,#505070);margin-top:4px;padding:0 4px}
+.wpc-bubble strong,.wpc-bubble b{font-weight:800;color:var(--wp-text-1,#fff)}
+.wpc-msg[data-role="user"] .wpc-bubble strong{color:#fff}
+.wpc-bubble code{font-family:var(--wp-mono,'JetBrains Mono',monospace);font-size:12px;background:rgba(16,185,129,.08);color:var(--wp-accent,#10b981);padding:1px 5px;border-radius:4px}
+.wpc-msg[data-role="user"] .wpc-bubble code{background:rgba(255,255,255,.15);color:#fff}
+.wpc-thinking{font-size:10px;color:var(--wp-purple,#b44dff);font-style:italic;margin-bottom:4px;display:flex;align-items:center;gap:4px;padding:0 4px}
+.wpc-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.wpc-pill{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1px solid rgba(16,185,129,.2);color:var(--wp-accent,#10b981);background:rgba(16,185,129,.06);cursor:pointer;transition:all .15s}
+.wpc-pill:hover{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3)}
+.wpc-btn{padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1px solid rgba(59,130,255,.2);color:var(--wp-blue,#3b82ff);background:none;cursor:pointer;transition:all .15s}
+.wpc-btn:hover{background:rgba(59,130,255,.06)}
+.wpc-files-badge{display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;font-family:var(--wp-mono);background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.1);color:var(--wp-accent);margin-top:6px}
 .wpc-streaming{display:inline-block;animation:wp-blink 1s infinite}
-.wpc-empty{text-align:center;padding:40px 20px;color:var(--wp-text-4)}
-.wpc-empty-icon{font-size:40px;margin-bottom:12px;opacity:.3}
-.wpc-empty-title{font-size:13px;font-weight:700;margin-bottom:4px;color:var(--wp-text-2)}
-.wpc-files-badge{display:flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;font-family:var(--wp-mono);background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.1);color:var(--wp-accent);margin-top:4px}
-.wpc-thinking{font-size:9px;color:var(--wp-purple);font-style:italic;margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.wpc-file-thumbs{display:flex;gap:4px;padding:4px 0;overflow-x:auto;flex-shrink:0}
-.wpc-file-thumbs::-webkit-scrollbar{display:none}
-.wpc-thumb{position:relative;width:48px;height:48px;border-radius:6px;background:var(--wp-bg-4);border:1px solid var(--wp-border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-.wpc-thumb-icon{font-size:16px;opacity:.6}
-.wpc-thumb-name{font-size:5px;font-weight:700;color:var(--wp-text-4);text-align:center;padding:0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
-.wpc-thumb-remove{position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:var(--wp-red);border:1px solid rgba(248,113,113,.3);color:#fff;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.wpc-empty{text-align:center;padding:60px 24px;color:var(--wp-text-4)}
+.wpc-empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+.wpc-empty-title{font-size:16px;font-weight:800;margin-bottom:6px;color:var(--wp-text-1,#fff)}
+.wpc-input-area{padding:12px;border-top:1px solid var(--wp-border);flex-shrink:0}
+.wpc-input-wrap{display:flex;gap:8px;align-items:flex-end;background:var(--wp-bg-3,#18181b);border-radius:12px;padding:10px 12px}
+.wpc-input{flex:1;background:none;border:none;font-size:14px;color:var(--wp-text-1,#fff);outline:none;font-family:var(--wp-font);resize:none;min-height:20px;max-height:120px;line-height:1.5}
+.wpc-input::placeholder{color:var(--wp-text-4,#505070)}
+.wpc-send{width:32px;height:32px;border-radius:8px;background:var(--wp-accent,#10b981);border:none;color:#fff;font-weight:900;font-size:14px;cursor:pointer;flex-shrink:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.wpc-send:hover{box-shadow:0 0 16px rgba(16,185,129,.3)}
+.wpc-send:disabled{opacity:.3;cursor:not-allowed}
+.wpc-upload-btn{width:32px;height:32px;border-radius:8px;background:none;border:1px solid var(--wp-border);color:var(--wp-text-3);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.wpc-upload-btn:hover{border-color:var(--wp-accent);color:var(--wp-accent)}
+.wpc-file-thumbs{display:flex;gap:6px;padding:6px 0;overflow-x:auto;flex-shrink:0}.wpc-file-thumbs::-webkit-scrollbar{display:none}
+.wpc-thumb{position:relative;width:52px;height:52px;border-radius:8px;background:var(--wp-bg-4);border:1px solid var(--wp-border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.wpc-thumb-icon{font-size:18px;opacity:.6}
+.wpc-thumb-name{font-size:6px;font-weight:700;color:var(--wp-text-4);text-align:center;padding:0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.wpc-thumb-remove{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:var(--wp-red,#ff3b5c);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
 .wpc-thumb:hover .wpc-thumb-remove{opacity:1}
 .wpc-thumb-img{width:100%;height:100%;object-fit:cover}
-.wpc-drop-zone{position:absolute;inset:0;z-index:50;background:rgba(52,211,153,.06);border:2px dashed var(--wp-accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--wp-accent);font-size:12px;font-weight:700;backdrop-filter:blur(4px)}
+.wpc-drop-zone{position:absolute;inset:0;z-index:50;background:rgba(16,185,129,.06);border:2px dashed var(--wp-accent);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--wp-accent);font-size:14px;font-weight:800;backdrop-filter:blur(4px)}
 @keyframes wp-blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 `
 
 function getFileIcon(name: string): string {
   const ext = name.split('.').pop()?.toLowerCase() || ''
-  const m: Record<string, string> = { ts: '📘', tsx: '📘', js: '📒', jsx: '📒', html: '🌐', css: '🎨', json: '📋', md: '📝', py: '🐍', sql: '🗄', png: '🖼', jpg: '🖼', jpeg: '🖼', gif: '🖼', svg: '🖼', pdf: '📕', txt: '📄' }
+  const m: Record<string, string> = { ts: '📘', tsx: '📘', js: '📒', jsx: '📒', html: '🌐', css: '🎨', json: '📋', md: '📝', py: '🐍', sql: '🗄', png: '🖼', jpg: '🖼', pdf: '📕', txt: '📄' }
   return m[ext] || '📄'
 }
 
-interface SelectedFile {
-  id: string
-  file: File
-  name: string
-  size: number
-  preview?: string
+function renderMarkdown(text: string): (string | JSX.Element)[] {
+  const parts: (string | JSX.Element)[] = []
+  let key = 0
+  const regex = /(\*\*(.+?)\*\*|`([^`]+)`)/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null = null
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
+    if (match[2]) parts.push(<strong key={`b${key++}`}>{match[2]}</strong>)
+    else if (match[3]) parts.push(<code key={`c${key++}`}>{match[3]}</code>)
+    lastIndex = match.index + match[0].length
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+  return parts
 }
+
+function formatTime(d?: Date): string {
+  if (!d) return ''
+  const h = d.getHours()
+  const m = d.getMinutes()
+  return `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`
+}
+
+interface SelectedFile { id: string; file: File; name: string; size: number; preview?: string }
 
 interface Props {
   chat: UseChatReturn
@@ -86,66 +114,40 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
     if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight
   }, [chat.messages])
 
-  // Create preview URLs for image files, validate type and size
   const addFiles = useCallback((files: FileList | File[]) => {
-    const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
-    const newFiles: SelectedFile[] = []
-    const rejected: string[] = []
-
+    const MAX = 50 * 1024 * 1024
+    const nf: SelectedFile[] = []
+    const rej: string[] = []
     for (const f of Array.from(files)) {
-      if (f.size > MAX_FILE_SIZE) {
-        rejected.push(`${f.name} (${formatSize(f.size)} — max 50MB)`)
-        continue
-      }
-      const sf: SelectedFile = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        file: f,
-        name: f.name,
-        size: f.size,
-      }
-      if (f.type.startsWith('image/')) {
-        sf.preview = URL.createObjectURL(f)
-      }
-      newFiles.push(sf)
+      if (f.size > MAX) { rej.push(`${f.name} (max 50MB)`); continue }
+      const sf: SelectedFile = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, file: f, name: f.name, size: f.size }
+      if (f.type.startsWith('image/')) sf.preview = URL.createObjectURL(f)
+      nf.push(sf)
     }
-
-    if (rejected.length > 0) {
-      toast('File rejected', rejected.join(', '), 'err')
-    }
-    if (newFiles.length > 0) {
-      setSelectedFiles(prev => [...prev, ...newFiles])
-      toast('Files', `${newFiles.length} file(s) attached`, 'nfo')
-    }
+    if (rej.length) toast('File rejected', rej.join(', '), 'err')
+    if (nf.length) { setSelectedFiles(p => [...p, ...nf]); toast('Files', `${nf.length} file(s) attached`, 'nfo') }
   }, [toast])
 
   const removeFile = useCallback((id: string) => {
-    setSelectedFiles(prev => {
-      const f = prev.find(p => p.id === id)
+    setSelectedFiles(p => {
+      const f = p.find(x => x.id === id)
       if (f?.preview) URL.revokeObjectURL(f.preview)
-      return prev.filter(p => p.id !== id)
+      return p.filter(x => x.id !== id)
     })
   }, [])
 
-  // Drag and drop handlers
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setDragging(true) }, [])
   const onDragLeave = useCallback((e: React.DragEvent) => {
     if (dropRef.current && !dropRef.current.contains(e.relatedTarget as Node)) setDragging(false)
   }, [])
-  // Convert File to base64 string (without data URI prefix)
   const fileToBase64 = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
-      reader.onload = () => {
-        const result = reader.result as string
-        // Strip "data:...;base64," prefix
-        const base64 = result.includes(',') ? result.split(',')[1] || '' : result
-        resolve(base64)
-      }
-      reader.onerror = () => reject(new Error('Failed to read file'))
+      reader.onload = () => { const s = reader.result as string; resolve(s.includes(',') ? s.split(',')[1] || '' : s) }
+      reader.onerror = () => reject(new Error('Read failed'))
       reader.readAsDataURL(file)
     })
   }, [])
-
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); setDragging(false)
     if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files)
@@ -153,36 +155,21 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
 
   const handleSend = async () => {
     if ((!input.trim() && !selectedFiles.length) || chat.isLoading) return
-    const msg = input.trim()
-    setInput('')
-
-    // Convert selected files to Attachment objects with base64 content
-    const attachments: { id: string; type: 'image' | 'file'; content: string; filename: string; mimeType: string }[] = []
+    const msg = input.trim(); setInput('')
+    const att: { id: string; type: 'image' | 'file'; content: string; filename: string; mimeType: string }[] = []
     for (const sf of selectedFiles) {
-      const base64 = await fileToBase64(sf.file)
-      const isImage = sf.file.type.startsWith('image/')
-      attachments.push({
-        id: sf.id,
-        type: isImage ? 'image' : 'file',
-        content: base64,
-        filename: sf.name,
-        mimeType: sf.file.type || 'application/octet-stream',
-      })
+      const b64 = await fileToBase64(sf.file)
+      att.push({ id: sf.id, type: sf.file.type.startsWith('image/') ? 'image' : 'file', content: b64, filename: sf.name, mimeType: sf.file.type || 'application/octet-stream' })
     }
     setSelectedFiles([])
-    logActivity('chat_send', { message_preview: msg.substring(0, 100), file_count: attachments.length })
-    await chat.sendMessage(msg, attachments.length > 0 ? attachments : undefined)
+    logActivity('chat_send', { message_preview: msg.substring(0, 100), file_count: att.length })
+    await chat.sendMessage(msg, att.length > 0 ? att : undefined)
   }
 
   return (
     <div className="wpc-wrap" ref={dropRef} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
       <style>{CSS}</style>
-
-      {/* Drop overlay */}
-      {dragging && (
-        <div className="wpc-drop-zone">Drop files here</div>
-      )}
-
+      {dragging && <div className="wpc-drop-zone">Drop files here</div>}
       <div className="wpc-msgs" ref={msgsRef}>
         {chat.messages.length === 0 && (
           <div className="wpc-empty">
@@ -192,23 +179,21 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
           </div>
         )}
         {chat.messages.map((m, i) => (
-          <div key={m.id || i} className="wpc-msg">
-            <div className={`wpc-avt ${m.role === 'assistant' ? 'wpc-avt-ai' : 'wpc-avt-u'}`}>
-              {m.role === 'assistant' ? '⚡' : '→'}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className={`wpc-role ${m.role === 'assistant' ? 'wpc-role-ai' : 'wpc-role-u'}`}>
-                {m.role === 'assistant' ? 'File Engine' : 'You'}
-              </div>
-              {m.thinking && (
-                <div className="wpc-thinking">
-                  💭 {m.thinking.substring(0, 80)}{m.thinking.length > 80 ? '...' : ''}
+          <div key={m.id || i} className="wpc-msg" data-role={m.role === 'assistant' ? 'assistant' : 'user'}>
+            {m.thinking && (
+              <div className="wpc-thinking">💭 {m.thinking.substring(0, 80)}{m.thinking.length > 80 ? '...' : ''}</div>
+            )}
+            <div className="wpc-bubble">
+              <div className="wpc-bubble-hdr">
+                <div className={`wpc-avt ${m.role === 'assistant' ? 'wpc-avt-ai' : 'wpc-avt-u'}`}>
+                  {m.role === 'assistant' ? 'S' : '→'}
                 </div>
-              )}
-              <div className="wpc-txt">
-                {m.content}
-                {m.status === 'streaming' && <span className="wpc-streaming">▊</span>}
+                <span className={`wpc-role ${m.role === 'assistant' ? 'wpc-role-ai' : 'wpc-role-u'}`}>
+                  {m.role === 'assistant' ? 'StreamsAI' : 'You'}
+                </span>
               </div>
+              {renderMarkdown(m.content)}
+              {m.status === 'streaming' && <span className="wpc-streaming">▊</span>}
               {m.files && m.files.length > 0 && (
                 <>
                   <div className="wpc-files-badge">📄 {m.files.length} file{m.files.length > 1 ? 's' : ''} generated</div>
@@ -220,21 +205,12 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
                 </>
               )}
             </div>
+            <div className="wpc-time">{formatTime(m.timestamp ? new Date(m.timestamp) : undefined)}</div>
           </div>
         ))}
       </div>
-
-      {/* File input (hidden) */}
-      <input
-        ref={fileRef} type="file" multiple
-        accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.png,.jpg,.jpeg,.gif,.svg,.pdf"
-        style={{ display: 'none' }}
-        onChange={e => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = '' }}
-      />
-
-      {/* Input area */}
+      <input ref={fileRef} type="file" multiple accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.png,.jpg,.jpeg,.gif,.svg,.pdf" style={{ display: 'none' }} onChange={e => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = '' }} />
       <div className="wpc-input-area">
-        {/* File preview thumbnails */}
         {selectedFiles.length > 0 && (
           <div className="wpc-file-thumbs">
             {selectedFiles.map(sf => (
@@ -247,20 +223,14 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
                     <div className="wpc-thumb-name">{sf.name}</div>
                   </>
                 )}
-                <div className="wpc-thumb-size" style={{ fontSize: 7, color: 'var(--wp-text-4)', textAlign: 'center' }}>{formatSize(sf.size)}</div>
                 <div className="wpc-thumb-remove" onClick={() => removeFile(sf.id)}>✕</div>
               </div>
             ))}
           </div>
         )}
         <div className="wpc-input-wrap">
-          <button className="wpc-upload-btn" onClick={() => fileRef.current?.click()} title="Attach files">+</button>
-          <input
-            className="wpc-input" placeholder="Ask anything..."
-            value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-            disabled={chat.isLoading}
-          />
+          <button className="wpc-upload-btn" onClick={() => fileRef.current?.click()} title="Attach files">📎</button>
+          <input className="wpc-input" placeholder="Ask anything..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }} disabled={chat.isLoading} />
           <button className="wpc-send" onClick={chat.isLoading ? chat.stopGeneration : handleSend} disabled={!input.trim() && !selectedFiles.length && !chat.isLoading}>
             {chat.isLoading ? '⏹' : '↑'}
           </button>

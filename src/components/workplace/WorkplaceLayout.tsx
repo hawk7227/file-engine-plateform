@@ -554,15 +554,30 @@ export default function WorkplaceLayout({ user, profile }: Props) {
               </div>
             )}
             <div className="wp-tbar">
-              {LEFT_TABS.map(t => (
-                <button
-                  key={t.id}
-                  className={`wp-tbtn${leftTab === t.id ? ' on' : ''}`}
-                  onClick={() => setLeftTab(t.id)}
-                >
-                  {t.icon} {t.label}
-                </button>
-              ))}
+              <button
+                className={`wp-tbtn${leftTab === 'chat' ? ' on' : ''}`}
+                onClick={() => setLeftTab('chat')}
+              >
+                💬 Chat
+              </button>
+              <button
+                className={`wp-tbtn${leftTab === 'theme' ? ' on' : ''}`}
+                onClick={() => setLeftTab('theme')}
+              >
+                🎨 Theme
+              </button>
+              <button
+                className="wp-tbtn"
+                onClick={() => window.location.href = '/admin'}
+              >
+                📊 Admin
+              </button>
+              <button
+                className="wp-tbtn"
+                onClick={() => toast('Settings', 'Coming soon', 'nfo')}
+              >
+                ⚙ Settings
+              </button>
             </div>
             <div className="wp-tcontent">
               <div className={`wp-tpane${leftTab === 'chat' ? ' show' : ''}`}>
