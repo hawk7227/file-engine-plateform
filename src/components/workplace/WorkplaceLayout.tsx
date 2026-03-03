@@ -28,6 +28,7 @@ import { WPPreviewCanvas } from './WPPreviewCanvas'
 import { WPCodeOutput } from './WPCodeOutput'
 import { WPDocViewer } from './WPDocViewer'
 import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
+import { useConversation } from '@/hooks/useConversation'
 import { WPDiffPreview } from './WPDiffPreview'
 import type { DiffProposal } from './WPDiffPreview'
 
@@ -159,6 +160,10 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   })
   const [rotated, setRotated] = useState(false)
 
+  // ── Conversation persistence ──
+  const initialChatId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('chat') || undefined : undefined
+  const conv = useConversation(initialChatId)
+
   // §8: Persist theme to localStorage + set data attribute for CSS
   useEffect(() => {
     localStorage.setItem('wp-theme', theme)
@@ -180,6 +185,34 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [refreshKey, setRefreshKey] = useState(0)
   const [diffProposal, setDiffProposal] = useState<DiffProposal | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  // ── Load conversation from URL on mount ──
+  useEffect(() => {
+    if (!initialChatId || conv.isLoading) return
+    conv.loadConversation(initialChatId).then(messages => {
+      if (messages.length > 0) {
+        // Restore messages into chat state
+        const restored = messages.map(m => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: m.created_at,
+          status: 'complete' as const,
+        }))
+        chat.setMessages(restored)
+
+        // Restore generated files from last assistant message
+        const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant' && m.files_json)
+        if (lastAssistant?.files_json && Array.isArray(lastAssistant.files_json)) {
+          const files = lastAssistant.files_json as { path: string; content: string; language?: string }[]
+          setGeneratedFiles(files.map(f => ({ path: f.path, content: f.content, language: f.language || 'text' })))
+        }
+      }
+    })
+    // Load recent chats for sidebar
+    conv.loadRecentChats()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Build preview HTML from generated files (debounced 150ms) ──
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -205,13 +238,40 @@ export default function WorkplaceLayout({ user, profile }: Props) {
 
   // ── Hooks ──
   const chat = useChat({
-    onComplete: (files) => {
+    onMessage: async (msg) => {
+      // Auto-create conversation on first user message
+      if (msg.role === 'user') {
+        if (!conv.conversationId) {
+          try {
+            await conv.createConversation({ model: 'auto' })
+          } catch { /* non-fatal — chat still works without persistence */ }
+        }
+        if (conv.conversationId) {
+          conv.saveUserMessage(msg.content, msg.attachments as unknown[] | undefined)
+        }
+      }
+    },
+    onComplete: async (files) => {
       if (files?.length) {
         setGeneratedFiles(files)
         realtime.logActivity('chat_receive', {
           files: files.map(f => f.path),
           message_preview: 'File generation complete',
         })
+      }
+      // Save assistant message to DB
+      if (conv.conversationId && chat.messages.length >= 2) {
+        const lastAssistant = [...chat.messages].reverse().find(m => m.role === 'assistant')
+        if (lastAssistant) {
+          conv.saveAssistantMessage(lastAssistant.content, {
+            files_json: files?.map(f => ({ path: f.path, content: f.content, language: f.language })) || undefined,
+          })
+          // Auto-title after first exchange
+          const firstUser = chat.messages.find(m => m.role === 'user')
+          if (firstUser) {
+            conv.generateTitle(firstUser.content, lastAssistant.content.slice(0, 300))
+          }
+        }
       }
     },
     onFilesUpdated: (files) => {
