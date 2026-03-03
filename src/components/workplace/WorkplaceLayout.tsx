@@ -81,7 +81,7 @@ const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
-:root{--wp-bg-0:#040406;--wp-bg-1:#08080c;--wp-bg-2:#0c0c12;--wp-bg-3:#111118;--wp-bg-4:#18181f;--wp-border:#1e1e28;--wp-border-2:#2a2a38;--wp-text-1:#f0f0f4;--wp-text-2:#a0a0b0;--wp-text-3:#606070;--wp-text-4:#404050;--wp-accent:#34d399;--wp-accent-dim:rgba(52,211,153,.08);--wp-purple:#a78bfa;--wp-purple-dim:rgba(167,139,250,.08);--wp-blue:#60a5fa;--wp-red:#f87171;--wp-yellow:#fbbf24;--wp-cyan:#22d3ee;--wp-font:'DM Sans',-apple-system,sans-serif;--wp-mono:'Geist Mono','JetBrains Mono',monospace}
+:root{--wp-bg-0:#040406;--wp-bg-1:#08080c;--wp-bg-2:#0c0c12;--wp-bg-3:#111118;--wp-bg-4:#18181f;--wp-border:#1e1e28;--wp-border-2:#2a2a38;--wp-text-1:#f0f0f4;--wp-text-2:#a0a0b0;--wp-text-3:#606070;--wp-text-4:#404050;--wp-accent:#34d399;--wp-accent-dim:rgba(52,211,153,.08);--wp-purple:#a78bfa;--wp-purple-dim:rgba(167,139,250,.08);--wp-blue:#60a5fa;--wp-red:#f87171;--wp-yellow:#fbbf24;--wp-cyan:#22d3ee;--wp-font:'DM Sans',-apple-system,sans-serif;--wp-mono:'Geist Mono','JetBrains Mono',monospace;--wp-fs:clamp(11px,1.4vw,14px);--wp-fs-sm:clamp(8px,1vw,10px);--wp-fs-xs:clamp(6px,.8vw,8px)}
 [data-wp-theme="light"]{--wp-bg-0:#f8f8fa;--wp-bg-1:#f0f0f4;--wp-bg-2:#e8e8ee;--wp-bg-3:#e0e0e8;--wp-bg-4:#d8d8e0;--wp-border:#d0d0da;--wp-border-2:#c0c0cc;--wp-text-1:#111118;--wp-text-2:#44445a;--wp-text-3:#707088;--wp-text-4:#9090a4;--wp-accent:#059669;--wp-accent-dim:rgba(5,150,105,.06)}
 .wp-root{display:flex;flex-direction:column;height:100vh;background:var(--wp-bg-0);color:var(--wp-text-1);font-family:var(--wp-font);-webkit-font-smoothing:antialiased;overflow:hidden}
 .wp-root *{margin:0;padding:0;box-sizing:border-box}
@@ -436,7 +436,6 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 theme={theme}
                 refreshKey={refreshKey}
                 onCloseBrowser={() => setShowBrowser(false)}
-                onClosePreview={() => { setGeneratedFiles([]); setPreviewHtml(null) }}
                 onFallbackToCode={() => { toggleBottomExpand(); setBottomTab('sql') }}
               />
             </div>
