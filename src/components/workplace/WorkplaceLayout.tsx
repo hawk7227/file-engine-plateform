@@ -30,6 +30,9 @@ import { WPDocViewer } from './WPDocViewer'
 import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
 import { useConversation } from '@/hooks/useConversation'
 import { WPSidebar } from './WPSidebar'
+import { WPThemePanel } from './WPThemePanel'
+import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/theme-engine'
+import type { ThemeScheme } from '@/lib/theme-engine'
 import { WPDiffPreview } from './WPDiffPreview'
 import type { DiffProposal } from './WPDiffPreview'
 
@@ -66,7 +69,7 @@ export const BROWSER_PRESET: DevicePreset = {
 // LEFT PANEL TABS
 // ============================================
 
-type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed'
+type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed' | 'theme'
 type BottomTab = 'sql' | 'md' | 'doc' | 'git' | 'diff' | 'logs' | 'console'
 
 const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
@@ -76,6 +79,7 @@ const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
   { id: 'images', icon: '🖼', label: 'Imgs' },
   { id: 'team', icon: '👥', label: 'Team' },
   { id: 'feed', icon: '📡', label: 'Feed' },
+  { id: 'theme', icon: '🎨', label: 'Theme' },
 ]
 
 // ============================================
@@ -151,38 +155,22 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([])
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('wp-theme')
-      if (saved === 'light' || saved === 'dark') return saved
-      if (window.matchMedia?.('(prefers-color-scheme: light)').matches) return 'light'
-    }
-    return 'dark'
+  const [themeScheme, setThemeScheme] = useState<ThemeScheme>(() => {
+    if (typeof window !== 'undefined') return loadThemeScheme()
+    return loadThemeScheme()
   })
+  const theme = themeScheme.category === 'light' ? 'light' : 'dark'
   const [rotated, setRotated] = useState(false)
 
   // ── Conversation persistence ──
   const initialChatId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('chat') || undefined : undefined
   const conv = useConversation(initialChatId)
 
-  // §8: Persist theme to localStorage + set data attribute for CSS
+  // §8: Apply theme scheme on mount and when it changes
   useEffect(() => {
-    localStorage.setItem('wp-theme', theme)
-    document.documentElement.setAttribute('data-wp-theme', theme)
+    applyTheme(themeScheme)
     return () => { document.documentElement.removeAttribute('data-wp-theme') }
-  }, [theme])
-
-  // §8: Listen for system preference changes
-  useEffect(() => {
-    const mq = window.matchMedia?.('(prefers-color-scheme: light)')
-    if (!mq) return
-    const handler = (e: MediaQueryListEvent) => {
-      const saved = localStorage.getItem('wp-theme')
-      if (!saved) setTheme(e.matches ? 'light' : 'dark')
-    }
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  }, [themeScheme])
   const [refreshKey, setRefreshKey] = useState(0)
   const [diffProposal, setDiffProposal] = useState<DiffProposal | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -574,6 +562,12 @@ export default function WorkplaceLayout({ user, profile }: Props) {
               <div className={`wp-tpane${leftTab === 'feed' ? ' show' : ''}`}>
                 <WPActivityFeed activities={realtime.activities} />
               </div>
+              <div className={`wp-tpane${leftTab === 'theme' ? ' show' : ''}`}>
+                <WPThemePanel
+                  activeSchemeId={themeScheme.id}
+                  onSchemeChange={(scheme) => setThemeScheme(scheme)}
+                />
+              </div>
             </div>
           </div>
 
@@ -592,7 +586,12 @@ export default function WorkplaceLayout({ user, profile }: Props) {
               onZoomChange={setZoom}
               onToggleBrowser={() => setShowBrowser(p => !p)}
               onToggleRotation={() => setRotated(r => !r)}
-              onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+              onToggleTheme={() => {
+                const schemes = THEME_SCHEMES
+                const idx = schemes.findIndex(s => s.id === themeScheme.id)
+                const next = schemes[(idx + 1) % schemes.length]
+                if (next) { applyTheme(next); saveThemeId(next.id); setThemeScheme(next) }
+              }}
               onRefresh={() => setRefreshKey(k => k + 1)}
               toast={toast}
             />
@@ -668,7 +667,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
           <span>Device: <span>{activeDevice.name}</span></span>
           <span>Screen: <span>{activeDevice.cssViewport.width}×{activeDevice.cssViewport.height}</span></span>
           <span>DPR: <span>{activeDevice.dpr}x</span></span>
-          <span>Theme: <span style={{ color: theme === 'dark' ? 'var(--wp-yellow)' : 'var(--wp-blue)' }}>{theme.toUpperCase()}</span></span>
+          <span>Theme: <span style={{ color: 'var(--wp-accent)' }}>{themeScheme.name}</span></span>
           {rotated && <span style={{ color: 'var(--wp-purple)' }}>LANDSCAPE</span>}
           <span>Env: <span style={{ color: 'var(--wp-yellow)' }}>STAGING</span></span>
           <span>Build: <span style={{ color: preview.phase === 'error' ? 'var(--wp-red)' : 'var(--wp-accent)' }}>
