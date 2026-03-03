@@ -4,13 +4,7 @@ import { useEffect } from 'react'
 
 const STYLE_ID = 'streamsai-chat-theme-override'
 
-// Base theme + WP mappings + chat typography + iPhone rules
 const CSS = `
-/* -----------------------------------------------------------
-   StreamsAI Chat Theme Override (late-injected)
-   Goal: match demo colors, fonts, sizing WITHOUT touching WP files
------------------------------------------------------------ */
-
 :root{
   --streams-bg:#09090b;
   --streams-bg2:#111114;
@@ -23,157 +17,82 @@ const CSS = `
   --streams-t3:#52525b;
   --streams-brand:#10b981;
   --streams-brand2:#14b8a6;
-
   --streams-font:'Inter',system-ui,sans-serif;
   --streams-mono:'JetBrains Mono',monospace;
-
-  /* Desktop font scaling (default) */
   --streams-chat-scale: 1;
-
-  /* Mobile font scaling (separate) */
   --streams-chat-scale-mobile: 0.98;
 }
-
-/* ------------------------------
-   Map Workplace theme vars -> Demo vars
-   (WP files use --wp-* extensively)
------------------------------- */
-.wp-root,
-.wpc-wrap{
-  --wp-bg-0: var(--streams-bg) !important;
-  --wp-bg-1: var(--streams-bg2) !important;
-  --wp-bg-2: var(--streams-bg2) !important;
-  --wp-bg-3: var(--streams-bg3) !important;
-  --wp-bg-4: var(--streams-bg4) !important;
-
-  --wp-border: var(--streams-bdr) !important;
-  --wp-border-2: var(--streams-bdr2) !important;
-
-  --wp-text-1: var(--streams-t1) !important;
-  --wp-text-2: var(--streams-t2) !important;
-  --wp-text-3: var(--streams-t3) !important;
-  --wp-text-4: var(--streams-t3) !important;
-
-  --wp-accent: var(--streams-brand) !important;
-  --wp-accent-dim: rgba(16,185,129,.08) !important;
-
+.wp-root,.wpc-wrap{
   --wp-font: var(--streams-font) !important;
   --wp-mono: var(--streams-mono) !important;
 }
+.wpc-wrap,.wpc-wrap *{ font-family: var(--streams-font) !important; }
+.wpc-wrap{ background: var(--streams-bg) !important; color: var(--streams-t1) !important; }
 
-/* Force Inter across the chat surface */
-.wp-root, .wp-root *{
-  font-family: var(--streams-font) !important;
+/* 3) Sidebar */
+.wp-sb-section-label{ font-size:9px!important;font-weight:700!important;color:var(--streams-t3)!important;text-transform:uppercase!important }
+.wp-sb-chat{ font-size:12px!important;color:var(--streams-t2)!important }
+.wp-sb-chat.active{ background:rgba(16,185,129,.06)!important;color:var(--streams-brand)!important }
+
+/* 4) Chat header */
+.wpc-header-title,.chat-hd-title{ font-size:12px!important;font-weight:600!important }
+.wpc-token-bar,.token-bar{ font-size:10px!important;font-family:var(--streams-mono)!important;color:var(--streams-t3)!important }
+
+/* 5) Messages */
+.wpc-txt{ font-size:calc(13px * var(--streams-chat-scale))!important;line-height:1.65!important;color:var(--streams-t2)!important;white-space:pre-wrap!important;word-break:break-word!important }
+.wpc-msg{ margin-bottom:4px!important }
+.wpc-msg .wpc-txt{ padding:10px 14px!important;border-radius:16px!important;max-width:75%!important }
+.wpc-msg[data-role="user"] .wpc-txt,.msg.user .msg-bubble{ background:linear-gradient(135deg,#10b981,#14b8a6)!important;color:#fff!important;border-bottom-right-radius:4px!important }
+.wpc-msg[data-role="assistant"] .wpc-txt,.msg.ai .msg-bubble{ background:var(--streams-bg3)!important;color:var(--streams-t2)!important;border:1px solid rgba(255,255,255,.06)!important;border-bottom-left-radius:4px!important }
+.wpc-role{ font-size:calc(9px * var(--streams-chat-scale))!important;font-weight:700!important;letter-spacing:.5px!important;text-transform:uppercase!important }
+.wpc-role-ai{ color:var(--streams-brand)!important }
+.wpc-role-u{ color:var(--streams-t3)!important }
+.wpc-time,.msg-time{ font-size:9px!important;color:var(--streams-t3)!important }
+.wpc-txt code,.msg-bubble code{ font-family:var(--streams-mono)!important;font-size:calc(11px * var(--streams-chat-scale))!important;color:var(--streams-brand)!important;background:rgba(16,185,129,.06)!important;padding:1px 4px!important;border-radius:4px!important }
+.wpc-txt .wpc-status,.wpc-txt .preview-hint{ font-size:calc(11px * var(--streams-chat-scale))!important;color:var(--streams-t3)!important }
+
+/* 6) Input */
+.wpc-input{ font-size:calc(13px * var(--streams-chat-scale))!important;color:var(--streams-t1)!important }
+.wpc-input::placeholder{ color:var(--streams-t3)!important }
+.wpc-input-wrap{ background:var(--streams-bg3)!important;border-radius:12px!important;padding:8px 12px!important;min-height:42px!important }
+.wpc-send{ background:var(--streams-brand)!important;color:#fff!important;font-size:12px!important;font-weight:600!important;width:28px!important;height:28px!important;border-radius:8px!important }
+.wpc-pill{ font-size:calc(10px * var(--streams-chat-scale))!important;padding:4px 10px!important;border-radius:6px!important;font-weight:700!important }
+.wpc-btn{ font-size:calc(10px * var(--streams-chat-scale))!important;padding:4px 10px!important;border-radius:6px!important;font-weight:700!important }
+.wpc-avt{ width:24px!important;height:24px!important;border-radius:8px!important;font-size:10px!important }
+.wpc-files-badge{ font-size:9px!important;font-family:var(--streams-mono)!important }
+.wpc-thinking{ font-size:10px!important;color:var(--streams-brand2)!important }
+.wpc-empty-title{ font-size:15px!important;font-weight:800!important }
+
+/* 7) Preview */
+.wp-pbtn,.pv-tab{ font-size:10px!important;font-weight:500!important;color:var(--streams-t3)!important }
+.pv-tab.on{ background:var(--streams-brand)!important;color:#fff!important }
+.pv-console,.wpc-console{ font-family:var(--streams-mono)!important;font-size:10px!important;color:var(--streams-t3)!important }
+
+/* Scrollbars */
+.wp-root ::-webkit-scrollbar,.wpc-wrap ::-webkit-scrollbar{ width:5px!important;height:5px!important }
+.wp-root ::-webkit-scrollbar-thumb,.wpc-wrap ::-webkit-scrollbar-thumb{ background:var(--streams-bg4)!important;border-radius:3px!important }
+.wp-root ::selection,.wpc-wrap ::selection{ background:rgba(16,185,129,.3)!important }
+
+/* iPhone separate */
+@media (max-width:430px),(pointer:coarse){
+  .wpc-txt{ font-size:calc(13px * var(--streams-chat-scale-mobile))!important;line-height:1.65!important }
+  .wpc-input{ font-size:calc(13px * var(--streams-chat-scale-mobile))!important }
+  .wpc-pill,.wpc-btn{ font-size:calc(10px * var(--streams-chat-scale-mobile))!important }
+  .wpc-role{ font-size:calc(9px * var(--streams-chat-scale-mobile))!important }
+  .wpc-msg .wpc-txt,.msg-bubble{ max-width:88%!important;padding:9px 12px!important;border-radius:14px!important }
+  .wpc-msgs{ padding-left:12px!important;padding-right:12px!important }
+  .wpc-header,.chat-hd{ height:42px!important }
+  .wpc-input-area{ padding:8px 10px!important }
+  .wpc-input-wrap{ padding:6px 10px!important;min-height:38px!important }
 }
-
-.wpc-wrap{
-  background: var(--streams-bg) !important;
-  color: var(--streams-t1) !important;
-}
-
-/* ------------------------------
-   Match the HTML demo message typography (DESKTOP)
------------------------------- */
-.wpc-txt{
-  font-size: calc(13px * var(--streams-chat-scale)) !important;
-  line-height: 1.65 !important;
-  color: var(--streams-t2) !important;
-}
-
-.wpc-role{
-  font-size: calc(9px * var(--streams-chat-scale)) !important;
-  letter-spacing: .5px !important;
-}
-
-.wpc-input{
-  font-size: calc(13px * var(--streams-chat-scale)) !important;
-  color: var(--streams-t1) !important;
-}
-.wpc-input::placeholder{
-  color: var(--streams-t3) !important;
-}
-
-.wpc-pill, .wpc-btn{
-  font-size: calc(10px * var(--streams-chat-scale)) !important;
-}
-
-/* scrollbars */
-.wp-root ::-webkit-scrollbar,
-.wpc-wrap ::-webkit-scrollbar{
-  width: 5px !important;
-  height: 5px !important;
-}
-.wp-root ::-webkit-scrollbar-thumb,
-.wpc-wrap ::-webkit-scrollbar-thumb{
-  background: var(--streams-bg4) !important;
-  border-radius: 3px !important;
-}
-
-/* selection */
-.wp-root ::selection,
-.wpc-wrap ::selection{
-  background: rgba(16,185,129,.3) !important;
-}
-
-/* -----------------------------------------------------------
-   iPhone / small-screen adjustments (SEPARATE)
-   prevents the “cramped like your screenshot” effect
------------------------------------------------------------ */
-@media (max-width: 430px), (pointer:coarse) {
-  .wpc-txt{
-    font-size: calc(13px * var(--streams-chat-scale-mobile)) !important;
-    line-height: 1.65 !important;
-  }
-  .wpc-input{
-    font-size: calc(13px * var(--streams-chat-scale-mobile)) !important;
-  }
-  .wpc-pill, .wpc-btn{
-    font-size: calc(10px * var(--streams-chat-scale-mobile)) !important;
-  }
-
-  /* give bubbles breathing room */
-  .wpc-msg-bubble,
-  .msg-bubble{
-    max-width: 88% !important;
-    padding: 9px 12px !important;
-    border-radius: 14px !important;
-  }
-
-  /* reduce edge padding */
-  .wpc-msgs,
-  .msgs{
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
-  /* compact header/input */
-  .wpc-header,
-  .chat-hd{
-    height: 42px !important;
-  }
-
-  .wpc-input-row,
-  .chat-input{
-    padding: 10px 12px !important;
-  }
-}
-
-@media (max-height: 740px) and (max-width: 430px) {
-  .wpc-header,
-  .chat-hd{
-    height: 38px !important;
-  }
-  .wpc-msgs,
-  .msgs{
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-  }
+@media (max-height:740px) and (max-width:430px){
+  .wpc-header,.chat-hd{ height:38px!important }
+  .wpc-msgs{ padding-top:8px!important;padding-bottom:8px!important }
 }
 `
 
 export function WPChatThemeOverride() {
   useEffect(() => {
-    // Ensure Inter + JetBrains Mono are available
     const ensureFontLink = (href: string) => {
       const existing = document.querySelector(`link[href="${href}"]`)
       if (existing) return
@@ -182,12 +101,9 @@ export function WPChatThemeOverride() {
       link.href = href
       document.head.appendChild(link)
     }
-
     ensureFontLink(
-      'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap'
+      'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap'
     )
-
-    // Inject CSS as the last style tag (wins)
     let style = document.getElementById(STYLE_ID) as HTMLStyleElement | null
     if (!style) {
       style = document.createElement('style')
@@ -195,25 +111,16 @@ export function WPChatThemeOverride() {
       document.head.appendChild(style)
     }
     style.textContent = CSS
-
-    // Restore saved desktop scale
     const savedDesktop = window.localStorage.getItem('streams-chat-scale')
     if (savedDesktop) {
       const n = Number(savedDesktop)
-      if (Number.isFinite(n)) {
-        document.documentElement.style.setProperty('--streams-chat-scale', String(n))
-      }
+      if (Number.isFinite(n)) document.documentElement.style.setProperty('--streams-chat-scale', String(n))
     }
-
-    // Restore saved mobile scale
     const savedMobile = window.localStorage.getItem('streams-chat-scale-mobile')
     if (savedMobile) {
       const n = Number(savedMobile)
-      if (Number.isFinite(n)) {
-        document.documentElement.style.setProperty('--streams-chat-scale-mobile', String(n))
-      }
+      if (Number.isFinite(n)) document.documentElement.style.setProperty('--streams-chat-scale-mobile', String(n))
     }
   }, [])
-
   return null
 }

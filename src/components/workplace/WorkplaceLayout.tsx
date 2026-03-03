@@ -23,7 +23,7 @@ import { WPVideoStudio } from './WPVideoStudio'
 import { WPImageStudio } from './WPImageStudio'
 import { WPTeamPanel } from './WPTeamPanel'
 import { WPActivityFeed } from './WPActivityFeed'
-import { WPToolbar } from './WPToolbar'
+// WPToolbar removed — controls moved to sidebar
 import { WPPreviewCanvas } from './WPPreviewCanvas'
 import { WPCodeOutput } from './WPCodeOutput'
 import { WPDocViewer } from './WPDocViewer'
@@ -31,6 +31,8 @@ import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
 import { useConversation } from '@/hooks/useConversation'
 import { WPSidebar } from './WPSidebar'
 import { WPThemePanel } from './WPThemePanel'
+import { WPChatThemeOverride } from './WPChatThemeOverride'
+import { WPChatFontSizer } from './WPChatFontSizer'
 import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/theme-engine'
 import type { ThemeScheme } from '@/lib/theme-engine'
 import { WPDiffPreview } from './WPDiffPreview'
@@ -458,6 +460,8 @@ export default function WorkplaceLayout({ user, profile }: Props) {
     <>
       <style>{CSS}</style>
       <div className="wp-root">
+        <WPChatThemeOverride />
+        <WPChatFontSizer />
         {/* ═══ TOP BAR ═══ */}
         <div className="wp-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -580,28 +584,6 @@ export default function WorkplaceLayout({ user, profile }: Props) {
 
           {/* ═══ CENTER ═══ */}
           <div className="wp-center">
-            <WPToolbar
-              activeDevice={activeDevice}
-              devices={DEVICES}
-              zoom={zoom}
-              showBrowser={showBrowser}
-              previewUrl={previewUrl}
-              previewPhase={preview.phase}
-              rotated={rotated}
-              theme={theme}
-              onDeviceChange={setActiveDevice}
-              onZoomChange={setZoom}
-              onToggleBrowser={() => setShowBrowser(p => !p)}
-              onToggleRotation={() => setRotated(r => !r)}
-              onToggleTheme={() => {
-                const schemes = THEME_SCHEMES
-                const idx = schemes.findIndex(s => s.id === themeScheme.id)
-                const next = schemes[(idx + 1) % schemes.length]
-                if (next) { applyTheme(next); saveThemeId(next.id); setThemeScheme(next) }
-              }}
-              onRefresh={() => setRefreshKey(k => k + 1)}
-              toast={toast}
-            />
             <div className="wp-canvas-area">
               <WPPreviewCanvas
                 activeDevice={activeDevice}
