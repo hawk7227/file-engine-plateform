@@ -14,8 +14,8 @@ import type { ConversationMeta } from '@/hooks/useConversation'
 // =====================================================
 
 const CSS = `
-.wp-sidebar{display:flex;flex-direction:column;width:260px;min-width:260px;height:100%;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);transition:width .2s ease,min-width .2s ease,opacity .2s ease;overflow:hidden;position:relative;z-index:20}
-.wp-sidebar.collapsed{width:0;min-width:0;opacity:0;border-right:none;pointer-events:none}
+.wp-sidebar{display:flex;flex-direction:column;width:260px;height:100%;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);transition:transform .2s ease,opacity .2s ease;overflow:hidden;position:fixed;left:0;top:36px;bottom:28px;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.wp-sidebar.collapsed{transform:translateX(-100%);opacity:0;pointer-events:none}
 .wp-sidebar-inner{display:flex;flex-direction:column;width:260px;height:100%;overflow:hidden}
 
 .wp-sb-top{padding:12px;display:flex;align-items:center;gap:8px}
@@ -51,6 +51,7 @@ const CSS = `
 .wp-sb-chat-menu{opacity:0;padding:2px 4px;border-radius:4px;border:none;background:none;color:var(--wp-text-4);cursor:pointer;font-size:11px;flex-shrink:0;transition:opacity .15s}
 .wp-sb-chat:hover .wp-sb-chat-menu{opacity:1}
 .wp-sb-chat-menu:hover{color:var(--wp-text-1);background:var(--wp-bg-2)}
+.wp-sb-rename-input{background:var(--wp-bg-2);border:1px solid var(--wp-accent);border-radius:4px;padding:1px 4px;font:11px/1.3 var(--wp-font);color:var(--wp-text-1);outline:none;width:100%}
 
 .wp-sb-dropdown{position:absolute;right:4px;top:100%;background:var(--wp-bg-2);border:1px solid var(--wp-border);border-radius:8px;padding:4px;z-index:30;min-width:120px;box-shadow:var(--wp-shadow-2)}
 .wp-sb-dropdown button{display:block;width:100%;padding:6px 8px;border:none;background:none;color:var(--wp-text-2);font:11px/1.3 var(--wp-font);cursor:pointer;text-align:left;border-radius:4px;white-space:nowrap}
@@ -64,6 +65,7 @@ const CSS = `
 .wp-sb-pplan{font:10px/1 var(--wp-font);color:var(--wp-text-4)}
 
 .wp-sb-empty{padding:16px 12px;font:11px/1.5 var(--wp-font);color:var(--wp-text-4);text-align:center}
+.wp-sidebar-backdrop{position:fixed;inset:0;top:36px;bottom:28px;background:rgba(0,0,0,.3);z-index:39;transition:opacity .2s}
 
 @media(max-width:1023px){
   .wp-sidebar{position:fixed;left:0;top:0;z-index:50;box-shadow:var(--wp-shadow-3)}
@@ -166,17 +168,16 @@ export function WPSidebar({
   ]
 
   const renderChat = (c: ConversationMeta) => (
-    <div key={c.id} className={`wp-sb-chat${activeChatId === c.id ? ' active' : ''}`} style={{ position: 'relative' }}>
+    <div key={c.id} className={`wp-sb-chat${activeChatId === c.id ? ' active' : ''}`}>
       <span className="wp-sb-chat-dot" />
       {renameId === c.id ? (
         <input
           ref={renameRef}
-          className="wp-sb-chat-title"
+          className="wp-sb-rename-input"
           value={renameValue}
           onChange={e => setRenameValue(e.target.value)}
           onBlur={() => handleRenameSubmit(c.id)}
           onKeyDown={e => { if (e.key === 'Enter') handleRenameSubmit(c.id); if (e.key === 'Escape') { setRenameId(null); setRenameValue('') } }}
-          style={{ background: 'var(--wp-bg-2)', border: '1px solid var(--wp-accent)', borderRadius: 4, padding: '1px 4px', font: '11px/1.3 var(--wp-font)', color: 'var(--wp-text-1)', outline: 'none', width: '100%' }}
         />
       ) : (
         <span className="wp-sb-chat-title" onClick={() => onSelectChat(c.id)}>{c.title}</span>
@@ -268,6 +269,7 @@ export function WPSidebar({
           </div>
         </div>
       </div>
+      {!collapsed && <div className="wp-sidebar-backdrop" onClick={onToggle} />}
     </>
   )
 }

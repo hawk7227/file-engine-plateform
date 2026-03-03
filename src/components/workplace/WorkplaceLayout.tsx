@@ -511,14 +511,21 @@ export default function WorkplaceLayout({ user, profile }: Props) {
         <div className="wp-main">
           {/* ═══ LEFT PANEL ═══ */}
           <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`}>
-            <div className="wp-lheader">
-              <div className="wp-logo">FE</div>
-              <div>
-                <div className="wp-ltitle">File Engine</div>
-                <div className="wp-lsub">Workplace IDE</div>
+            {/* Sidebar toggle (shows when sidebar collapsed) */}
+            {sidebarCollapsed && (
+              <div className="wp-lheader">
+                <button className="wp-sb-toggle" onClick={toggleSidebar} title="Open sidebar">☰</button>
+                <div>
+                  <div className="wp-ltitle">File Engine</div>
+                  <div className="wp-lsub">Workplace IDE</div>
+                </div>
               </div>
-              <div className="wp-gh"> hawk7227</div>
-            </div>
+            )}
+            {!sidebarCollapsed && (
+              <div className="wp-lheader">
+                <div className="wp-ltitle">{leftTab.charAt(0).toUpperCase() + leftTab.slice(1)}</div>
+              </div>
+            )}
             <div className="wp-tbar">
               {LEFT_TABS.map(t => (
                 <button
