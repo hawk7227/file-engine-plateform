@@ -97,7 +97,7 @@ const CSS = `
 .wp-root ::-webkit-scrollbar{width:4px;height:4px}.wp-root ::-webkit-scrollbar-track{background:transparent}.wp-root ::-webkit-scrollbar-thumb{background:var(--wp-border-2);border-radius:4px}
 .wp-topbar{height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--wp-border);background:var(--wp-bg-1);flex-shrink:0}
 .wp-main{flex:1;display:flex;overflow:hidden}
-.wp-left{width:300px;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);display:flex;flex-direction:column;flex-shrink:0}
+.wp-left{width:var(--wp-left-w,300px);background:var(--wp-bg-1);border-right:1px solid var(--wp-border);display:flex;flex-direction:column;flex-shrink:0}
 .wp-lheader{padding:12px 14px;border-bottom:1px solid var(--wp-border);display:flex;align-items:center;gap:10px}
 .wp-logo{width:32px;height:32px;border-radius:8px;background:var(--wp-accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;flex-shrink:0;box-shadow:0 0 20px rgba(0,245,160,.25)}
 .wp-ltitle{font-size:13px;font-weight:800;letter-spacing:-.3px}
@@ -112,6 +112,7 @@ const CSS = `
 .wp-bottom-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--wp-border);min-width:0;overflow:hidden}
 .wp-bottom-right{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .wp-resize-v{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:20}.wp-resize-v:hover{background:transparent}
+.wp-resize-h{width:6px;cursor:col-resize;background:transparent;flex-shrink:0;position:relative;z-index:10;transition:background .15s}.wp-resize-h:hover{background:var(--wp-accent-dim)}.wp-resize-h:active{background:var(--wp-accent)}
 .wp-pbar{display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:32px;background:var(--wp-bg-3);border-bottom:1px solid var(--wp-border);flex-shrink:0}
 .wp-pbar-t{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--wp-text-3);display:flex;align-items:center;gap:4px}
 .wp-pbar-t .dot{width:5px;height:5px;border-radius:50%}
@@ -183,6 +184,28 @@ export default function WorkplaceLayout({ user, profile }: Props) {
     return false
   })
   const [sidebarNav, setSidebarNav] = useState('chats')
+  const [leftWidth, setLeftWidth] = useState(300)
+
+  // ── Horizontal resize (left panel ↔ center) ──
+  const startResizeH = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startW = leftWidth
+    const onMove = (ev: MouseEvent) => {
+      const delta = ev.clientX - startX
+      setLeftWidth(Math.max(200, Math.min(600, startW + delta)))
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }, [leftWidth])
 
   // ── Load conversation from URL on mount ──
   useEffect(() => {

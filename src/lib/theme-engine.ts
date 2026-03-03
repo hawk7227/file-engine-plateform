@@ -45,7 +45,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#040406', bg1: '#08080c', bg2: '#0c0c12', bg3: '#111118', bg4: '#18181f',
       border: '#1e1e28', border2: '#2a2a38',
-      text1: '#f0f0f4', text2: '#a0a0b0', text3: '#606070', text4: '#404050',
+      text1: '#ffffff', text2: '#c8c8d8', text3: '#606070', text4: '#404050',
       accent: '#34d399', accentDim: 'rgba(52,211,153,.08)',
       purple: '#a78bfa', blue: '#60a5fa', red: '#f87171', yellow: '#fbbf24', cyan: '#22d3ee',
     },
@@ -95,7 +95,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#001a0a', bg1: '#002210', bg2: '#003318', bg3: '#004422', bg4: '#00552c',
       border: '#006633', border2: '#00884a',
-      text1: '#e0ffe8', text2: '#80ffaa', text3: '#40cc70', text4: '#208848',
+      text1: '#ffffff', text2: '#b0ffd0', text3: '#40cc70', text4: '#208848',
       accent: '#00ff66', accentDim: 'rgba(0,255,102,.12)',
       purple: '#cc66ff', blue: '#33ccff', red: '#ff3366', yellow: '#ffcc00', cyan: '#00ffcc',
     },
@@ -107,7 +107,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#000a1a', bg1: '#001030', bg2: '#001845', bg3: '#002060', bg4: '#003080',
       border: '#0040a0', border2: '#0060cc',
-      text1: '#e0f0ff', text2: '#80c4ff', text3: '#4090dd', text4: '#2060aa',
+      text1: '#ffffff', text2: '#b0ddff', text3: '#4090dd', text4: '#2060aa',
       accent: '#00aaff', accentDim: 'rgba(0,170,255,.12)',
       purple: '#aa66ff', blue: '#00ccff', red: '#ff4488', yellow: '#ffdd33', cyan: '#00ffee',
     },
@@ -119,7 +119,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#1a000e', bg1: '#2a0018', bg2: '#3d0025', bg3: '#500033', bg4: '#660040',
       border: '#880055', border2: '#aa006e',
-      text1: '#ffe0f0', text2: '#ff80c0', text3: '#cc4090', text4: '#992060',
+      text1: '#ffffff', text2: '#ffb0d8', text3: '#cc4090', text4: '#992060',
       accent: '#ff0088', accentDim: 'rgba(255,0,136,.12)',
       purple: '#cc44ff', blue: '#4488ff', red: '#ff2244', yellow: '#ffaa00', cyan: '#00ffcc',
     },
@@ -131,7 +131,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#1a0d00', bg1: '#2a1600', bg2: '#3d2000', bg3: '#552c00', bg4: '#663800',
       border: '#884a00', border2: '#aa6000',
-      text1: '#fff0e0', text2: '#ffc080', text3: '#cc8840', text4: '#996020',
+      text1: '#ffffff', text2: '#ffd8b0', text3: '#cc8840', text4: '#996020',
       accent: '#ff8800', accentDim: 'rgba(255,136,0,.12)',
       purple: '#cc66ff', blue: '#44aaff', red: '#ff3344', yellow: '#ffee00', cyan: '#00ddcc',
     },
@@ -143,7 +143,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#0d001a', bg1: '#160028', bg2: '#200038', bg3: '#2c004d', bg4: '#380066',
       border: '#4a0088', border2: '#6000aa',
-      text1: '#f0e0ff', text2: '#cc80ff', text3: '#9940dd', text4: '#6620aa',
+      text1: '#ffffff', text2: '#ddb0ff', text3: '#9940dd', text4: '#6620aa',
       accent: '#aa44ff', accentDim: 'rgba(170,68,255,.12)',
       purple: '#ff44cc', blue: '#44aaff', red: '#ff4466', yellow: '#ffcc00', cyan: '#00ffaa',
     },
@@ -155,7 +155,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#1a0000', bg1: '#280808', bg2: '#381010', bg3: '#4d1818', bg4: '#662222',
       border: '#882e2e', border2: '#aa4040',
-      text1: '#ffe0e0', text2: '#ff8080', text3: '#dd4444', text4: '#aa2222',
+      text1: '#ffffff', text2: '#ffb0b0', text3: '#dd4444', text4: '#aa2222',
       accent: '#ff2222', accentDim: 'rgba(255,34,34,.12)',
       purple: '#cc44ff', blue: '#4488ff', red: '#ff6644', yellow: '#ffcc00', cyan: '#00ddff',
     },
@@ -167,7 +167,7 @@ export const THEME_SCHEMES: ThemeScheme[] = [
     colors: {
       bg0: '#1a1400', bg1: '#282000', bg2: '#382e00', bg3: '#4d3e00', bg4: '#665200',
       border: '#886800', border2: '#aa8400',
-      text1: '#fff8e0', text2: '#ffdd66', text3: '#ccaa33', text4: '#998000',
+      text1: '#ffffff', text2: '#ffdd66', text3: '#ccaa33', text4: '#998000',
       accent: '#ffcc00', accentDim: 'rgba(255,204,0,.12)',
       purple: '#cc66ff', blue: '#44aaff', red: '#ff4455', yellow: '#ffee44', cyan: '#00ddbb',
     },
