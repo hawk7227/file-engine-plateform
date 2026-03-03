@@ -54,6 +54,7 @@ interface SelectedFile {
   id: string
   file: File
   name: string
+  size: number
   preview?: string
 }
 
@@ -65,6 +66,12 @@ interface Props {
   onPreviewFiles: (files: GeneratedFile[]) => void
   toast: (t: string, m: string, type?: string) => void
   logActivity: (type: string, detail: Record<string, unknown>) => Promise<void>
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes}B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
 }
 
 export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleBrowser, onPreviewFiles, toast, logActivity }: Props) {
@@ -79,17 +86,36 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
     if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight
   }, [chat.messages])
 
-  // Create preview URLs for image files
+  // Create preview URLs for image files, validate type and size
   const addFiles = useCallback((files: FileList | File[]) => {
-    const newFiles: SelectedFile[] = Array.from(files).map(f => {
-      const sf: SelectedFile = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, file: f, name: f.name }
+    const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+    const newFiles: SelectedFile[] = []
+    const rejected: string[] = []
+
+    for (const f of Array.from(files)) {
+      if (f.size > MAX_FILE_SIZE) {
+        rejected.push(`${f.name} (${formatSize(f.size)} — max 50MB)`)
+        continue
+      }
+      const sf: SelectedFile = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        file: f,
+        name: f.name,
+        size: f.size,
+      }
       if (f.type.startsWith('image/')) {
         sf.preview = URL.createObjectURL(f)
       }
-      return sf
-    })
-    setSelectedFiles(prev => [...prev, ...newFiles])
-    toast('Files', `${newFiles.length} file(s) attached`, 'nfo')
+      newFiles.push(sf)
+    }
+
+    if (rejected.length > 0) {
+      toast('File rejected', rejected.join(', '), 'err')
+    }
+    if (newFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...newFiles])
+      toast('Files', `${newFiles.length} file(s) attached`, 'nfo')
+    }
   }, [toast])
 
   const removeFile = useCallback((id: string) => {
@@ -221,6 +247,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
                     <div className="wpc-thumb-name">{sf.name}</div>
                   </>
                 )}
+                <div className="wpc-thumb-size" style={{ fontSize: 7, color: 'var(--wp-text-4)', textAlign: 'center' }}>{formatSize(sf.size)}</div>
                 <div className="wpc-thumb-remove" onClick={() => removeFile(sf.id)}>✕</div>
               </div>
             ))}

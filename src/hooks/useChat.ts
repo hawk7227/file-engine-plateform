@@ -385,6 +385,29 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
               onSandboxPreview?.(parsed.url, parsed.sandboxId || '')
             }
 
+            // ── Downloads ready (generated DOCX, XLSX, PDF, PPTX, ZIP) ──
+            if (parsed.type === 'downloads_ready' && parsed.downloads) {
+              for (const dl of parsed.downloads as { filename: string; mimeType: string; base64: string; sizeBytes: number }[]) {
+                try {
+                  const byteChars = atob(dl.base64)
+                  const byteNums = new Array(byteChars.length)
+                  for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i)
+                  const blob = new Blob([new Uint8Array(byteNums)], { type: dl.mimeType })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = dl.filename
+                  document.body.appendChild(a)
+                  a.click()
+                  document.body.removeChild(a)
+                  setTimeout(() => URL.revokeObjectURL(url), 5000)
+                  console.log(`[useChat] Auto-downloaded: ${dl.filename} (${Math.ceil(dl.sizeBytes / 1024)}KB)`)
+                } catch (dlErr) {
+                  console.error(`[useChat] Download failed: ${dl.filename}`, dlErr)
+                }
+              }
+            }
+
             // ── Error ──
             if (parsed.error) {
               throw new Error(parsed.error)

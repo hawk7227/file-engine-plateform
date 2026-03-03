@@ -21,6 +21,14 @@ const CSS = `
 .wp-code-copy{position:absolute;top:6px;right:6px;padding:3px 8px;border-radius:5px;font-size:8px;font-weight:700;background:var(--wp-bg-3);border:1px solid var(--wp-border);color:var(--wp-text-3);cursor:pointer;font-family:var(--wp-font);opacity:0;transition:opacity .15s}
 .wp-code-body:hover .wp-code-copy{opacity:1}
 .wp-code-copy:hover{background:var(--wp-bg-4);color:var(--wp-text-1)}
+.wp-code-actions{display:flex;align-items:center;gap:4px;padding:0 6px;flex-shrink:0;border-bottom:1px solid var(--wp-border)}
+.wp-code-dl{padding:3px 8px;border-radius:5px;font-size:8px;font-weight:700;background:none;border:1px solid var(--wp-border);color:var(--wp-text-4);cursor:pointer;font-family:var(--wp-mono);white-space:nowrap;transition:all .15s}
+.wp-code-dl:hover{background:var(--wp-accent-dim);color:var(--wp-accent);border-color:var(--wp-accent)}
+.wp-code-dl.zip{background:var(--wp-accent-dim);color:var(--wp-accent);border-color:var(--wp-accent)}
+.wp-code-dl.zip:hover{background:var(--wp-accent);color:#fff}
+.wp-code-dl:disabled{opacity:.4;pointer-events:none}
+.wp-code-newtab{padding:3px 8px;border-radius:5px;font-size:8px;font-weight:700;background:none;border:1px solid var(--wp-border);color:var(--wp-text-4);cursor:pointer;font-family:var(--wp-mono);transition:all .15s}
+.wp-code-newtab:hover{background:var(--wp-bg-4);color:var(--wp-text-2)}
 
 /* Syntax highlighting */
 .wp-kw{color:#c084fc}
@@ -88,11 +96,65 @@ interface Props {
 
 export function WPCodeOutput({ files }: Props) {
   const [activeIdx, setActiveIdx] = useState(0)
+  const [downloading, setDownloading] = useState(false)
   const codeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (activeIdx >= files.length && files.length > 0) setActiveIdx(0)
   }, [files, activeIdx])
+
+  // Download a single file
+  const downloadFile = (file: GeneratedFile) => {
+    const blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = file.path.split('/').pop() || 'file'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  // Download all files as ZIP
+  const downloadAllAsZip = async () => {
+    if (downloading || files.length === 0) return
+    setDownloading(true)
+    try {
+      const filesMap: Record<string, string> = {}
+      for (const f of files) {
+        filesMap[f.path] = f.content
+      }
+      const resp = await fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ format: 'zip', files: filesMap, filename: 'project.zip' }),
+      })
+      if (!resp.ok) throw new Error('Download failed')
+      const blob = await resp.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'project.zip'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('ZIP download error:', err)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  // Open preview HTML in new tab
+  const openInNewTab = () => {
+    const htmlFile = files.find(f => f.path.endsWith('.html'))
+    if (htmlFile) {
+      const win = window.open('', '_blank')
+      if (win) { win.document.write(htmlFile.content); win.document.close() }
+    }
+  }
 
   if (!files.length) {
     return (
@@ -132,6 +194,21 @@ export function WPCodeOutput({ files }: Props) {
               </button>
             )
           })}
+        </div>
+        <div className="wp-code-actions">
+          <button className="wp-code-dl" onClick={() => downloadFile(file)} title="Download this file">
+            ↓ {getFileName(file.path)}
+          </button>
+          {files.length > 1 && (
+            <button className="wp-code-dl zip" onClick={downloadAllAsZip} disabled={downloading} title="Download all files as ZIP">
+              {downloading ? '⏳ Packing...' : `📦 ZIP (${files.length})`}
+            </button>
+          )}
+          {files.some(f => f.path.endsWith('.html')) && (
+            <button className="wp-code-newtab" onClick={openInNewTab} title="Open HTML in new tab">
+              ↗ New tab
+            </button>
+          )}
         </div>
         <div className="wp-code-body" ref={codeRef}>
           <button

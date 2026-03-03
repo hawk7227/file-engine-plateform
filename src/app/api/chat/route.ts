@@ -9,6 +9,9 @@
 import { NextRequest } from 'next/server'
 import { BRAND_NAME, BRAND_AI_NAME } from '@/lib/brand'
 import { getSandboxProvider } from '@/lib/sandbox/index'
+import { processUploads } from '@/lib/upload-processor'
+import { generateZip, generateDocx, generateXlsx, generatePdf, generatePptx } from '@/lib/file-generator'
+import type { DocxSection, SheetData, SlideData } from '@/lib/file-generator'
 import { createClient } from '@supabase/supabase-js'
 import { sanitizeResponse, getActualModelId, selectProvider } from '@/lib/ai-config'
 import { buildSmartContext, SYSTEM_PROMPT_COMPACT, INTENT_PROMPT_ADDITIONS, classifyIntent } from '@/lib/smart-context'
@@ -168,6 +171,53 @@ const TOOLS: ToolDef[] = [
       packages: { type: 'string', description: 'Space-separated package names (e.g. "react react-dom next")', required: true },
       dev: { type: 'boolean', description: 'Install as devDependencies' }
     }
+  },
+  {
+    name: 'generate_zip',
+    description: 'Package all project files into a downloadable ZIP archive. Use when user asks to download or export their project.',
+    params: {
+      filename: { type: 'string', description: 'Output filename (default: project.zip)' }
+    }
+  },
+  {
+    name: 'generate_docx',
+    description: 'Create a Word document (.docx) with headings, paragraphs, lists, tables, and code blocks.',
+    params: {
+      title: { type: 'string', description: 'Document title', required: true },
+      filename: { type: 'string', description: 'Output filename (default: document.docx)' },
+      sections: { type: 'array', description: 'Array of sections: {type: "heading"|"paragraph"|"list"|"table"|"code"|"pagebreak", text?, level?, items?, rows?, bold?}', required: true }
+    }
+  },
+  {
+    name: 'generate_xlsx',
+    description: 'Create an Excel spreadsheet (.xlsx) with headers, data rows, and multiple sheets.',
+    params: {
+      filename: { type: 'string', description: 'Output filename (default: spreadsheet.xlsx)' },
+      sheets: { type: 'array', description: 'Array of sheets: {name?, headers: string[], rows: any[][]}', required: true }
+    }
+  },
+  {
+    name: 'generate_pdf',
+    description: 'Create a PDF document with headings, paragraphs, lists, and code blocks.',
+    params: {
+      title: { type: 'string', description: 'Document title', required: true },
+      filename: { type: 'string', description: 'Output filename (default: document.pdf)' },
+      sections: { type: 'array', description: 'Array of sections: {type: "heading"|"paragraph"|"list"|"code"|"pagebreak", text?, level?, items?, bold?}', required: true }
+    }
+  },
+  {
+    name: 'generate_pptx',
+    description: 'Create a PowerPoint presentation (.pptx) with slides, titles, bullets, and speaker notes.',
+    params: {
+      title: { type: 'string', description: 'Presentation title', required: true },
+      filename: { type: 'string', description: 'Output filename (default: presentation.pptx)' },
+      slides: { type: 'array', description: 'Array of slides: {title, body?, bullets?: string[], notes?}', required: true }
+    }
+  },
+  {
+    name: 'list_files',
+    description: 'List all files currently in the project. Shows filenames, sizes, and types.',
+    params: {}
   }
 ]
 
@@ -565,6 +615,62 @@ async function execTool(name: string, input: Record<string, unknown>, ctx: ToolC
         }
         ctx.files['package.json'] = JSON.stringify(pkg, null, 2)
         return { success: true, result: `✓ Added to ${depKey}: ${packages}\npackage.json updated.` }
+      }
+      case 'generate_zip': {
+        const result = await generateZip(ctx.files, s('filename') || 'project.zip')
+        if (!result.success) return { success: false, result: result.error || 'ZIP generation failed' }
+        // Store in files as a download reference
+        const dlKey = `__download__${result.filename}`
+        ctx.files[dlKey] = result.base64 || ''
+        return { success: true, result: `✓ Generated ${result.filename} (${Math.ceil((result.sizeBytes || 0) / 1024)}KB, ${Object.keys(ctx.files).filter(k => !k.startsWith('__download__')).length} files)\nDownload will be available when generation completes.` }
+      }
+      case 'generate_docx': {
+        const sections = (input.sections || []) as DocxSection[]
+        if (sections.length === 0) return { success: false, result: 'No sections provided' }
+        const result = await generateDocx(sections, s('title') || 'Document', s('filename') || 'document.docx')
+        if (!result.success) return { success: false, result: result.error || 'DOCX generation failed' }
+        const dlKey = `__download__${result.filename}`
+        ctx.files[dlKey] = result.base64 || ''
+        return { success: true, result: `✓ Generated ${result.filename} (${Math.ceil((result.sizeBytes || 0) / 1024)}KB)` }
+      }
+      case 'generate_xlsx': {
+        const sheets = (input.sheets || []) as SheetData[]
+        if (sheets.length === 0) return { success: false, result: 'No sheets provided' }
+        const result = await generateXlsx(sheets, s('filename') || 'spreadsheet.xlsx')
+        if (!result.success) return { success: false, result: result.error || 'XLSX generation failed' }
+        const dlKey = `__download__${result.filename}`
+        ctx.files[dlKey] = result.base64 || ''
+        return { success: true, result: `✓ Generated ${result.filename} (${Math.ceil((result.sizeBytes || 0) / 1024)}KB, ${sheets.length} sheet${sheets.length > 1 ? 's' : ''})` }
+      }
+      case 'generate_pdf': {
+        const sections = (input.sections || []) as DocxSection[]
+        if (sections.length === 0) return { success: false, result: 'No sections provided' }
+        const result = await generatePdf(sections, s('title') || 'Document', s('filename') || 'document.pdf')
+        if (!result.success) return { success: false, result: result.error || 'PDF generation failed' }
+        const dlKey = `__download__${result.filename}`
+        ctx.files[dlKey] = result.base64 || ''
+        return { success: true, result: `✓ Generated ${result.filename} (${Math.ceil((result.sizeBytes || 0) / 1024)}KB)` }
+      }
+      case 'generate_pptx': {
+        const slides = (input.slides || []) as SlideData[]
+        if (slides.length === 0) return { success: false, result: 'No slides provided' }
+        const result = await generatePptx(slides, s('title') || 'Presentation', s('filename') || 'presentation.pptx')
+        if (!result.success) return { success: false, result: result.error || 'PPTX generation failed' }
+        const dlKey = `__download__${result.filename}`
+        ctx.files[dlKey] = result.base64 || ''
+        return { success: true, result: `✓ Generated ${result.filename} (${Math.ceil((result.sizeBytes || 0) / 1024)}KB, ${slides.length} slides)` }
+      }
+      case 'list_files': {
+        const fileList = Object.keys(ctx.files).filter(k => !k.startsWith('__download__'))
+        if (fileList.length === 0) return { success: true, result: 'No files in project yet.' }
+        const lines = fileList.map(f => {
+          const content = ctx.files[f]
+          const lineCount = content.split('\n').length
+          const sizeK = Math.ceil(content.length / 1024)
+          const ext = f.split('.').pop() || ''
+          return `  ${f} (${lineCount} lines, ${sizeK}KB, .${ext})`
+        })
+        return { success: true, result: `${fileList.length} files:\n${lines.join('\n')}` }
       }
       default:
         return { success: false, result: `Unknown tool: ${name}` }
@@ -982,16 +1088,27 @@ export async function POST(request: NextRequest) {
       : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}\n\n${ctx}${memoryContext}` : `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}${memoryContext}`)
     const toolCtx: ToolContext = { files: { ...files }, projectId, attachments }
 
-    // §1.8: Inject non-image file attachments into toolCtx.files
-    // This makes uploaded .ts, .tsx, .html, .css, etc. available to view_file and edit_file
-    if (attachments) {
-      for (const att of attachments) {
-        if (att.type === 'file' && att.filename && att.content) {
-          try {
-            // att.content is base64 — decode to string for text files
-            const decoded = Buffer.from(att.content, 'base64').toString('utf-8')
-            toolCtx.files[att.filename] = decoded
-          } catch { /* binary file — skip */ }
+    // Process uploads: extract ZIP/PDF/DOCX/XLSX, decode text files into toolCtx.files,
+    // strip non-image attachments from messages, build manifest for AI context.
+    // This prevents "prompt is too long" by keeping file content out of the context window.
+    let uploadManifest = ''
+    if (attachments && attachments.length > 0) {
+      try {
+        const processed = await processUploads(attachments, toolCtx.files)
+        toolCtx.attachments = processed.attachments // Only images remain
+        uploadManifest = processed.manifest
+        if (processed.filesExtracted > 0) {
+          console.log(`[Upload] Processed ${processed.filesExtracted} files from ${attachments.length} attachments`)
+        }
+      } catch (procErr: unknown) {
+        console.error(`[Upload Error]`, procErr)
+        // Fallback: basic text decode for non-image files
+        for (const att of attachments) {
+          if (att.type === 'file' && att.filename && att.content) {
+            try {
+              toolCtx.files[att.filename] = Buffer.from(att.content, 'base64').toString('utf-8')
+            } catch { /* binary — skip */ }
+          }
         }
       }
     }
@@ -1015,9 +1132,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (stream && needsAgent) {
-      return agentStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx, enableThinking, attachments, intent)
+      // Append upload manifest to last user message so AI knows what files are available
+      if (uploadManifest) {
+        const lastMsg = optMsgs[optMsgs.length - 1]
+        if (lastMsg && lastMsg.role === 'user' && typeof lastMsg.content === 'string') {
+          lastMsg.content = lastMsg.content + uploadManifest
+        }
+      }
+      return agentStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx, enableThinking, toolCtx.attachments || [], intent)
     }
-    return simpleStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, attachments)
+    return simpleStream(provider, resolvedModel, sysProm, optMsgs as Message[], apiKey, maxTokens, toolCtx.attachments || [])
   } catch (error: unknown) {
     console.error('[Chat API Error]', error)
     return new Response(JSON.stringify({ error: `${BRAND_NAME} encountered an error`, details: sanitizeResponse((error instanceof Error ? error.message : String(error)) || 'Unknown error') }), { status: 500, headers: { 'Content-Type': 'application/json' } })
@@ -1138,6 +1262,10 @@ async function agentStream(
       try {
         let apiMsgs = buildInitialMessages(provider, messages, attachments)
 
+        // Pre-flight compaction — prevent "prompt is too long" on first call
+        // System prompt can be 5-15k tokens, so compact messages to fit under ceiling
+        apiMsgs = compact(apiMsgs, HARD_TOKEN_CEILING)
+
         for (let i = 0; i < MAX_ITER; i++) {
           // ── STREAM AI RESPONSE ──
           // Let AI choose naturally: tools OR code blocks (dual-mode system prompt handles both)
@@ -1208,7 +1336,7 @@ async function agentStream(
           apiMsgs = appendToolResults(provider, apiMsgs, parsed.text, parsed.toolCalls, results)
 
           // ── CONTEXT COMPACTION ──
-          apiMsgs = compact(apiMsgs, maxTokens * 3)
+          apiMsgs = compact(apiMsgs, HARD_TOKEN_CEILING)
 
           // ── CHECK STOP REASON ──
           if (parsed.stopReason !== 'tool_use') break
@@ -1216,13 +1344,40 @@ async function agentStream(
 
         // ── SEND FINAL FILES ──
         if (Object.keys(toolCtx.files).length > 0) {
-          const fileList = Object.entries(toolCtx.files).map(([p, c]) => ({ path: p, language: langFromPath(p), content: c }))
-          console.log(`[Files Updated] ${fileList.length} files: ${fileList.map(f => `${f.path}(${f.content.length}b)`).join(', ')}`)
-          ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
-            type: 'files_updated',
-            files: fileList,
-            sandboxId: toolCtx.sandboxId || null
-          })}\n\n`))
+          // Separate code files from generated binary downloads
+          const codeFiles = Object.entries(toolCtx.files)
+            .filter(([p]) => !p.startsWith('__download__'))
+            .map(([p, c]) => ({ path: p, language: langFromPath(p), content: c }))
+
+          const downloadFiles = Object.entries(toolCtx.files)
+            .filter(([p]) => p.startsWith('__download__'))
+            .map(([p, base64]) => {
+              const filename = p.replace('__download__', '')
+              const ext = filename.split('.').pop()?.toLowerCase() || ''
+              const mimeMap: Record<string, string> = {
+                zip: 'application/zip', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', pdf: 'application/pdf',
+                pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+              }
+              return { filename, mimeType: mimeMap[ext] || 'application/octet-stream', base64, sizeBytes: Math.ceil(base64.length * 3 / 4) }
+            })
+
+          if (codeFiles.length > 0) {
+            console.log(`[Files Updated] ${codeFiles.length} code files: ${codeFiles.map(f => `${f.path}(${f.content.length}b)`).join(', ')}`)
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
+              type: 'files_updated',
+              files: codeFiles,
+              sandboxId: toolCtx.sandboxId || null
+            })}\n\n`))
+          }
+
+          if (downloadFiles.length > 0) {
+            console.log(`[Downloads] ${downloadFiles.length} files: ${downloadFiles.map(d => `${d.filename}(${Math.ceil(d.sizeBytes/1024)}KB)`).join(', ')}`)
+            ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
+              type: 'downloads_ready',
+              downloads: downloadFiles.map(d => ({ filename: d.filename, mimeType: d.mimeType, base64: d.base64, sizeBytes: d.sizeBytes }))
+            })}\n\n`))
+          }
         } else {
           console.log(`[Files Updated] No files in toolCtx`)
         }
@@ -1615,20 +1770,75 @@ function convertToOpenAIMessages(sys: string, msgs: Record<string, unknown>[]): 
 
 // =====================================================
 // CONTEXT COMPACTION (provider-agnostic)
+// Enforces a hard token ceiling to prevent "prompt is too long" errors.
+// Strategy: keep system prompt + recent 4 messages intact, progressively
+// truncate older messages starting with largest tool_results.
 // =====================================================
 
+const HARD_TOKEN_CEILING = 170_000 // Leave headroom for system prompt + response
+
+function estimateTokens(content: unknown): number {
+  if (typeof content === 'string') return Math.ceil(content.length / 3.5)
+  return Math.ceil(JSON.stringify(content).length / 3.5)
+}
+
 function compact(msgs: Record<string, unknown>[], maxTok: number): Record<string, unknown>[] {
-  const est = (ms: Record<string, unknown>[]) => ms.reduce((t, m) => t + Math.ceil((typeof m.content === 'string' ? m.content : JSON.stringify(m.content)).length / 4), 0)
-  if (est(msgs) <= maxTok || msgs.length <= 4) return msgs
-  const old = msgs.slice(0, -4)
-  const recent = msgs.slice(-4)
-  return [...old.map(m => {
-    if (typeof m.content === 'string' && m.content.length > 500)
-      return { ...m, content: m.content.slice(0, 200) + '\n...[compacted]...\n' + m.content.slice(-100) }
-    if (Array.isArray(m.content))
-      return { ...m, content: m.content.map((b: ContentBlock) => b.type === 'tool_result' && typeof b.content === 'string' && b.content.length > 300 ? { ...b, content: b.content.slice(0, 150) + '\n[compacted]' } : b) }
+  const totalEst = msgs.reduce((t, m) => t + estimateTokens(m.content), 0)
+  const ceiling = Math.min(maxTok, HARD_TOKEN_CEILING)
+
+  if (totalEst <= ceiling || msgs.length <= 4) return msgs
+
+  // Phase 1: Truncate tool_result blocks in ALL messages (most token-heavy)
+  let result = msgs.map((m, idx) => {
+    // Keep last 4 messages with lighter truncation
+    const isRecent = idx >= msgs.length - 4
+    const limit = isRecent ? 2000 : 300
+
+    if (typeof m.content === 'string' && m.content.length > limit) {
+      const keep = isRecent ? 1500 : 150
+      return { ...m, content: m.content.slice(0, keep) + '\n...[compacted]...\n' + m.content.slice(-Math.min(100, limit - keep)) }
+    }
+    if (Array.isArray(m.content)) {
+      return { ...m, content: (m.content as ContentBlock[]).map((b: ContentBlock) => {
+        if (b.type === 'tool_result' && typeof b.content === 'string' && b.content.length > limit) {
+          const keep = isRecent ? 800 : 100
+          return { ...b, content: b.content.slice(0, keep) + '\n[compacted — ' + Math.ceil(b.content.length / 1000) + 'k chars]' }
+        }
+        return b
+      })}
+    }
     return m
-  }), ...recent]
+  })
+
+  // Phase 2: If still over budget, drop oldest messages (keep first + last 6)
+  let est2 = result.reduce((t, m) => t + estimateTokens(m.content), 0)
+  if (est2 > ceiling && result.length > 8) {
+    const first = result[0]  // Keep first message for context
+    const recent = result.slice(-6)
+    const summary = { role: 'user' as const, content: `[${result.length - 7} earlier messages compacted to fit context window]` }
+    result = [first, summary, ...recent]
+  }
+
+  // Phase 3: Nuclear — if STILL over, truncate everything to bare minimum
+  est2 = result.reduce((t, m) => t + estimateTokens(m.content), 0)
+  if (est2 > ceiling) {
+    result = result.map(m => {
+      if (typeof m.content === 'string' && m.content.length > 500) {
+        return { ...m, content: m.content.slice(0, 200) + '\n[truncated]' }
+      }
+      if (Array.isArray(m.content)) {
+        return { ...m, content: (m.content as ContentBlock[]).map((b: ContentBlock) => {
+          if (typeof b.content === 'string' && b.content.length > 200) {
+            return { ...b, content: b.content.slice(0, 100) + '[truncated]' }
+          }
+          return b
+        })}
+      }
+      return m
+    })
+  }
+
+  return result
 }
 
 // =====================================================
