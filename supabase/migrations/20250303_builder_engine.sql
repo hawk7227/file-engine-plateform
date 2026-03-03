@@ -1,11 +1,10 @@
--- Builder Engine schema + KPB storage pointers
--- Generated: 2026-03-03
--- Source: builder_engine_package_v1 + kpb_v1
+-- ================================================================
+-- Builder Engine + KPB — FIXED for existing projects table
+-- Existing projects table uses user_id (not owner_id)
+-- Run in Supabase SQL Editor
+-- ================================================================
 
--- ══════════════════════════════════════════════
--- USER PREFERENCES (token-independent memory)
--- ══════════════════════════════════════════════
-
+-- ── user_preferences ──
 create table if not exists public.user_preferences (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   tone_mode text default 'copilot',
@@ -16,20 +15,7 @@ create table if not exists public.user_preferences (
   updated_at timestamptz default now()
 );
 
--- ══════════════════════════════════════════════
--- PROJECTS + STATE + DECISIONS + TASKS
--- ══════════════════════════════════════════════
-
-create table if not exists public.projects (
-  id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null references public.profiles(id) on delete cascade,
-  name text not null,
-  type text not null,
-  status text default 'active',
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
+-- ── project_members ──
 create table if not exists public.project_members (
   project_id uuid references public.projects(id) on delete cascade,
   user_id uuid references public.profiles(id) on delete cascade,
@@ -38,6 +24,7 @@ create table if not exists public.project_members (
   primary key (project_id, user_id)
 );
 
+-- ── project_state ──
 create table if not exists public.project_state (
   project_id uuid primary key references public.projects(id) on delete cascade,
   active_goal text,
@@ -49,6 +36,7 @@ create table if not exists public.project_state (
   updated_at timestamptz default now()
 );
 
+-- ── project_decisions ──
 create table if not exists public.project_decisions (
   id uuid primary key default gen_random_uuid(),
   project_id uuid references public.projects(id) on delete cascade,
@@ -61,6 +49,7 @@ create table if not exists public.project_decisions (
   created_at timestamptz default now()
 );
 
+-- ── project_tasks ──
 create table if not exists public.project_tasks (
   id uuid primary key default gen_random_uuid(),
   project_id uuid references public.projects(id) on delete cascade,
@@ -74,10 +63,7 @@ create table if not exists public.project_tasks (
   updated_at timestamptz default now()
 );
 
--- ══════════════════════════════════════════════
--- CHAT THREADS + MESSAGES
--- ══════════════════════════════════════════════
-
+-- ── chat_threads ──
 create table if not exists public.chat_threads (
   id uuid primary key default gen_random_uuid(),
   project_id uuid references public.projects(id) on delete cascade,
@@ -87,6 +73,7 @@ create table if not exists public.chat_threads (
   updated_at timestamptz default now()
 );
 
+-- ── chat_messages ──
 create table if not exists public.chat_messages (
   id uuid primary key default gen_random_uuid(),
   thread_id uuid references public.chat_threads(id) on delete cascade,
@@ -96,10 +83,7 @@ create table if not exists public.chat_messages (
   created_at timestamptz default now()
 );
 
--- ══════════════════════════════════════════════
--- PATCH SETS + BUILD RUNS (evidence)
--- ══════════════════════════════════════════════
-
+-- ── patch_sets ──
 create table if not exists public.patch_sets (
   id uuid primary key default gen_random_uuid(),
   project_id uuid references public.projects(id) on delete cascade,
@@ -109,6 +93,7 @@ create table if not exists public.patch_sets (
   created_at timestamptz default now()
 );
 
+-- ── patch_files ──
 create table if not exists public.patch_files (
   id uuid primary key default gen_random_uuid(),
   patch_set_id uuid references public.patch_sets(id) on delete cascade,
@@ -120,6 +105,7 @@ create table if not exists public.patch_files (
   created_at timestamptz default now()
 );
 
+-- ── build_runs ──
 create table if not exists public.build_runs (
   id uuid primary key default gen_random_uuid(),
   project_id uuid references public.projects(id) on delete cascade,
@@ -131,10 +117,7 @@ create table if not exists public.build_runs (
   finished_at timestamptz
 );
 
--- ══════════════════════════════════════════════
--- KNOWLEDGE SYSTEM (sources + docs + chunks)
--- ══════════════════════════════════════════════
-
+-- ── knowledge_sources ──
 create table if not exists public.knowledge_sources (
   id uuid primary key default gen_random_uuid(),
   owner_scope text not null,
@@ -148,6 +131,7 @@ create table if not exists public.knowledge_sources (
   created_at timestamptz default now()
 );
 
+-- ── knowledge_documents ──
 create table if not exists public.knowledge_documents (
   id uuid primary key default gen_random_uuid(),
   source_id uuid references public.knowledge_sources(id) on delete cascade,
@@ -160,7 +144,6 @@ create table if not exists public.knowledge_documents (
   content_hash text,
   fetched_at timestamptz,
   meta jsonb default '{}'::jsonb,
-  -- KPB v1 storage pointers (for 1.5-2GB scale)
   storage_bucket text,
   storage_path text,
   byte_size int,
@@ -169,6 +152,7 @@ create table if not exists public.knowledge_documents (
   created_at timestamptz default now()
 );
 
+-- ── knowledge_chunks ──
 create table if not exists public.knowledge_chunks (
   id uuid primary key default gen_random_uuid(),
   document_id uuid references public.knowledge_documents(id) on delete cascade,
@@ -178,7 +162,6 @@ create table if not exists public.knowledge_chunks (
   source_url text,
   content_hash text,
   meta jsonb default '{}'::jsonb,
-  -- KPB v1 storage pointers
   storage_bucket text,
   storage_path text,
   byte_size int,
@@ -186,6 +169,7 @@ create table if not exists public.knowledge_chunks (
   created_at timestamptz default now()
 );
 
+-- ── knowledge_ingest_runs ──
 create table if not exists public.knowledge_ingest_runs (
   id uuid primary key default gen_random_uuid(),
   source_id uuid references public.knowledge_sources(id) on delete cascade,
@@ -196,6 +180,7 @@ create table if not exists public.knowledge_ingest_runs (
   finished_at timestamptz
 );
 
+-- ── knowledge_fixes ──
 create table if not exists public.knowledge_fixes (
   id uuid primary key default gen_random_uuid(),
   scope text not null,
@@ -209,11 +194,22 @@ create table if not exists public.knowledge_fixes (
   created_at timestamptz default now()
 );
 
+-- ── admin_api_keys ──
+create table if not exists public.admin_api_keys (
+  id uuid primary key default gen_random_uuid(),
+  team_id uuid,
+  key_name text not null,
+  encrypted_value text not null,
+  updated_by uuid,
+  updated_at timestamptz default now(),
+  unique(team_id, key_name)
+);
+
 -- ══════════════════════════════════════════════
 -- INDEXES
 -- ══════════════════════════════════════════════
 
-create index if not exists idx_projects_owner_updated on public.projects(owner_id, updated_at desc);
+create index if not exists idx_projects_user_updated on public.projects(user_id, updated_at desc);
 create index if not exists idx_project_members_user on public.project_members(user_id);
 create index if not exists idx_decisions_project_created on public.project_decisions(project_id, created_at desc);
 create index if not exists idx_tasks_project_status_pri on public.project_tasks(project_id, status, priority);
@@ -227,17 +223,13 @@ create index if not exists idx_kdocs_pack on public.knowledge_documents(pack);
 create index if not exists idx_kchunks_doc_idx on public.knowledge_chunks(document_id, chunk_index);
 create index if not exists idx_kruns_source_started on public.knowledge_ingest_runs(source_id, started_at desc);
 create index if not exists idx_kfixes_sig on public.knowledge_fixes(signature);
-
--- Full-text search index on knowledge chunks
-create index if not exists idx_kchunks_content_fts on public.knowledge_chunks
-  using gin(to_tsvector('english', content));
+create index if not exists idx_kchunks_content_fts on public.knowledge_chunks using gin(to_tsvector('english', content));
 
 -- ══════════════════════════════════════════════
--- RLS POLICIES
+-- RLS (uses user_id on projects, not owner_id)
 -- ══════════════════════════════════════════════
 
 alter table public.user_preferences enable row level security;
-alter table public.projects enable row level security;
 alter table public.project_members enable row level security;
 alter table public.project_state enable row level security;
 alter table public.project_decisions enable row level security;
@@ -261,48 +253,104 @@ returns boolean language sql stable as $$
     from public.projects pr
     left join public.project_members pm on pm.project_id = pr.id and pm.user_id = auth.uid()
     where pr.id = p_project_id
-      and (pr.owner_id = auth.uid() or pm.user_id is not null)
+      and (pr.user_id = auth.uid() or pm.user_id is not null)
   );
 $$;
 
--- User preferences: own only
-create policy "prefs_select_own" on public.user_preferences for select using (user_id = auth.uid());
-create policy "prefs_insert_own" on public.user_preferences for insert with check (user_id = auth.uid());
-create policy "prefs_update_own" on public.user_preferences for update using (user_id = auth.uid());
+-- User preferences
+create policy if not exists "prefs_select_own" on public.user_preferences for select using (user_id = auth.uid());
+create policy if not exists "prefs_insert_own" on public.user_preferences for insert with check (user_id = auth.uid());
+create policy if not exists "prefs_update_own" on public.user_preferences for update using (user_id = auth.uid());
 
--- Projects: owner or member can read
-create policy "projects_select_member" on public.projects for select using (
-  owner_id = auth.uid()
-  or exists(select 1 from public.project_members pm where pm.project_id = id and pm.user_id = auth.uid())
-);
-create policy "projects_insert_owner" on public.projects for insert with check (owner_id = auth.uid());
-create policy "projects_update_owner" on public.projects for update using (owner_id = auth.uid());
-
--- Project-scoped tables: member access
-create policy "state_member" on public.project_state for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
-create policy "decisions_member" on public.project_decisions for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
-create policy "tasks_member" on public.project_tasks for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
-create policy "threads_member" on public.chat_threads for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
-create policy "messages_member" on public.chat_messages for all using (
+-- Project-scoped tables
+create policy if not exists "state_member" on public.project_state for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
+create policy if not exists "decisions_member" on public.project_decisions for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
+create policy if not exists "tasks_member" on public.project_tasks for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
+create policy if not exists "threads_member" on public.chat_threads for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
+create policy if not exists "messages_member" on public.chat_messages for all using (
   exists(select 1 from public.chat_threads t where t.id = thread_id and public.is_project_member(t.project_id))
 ) with check (
   exists(select 1 from public.chat_threads t where t.id = thread_id and public.is_project_member(t.project_id))
 );
-create policy "patch_sets_member" on public.patch_sets for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
-create policy "patch_files_member" on public.patch_files for all using (
+create policy if not exists "patch_sets_member" on public.patch_sets for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
+create policy if not exists "patch_files_member" on public.patch_files for all using (
   exists(select 1 from public.patch_sets ps where ps.id = patch_set_id and public.is_project_member(ps.project_id))
 ) with check (
   exists(select 1 from public.patch_sets ps where ps.id = patch_set_id and public.is_project_member(ps.project_id))
 );
-create policy "build_runs_member" on public.build_runs for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
+create policy if not exists "build_runs_member" on public.build_runs for all using (public.is_project_member(project_id)) with check (public.is_project_member(project_id));
 
--- Knowledge: global readable, project-scoped for members
-create policy "knowledge_sources_select" on public.knowledge_sources for select using (
+-- Knowledge: globally readable
+create policy if not exists "knowledge_sources_select" on public.knowledge_sources for select using (
   owner_scope = 'global'
   or (project_id is not null and public.is_project_member(project_id))
   or (owner_scope = 'user' and owner_id = auth.uid())
 );
-create policy "knowledge_docs_select" on public.knowledge_documents for select using (true);
-create policy "knowledge_chunks_select" on public.knowledge_chunks for select using (true);
-create policy "knowledge_runs_select" on public.knowledge_ingest_runs for select using (true);
-create policy "knowledge_fixes_select" on public.knowledge_fixes for select using (true);
+create policy if not exists "knowledge_docs_select" on public.knowledge_documents for select using (true);
+create policy if not exists "knowledge_chunks_select" on public.knowledge_chunks for select using (true);
+create policy if not exists "knowledge_runs_select" on public.knowledge_ingest_runs for select using (true);
+create policy if not exists "knowledge_fixes_select" on public.knowledge_fixes for select using (true);
+
+-- ══════════════════════════════════════════════
+-- Give your user a team_id for admin keys panel
+-- ══════════════════════════════════════════════
+
+UPDATE profiles SET team_id = id WHERE email = 'hawkinsmarcus127@gmail.com' AND team_id IS NULL;
+
+-- ══════════════════════════════════════════════
+-- SEED: Known Issues
+-- ══════════════════════════════════════════════
+
+INSERT INTO knowledge_fixes (scope, signature, symptoms, root_cause, fix_steps, confidence) VALUES
+('global', 'nextjs_dynamic_import_ssr_mismatch',
+ '{"includes": ["Hydration failed", "Text content does not match server-rendered HTML"]}',
+ 'Client/server render mismatch due to dynamic content rendered on server.',
+ E'Wrap component with next/dynamic and disable SSR.\nGate browser-only APIs behind useEffect.',
+ 0.80),
+('global', 'supabase_rls_denied_select',
+ '{"includes": ["permission denied for relation", "new row violates row-level security policy"]}',
+ 'RLS enabled without correct SELECT/INSERT policies for authenticated role.',
+ E'Create explicit RLS policies for authenticated users.\nVerify auth.uid() matches owner columns.',
+ 0.85),
+('global', 'stripe_webhook_signature_verification_failed',
+ '{"includes": ["No signatures found matching the expected signature"]}',
+ 'Wrong webhook secret or request body modified before verification.',
+ E'Use the endpoint webhook signing secret (whsec_...).\nUse raw request body; disable JSON parsing before verification.',
+ 0.90),
+('global', 'navigator_locks_deadlock',
+ '{"includes": ["navigator.locks", "lock timeout", "auth session stuck"]}',
+ 'Supabase auth navigator.locks deadlock.',
+ E'Override lock in createBrowserClient auth config.\nUse custom storageKey.',
+ 0.95),
+('global', 'vercel_env_vars_missing_runtime',
+ '{"includes": ["API keys not available", "process.env undefined", "Missing env"]}',
+ 'Env vars not available at runtime on Vercel.',
+ E'Verify in Vercel Settings > Environment Variables.\nRedeploy after adding new vars.',
+ 0.90),
+('global', 'localstorage_not_persisting',
+ '{"includes": ["NO TOKEN", "localStorage empty", "session not persisting"]}',
+ 'Browser blocks localStorage in certain contexts.',
+ E'Pass auth tokens via React props from auth boundary.\nCapture access_token at sign-in.',
+ 0.95),
+('global', 'supabase_406_not_acceptable',
+ '{"includes": ["406", "Not Acceptable"]}',
+ 'Table missing or query format invalid.',
+ E'Check table exists in Supabase dashboard.\nRun migration SQL if missing.',
+ 0.85)
+ON CONFLICT DO NOTHING;
+
+-- ══════════════════════════════════════════════
+-- SEED: Global knowledge sources
+-- ══════════════════════════════════════════════
+
+INSERT INTO knowledge_sources (owner_scope, type, name, base_url, meta, is_active) VALUES
+('global', 'web', 'Next.js Docs', 'https://nextjs.org/docs',
+ '{"seed_urls": ["https://nextjs.org/docs"], "include_patterns": ["^https://nextjs\\.org/docs/"], "exclude_patterns": [".*(privacy|terms).*"], "max_pages": 200, "chunk_size": 900, "chunk_overlap": 120}',
+ true),
+('global', 'web', 'Supabase Docs', 'https://supabase.com/docs',
+ '{"seed_urls": ["https://supabase.com/docs"], "include_patterns": ["^https://supabase\\.com/docs/"], "exclude_patterns": [".*(privacy|terms).*"], "max_pages": 200, "chunk_size": 900, "chunk_overlap": 120}',
+ true),
+('global', 'web', 'React Docs', 'https://react.dev',
+ '{"seed_urls": ["https://react.dev/"], "include_patterns": ["^https://react\\.dev/"], "exclude_patterns": [".*(privacy|terms).*"], "max_pages": 150, "chunk_size": 900, "chunk_overlap": 120}',
+ true)
+ON CONFLICT DO NOTHING;

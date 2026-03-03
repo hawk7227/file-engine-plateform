@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 
     // Verify ownership/membership
     const project = projectResult.data
-    if (project.owner_id !== user.id) {
+    if (project.user_id !== user.id) {
       const { data: membership } = await sb
         .from('project_members')
         .select('user_id')
