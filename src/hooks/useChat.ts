@@ -65,6 +65,8 @@ export interface ChatOptions {
   onFilesUpdated?: (files: GeneratedFile[]) => void
   onThinking?: (text: string) => void
   onChatCreated?: (chatId: string, title?: string) => void
+  /** Called when sandbox starts a dev server and provides a live preview URL */
+  onSandboxPreview?: (url: string, sandboxId: string) => void
 }
 
 export interface UseChatReturn {
@@ -136,7 +138,8 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
     onComplete,
     onToolCall,
     onFilesUpdated,
-    onThinking
+    onThinking,
+    onSandboxPreview
   } = options
 
   const [messages, setMessages] = useState<Message[]>([])
@@ -376,6 +379,12 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
               })
             }
 
+            // ── Sandbox preview URL (live dev server) ──
+            if (parsed.type === 'sandbox_preview' && parsed.url) {
+              console.log(`[useChat] sandbox_preview: ${parsed.url}`)
+              onSandboxPreview?.(parsed.url, parsed.sandboxId || '')
+            }
+
             // ── Error ──
             if (parsed.error) {
               throw new Error(parsed.error)
@@ -499,7 +508,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
       setIsLoading(false)
       abortControllerRef.current = null
     }
-  }, [messages, model, projectId, enableAgent, enableThinking, enableResearch, projectFiles, onMessage, onError, onComplete, onToolCall, onFilesUpdated, onThinking])
+  }, [messages, model, projectId, enableAgent, enableThinking, enableResearch, projectFiles, onMessage, onError, onComplete, onToolCall, onFilesUpdated, onThinking, onSandboxPreview])
 
   // Regenerate a response
   const regenerate = useCallback(async (messageId: string) => {

@@ -106,6 +106,7 @@ export function WPPreviewCanvas({
   const themedHtml = previewHtml ? wrapWithTheme(previewHtml, theme) : null
 
   // Auto-refresh iframes when content or refreshKey changes
+  // Uses document.open/write/close instead of srcdoc to preserve scroll position
   useEffect(() => {
     if (!themedHtml && !previewUrl) {
       setIframeStatus('empty')
@@ -121,7 +122,22 @@ export function WPPreviewCanvas({
       if (previewUrl) {
         frame.src = previewUrl
       } else if (themedHtml) {
-        frame.srcdoc = themedHtml
+        // Hot reload: write directly to iframe document instead of replacing srcdoc
+        // This preserves scroll position and doesn't destroy the browsing context
+        try {
+          const doc = frame.contentDocument
+          if (doc) {
+            doc.open()
+            doc.write(themedHtml)
+            doc.close()
+          } else {
+            // Fallback to srcdoc if contentDocument not accessible (cross-origin)
+            frame.srcdoc = themedHtml
+          }
+        } catch {
+          // Fallback for security restrictions
+          frame.srcdoc = themedHtml
+        }
       }
     })
 
@@ -246,7 +262,17 @@ export function WPPreviewCanvas({
                       <div className="err-title">Preview Error</div>
                       <div className="err-msg">{iframeError}</div>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        <button onClick={() => { setIframeError(null); setIframeStatus('loading'); if (phoneIframeRef.current && themedHtml) { phoneIframeRef.current.srcdoc = themedHtml } }}>Retry</button>
+                        <button onClick={() => {
+                          setIframeError(null)
+                          setIframeStatus('loading')
+                          if (phoneIframeRef.current && themedHtml) {
+                            try {
+                              const doc = phoneIframeRef.current.contentDocument
+                              if (doc) { doc.open(); doc.write(themedHtml); doc.close() }
+                              else { phoneIframeRef.current.srcdoc = themedHtml }
+                            } catch { phoneIframeRef.current.srcdoc = themedHtml }
+                          }
+                        }}>Retry</button>
                         {onFallbackToCode && (
                           <button className="err-code" onClick={onFallbackToCode}>View Code</button>
                         )}

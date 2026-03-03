@@ -60,9 +60,12 @@ interface Props {
   expanded: boolean
   previewPhase: string
   deployments: Array<{ id: string; status: string; error?: string; url?: string; time?: number; commit?: string }>
+  onConsoleTab?: () => void
+  consoleCount?: number
+  consoleHasErrors?: boolean
 }
 
-export function WPDocViewer({ activeTab, onTabChange, onExpand, expanded, previewPhase, deployments }: Props) {
+export function WPDocViewer({ activeTab, onTabChange, onExpand, expanded, previewPhase, deployments, onConsoleTab, consoleCount, consoleHasErrors }: Props) {
   // SQL State
   const [sqlQuery, setSqlQuery] = useState('SELECT id, email, plan FROM subscriptions LIMIT 10')
   const [sqlResults, setSqlResults] = useState<Array<Record<string, unknown>>>([])
@@ -121,6 +124,14 @@ export function WPDocViewer({ activeTab, onTabChange, onExpand, expanded, previe
               {t.label}
             </button>
           ))}
+          {onConsoleTab && (
+            <button
+              style={{ ...S.tbtn(false), color: consoleHasErrors ? 'var(--wp-red)' : undefined, position: 'relative' }}
+              onClick={onConsoleTab}
+            >
+              Console{(consoleCount ?? 0) > 0 ? ` (${consoleCount})` : ''}
+            </button>
+          )}
           <button className="wp-pbtn" onClick={onExpand} style={{ marginLeft: 4 }}>
             {expanded ? '↓' : '↑'}
           </button>

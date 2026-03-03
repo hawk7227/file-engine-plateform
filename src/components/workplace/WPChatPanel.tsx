@@ -105,6 +105,21 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
   const onDragLeave = useCallback((e: React.DragEvent) => {
     if (dropRef.current && !dropRef.current.contains(e.relatedTarget as Node)) setDragging(false)
   }, [])
+  // Convert File to base64 string (without data URI prefix)
+  const fileToBase64 = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result as string
+        // Strip "data:...;base64," prefix
+        const base64 = result.includes(',') ? result.split(',')[1] || '' : result
+        resolve(base64)
+      }
+      reader.onerror = () => reject(new Error('Failed to read file'))
+      reader.readAsDataURL(file)
+    })
+  }, [])
+
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); setDragging(false)
     if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files)
@@ -114,9 +129,23 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
     if ((!input.trim() && !selectedFiles.length) || chat.isLoading) return
     const msg = input.trim()
     setInput('')
+
+    // Convert selected files to Attachment objects with base64 content
+    const attachments: { id: string; type: 'image' | 'file'; content: string; filename: string; mimeType: string }[] = []
+    for (const sf of selectedFiles) {
+      const base64 = await fileToBase64(sf.file)
+      const isImage = sf.file.type.startsWith('image/')
+      attachments.push({
+        id: sf.id,
+        type: isImage ? 'image' : 'file',
+        content: base64,
+        filename: sf.name,
+        mimeType: sf.file.type || 'application/octet-stream',
+      })
+    }
     setSelectedFiles([])
-    logActivity('chat_send', { message_preview: msg.substring(0, 100), file_count: selectedFiles.length })
-    await chat.sendMessage(msg)
+    logActivity('chat_send', { message_preview: msg.substring(0, 100), file_count: attachments.length })
+    await chat.sendMessage(msg, attachments.length > 0 ? attachments : undefined)
   }
 
   return (

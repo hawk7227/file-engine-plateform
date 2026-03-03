@@ -8,6 +8,7 @@
 
 import { NextRequest } from 'next/server'
 import { BRAND_NAME, BRAND_AI_NAME } from '@/lib/brand'
+import { getSandboxProvider } from '@/lib/sandbox/index'
 import { createClient } from '@supabase/supabase-js'
 import { sanitizeResponse, getActualModelId, selectProvider } from '@/lib/ai-config'
 import { buildSmartContext, SYSTEM_PROMPT_COMPACT, INTENT_PROMPT_ADDITIONS, classifyIntent } from '@/lib/smart-context'
@@ -287,6 +288,10 @@ interface ToolContext {
   files: Record<string, string>
   projectId?: string
   attachments?: Attachment[]
+  /** Active sandbox ID — set on first create_file when SANDBOX_PROVIDER is configured */
+  sandboxId?: string
+  /** Sandbox preview URL — set when dev server starts */
+  sandboxPreviewUrl?: string
 }
 
 function escapeRegex(s: string): string {
@@ -297,31 +302,107 @@ async function execTool(name: string, input: Record<string, unknown>, ctx: ToolC
   const s = (key: string, fallback = ''): string => String(input[key] ?? fallback)
   const n = (key: string, fallback = 0): number => Number(input[key] ?? fallback)
   console.log(`[execTool] name=${name} inputKeys=[${Object.keys(input || {}).join(',')}] inputSize=${JSON.stringify(input || {}).length}`)
+
+  // Determine if real sandbox is available
+  const useSandbox = !!process.env.SANDBOX_PROVIDER && process.env.SANDBOX_PROVIDER !== 'mock'
+
   try {
     switch (name) {
       case 'create_file': {
         const filePath = s('path') || s('filepath') || s('file_path') || s('filename') || 'index.html'
         const fileContent = s('content') || s('code') || s('file_content')
         if (!fileContent) return { success: false, result: `No content provided for ${filePath}` }
+        // Always write to in-memory ctx.files (needed for SSE files_updated + preview)
         ctx.files[filePath] = fileContent
+
+        // Dual-write to sandbox filesystem when real sandbox is active
+        if (useSandbox) {
+          try {
+            const provider = await getSandboxProvider()
+            // Lazy-create sandbox on first file write
+            if (!ctx.sandboxId) {
+              const res = await provider.create({ projectId: ctx.projectId || 'default', userId: 'user', template: 'node' })
+              ctx.sandboxId = res.sandboxId
+              console.log(`[Sandbox] Created: ${ctx.sandboxId}`)
+            }
+            await provider.writeFiles(ctx.sandboxId, [{ path: filePath, content: fileContent }])
+          } catch (sbErr: unknown) {
+            console.error(`[Sandbox write error]`, sbErr)
+            // Non-fatal — in-memory copy still works for preview
+          }
+        }
         return { success: true, result: `Created ${filePath} (${fileContent.split('\n').length} lines)${s('description') ? ' — ' + s('description') : ''}` }
       }
       case 'edit_file': {
         const file = ctx.files[s('path')]
-        if (!file) return { success: false, result: `File not found: ${s('path')}` }
+        if (!file) return { success: false, result: `File not found: ${s('path')}\n\nAvailable:\n  ${Object.keys(ctx.files).join('\n  ') || '(none)'}` }
         const cnt = (file.match(new RegExp(escapeRegex(s('old_str')), 'g')) || []).length
         if (cnt === 0) return { success: false, result: `String not found in ${s('path')}. Use view_file to check.` }
         if (cnt > 1) return { success: false, result: `String appears ${cnt} times in ${s('path')}. Must be unique.` }
-        ctx.files[s('path')] = file.replace(s('old_str'), s('new_str'))
+        const updated = file.replace(s('old_str'), s('new_str'))
+        ctx.files[s('path')] = updated
+
+        // Sync edit to sandbox
+        if (useSandbox && ctx.sandboxId) {
+          try {
+            const provider = await getSandboxProvider()
+            await provider.writeFiles(ctx.sandboxId, [{ path: s('path'), content: updated }])
+          } catch { /* non-fatal */ }
+        }
         return { success: true, result: `Edited ${s('path')}${s('description') ? ' — ' + s('description') : ''}` }
       }
       case 'view_file': {
+        // Prefer sandbox filesystem for real file reads, fall back to in-memory
+        if (useSandbox && ctx.sandboxId) {
+          try {
+            const provider = await getSandboxProvider()
+            const content = await provider.readFile(ctx.sandboxId, s('path'))
+            if (content) {
+              // Sync back to in-memory
+              ctx.files[s('path')] = content
+              return { success: true, result: content.split('\n').map((l: string, i: number) => `${String(i + 1).padStart(4)} | ${l}`).join('\n') }
+            }
+          } catch { /* fall through to in-memory */ }
+        }
         const fc = ctx.files[s('path')]
         if (!fc) return { success: false, result: `File not found: ${s('path')}\n\nAvailable:\n  ${Object.keys(ctx.files).join('\n  ') || '(none)'}` }
         return { success: true, result: fc.split('\n').map((l: string, i: number) => `${String(i + 1).padStart(4)} | ${l}`).join('\n') }
       }
-      case 'run_command':
+      case 'run_command': {
+        // Use real sandbox execution when available
+        if (useSandbox && ctx.sandboxId) {
+          try {
+            const provider = await getSandboxProvider()
+            const cmd = s('command')
+
+            // Sync all in-memory files to sandbox before running
+            const fileEntries = Object.entries(ctx.files).map(([p, c]) => ({ path: p, content: c }))
+            if (fileEntries.length > 0) {
+              await provider.writeFiles(ctx.sandboxId, fileEntries)
+            }
+
+            const proc = await provider.exec(ctx.sandboxId, cmd, { timeoutMs: 90_000 })
+
+            // If command starts a dev server, capture preview URL
+            if (cmd.includes('dev') || cmd.includes('start')) {
+              const preview = await provider.getPreviewUrl(ctx.sandboxId)
+              if (preview?.url) {
+                ctx.sandboxPreviewUrl = preview.url
+                console.log(`[Sandbox] Preview URL: ${preview.url}`)
+                return { success: true, result: `${proc.stdout || proc.stderr || '✓ Server started'}\n\n🌐 Preview: ${preview.url}` }
+              }
+            }
+
+            const output = (proc.stdout + (proc.stderr ? '\n' + proc.stderr : '')).trim()
+            return { success: proc.exitCode === 0, result: output || `✓ Executed: ${cmd}` }
+          } catch (sbErr: unknown) {
+            console.error(`[Sandbox exec error]`, sbErr)
+            // Fall through to static analysis
+          }
+        }
+        // Fallback: static analysis sandbox
         return await runSandbox(s('command'), Object.entries(ctx.files).map(([p, c]) => ({ path: p, content: c })))
+      }
       case 'search_web':
         return await runWebSearch(s('query'), n('max_results') || 5)
       case 'search_github':
@@ -807,6 +888,20 @@ export async function POST(request: NextRequest) {
       : (ctx ? `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}\n\n${ctx}${memoryContext}` : `${SYSTEM_PROMPT_COMPACT}\n${intentAddition}${memoryContext}`)
     const toolCtx: ToolContext = { files: { ...files }, projectId, attachments }
 
+    // §1.8: Inject non-image file attachments into toolCtx.files
+    // This makes uploaded .ts, .tsx, .html, .css, etc. available to view_file and edit_file
+    if (attachments) {
+      for (const att of attachments) {
+        if (att.type === 'file' && att.filename && att.content) {
+          try {
+            // att.content is base64 — decode to string for text files
+            const decoded = Buffer.from(att.content, 'base64').toString('utf-8')
+            toolCtx.files[att.filename] = decoded
+          } catch { /* binary file — skip */ }
+        }
+      }
+    }
+
     // Fix #2/#5: Carry forward files from conversation history
     // This enables iteration ("make the header bigger") and error recovery
     // by making previously generated files available to view_file and edit_file
@@ -1035,6 +1130,16 @@ async function agentStream(
           })}\n\n`))
         } else {
           console.log(`[Files Updated] No files in toolCtx`)
+        }
+
+        // ── SEND SANDBOX PREVIEW URL if dev server started ──
+        if (toolCtx.sandboxPreviewUrl) {
+          ctrl.enqueue(enc.encode(`data: ${JSON.stringify({
+            type: 'sandbox_preview',
+            url: toolCtx.sandboxPreviewUrl,
+            sandboxId: toolCtx.sandboxId
+          })}\n\n`))
+          console.log(`[Sandbox Preview] ${toolCtx.sandboxPreviewUrl}`)
         }
 
         ctrl.enqueue(enc.encode('data: [DONE]\n\n'))

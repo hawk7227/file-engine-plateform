@@ -27,6 +27,7 @@ import { WPToolbar } from './WPToolbar'
 import { WPPreviewCanvas } from './WPPreviewCanvas'
 import { WPCodeOutput } from './WPCodeOutput'
 import { WPDocViewer } from './WPDocViewer'
+import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
 import { WPDiffPreview } from './WPDiffPreview'
 import type { DiffProposal } from './WPDiffPreview'
 
@@ -64,7 +65,7 @@ export const BROWSER_PRESET: DevicePreset = {
 // ============================================
 
 type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed'
-type BottomTab = 'sql' | 'md' | 'doc' | 'git' | 'diff' | 'logs'
+type BottomTab = 'sql' | 'md' | 'doc' | 'git' | 'diff' | 'logs' | 'console'
 
 const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
   { id: 'chat', icon: '💬', label: 'Chat' },
@@ -139,6 +140,7 @@ export default function WorkplaceLayout({ user, profile }: Props) {
   // ── State ──
   const [leftTab, setLeftTab] = useState<LeftTab>('chat')
   const [bottomTab, setBottomTab] = useState<BottomTab>('sql')
+  const consoleCapture = useConsoleCapture()
   const [bottomHeight, setBottomHeight] = useState(48)
   const [bottomExpanded, setBottomExpanded] = useState(false)
   const [activeDevice, setActiveDevice] = useState<DevicePreset>(DEVICES[1]) // 14 Pro Max
@@ -217,6 +219,11 @@ export default function WorkplaceLayout({ user, profile }: Props) {
       if (files?.length) {
         setGeneratedFiles(files)
       }
+    },
+    onSandboxPreview: (url) => {
+      // Sandbox dev server is running — load it directly in the iframe
+      console.log(`[Workplace] Sandbox preview URL: ${url}`)
+      setPreviewUrl(url)
     },
   })
 
@@ -459,14 +466,34 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 <WPCodeOutput files={generatedFiles} />
               </div>
               <div className="wp-bottom-right">
-                <WPDocViewer
-                  activeTab={bottomTab}
-                  onTabChange={(tab: string) => setBottomTab(tab as BottomTab)}
-                  onExpand={toggleBottomExpand}
-                  expanded={bottomExpanded}
-                  previewPhase={preview.phase}
-                  deployments={[]}
-                />
+                {bottomTab === 'console' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div className="wp-pbar">
+                      <div className="wp-pbar-t">
+                        <span className="dot" style={{ background: consoleCapture.entries.some(e => e.level === 'error') ? 'var(--wp-red)' : 'var(--wp-accent)' }} /> Console
+                        {consoleCapture.entries.length > 0 && (
+                          <span style={{ fontSize: 8, color: 'var(--wp-text-4)', marginLeft: 4 }}>({consoleCapture.entries.length})</span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: 2 }}>
+                        <button className="wp-pbtn" onClick={() => setBottomTab('sql')}>✕</button>
+                      </div>
+                    </div>
+                    <WPConsolePanel entries={consoleCapture.entries} onClear={consoleCapture.clear} />
+                  </div>
+                ) : (
+                  <WPDocViewer
+                    activeTab={bottomTab}
+                    onTabChange={(tab: string) => setBottomTab(tab as BottomTab)}
+                    onExpand={toggleBottomExpand}
+                    expanded={bottomExpanded}
+                    previewPhase={preview.phase}
+                    deployments={[]}
+                    onConsoleTab={() => setBottomTab('console')}
+                    consoleCount={consoleCapture.entries.length}
+                    consoleHasErrors={consoleCapture.entries.some(e => e.level === 'error')}
+                  />
+                )}
               </div>
             </div>
           </div>

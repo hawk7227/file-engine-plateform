@@ -105,6 +105,30 @@ function sortFiles(files: GeneratedFile[], entryName: string): GeneratedFile[] {
 
 // ── Build React preview HTML ──
 
+// ── Console capture — intercepts console.log/warn/error and postMessages to parent ──
+
+const CONSOLE_CAPTURE = `
+<script>
+(function(){
+  var _origLog = console.log, _origWarn = console.warn, _origErr = console.error, _origInfo = console.info;
+  function send(level, args) {
+    try {
+      var msg = Array.prototype.map.call(args, function(a) {
+        if (a === null) return 'null';
+        if (a === undefined) return 'undefined';
+        if (typeof a === 'object') { try { return JSON.stringify(a, null, 2); } catch(e) { return String(a); } }
+        return String(a);
+      }).join(' ');
+      window.parent.postMessage({ type: 'wp-console', level: level, message: msg, timestamp: Date.now() }, '*');
+    } catch(e) {}
+  }
+  console.log = function() { send('log', arguments); _origLog.apply(console, arguments); };
+  console.warn = function() { send('warn', arguments); _origWarn.apply(console, arguments); };
+  console.error = function() { send('error', arguments); _origErr.apply(console, arguments); };
+  console.info = function() { send('info', arguments); _origInfo.apply(console, arguments); };
+})();
+<\\/script>`
+
 function buildReactPreview(cat: CategorizedFiles): string {
   const allReactFiles = [...cat.react, ...cat.script]
   const entryName = findEntryComponent(cat.react)
@@ -127,6 +151,7 @@ function buildReactPreview(cat: CategorizedFiles): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+${CONSOLE_CAPTURE}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"><\/script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"><\/script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js"><\/script>
@@ -177,6 +202,7 @@ function buildPlainPreview(cat: CategorizedFiles): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+${CONSOLE_CAPTURE}
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
