@@ -31,6 +31,7 @@ import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
 import { useConversation } from '@/hooks/useConversation'
 import { WPSidebar } from './WPSidebar'
 import { WPThemePanel } from './WPThemePanel'
+import { WPAdminKeysPanel } from './WPAdminKeysPanel'
 import { WPChatThemeOverride } from './WPChatThemeOverride'
 import { WPChatFontSizer } from './WPChatFontSizer'
 import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/theme-engine'
@@ -71,7 +72,7 @@ export const BROWSER_PRESET: DevicePreset = {
 // LEFT PANEL TABS
 // ============================================
 
-type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed' | 'theme'
+type LeftTab = 'chat' | 'routes' | 'video' | 'images' | 'team' | 'feed' | 'theme' | 'admin' | 'settings'
 type BottomTab = 'sql' | 'md' | 'doc' | 'git' | 'diff' | 'logs' | 'console'
 
 const LEFT_TABS: { id: LeftTab; icon: string; label: string }[] = [
@@ -567,14 +568,14 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                 🎨 Theme
               </button>
               <button
-                className="wp-tbtn"
-                onClick={() => window.location.href = '/admin'}
+                className={`wp-tbtn${leftTab === 'admin' ? ' on' : ''}`}
+                onClick={() => setLeftTab('admin')}
               >
                 📊 Admin
               </button>
               <button
-                className="wp-tbtn"
-                onClick={() => toast('Settings', 'Coming soon', 'nfo')}
+                className={`wp-tbtn${leftTab === 'settings' ? ' on' : ''}`}
+                onClick={() => setLeftTab('settings')}
               >
                 ⚙ Settings
               </button>
@@ -616,6 +617,15 @@ export default function WorkplaceLayout({ user, profile }: Props) {
                   activeSchemeId={themeScheme.id}
                   onSchemeChange={(scheme) => setThemeScheme(scheme)}
                 />
+              </div>
+              <div className={`wp-tpane${leftTab === 'admin' ? ' show' : ''}`}>
+                <WPAdminKeysPanel toast={toast} />
+              </div>
+              <div className={`wp-tpane${leftTab === 'settings' ? ' show' : ''}`}>
+                <div style={{ padding: 16, color: 'var(--wp-text-3)', fontSize: 13 }}>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--wp-text-1)', marginBottom: 12 }}>Settings</div>
+                  <div style={{ opacity: .6 }}>Settings panel coming soon.</div>
+                </div>
               </div>
             </div>
           </div>
