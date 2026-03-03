@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Test: can we import key-pool?
     try {
       const { getKeyWithFailover } = await import('@/lib/key-pool')
-      const result = getKeyWithFailover()
+      const result = await getKeyWithFailover()
       logs.push(`6. key-pool: ${result ? result.provider + ' key found' : 'NO KEYS'}`)
     } catch (e: unknown) {
       logs.push('6. KEY-POOL IMPORT FAILED: ' + (e instanceof Error ? e.message : String(e)))

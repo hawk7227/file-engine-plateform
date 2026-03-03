@@ -480,7 +480,7 @@ async function execTool(name: string, input: Record<string, unknown>, ctx: ToolC
         const att = ctx.attachments?.[n('image_index')]
         if (!att || att.type !== 'image') return { success: false, result: 'No image found at that index' }
         try {
-          const keyResult = getKeyWithFailover()
+          const keyResult = await getKeyWithFailover()
           if (!keyResult) return { success: false, result: 'No API key available for vision' }
           const task = s('task') || 'full'
           const visionPrompt = task === 'layout' ? 'Analyze the layout structure, sections, and component hierarchy of this UI.'
@@ -976,7 +976,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Chat API] intent=${intent} enableAgent=${enableAgent} needsAgent=${needsAgent} model=${model} stream=${stream} msgText="${msgText.slice(0, 100)}"`)
 
-    const keyResult = getKeyWithFailover()
+    const keyResult = await getKeyWithFailover()
     if (!keyResult) return new Response(JSON.stringify({ error: `${BRAND_NAME} API keys not available` }), { status: 503, headers: { 'Content-Type': 'application/json' } })
     const { key: apiKey, provider } = keyResult
 

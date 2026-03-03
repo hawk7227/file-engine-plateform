@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     // If user doesn't have custom key, get from pool
     let provider: 'anthropic' | 'openai' = model.startsWith('claude') ? 'anthropic' : 'openai'
     if (!apiKey) {
-      const keyResult = getKeyWithFailover(provider)
+      const keyResult = await getKeyWithFailover(provider)
       if (keyResult) {
         apiKey = keyResult.key
         provider = keyResult.provider

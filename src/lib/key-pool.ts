@@ -2,7 +2,11 @@
 // FILE ENGINE - API KEY POOL MANAGER
 // Handles multiple API keys for zero throttling
 // Supports 1000s of concurrent builds
+// Keys loaded from: ENV vars → Supabase admin_api_keys
 // =====================================================
+
+import { createClient } from '@supabase/supabase-js'
+import { createDecipheriv, scryptSync } from 'crypto'
 
 export interface KeyPool {
   anthropic: string[]
@@ -32,6 +36,99 @@ const keyStats: Map<string, KeyStats> = new Map()
 
 // Track which keys are currently rate limited
 const rateLimitedKeys: Set<string> = new Set()
+
+// Track if DB keys have been loaded (async, one-shot)
+let dbKeysLoaded = false
+let dbKeysLoading: Promise<void> | null = null
+
+// =====================================================
+// DECRYPT HELPER (matches /api/admin/keys encryption)
+// =====================================================
+
+function decryptKey(data: string): string | null {
+  try {
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-key-do-not-use-in-prod'
+    const encKey = scryptSync(secret, 'admin-keys-salt', 32)
+    const [ivHex, authTagHex, encrypted] = data.split(':')
+    if (!ivHex || !authTagHex || !encrypted) return null
+    const iv = Buffer.from(ivHex, 'hex')
+    const authTag = Buffer.from(authTagHex, 'hex')
+    const decipher = createDecipheriv('aes-256-gcm', encKey, iv)
+    decipher.setAuthTag(authTag)
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+    return decrypted
+  } catch (e) {
+    console.warn('[KeyPool] Decrypt failed:', (e instanceof Error ? e.message : String(e)))
+    return null
+  }
+}
+
+// =====================================================
+// LOAD KEYS FROM SUPABASE admin_api_keys TABLE
+// =====================================================
+
+async function loadKeysFromDatabase(): Promise<void> {
+  if (dbKeysLoaded) return
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    console.warn('[KeyPool] No Supabase service role key — skipping DB key load')
+    dbKeysLoaded = true
+    return
+  }
+  try {
+    const supabase = createClient(url, serviceKey)
+    const { data, error } = await supabase
+      .from('admin_api_keys')
+      .select('key_name, encrypted_value')
+    if (error) {
+      console.warn('[KeyPool] DB key load error:', error.message)
+      dbKeysLoaded = true
+      return
+    }
+    if (!data || data.length === 0) {
+      console.log('[KeyPool] No keys stored in database')
+      dbKeysLoaded = true
+      return
+    }
+    let added = 0
+    for (const row of data) {
+      const name = row.key_name as string
+      const raw = decryptKey(row.encrypted_value as string)
+      if (!raw) continue
+      let provider: 'anthropic' | 'openai' | null = null
+      if (name.startsWith('ANTHROPIC_API_KEY')) provider = 'anthropic'
+      else if (name.startsWith('OPENAI_API_KEY')) provider = 'openai'
+      if (!provider) continue
+      if (!keyPool[provider].includes(raw)) {
+        keyPool[provider].push(raw)
+        initKeyStats(raw, provider)
+        added++
+      }
+    }
+    if (added > 0) console.log(`[KeyPool] Loaded ${added} key(s) from database`)
+  } catch (e) {
+    console.warn('[KeyPool] DB key load exception:', (e instanceof Error ? e.message : String(e)))
+  }
+  dbKeysLoaded = true
+}
+
+// =====================================================
+// ENSURE KEYS LOADED (env + DB)
+// =====================================================
+
+async function ensureKeysLoaded(): Promise<void> {
+  if (keyPool.anthropic.length === 0 && keyPool.openai.length === 0) {
+    initializeKeyPool()
+  }
+  if (keyPool.anthropic.length === 0 && keyPool.openai.length === 0) {
+    if (!dbKeysLoading) {
+      dbKeysLoading = loadKeysFromDatabase()
+    }
+    await dbKeysLoading
+  }
+}
 
 // =====================================================
 // INITIALIZE KEY POOL FROM ENV
@@ -201,11 +298,9 @@ export interface KeyResult {
   provider: 'anthropic' | 'openai'
 }
 
-export function getKeyWithFailover(preferredProvider?: 'anthropic' | 'openai'): KeyResult | null {
-  // Initialize if not done
-  if (keyPool.anthropic.length === 0 && keyPool.openai.length === 0) {
-    initializeKeyPool()
-  }
+export async function getKeyWithFailover(preferredProvider?: 'anthropic' | 'openai'): Promise<KeyResult | null> {
+  // Ensure all key sources loaded (env + DB)
+  await ensureKeysLoaded()
   
   // If no preference, load-balance across both providers equally
   // Pick the provider with the least-recently-used available key
