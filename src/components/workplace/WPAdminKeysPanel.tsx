@@ -97,15 +97,13 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
 
   const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    // Primary: admin secret (instant, no auth chain)
+    // Include admin secret if available
     if (adminSecret) {
       headers['X-Admin-Secret'] = adminSecret
-      return headers
     }
-    // Fallback: Bearer token from props
+    // Always include Bearer token too as fallback
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`
-      return headers
     }
     return headers
   }, [accessToken, adminSecret])
@@ -115,11 +113,6 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     setError(null)
     try {
       const headers = await getAuthHeaders()
-      if (!headers['Authorization']) {
-        setError('No auth token available — try refreshing the page')
-        setLoading(false)
-        return
-      }
       const res = await fetch('/api/admin/keys', { headers })
       if (!res.ok) {
         const data = await res.json()
