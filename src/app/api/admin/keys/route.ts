@@ -22,6 +22,14 @@ import { parseBody, parseAdminKeysRequest, validationErrorResponse } from '@/lib
 
 const ADMIN_SECRET = process.env.ADMIN_PANEL_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const OWNER_ID = process.env.ADMIN_OWNER_ID || ''
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+
+function getSupabaseAdmin() {
+    if (!SUPABASE_URL) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set')
+    if (!SERVICE_ROLE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set in Vercel env vars — add it under Project Settings → Environment Variables')
+    return createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
+}
 
 function getAuthAdmin(req: NextRequest): { id: string; role: string; team_id: string } | null {
     // Method 1: Admin secret header (from workplace panel)
@@ -137,11 +145,7 @@ export async function GET(req: NextRequest) {
         if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         if (!isAdmin(profile.role)) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        )
-
+        const supabase = getSupabaseAdmin()
         const teamId = profile.team_id
         if (!teamId) {
             // No team — return all keys as inactive from env check
@@ -214,10 +218,7 @@ export async function PUT(req: NextRequest) {
         const teamId = profile.team_id
         if (!teamId) return NextResponse.json({ error: 'No team configured' }, { status: 400 })
 
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        )
+        const supabase = getSupabaseAdmin()
 
         const encrypted = encrypt(value.trim())
 
@@ -301,10 +302,7 @@ export async function DELETE(req: NextRequest) {
         const teamId = profile.team_id
         if (!teamId) return NextResponse.json({ error: 'No team configured' }, { status: 400 })
 
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        )
+        const supabase = getSupabaseAdmin()
 
         await supabase
             .from('admin_api_keys')
