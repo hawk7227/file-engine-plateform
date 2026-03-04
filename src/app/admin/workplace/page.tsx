@@ -58,8 +58,19 @@ export default function AdminWorkplacePage() {
 
     async function initAuth() {
       try {
-        // 1. Check existing session
-        const { data: { session } } = await supabase.auth.getSession()
+        // 1. Check existing session (with timeout — navigator.locks can deadlock)
+        let session = null
+        try {
+          const sessionPromise = supabase.auth.getSession()
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('getSession timeout')), 3000)
+          )
+          const result = await Promise.race([sessionPromise, timeoutPromise]) as Awaited<ReturnType<typeof supabase.auth.getSession>>
+          session = result?.data?.session
+        } catch (e) {
+          console.log('[Workplace] getSession timed out or failed, forcing fresh sign-in:', e instanceof Error ? e.message : String(e))
+        }
+
         if (session?.user) {
           if (cancelled) return
           setUser(session.user)
