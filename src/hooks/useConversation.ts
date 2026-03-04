@@ -1,19 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-// =====================================================
-// useConversation — Conversation persistence hook
-//
-// Manages creating, loading, saving conversations and messages.
-// Wires into useChat for automatic persistence.
-// =====================================================
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabase } from '@/lib/supabase'
 
 export interface ConversationMeta {
   id: string
