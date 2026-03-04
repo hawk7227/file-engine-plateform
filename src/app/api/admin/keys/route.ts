@@ -184,7 +184,9 @@ export async function GET(req: NextRequest) {
             return { id: name, active: false, masked: null, source: 'none' as const }
         })
 
-        return NextResponse.json({ keys })
+        return NextResponse.json({ keys }, {
+            headers: { 'X-Auth-Method': 'admin-secret', 'X-Team-Id': teamId }
+        })
     } catch (error: unknown) {
         console.error('[Admin Keys GET]', error)
         return NextResponse.json({ error: 'Failed to fetch keys' }, { status: 500 })
@@ -229,7 +231,15 @@ export async function PUT(req: NextRequest) {
                 updated_at: new Date().toISOString(),
             }, { onConflict: 'team_id,key_name' })
 
-        if (error) throw error
+        if (error) {
+            console.error('[Admin Keys PUT] Supabase upsert error:', JSON.stringify(error))
+            return NextResponse.json({
+                error: `DB upsert failed: ${error.message}`,
+                code: error.code,
+                hint: error.hint || null,
+                details: error.details || null,
+            }, { status: 500 })
+        }
 
         return NextResponse.json({
             saved: true,

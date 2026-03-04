@@ -183,6 +183,18 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     }
   }
 
+  const runDebug = useCallback(async () => {
+    try {
+      const headers = await getAuthHeaders()
+      const res = await fetch('/api/admin/keys/debug', { headers })
+      const data = await res.json()
+      console.table(data.checks)
+      setError(`DEBUG (check console): ${JSON.stringify(data.checks, null, 2)}`)
+    } catch (e) {
+      setError(`Debug fetch failed: ${e instanceof Error ? e.message : String(e)}`)
+    }
+  }, [getAuthHeaders])
+
   const activeCount = keys.filter(k => k.active).length
   const totalCount = keys.length
   const anthropicActive = keys.filter(k => k.id.startsWith('ANTHROPIC') && k.active).length
@@ -191,7 +203,7 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
   return (
     <div className="wak-wrap">
       <style>{CSS}</style>
-      <div className="wak-hdr">API Keys</div>
+      <div className="wak-hdr">API Keys <button className="wak-btn" onClick={runDebug} style={{marginLeft:8,fontSize:9}}>⚙ Debug</button></div>
       <div className="wak-sub">
         Encrypted with AES-256-GCM. Stored in Supabase — no env vars needed.
         Keys are loaded automatically by the chat engine.
