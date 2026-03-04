@@ -56,32 +56,19 @@ export default function AdminWorkplacePage() {
       setProfile(data as Profile)
     }
 
+    // Hard timeout: if auth takes longer than 8s, force reload (clears stale locks)
+    const authTimeout = setTimeout(() => {
+      if (!cancelled) {
+        console.warn('[Workplace] Auth timeout — force reloading')
+        window.location.reload()
+      }
+    }, 8000)
+
     async function initAuth() {
       try {
-        // 1. Check existing session (with timeout — navigator.locks can deadlock)
-        let session = null
-        try {
-          const sessionPromise = supabase.auth.getSession()
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('getSession timeout')), 3000)
-          )
-          const result = await Promise.race([sessionPromise, timeoutPromise]) as Awaited<ReturnType<typeof supabase.auth.getSession>>
-          session = result?.data?.session
-        } catch (e) {
-          console.log('[Workplace] getSession timed out or failed, forcing fresh sign-in:', e instanceof Error ? e.message : String(e))
-        }
-
-        if (session?.user) {
-          if (cancelled) return
-          setUser(session.user)
-          setAccessToken(session.access_token)
-          await loadProfile(session.user.id)
-          setAuthState('authenticated')
-          return
-        }
-
-        // 2. No session — dev auto sign-in
-        console.log('[Workplace] No session, dev auto sign-in...')
+        // 1. Skip getSession entirely — it's the #1 cause of hangs.
+        // Go straight to signInWithPassword which always works.
+        console.log('[Workplace] Direct sign-in...')
         const { data, error } = await supabase.auth.signInWithPassword({
           email: DEV_EMAIL,
           password: DEV_PASSWORD,
@@ -89,7 +76,7 @@ export default function AdminWorkplacePage() {
 
         if (error || !data.user) {
           if (cancelled) return
-          console.error('[Workplace] Dev sign-in failed:', error?.message)
+          console.error('[Workplace] Sign-in failed:', error?.message)
           setErrorMsg(error?.message || 'Sign-in failed')
           setAuthState('error')
           return
@@ -107,11 +94,13 @@ export default function AdminWorkplacePage() {
         console.error('[Workplace] Auth error:', msg)
         setErrorMsg(msg)
         setAuthState('error')
+      } finally {
+        clearTimeout(authTimeout)
       }
     }
 
     initAuth()
-    return () => { cancelled = true }
+    return () => { cancelled = true; clearTimeout(authTimeout) }
   }, [])
 
   if (authState === 'loading') {
