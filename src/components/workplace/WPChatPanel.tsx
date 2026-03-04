@@ -128,9 +128,12 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const MAX = 50 * 1024 * 1024
+    const BLOCKED_EXTS = ['zip', 'tar', 'gz', 'rar', '7z', 'bz2', 'xz']
     const nf: SelectedFile[] = []
     const rej: string[] = []
     for (const f of Array.from(files)) {
+      const ext = f.name.split('.').pop()?.toLowerCase() || ''
+      if (BLOCKED_EXTS.includes(ext)) { rej.push(`${f.name} (archive files not supported)`); continue }
       if (f.size > MAX) { rej.push(`${f.name} (max 50MB)`); continue }
       const sf: SelectedFile = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, file: f, name: f.name, size: f.size }
       if (f.type.startsWith('image/')) sf.preview = URL.createObjectURL(f)
