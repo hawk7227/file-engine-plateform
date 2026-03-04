@@ -36,7 +36,10 @@ const CSS = `
 .wak-input{flex:1;background:var(--wp-bg-2);border:1px solid var(--wp-border);border-radius:8px;padding:6px 10px;font-size:11px;font-family:var(--wp-mono);color:var(--wp-text-1);outline:none;transition:border-color .15s}
 .wak-input:focus{border-color:var(--wp-accent)}
 .wak-input::placeholder{color:var(--wp-text-4)}
-.wak-edit-row{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--wp-bg-2);border:1px solid var(--wp-accent);border-radius:10px;margin-bottom:6px}
+.wak-edit-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;background:var(--wp-bg-2);border:1px solid var(--wp-accent);border-radius:10px;margin-bottom:6px}
+.wak-edit-row .wak-row-label{width:100%;font-size:10px;font-weight:700;color:var(--wp-accent);font-family:var(--wp-mono);margin-bottom:2px}
+.wak-edit-row .wak-input{flex:1;min-width:0}
+.wak-edit-row .wak-btn{flex-shrink:0}
 .wak-loading{text-align:center;padding:32px;color:var(--wp-text-4);font-size:12px}
 .wak-error{padding:10px 12px;border-radius:8px;background:rgba(255,59,92,.06);border:1px solid rgba(255,59,92,.15);color:var(--wp-red);font-size:11px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .wak-success{padding:10px 12px;border-radius:8px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.15);color:var(--wp-accent);font-size:11px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
