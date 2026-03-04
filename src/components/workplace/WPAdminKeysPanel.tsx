@@ -17,7 +17,7 @@ const CSS = `
 .wak-section-title span{font-size:14px}
 .wak-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--wp-bg-3);border:1px solid var(--wp-border);border-radius:10px;margin-bottom:6px;transition:border-color .15s}
 .wak-row:hover{border-color:var(--wp-border-2)}
-.wak-row-label{font-size:10px;font-weight:700;color:var(--wp-text-2);min-width:100px;font-family:var(--wp-mono);flex-shrink:0}
+.wak-row-label{font-size:9px;font-weight:700;color:var(--wp-text-2);min-width:140px;font-family:var(--wp-mono);flex-shrink:0}
 .wak-row-status{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .wak-row-status.active{background:var(--wp-accent);box-shadow:0 0 6px rgba(0,245,160,.3)}
 .wak-row-status.inactive{background:var(--wp-red);opacity:.4}
@@ -61,9 +61,14 @@ interface KeyInfo {
 
 const KEY_SECTIONS = [
   {
-    title: 'AI Chat',
-    icon: '🧠',
-    keys: ['ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY_1', 'ANTHROPIC_API_KEY_2', 'OPENAI_API_KEY', 'OPENAI_API_KEY_1', 'OPENAI_API_KEY_2']
+    title: 'Anthropic Keys',
+    icon: '🟣',
+    keys: ['ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY_1', 'ANTHROPIC_API_KEY_2']
+  },
+  {
+    title: 'OpenAI Keys',
+    icon: '🟢',
+    keys: ['OPENAI_API_KEY', 'OPENAI_API_KEY_1', 'OPENAI_API_KEY_2']
   },
   {
     title: 'Media Generation',
@@ -238,7 +243,7 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
               {sectionKeys.map(k => (
                 editingKey === k.id ? (
                   <div key={k.id} className="wak-edit-row">
-                    <span className="wak-row-label">{k.id.replace(/_/g, '_').split('_').slice(-2).join('_')}</span>
+                    <span className="wak-row-label">{k.id}</span>
                     <input
                       className="wak-input"
                       type="password"
@@ -259,7 +264,7 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
                 ) : (
                   <div key={k.id} className="wak-row">
                     <div className={`wak-row-status ${k.active ? 'active' : 'inactive'}`} />
-                    <span className="wak-row-label">{k.id.replace(/_/g, '_').split('_').slice(-2).join('_')}</span>
+                    <span className="wak-row-label">{k.id}</span>
                     <span className="wak-row-masked">{k.masked || '—'}</span>
                     <span className={`wak-row-source ${k.source}`}>{k.source}</span>
                     <div className="wak-row-actions">
