@@ -1,0 +1,14 @@
+name: Diagnose Admin Keys
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install @supabase/supabase-js
+      - run: node scripts/diagnose-keys.mjs
