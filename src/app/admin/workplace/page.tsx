@@ -5,19 +5,72 @@ import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/types'
-import { supabase } from '@/lib/supabase'
 
 const WorkplaceLayout = dynamic(
   () => import('@/components/workplace/WorkplaceLayout'),
   { ssr: false }
 )
 
-// Dev Auth — reads env vars, falls back to hardcoded for staging
-// After confirming, rotate password and set NEXT_PUBLIC_DEV_EMAIL / NEXT_PUBLIC_DEV_PASSWORD in Vercel
+// =====================================================
+// ZERO Supabase SDK on the client.
+// Auth via direct REST calls to Supabase GoTrue API.
+// Profile via direct REST call to PostgREST.
+// No navigator.locks, no localStorage session, no hangs.
+// =====================================================
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const DEV_EMAIL = process.env.NEXT_PUBLIC_DEV_EMAIL || 'hawkinsmarcus127@gmail.com'
 const DEV_PASSWORD = process.env.NEXT_PUBLIC_DEV_PASSWORD || 'Horace120!'
 
 type AuthState = 'loading' | 'authenticated' | 'error'
+
+async function signInDirect(email: string, password: string): Promise<{ user: User | null; access_token: string | null; error: string | null }> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      return { user: null, access_token: null, error: data.error_description || data.msg || `HTTP ${res.status}` }
+    }
+    return {
+      user: data.user as User,
+      access_token: data.access_token as string,
+      error: null,
+    }
+  } catch (e) {
+    return { user: null, access_token: null, error: e instanceof Error ? e.message : 'Network error' }
+  }
+}
+
+async function loadProfileDirect(userId: string, accessToken: string): Promise<Profile | null> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=*&limit=1`,
+      {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json',
+        },
+      }
+    )
+    if (!res.ok) {
+      console.warn('[Workplace] Profile fetch failed:', res.status)
+      return null
+    }
+    const rows = await res.json()
+    return rows?.[0] || null
+  } catch {
+    return null
+  }
+}
 
 export default function AdminWorkplacePage() {
   const [authState, setAuthState] = useState<AuthState>('loading')
@@ -29,17 +82,33 @@ export default function AdminWorkplacePage() {
   useEffect(() => {
     let cancelled = false
 
-    async function loadProfile(userId: string) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
+    async function initAuth() {
+      console.log('[Workplace] Direct REST sign-in (no SDK)...')
 
-      if (error || !data) {
-        console.warn('[Workplace] Profile load failed, using defaults:', error?.message)
+      const { user: authUser, access_token, error } = await signInDirect(DEV_EMAIL, DEV_PASSWORD)
+
+      if (cancelled) return
+
+      if (error || !authUser || !access_token) {
+        console.error('[Workplace] Sign-in failed:', error)
+        setErrorMsg(error || 'Sign-in failed')
+        setAuthState('error')
+        return
+      }
+
+      console.log('[Workplace] Signed in:', authUser.email, 'token length:', access_token.length)
+      setUser(authUser)
+      setAccessToken(access_token)
+
+      // Load profile
+      const prof = await loadProfileDirect(authUser.id, access_token)
+      if (cancelled) return
+
+      if (prof) {
+        setProfile(prof as Profile)
+      } else {
         setProfile({
-          id: userId,
+          id: authUser.id,
           email: DEV_EMAIL,
           full_name: 'Marcus',
           avatar_url: null,
@@ -47,60 +116,17 @@ export default function AdminWorkplacePage() {
           claude_api_key: null,
           openai_api_key: null,
           role: 'owner',
-          team_id: null,
+          team_id: authUser.id,
           skill_level: null,
           created_at: new Date().toISOString(),
         })
-        return
       }
-      setProfile(data as Profile)
-    }
 
-    // Hard timeout: if auth takes longer than 8s, force reload (clears stale locks)
-    const authTimeout = setTimeout(() => {
-      if (!cancelled) {
-        console.warn('[Workplace] Auth timeout — force reloading')
-        window.location.reload()
-      }
-    }, 8000)
-
-    async function initAuth() {
-      try {
-        // 1. Skip getSession entirely — it's the #1 cause of hangs.
-        // Go straight to signInWithPassword which always works.
-        console.log('[Workplace] Direct sign-in...')
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: DEV_EMAIL,
-          password: DEV_PASSWORD,
-        })
-
-        if (error || !data.user) {
-          if (cancelled) return
-          console.error('[Workplace] Sign-in failed:', error?.message)
-          setErrorMsg(error?.message || 'Sign-in failed')
-          setAuthState('error')
-          return
-        }
-
-        if (cancelled) return
-        console.log('[Workplace] Signed in as:', data.user.email)
-        setUser(data.user)
-        setAccessToken(data.session?.access_token || null)
-        await loadProfile(data.user.id)
-        setAuthState('authenticated')
-      } catch (err) {
-        if (cancelled) return
-        const msg = err instanceof Error ? err.message : 'Unknown error'
-        console.error('[Workplace] Auth error:', msg)
-        setErrorMsg(msg)
-        setAuthState('error')
-      } finally {
-        clearTimeout(authTimeout)
-      }
+      setAuthState('authenticated')
     }
 
     initAuth()
-    return () => { cancelled = true; clearTimeout(authTimeout) }
+    return () => { cancelled = true }
   }, [])
 
   if (authState === 'loading') {
@@ -112,7 +138,7 @@ export default function AdminWorkplacePage() {
       }}>
         <div style={{ fontSize: 32, opacity: 0.3 }}>&#x26A1;</div>
         <div style={{ fontSize: 14, fontWeight: 700 }}>Authenticating...</div>
-        <div style={{ fontSize: 11, color: '#7878a0' }}>Connecting to Supabase</div>
+        <div style={{ fontSize: 11, color: '#7878a0' }}>Connecting...</div>
       </div>
     )
   }
@@ -128,7 +154,7 @@ export default function AdminWorkplacePage() {
         <div style={{ fontSize: 32 }}>&#x26A0;</div>
         <div style={{ fontSize: 16, fontWeight: 800 }}>Auth Failed</div>
         <div style={{ fontSize: 12, color: '#7878a0', maxWidth: 400 }}>
-          {errorMsg || 'Could not authenticate. Check Supabase connection and credentials.'}
+          {errorMsg || 'Could not authenticate.'}
         </div>
         <button
           onClick={() => window.location.reload()}
