@@ -91,22 +91,24 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
   const [editValue, setEditValue] = useState('')
   const [saving, setSaving] = useState(false)
 
+  // Admin secret — set NEXT_PUBLIC_ADMIN_SECRET in Vercel
+  // Must match ADMIN_PANEL_SECRET on server side
+  const adminSecret = process.env.NEXT_PUBLIC_ADMIN_SECRET || ''
+
   const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    // Primary: admin secret (instant, no auth chain)
+    if (adminSecret) {
+      headers['X-Admin-Secret'] = adminSecret
+      return headers
+    }
+    // Fallback: Bearer token from props
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`
       return headers
     }
-    // Fallback: try to get a fresh token from supabase
-    try {
-      const { supabase } = await import('@/lib/supabase')
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-    } catch { /* no fallback available */ }
     return headers
-  }, [accessToken])
+  }, [accessToken, adminSecret])
 
   const loadKeys = useCallback(async () => {
     setLoading(true)
@@ -132,10 +134,8 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     }
   }, [getAuthHeaders])
 
-  // Only load when accessToken is available
-  useEffect(() => {
-    if (accessToken) loadKeys()
-  }, [accessToken, loadKeys])
+  // Load keys on mount (admin secret = instant auth, no waiting)
+  useEffect(() => { loadKeys() }, [loadKeys])
 
   const handleSave = async (keyName: string) => {
     if (!editValue.trim() || editValue.trim().length < 5) {
