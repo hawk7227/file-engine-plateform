@@ -943,31 +943,40 @@ export async function POST(request: NextRequest) {
     if (!lastMsg) return new Response(JSON.stringify({ error: 'No user message' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
     const msgText = typeof lastMsg.content === 'string' ? lastMsg.content : (lastMsg.content as ContentBlock[]).map(b => b.text || '').join('')
 
-    // ── FIX 2: Parallel pre-LLM loading (saves 200-600ms) ──
-    // Run team settings, smart context, and memory in parallel instead of sequential awaits
-    const teamIdPromise = userId !== 'anonymous' ? getUserTeamId(userId) : Promise.resolve(null)
-    const memoryPromise = userId !== 'anonymous' ? supabase
-      .from('user_memories')
-      .select('type, key, value, confidence')
-      .eq('user_id', userId)
-      .in('type', ['style', 'preference'])
-      .gte('confidence', 0.5)
-      .limit(10)
-      .then(r => r.data)
-      .then(d => d, () => null) : Promise.resolve(null)
+    // Pre-LLM loading with hard timeout — browser supabase singleton may hang on server
+    const withTimeout = <T>(p: Promise<T>, ms: number, fallback: T): Promise<T> =>
+      Promise.race([p, new Promise<T>(res => setTimeout(() => res(fallback), ms))])
 
-    const teamId = await teamIdPromise
-    const [adminSettings, memories] = await Promise.all([
-      getTeamCostSettings(teamId),
-      memoryPromise
+    const [teamId, memories] = await Promise.all([
+      withTimeout(
+        userId !== 'anonymous' ? getUserTeamId(userId) : Promise.resolve(null),
+        3000, null
+      ),
+      withTimeout(
+        userId !== 'anonymous'
+          ? Promise.resolve(supabase.from('user_memories').select('type, key, value, confidence')
+              .eq('user_id', userId).in('type', ['style', 'preference'])
+              .gte('confidence', 0.5).limit(10)).then(r => r.data).catch(() => null)
+          : Promise.resolve(null),
+        3000, null
+      )
     ])
 
-    const smartCtx = await buildSmartContext({
+    const adminSettings = await withTimeout(getTeamCostSettings(teamId), 3000, null as never).catch(() => null as never)
+
+    const smartCtxRaw = await withTimeout(buildSmartContext({
       userId, userMessage: msgText, projectId: projectId || undefined,
       attachments: attachments?.map(a => ({ type: a.type, content: a.content, filename: a.filename })),
       previousMessages: messages.map(m => ({ role: m.role, content: typeof m.content === 'string' ? m.content : '[complex]' })),
       endpoint: 'chat', adminSettings
-    })
+    }), 4000, null)
+    // Safe fallback if smartCtx timed out or failed
+    const smartCtx = smartCtxRaw ?? {
+      modelTier: 'pro' as const,
+      trimmedMessages: messages,
+      maxTokens: 8192,
+      injectedContext: '',
+    }
 
     const intent = classifyIntent(msgText)
     const needsAgent = enableAgent && (
@@ -1009,8 +1018,10 @@ export async function POST(request: NextRequest) {
     const isProModel = resolvedModel.includes('sonnet') || resolvedModel === 'gpt-4o'
     if ((isPremiumModel || isProModel) && userId !== 'anonymous') {
       try {
-        const { data: prof } = await supabase.from('profiles').select('plan').eq('id', userId).single()
-        const plan = prof?.plan || 'free'
+        // plan is in subscriptions table, not profiles
+        const subResult = await Promise.resolve(supabase.from('subscriptions').select('plan').eq('user_id', userId).eq('status', 'active').single()).catch(() => ({ data: null }))
+        const sub = subResult?.data
+        const plan = (sub as {plan?: string} | null)?.plan || 'free'
         const premiumCaps: Record<string, number> = { free: 0, starter: 2, pro: 5, max: 15, enterprise: 25 }
         const proCaps: Record<string, number> = { free: 5, starter: 20, pro: 60, max: 100, enterprise: 150 }
         const today = new Date().toISOString().split('T')[0]
