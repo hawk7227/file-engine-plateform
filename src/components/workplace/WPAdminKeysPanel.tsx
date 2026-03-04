@@ -83,11 +83,20 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
   const [editValue, setEditValue] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const getAuthHeaders = useCallback((): Record<string, string> => {
+  const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`
+      return headers
     }
+    // Fallback: try to get a fresh token from supabase
+    try {
+      const { supabase } = await import('@/lib/supabase')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+    } catch { /* no fallback available */ }
     return headers
   }, [accessToken])
 
@@ -95,7 +104,12 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     setLoading(true)
     setError(null)
     try {
-      const headers = getAuthHeaders()
+      const headers = await getAuthHeaders()
+      if (!headers['Authorization']) {
+        setError('No auth token available — try refreshing the page')
+        setLoading(false)
+        return
+      }
       const res = await fetch('/api/admin/keys', { headers })
       if (!res.ok) {
         const data = await res.json()
@@ -110,7 +124,10 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     }
   }, [getAuthHeaders])
 
-  useEffect(() => { loadKeys() }, [loadKeys])
+  // Only load when accessToken is available
+  useEffect(() => {
+    if (accessToken) loadKeys()
+  }, [accessToken, loadKeys])
 
   const handleSave = async (keyName: string) => {
     if (!editValue.trim() || editValue.trim().length < 5) {
@@ -121,7 +138,7 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     setError(null)
     setSuccess(null)
     try {
-      const headers = getAuthHeaders()
+      const headers = await getAuthHeaders()
       const res = await fetch('/api/admin/keys', {
         method: 'PUT',
         headers,
@@ -148,7 +165,7 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
     setError(null)
     setSuccess(null)
     try {
-      const headers = getAuthHeaders()
+      const headers = await getAuthHeaders()
       const res = await fetch('/api/admin/keys', {
         method: 'DELETE',
         headers,

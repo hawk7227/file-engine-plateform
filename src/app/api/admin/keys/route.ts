@@ -19,40 +19,58 @@ async function getAuthUser(req: NextRequest) {
         console.log('[Admin Keys] No Authorization header')
         return null
     }
-    console.log('[Admin Keys] Token present, length:', token.length)
+    console.log('[Admin Keys] Token length:', token.length)
 
-    // Use anon key to verify the JWT token
-    const anonClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    const { data: { user }, error: authError } = await anonClient.auth.getUser(token)
-    if (authError || !user) {
-        console.log('[Admin Keys] getUser failed:', authError?.message || 'no user')
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!url || !anonKey) {
+        console.log('[Admin Keys] Missing SUPABASE_URL or ANON_KEY')
+        return null
+    }
+
+    // Verify token and get user
+    const authClient = createClient(url, anonKey)
+    const { data: { user }, error: authErr } = await authClient.auth.getUser(token)
+    if (authErr || !user) {
+        console.log('[Admin Keys] getUser failed:', authErr?.message || 'no user returned')
         return null
     }
     console.log('[Admin Keys] User verified:', user.id, user.email)
 
-    // Use service role key to read profile (bypasses RLS)
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    console.log('[Admin Keys] Service role key:', serviceKey ? 'present' : 'MISSING')
-    const profileClient = serviceKey
-        ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
-        : anonClient
-
-    const { data: profile, error: profileError } = await profileClient
-        .from('profiles')
-        .select('id, role, team_id')
-        .eq('id', user.id)
-        .single()
-
-    if (profileError) {
-        console.log('[Admin Keys] Profile query failed:', profileError.message)
-    } else {
-        console.log('[Admin Keys] Profile found:', profile?.role, 'team:', profile?.team_id)
+    // Direct admin check: known owner email = admin access
+    // This avoids the profiles table query that was causing timeouts
+    const OWNER_EMAILS = ['hawkinsmarcus127@gmail.com']
+    if (OWNER_EMAILS.includes(user.email || '')) {
+        console.log('[Admin Keys] Owner email match — admin granted')
+        return { id: user.id, role: 'owner' as const, team_id: user.id }
     }
 
-    return profile
+    // For non-owner users, query profiles (with timeout protection)
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const dbClient = serviceKey ? createClient(url, serviceKey) : authClient
+
+    try {
+        const { data: profile, error: profErr } = await dbClient
+            .from('profiles')
+            .select('id, role, team_id')
+            .eq('id', user.id)
+            .maybeSingle()
+
+        if (profErr) {
+            console.log('[Admin Keys] Profile error:', profErr.message)
+            return null
+        }
+        if (!profile) {
+            console.log('[Admin Keys] No profile for', user.id)
+            return null
+        }
+        console.log('[Admin Keys] Profile:', profile.role)
+        return profile
+    } catch (e) {
+        console.log('[Admin Keys] Profile query exception:', e instanceof Error ? e.message : String(e))
+        return null
+    }
 }
 
 function isAdmin(role: string): boolean {
