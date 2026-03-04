@@ -221,15 +221,49 @@ export async function PUT(req: NextRequest) {
 
         const encrypted = encrypt(value.trim())
 
-        const { error } = await supabase
+        const upsertPayload = {
+            team_id: teamId,
+            key_name,
+            encrypted_value: encrypted,
+            updated_by: profile.id,
+            updated_at: new Date().toISOString(),
+        }
+
+        let { error } = await supabase
             .from('admin_api_keys')
-            .upsert({
-                team_id: teamId,
-                key_name,
-                encrypted_value: encrypted,
-                updated_by: profile.id,
-                updated_at: new Date().toISOString(),
-            }, { onConflict: 'team_id,key_name' })
+            .upsert(upsertPayload, { onConflict: 'team_id,key_name' })
+
+        // Self-heal: if table doesn't exist, create it and retry once
+        if (error && error.code === '42P01') {
+            console.log('[Admin Keys PUT] Table missing — creating...')
+            const { error: createErr } = await supabase.rpc('exec_sql', {
+                sql: `
+                    CREATE TABLE IF NOT EXISTS public.admin_api_keys (
+                        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                        team_id UUID NOT NULL,
+                        key_name TEXT NOT NULL,
+                        encrypted_value TEXT NOT NULL,
+                        updated_by UUID,
+                        updated_at TIMESTAMPTZ DEFAULT now(),
+                        created_at TIMESTAMPTZ DEFAULT now(),
+                        UNIQUE(team_id, key_name)
+                    );
+                    CREATE INDEX IF NOT EXISTS idx_admin_api_keys_team ON public.admin_api_keys(team_id);
+                `
+            })
+            if (createErr) {
+                console.error('[Admin Keys PUT] Table create failed:', JSON.stringify(createErr))
+                return NextResponse.json({
+                    error: `Table missing and could not be created: ${createErr.message}. Run supabase/supabase-migration-admin-keys.sql in your Supabase SQL editor.`,
+                    code: 'TABLE_MISSING',
+                }, { status: 500 })
+            }
+            // Retry upsert after table creation
+            const retry = await supabase
+                .from('admin_api_keys')
+                .upsert(upsertPayload, { onConflict: 'team_id,key_name' })
+            error = retry.error
+        }
 
         if (error) {
             console.error('[Admin Keys PUT] Supabase upsert error:', JSON.stringify(error))

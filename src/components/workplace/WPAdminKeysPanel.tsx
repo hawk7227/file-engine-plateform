@@ -255,16 +255,21 @@ export function WPAdminKeysPanel({ toast, accessToken }: Props) {
                       placeholder={`Paste ${k.id}...`}
                       value={editValue}
                       onChange={e => setEditValue(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') handleSave(k.id); if (e.key === 'Escape') { setEditingKey(null); setEditValue('') } }}
+                      onKeyDown={e => { if (e.key === 'Enter') handleSave(k.id); if (e.key === 'Escape') { setEditingKey(null); setEditValue(''); setError(null) } }}
                       autoFocus
                       disabled={saving}
                     />
                     <button className="wak-btn save" onClick={() => handleSave(k.id)} disabled={saving || !editValue.trim()}>
-                      {saving ? '...' : 'Save'}
+                      {saving ? 'Saving...' : 'Save'}
                     </button>
-                    <button className="wak-btn" onClick={() => { setEditingKey(null); setEditValue('') }}>
+                    <button className="wak-btn" onClick={() => { setEditingKey(null); setEditValue(''); setError(null) }}>
                       Esc
                     </button>
+                    {error && editingKey === k.id && (
+                      <div style={{width:'100%',marginTop:4,padding:'4px 8px',borderRadius:6,background:'rgba(255,59,92,.1)',border:'1px solid rgba(255,59,92,.2)',color:'var(--wp-red)',fontSize:10,fontWeight:700}}>
+                        ⚠ {error}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div key={k.id} className="wak-row">
