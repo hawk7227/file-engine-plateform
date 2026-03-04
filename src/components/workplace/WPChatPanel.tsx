@@ -260,7 +260,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
         )}
         <div className="wpc-input-wrap">
           <button className="wpc-upload-btn" onClick={() => fileRef.current?.click()} title="Attach files">📎</button>
-          <input className="wpc-input" placeholder="Ask anything..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }} disabled={chat.isLoading} />
+          <textarea className="wpc-input" placeholder="Ask anything..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }} disabled={chat.isLoading} rows={1} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}></textarea>
           <button className="wpc-send" onClick={chat.isLoading ? chat.stopGeneration : handleSend} disabled={!input.trim() && !selectedFiles.length && !chat.isLoading}>
             {chat.isLoading ? '⏹' : '↑'}
           </button>
