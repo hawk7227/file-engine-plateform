@@ -2,6 +2,8 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react'
 import type { DevicePreset } from './WorkplaceLayout'
+import { injectInspector } from '@/lib/preview-assembler'
+import { WPVisualEditor } from './WPVisualEditor'
 
 // ============================================
 // CSS — Docked layout: phone centered in panel via flexbox
@@ -82,11 +84,12 @@ interface Props {
   onCloseBrowser: () => void
   onClosePreview?: () => void
   onFallbackToCode?: () => void
+  onElementClick?: (component: string | null, tag: string) => void
 }
 
 export function WPPreviewCanvas({
   activeDevice, showBrowser, zoom, previewUrl, previewHtml,
-  rotated, theme, refreshKey, onCloseBrowser, onFallbackToCode,
+  rotated, theme, refreshKey, onCloseBrowser, onFallbackToCode, onElementClick,
 }: Props) {
   const phoneIframeRef = useRef<HTMLIFrameElement>(null)
   const browserIframeRef = useRef<HTMLIFrameElement>(null)
@@ -94,6 +97,7 @@ export function WPPreviewCanvas({
   const [browserPos, setBrowserPos] = useState({ x: 40, y: 40 })
   const [iframeStatus, setIframeStatus] = useState<'empty' | 'loading' | 'live' | 'error'>('empty')
   const [iframeError, setIframeError] = useState<string | null>(null)
+  const [visualEditorOpen, setVisualEditorOpen] = useState(false)
 
   // Compute dimensions with rotation
   const baseW = activeDevice.cssViewport.width
@@ -103,7 +107,17 @@ export function WPPreviewCanvas({
   const phoneRadius = rotated ? Math.max(18, activeDevice.borderRadius - 10) : activeDevice.borderRadius
   const screenRadius = Math.max(0, phoneRadius - 14)
 
-  const themedHtml = previewHtml ? wrapWithTheme(previewHtml, theme) : null
+  const themedHtml = previewHtml ? injectInspector(wrapWithTheme(previewHtml, theme)) : null
+
+  const toggleVisualEditor = useCallback(() => {
+    setVisualEditorOpen(prev => {
+      const next = !prev
+      const msg = next ? 'fe-activate-inspector' : 'fe-deactivate-inspector'
+      phoneIframeRef.current?.contentWindow?.postMessage({ type: msg }, '*')
+      browserIframeRef.current?.contentWindow?.postMessage({ type: msg }, '*')
+      return next
+    })
+  }, [])
 
   // Auto-refresh iframes when content or refreshKey changes
   // Uses document.open/write/close instead of srcdoc to preserve scroll position
@@ -141,7 +155,12 @@ export function WPPreviewCanvas({
       }
     })
 
-    const timer = setTimeout(() => setIframeStatus('live'), 600)
+    const timer = setTimeout(() => {
+      setIframeStatus('live')
+      if (visualEditorOpen) {
+        phoneIframeRef.current?.contentWindow?.postMessage({ type: 'fe-activate-inspector' }, '*')
+      }
+    }, 600)
     return () => clearTimeout(timer)
   }, [themedHtml, previewUrl, refreshKey])
 
@@ -163,10 +182,13 @@ export function WPPreviewCanvas({
         setIframeStatus('error')
         setIframeError(e.data.message || 'Runtime error in preview')
       }
+      if (e.data?.type === 'fe-click-edit') {
+        onElementClick?.(e.data.component || null, e.data.tag || '')
+      }
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [])
+  }, [onElementClick])
 
   // Browser drag — pointer capture guarantees mouseup even over iframes
   const onBrowserDragDown = useCallback((e: React.PointerEvent) => {
@@ -224,6 +246,26 @@ export function WPPreviewCanvas({
       <style>{CANVAS_CSS}</style>
       <div className="wp-canvas">
         {/* PHONE — centered via flexbox parent, scaled via transform */}
+        {/* Edit button — floats top-left of canvas */}
+        {hasContent && (
+          <button
+            onClick={toggleVisualEditor}
+            style={{
+              position: 'absolute', top: 12, left: 12, zIndex: 50,
+              padding: '5px 12px', borderRadius: 8,
+              background: visualEditorOpen ? '#00f5a0' : 'rgba(0,0,0,.7)',
+              color: visualEditorOpen ? '#000' : '#00f5a0',
+              border: '1px solid rgba(0,245,160,.3)',
+              font: '700 11px/20px monospace',
+              cursor: 'pointer', backdropFilter: 'blur(8px)',
+              transition: 'all .15s',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}
+          >
+            {visualEditorOpen ? '✕ Exit Edit' : '✏ Edit'}
+          </button>
+        )}
+
         <div className="wp-phone-wrap" style={{ transform: `scale(${zoom})` }}>
           <div className="wp-phone" style={{ width: vw, height: vh, borderRadius: phoneRadius }}>
             {showDI && <div className="wp-phone-di"><div className="cam" /></div>}
@@ -329,6 +371,16 @@ export function WPPreviewCanvas({
           </div>
         )}
       </div>
+
+        {/* Visual editor panel — floats over canvas */}
+        <WPVisualEditor
+          iframeRef={phoneIframeRef}
+          visible={visualEditorOpen}
+          onClose={() => {
+            setVisualEditorOpen(false)
+            phoneIframeRef.current?.contentWindow?.postMessage({ type: 'fe-deactivate-inspector' }, '*')
+          }}
+        />
     </>
   )
 }

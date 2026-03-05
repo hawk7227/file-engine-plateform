@@ -224,6 +224,187 @@ window.onerror = function(msg) {
 
 // ── Main entry point ──
 
+
+// ── Click-to-edit inspector injection ──
+const INSPECTOR_JS = `
+(function() {
+  var selected = null;
+  var originalStyles = {};
+  var overlay = null;
+  var active = false;
+  var uidCounter = 0;
+
+  // Assign unique IDs to all elements on load
+  function assignUids() {
+    var all = document.querySelectorAll('*');
+    for (var i = 0; i < all.length; i++) {
+      if (!all[i].dataset.feUid) {
+        all[i].dataset.feUid = 'fe-' + (++uidCounter);
+      }
+    }
+  }
+
+  function getStyles(el) {
+    var cs = window.getComputedStyle(el);
+    return {
+      color: cs.color,
+      backgroundColor: cs.backgroundColor,
+      fontSize: cs.fontSize,
+      fontWeight: cs.fontWeight,
+      padding: cs.padding,
+      borderRadius: cs.borderRadius,
+      opacity: cs.opacity,
+      letterSpacing: cs.letterSpacing,
+      lineHeight: cs.lineHeight,
+      textAlign: cs.textAlign,
+      display: cs.display,
+      width: cs.width,
+      height: cs.height
+    };
+  }
+
+  function getDirectText(el) {
+    var text = '';
+    for (var i = 0; i < el.childNodes.length; i++) {
+      if (el.childNodes[i].nodeType === 3) {
+        text += el.childNodes[i].textContent;
+      }
+    }
+    return text.trim();
+  }
+
+  function showOverlay(el) {
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;pointer-events:none;z-index:2147483646;box-shadow:0 0 0 2px #00f5a0,0 0 0 4px rgba(0,245,160,.2);border-radius:3px;transition:all .08s ease;';
+      var badge = document.createElement('div');
+      badge.id = '__fe_badge';
+      badge.style.cssText = 'position:absolute;top:-24px;left:0;background:#00f5a0;color:#000;font:700 10px/20px monospace;padding:1px 7px;border-radius:4px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+      overlay.appendChild(badge);
+      document.body.appendChild(overlay);
+    }
+    var r = el.getBoundingClientRect();
+    overlay.style.left = (r.left - 2) + 'px';
+    overlay.style.top = (r.top - 2) + 'px';
+    overlay.style.width = (r.width + 4) + 'px';
+    overlay.style.height = (r.height + 4) + 'px';
+    overlay.style.display = 'block';
+    var badge = overlay.querySelector('#__fe_badge');
+    badge.textContent = el.tagName.toLowerCase() + (el.id ? '#'+el.id : '') + (el.className && typeof el.className==='string' ? '.'+el.className.trim().split(/\s+/)[0] : '');
+  }
+
+  function hideOverlay() {
+    if (overlay) overlay.style.display = 'none';
+  }
+
+  function selectElement(el) {
+    if (!el || el === document.body || el === document.documentElement) return;
+    selected = el;
+    // Save original inline styles for reset
+    originalStyles[el.dataset.feUid] = el.getAttribute('style') || '';
+
+    var info = {
+      uid: el.dataset.feUid,
+      tag: el.tagName.toLowerCase(),
+      text: getDirectText(el),
+      rect: el.getBoundingClientRect(),
+      styles: getStyles(el)
+    };
+    window.parent.postMessage({ type: 'fe-element-selected', element: info }, '*');
+    showOverlay(el);
+  }
+
+  function onMouseMove(e) {
+    if (!active) return;
+    if (e.target === overlay || overlay && overlay.contains(e.target)) return;
+    showOverlay(e.target);
+  }
+
+  function onClick(e) {
+    if (!active) return;
+    if (e.target === overlay || overlay && overlay.contains(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    selectElement(e.target);
+  }
+
+  function activate() {
+    active = true;
+    assignUids();
+    document.addEventListener('mousemove', onMouseMove, true);
+    document.addEventListener('click', onClick, true);
+    document.body.style.cursor = 'crosshair';
+  }
+
+  function deactivate() {
+    active = false;
+    document.removeEventListener('mousemove', onMouseMove, true);
+    document.removeEventListener('click', onClick, true);
+    document.body.style.cursor = '';
+    hideOverlay();
+  }
+
+  // Listen for commands from parent
+  window.addEventListener('message', function(e) {
+    if (!e.data || !e.data.type) return;
+
+    if (e.data.type === 'fe-activate-inspector') {
+      activate();
+    }
+
+    if (e.data.type === 'fe-deactivate-inspector') {
+      deactivate();
+      selected = null;
+      hideOverlay();
+    }
+
+    if (e.data.type === 'fe-apply-style') {
+      var uid = e.data.uid;
+      var el = document.querySelector('[data-fe-uid="' + uid + '"]');
+      if (!el) return;
+      el.style[e.data.prop] = e.data.value;
+      if (selected && selected.dataset.feUid === uid) showOverlay(el);
+    }
+
+    if (e.data.type === 'fe-apply-text') {
+      var uid = e.data.uid;
+      var el = document.querySelector('[data-fe-uid="' + uid + '"]');
+      if (!el) return;
+      // Only update text nodes, preserve child elements
+      for (var i = 0; i < el.childNodes.length; i++) {
+        if (el.childNodes[i].nodeType === 3 && el.childNodes[i].textContent.trim()) {
+          el.childNodes[i].textContent = e.data.text;
+          break;
+        }
+      }
+      if (el.childNodes.length === 0 || (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3)) {
+        el.textContent = e.data.text;
+      }
+    }
+
+    if (e.data.type === 'fe-reset-element') {
+      var uid = e.data.uid;
+      var el = document.querySelector('[data-fe-uid="' + uid + '"]');
+      if (!el) return;
+      el.setAttribute('style', originalStyles[uid] || '');
+      if (selected && selected.dataset.feUid === uid) showOverlay(el);
+    }
+  });
+
+  // Auto-activate on load (parent controls via messages)
+  document.addEventListener('DOMContentLoaded', function() {
+    assignUids();
+  });
+})();
+`
+
+export function injectInspector(html: string): string {
+  const script = `<script>\n${INSPECTOR_JS}\n</script>`
+  if (html.includes('</body>')) return html.replace('</body>', script + '</body>')
+  if (html.includes('</html>')) return html.replace('</html>', script + '</html>')
+  return html + script
+}
+
 export function assemblePreviewHtml(files: GeneratedFile[]): string | null {
   if (!files.length) return null
 
