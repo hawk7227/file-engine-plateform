@@ -491,8 +491,8 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     }) || generatedFiles.find(f => f.path.includes(component))
     if (match) {
       setEditorOpenFile(match.path)
-      // Expand bottom panel if collapsed
-      if (!bottomExpanded) {
+      // Expand bottom panel if collapsed — but not when Page Builder is active
+      if (!bottomExpanded && !pageBuilderMode) {
         setBottomHeight(300)
         setBottomExpanded(true)
       }
@@ -539,7 +539,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
 
       // Always open in editor
       setEditorOpenFile(file.name)
-      if (!bottomExpanded) { setBottomHeight(320); setBottomExpanded(true) }
+      if (!bottomExpanded && !pageBuilderMode) { setBottomHeight(320); setBottomExpanded(true) }
       toast('Opened', file.name, 'ok')
 
       // If GitHub coords set → resolve full dependency graph from repo
@@ -959,6 +959,8 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
               <WPPageBuilder
                 initialCode={generatedFiles[0]?.content || ''}
                 initialFilename={generatedFiles[0]?.path || 'component.tsx'}
+                externalCode={generatedFiles[0]?.content}
+                externalFilename={generatedFiles[0]?.path}
               />
             ) : (
             <>

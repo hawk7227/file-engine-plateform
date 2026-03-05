@@ -672,11 +672,13 @@ function ImageAnalyzer({ onGenerateCode, providerCfg }: { onGenerateCode: (token
 interface Props {
   initialCode?: string
   initialFilename?: string
+  externalCode?: string       // When set, syncs into editor (file loaded from outside)
+  externalFilename?: string   // Matching filename for externalCode
 }
 
 type PBMode = 'preview' | 'editor' | 'analyzer' | 'imagegen'
 
-export function WPPageBuilder({ initialCode = '', initialFilename = 'component.tsx' }: Props) {
+export function WPPageBuilder({ initialCode = '', initialFilename = 'component.tsx', externalCode, externalFilename }: Props) {
   const [mode, setMode] = useState<PBMode>('preview')
   const [code, setCode] = useState(initialCode)
   const [filename, setFilename] = useState(initialFilename)
@@ -706,6 +708,24 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
 
   // ── Keep codeRef in sync (used by Monaco initMonaco to avoid stale closure) ──
   useEffect(() => { codeRef.current = code }, [code])
+
+  // ── Sync external file load into editor ──
+  // When WorkplaceLayout loads a file and passes it via externalCode prop,
+  // update internal code + filename state and switch to editor mode so user sees it.
+  const prevExternalRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (!externalCode || externalCode === prevExternalRef.current) return
+    prevExternalRef.current = externalCode
+    setCode(externalCode)
+    codeRef.current = externalCode
+    if (externalFilename) setFilename(externalFilename)
+    setMode('editor')
+    // Sync into Monaco editor instance if already loaded
+    if (editorInstanceRef.current) {
+      const model = editorInstanceRef.current.getModel()
+      if (model) model.setValue(externalCode)
+    }
+  }, [externalCode, externalFilename])
 
   // ── Build preview HTML whenever code changes ──
   useEffect(() => {
