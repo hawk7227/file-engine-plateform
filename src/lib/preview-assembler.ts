@@ -134,12 +134,13 @@ function buildReactPreview(cat: CategorizedFiles): string {
   const entryName = findEntryComponent(cat.react)
   const sorted = sortFiles(allReactFiles, entryName)
 
-  // Process each file: strip imports, strip TS types
+  // With data-presets="react,typescript" Babel handles all TS natively.
+  // We only need to: strip import statements (inlined) + strip export keywords.
   const processedScripts = sorted.map(f => {
     let code = stripImports(f.content)
-    if (f.path.endsWith('.ts') || f.path.endsWith('.tsx')) {
-      code = stripTypeAnnotations(code)
-    }
+    // Strip export keywords — everything is in same scope
+    code = code.replace(/^export\s+default\s+/gm, '')
+    code = code.replace(/^export\s+(?=(?:const|let|var|function|class|async|type|interface)\s)/gm, '')
     return `// ── ${f.path} ──\n${code}`
   }).join('\n\n')
 
@@ -164,14 +165,20 @@ ${cssContent}
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" data-type="module">
-const { useState, useEffect, useRef, useCallback, useMemo, useContext, createContext, Fragment } = React;
+<script type="text/babel" data-presets="react,typescript">
+const { useState, useEffect, useRef, useCallback, useMemo, useContext, createContext, Fragment,
+        forwardRef, memo, useReducer, useLayoutEffect, useId } = React;
 
 ${processedScripts}
 
 // ── Mount ──
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(${entryName}));
+try {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(React.createElement(${entryName}));
+} catch(e) {
+  document.getElementById('root').innerHTML =
+    '<div style="padding:24px;font-family:monospace;color:#f87171"><b>Mount Error</b><pre style="margin-top:8px;font-size:11px;white-space:pre-wrap">' + (e instanceof Error ? e.message : String(e)) + '</pre></div>';
+}
 <\/script>
 <script>
 function showError(msg, line, col) {
