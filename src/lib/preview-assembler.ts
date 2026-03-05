@@ -152,9 +152,9 @@ function buildReactPreview(cat: CategorizedFiles): string {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 ${CONSOLE_CAPTURE}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"><\/script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"><\/script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js"><\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"><\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"><\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js" crossorigin="anonymous"><\/script>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet" crossorigin="anonymous">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -174,18 +174,23 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(React.createElement(${entryName}));
 <\/script>
 <script>
-window.onerror = function(msg, src, line, col, err) {
+function showError(msg, line, col) {
   var el = document.getElementById('root');
+  var display = (msg && msg !== 'Script error.' && msg !== 'Script error') ? msg : 'A script error occurred. Check that your component has no syntax errors.';
   if (el) {
-    el.innerHTML = '<div style="padding:24px;font-family:monospace">'
-      + '<div style="color:#f87171;font-size:14px;font-weight:700;margin-bottom:8px">Runtime Error</div>'
-      + '<pre style="color:#fbbf24;font-size:11px;white-space:pre-wrap;word-break:break-word">' + String(msg) + '</pre>'
-      + '<div style="color:#71717a;font-size:10px;margin-top:8px">Line ' + line + (col ? ':' + col : '') + '</div>'
-      + '</div>';
+    el.innerHTML = '<div style="padding:24px;font-family:monospace"><div style="color:#f87171;font-size:14px;font-weight:700;margin-bottom:8px">Runtime Error</div><pre style="color:#fbbf24;font-size:11px;white-space:pre-wrap;word-break:break-word">' + display + '</pre>' + (line ? '<div style="color:#71717a;font-size:10px;margin-top:8px">Line ' + line + (col ? ':' + col : '') + '</div>' : '') + '</div>';
   }
-  window.parent.postMessage({ type: 'wp-iframe-error', message: String(msg) }, '*');
+  window.parent.postMessage({ type: 'wp-iframe-error', message: display }, '*');
+}
+window.onerror = function(msg, src, line, col, err) {
+  var detail = (err && err.message) ? err.message : String(msg);
+  showError(detail, line, col);
   return true;
 };
+window.addEventListener('unhandledrejection', function(e) {
+  var msg = e.reason ? (e.reason.message || String(e.reason)) : 'Unhandled promise rejection';
+  showError(msg, null, null);
+});
 <\/script>
 </body>
 </html>`
@@ -475,10 +480,10 @@ const NPM_GLOBALS: Record<string, string> = {
 
 // ── CDN scripts to load ───────────────────────────────────────────────────
 const CDN_SCRIPTS = `
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">`
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet" crossorigin="anonymous">`
 
 // ── Runtime shims injected as a <script> before Babel modules ─────────────
 // These are window globals that Babel's module system will resolve
@@ -684,14 +689,23 @@ try {
 }
 </script>
 <script>
-window.onerror = function(msg, src, line, col, err) {
+function showError(msg, line) {
   var el = document.getElementById('root');
+  var display = (msg && msg !== 'Script error.' && msg !== 'Script error') ? msg : 'A script error occurred. Check that your component has no syntax errors.';
   if (el && !el.hasChildNodes()) {
-    el.innerHTML = '<div style="padding:24px;font-family:monospace"><div style="color:#f87171;font-weight:700;margin-bottom:8px">Runtime Error</div><pre style="color:#fbbf24;font-size:11px;white-space:pre-wrap">' + String(msg) + '</pre><div style="color:#71717a;font-size:10px;margin-top:8px">Line ' + line + '</div></div>';
+    el.innerHTML = '<div style="padding:24px;font-family:monospace"><div style="color:#f87171;font-weight:700;margin-bottom:8px">Runtime Error</div><pre style="color:#fbbf24;font-size:11px;white-space:pre-wrap;word-break:break-word">' + display + '</pre>' + (line ? '<div style="color:#71717a;font-size:10px;margin-top:8px">Line ' + line + '</div>' : '') + '</div>';
   }
-  window.parent.postMessage({ type: 'wp-iframe-error', message: String(msg) }, '*');
+  window.parent.postMessage({ type: 'wp-iframe-error', message: display }, '*');
+}
+window.onerror = function(msg, src, line, col, err) {
+  var detail = (err && err.message) ? err.message : String(msg);
+  showError(detail, line);
   return true;
 };
+window.addEventListener('unhandledrejection', function(e) {
+  var msg = e.reason ? (e.reason.message || String(e.reason)) : 'Unhandled promise rejection';
+  showError(msg, null);
+});
 </script>
 </body>
 </html>`
