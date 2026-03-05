@@ -6,7 +6,8 @@
  * Deploys files to Vercel production.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard';
 import { 
 
   createProductionDeployment, 
@@ -36,8 +37,12 @@ interface DeployVercelRequest {
 // ============================================
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (auth.error) return auth.error
+  
   try {
     const body = await request.json() as Record<string, any>;
     

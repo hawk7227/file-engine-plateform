@@ -6,7 +6,8 @@
  * Fixes code based on user feedback (text or voice).
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard';
 import { userRequestedFix } from '@/lib/file-engine/auto-fix-engine';
 import { validationErrorResponse } from '@/lib/schemas'
 
@@ -30,8 +31,12 @@ interface UserFixRequest {
 // ============================================
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (auth.error) return auth.error
+  
   try {
     const body = await request.json() as Record<string, any>;
     

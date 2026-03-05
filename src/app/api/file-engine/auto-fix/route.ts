@@ -6,7 +6,8 @@
  * Automatically fixes build errors using AI.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard';
 import { autoFixErrors } from '@/lib/file-engine/auto-fix-engine';
 import { parseBody, parseAutoFixRequest, validationErrorResponse } from '@/lib/schemas'
 
@@ -29,8 +30,12 @@ interface AutoFixRequest {
 // ============================================
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (auth.error) return auth.error
+  
   try {
     const parsed = await parseBody(request, parseAutoFixRequest)
     if (!parsed.success) return validationErrorResponse(parsed.error)

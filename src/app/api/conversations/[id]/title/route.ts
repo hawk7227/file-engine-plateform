@@ -10,6 +10,7 @@ import { createClient } from '@supabase/supabase-js'
 import { selectProvider } from '@/lib/ai-config'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 20
 
 function getSupabaseClient(authHeader: string) {
   return createClient(

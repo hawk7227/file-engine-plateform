@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 // =====================================================
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 15
 
 const ADMIN_SECRET = process.env.ADMIN_PANEL_SECRET || ''
 const OWNER_ID = process.env.ADMIN_OWNER_ID || ''

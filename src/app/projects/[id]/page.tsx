@@ -1,4 +1,5 @@
 'use client'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard'
 import { parseBody, parseFetchUrlRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 20
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req)
+  if (auth.error) return auth.error
   try {
     const parsed = await parseBody(req, parseFetchUrlRequest)
     if (!parsed.success) return validationErrorResponse(parsed.error)

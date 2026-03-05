@@ -109,6 +109,7 @@ interface OpenFile {
 interface Props {
   generatedFiles: GeneratedFile[]
   onFilesSave?: (files: GeneratedFile[]) => void
+  onLiveUpdate?: (files: GeneratedFile[]) => void  // fires on every edit (debounced 300ms)
   toast: (title: string, msg: string, type?: string) => void
   openFilePath?: string | null          // set externally (e.g. from inspector click)
   onOpenFileConsumed?: () => void        // called after we've opened it
@@ -116,7 +117,7 @@ interface Props {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath, onOpenFileConsumed }: Props) {
+export function WPFileEditor({ generatedFiles, onFilesSave, onLiveUpdate, toast, openFilePath, onOpenFileConsumed }: Props) {
   // GitHub repo config
   const [owner, setOwner] = useState('')
   const [repoName, setRepoName] = useState('')
@@ -137,6 +138,7 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath,
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const lineNumsRef = useRef<HTMLDivElement>(null)
   const localUploadRef = useRef<HTMLInputElement>(null)
+  const liveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── Respond to external file open request (e.g. inspector click) ─────────
   useEffect(() => {
@@ -556,7 +558,28 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath,
                 ref={textareaRef}
                 className="wfe-textarea"
                 value={openFile.content}
-                onChange={e => setOpenFile(prev => prev ? { ...prev, content: e.target.value } : null)}
+                onChange={e => {
+                  const val = e.target.value
+                  setOpenFile(prev => {
+                    if (!prev) return null
+                    const updated = { ...prev, content: val }
+                    // Live preview: debounce 300ms push to parent
+                    if (onLiveUpdate) {
+                      if (liveDebounceRef.current) clearTimeout(liveDebounceRef.current)
+                      liveDebounceRef.current = setTimeout(() => {
+                        const liveFiles = generatedFiles.map(f =>
+                          f.path === updated.path ? { ...f, content: val } : f
+                        )
+                        // If file not in generatedFiles yet (locally uploaded), add it
+                        if (!liveFiles.find(f => f.path === updated.path)) {
+                          liveFiles.push({ path: updated.path, content: val, language: updated.path.split('.').pop() || 'text' })
+                        }
+                        onLiveUpdate(liveFiles)
+                      }, 300)
+                    }
+                    return updated
+                  })
+                }}
                 onScroll={syncLineScroll}
                 onKeyDown={handleKeyDown}
                 onClick={handleCursorMove}

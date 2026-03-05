@@ -6,7 +6,8 @@
  * Creates a GitHub repo and pushes files, or pushes to existing repo.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard';
 import { BRAND_NAME } from '@/lib/brand'
 import { 
 
@@ -42,8 +43,12 @@ interface PushGitHubRequest {
 // ============================================
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (auth.error) return auth.error
+  
   try {
     const body = await request.json() as Record<string, any>;
     

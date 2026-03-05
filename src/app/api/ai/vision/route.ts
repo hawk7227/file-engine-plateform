@@ -16,6 +16,7 @@ import {
 import { parseBody, parseAIVisionRequest, validationErrorResponse } from '@/lib/schemas'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 30
 
 export async function POST(request: NextRequest) {
   try {

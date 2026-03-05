@@ -138,6 +138,7 @@ const VALID_KEYS = [
 
 // ── GET — List all keys (masked, never raw) ──
 export const dynamic = 'force-dynamic'
+export const maxDuration = 15
 
 export async function GET(req: NextRequest) {
     try {

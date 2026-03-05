@@ -1,4 +1,5 @@
 'use client'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -150,6 +151,7 @@ export default function PricingPage() {
   }
 
   return (
+    <ErrorBoundary>
     <div className="pricing-page">
       <div className="pricing-bg" />
       
@@ -512,5 +514,6 @@ export default function PricingPage() {
         }
       `}</style>
     </div>
+    </ErrorBoundary>
   )
 }

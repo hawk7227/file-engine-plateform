@@ -6,7 +6,8 @@
  * Deploys to both Vercel and GitHub in a single operation.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth-guard';
 import { BRAND_NAME } from '@/lib/brand'
 import { 
 
@@ -51,8 +52,12 @@ interface DeployBothRequest {
 // ============================================
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 90
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (auth.error) return auth.error
+  
   try {
     const body = await request.json() as Record<string, any>;
     

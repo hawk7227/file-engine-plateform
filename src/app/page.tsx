@@ -1,4 +1,5 @@
 'use client'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 // =====================================================
 // FILE ENGINE - LANDING PAGE
@@ -160,6 +161,7 @@ export default function LandingPage() {
   ]
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-zinc-950 text-white">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800">
@@ -581,5 +583,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+    </ErrorBoundary>
   )
 }
