@@ -179,6 +179,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   }, [themeScheme])
   const [refreshKey, setRefreshKey] = useState(0)
   const [diffProposal, setDiffProposal] = useState<DiffProposal | null>(null)
+  const [editorOpenFile, setEditorOpenFile] = useState<string | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -432,6 +433,24 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const handleElementClick = useCallback((component: string | null, tag: string) => {
+    // Find matching file in generated files
+    if (!component) return
+    // Try exact filename match: Button -> Button.tsx, button.tsx
+    const match = generatedFiles.find(f => {
+      const name = f.path.split('/').pop()?.replace(/\.tsx?$/, '') || ''
+      return name.toLowerCase() === component.toLowerCase()
+    }) || generatedFiles.find(f => f.path.includes(component))
+    if (match) {
+      setEditorOpenFile(match.path)
+      // Expand bottom panel if collapsed
+      if (!bottomExpanded) {
+        setBottomHeight(300)
+        setBottomExpanded(true)
+      }
+    }
+  }, [generatedFiles, bottomExpanded])
+
   const handleEditorSave = useCallback((files: GeneratedFile[]) => {
     setGeneratedFiles(files)
   }, [])
@@ -494,34 +513,90 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
         <WPChatFontSizer />
         {/* ═══ TOP BAR ═══ */}
         <div className="wp-topbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {/* Left: logo + title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <button className="wp-tb wp-mobile-toggle" onClick={() => setMobileSidebarOpen(p => !p)} style={{ padding: '3px 6px' }}>☰</button>
-            <div className="wp-logo" style={{ width: 22, height: 22, fontSize: 7 }}>FE</div>
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '-.3px' }}>Workplace</span>
-            <span style={{ fontSize: 7, color: 'var(--wp-text-4)', fontWeight: 700 }}>ADMIN v3</span>
+            <div className="wp-logo" style={{ width: 28, height: 28, fontSize: 8, borderRadius: 8 }}>FE</div>
+            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-.3px' }}>Workplace</span>
           </div>
-          <div className="wp-tsep" style={{ margin: '0 4px' }} />
-          <div className="wp-avstack">
-            {realtime.teamMembers.slice(0, 4).map((m, i) => (
-              <div key={m.user_id} className="wp-avt" style={{
-                background: m.user_id === user.id
-                  ? 'var(--wp-accent)'
-                  : `hsl(${(i * 90 + 260) % 360}, 70%, 65%)`,
-                color: m.user_id === user.id ? '#000' : '#fff',
-              }}>
-                {m.user_name?.[0]?.toUpperCase() || '?'}
-              </div>
-            ))}
-            <span className="wp-avcount">{onlineCount} online</span>
+
+          <div className="wp-tsep" style={{ margin: '0 8px' }} />
+
+          {/* Centre: Theme / Admin / Settings tabs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <button
+              className="wp-tb"
+              onClick={() => setLeftTab(leftTab === 'theme' ? 'chat' : 'theme')}
+              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: leftTab === 'theme' ? 'var(--wp-accent-dim)' : 'none', color: leftTab === 'theme' ? 'var(--wp-accent)' : 'var(--wp-text-3)', border: leftTab === 'theme' ? '1px solid rgba(0,245,160,.2)' : '1px solid transparent' }}
+            >
+              🎨 Theme
+            </button>
+            <button
+              className="wp-tb"
+              onClick={() => setLeftTab(leftTab === 'admin' ? 'chat' : 'admin')}
+              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: leftTab === 'admin' ? 'var(--wp-accent-dim)' : 'none', color: leftTab === 'admin' ? 'var(--wp-accent)' : 'var(--wp-text-3)', border: leftTab === 'admin' ? '1px solid rgba(0,245,160,.2)' : '1px solid transparent' }}
+            >
+              📊 Admin
+            </button>
+            <button
+              className="wp-tb"
+              onClick={() => setLeftTab(leftTab === 'settings' ? 'chat' : 'settings')}
+              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: leftTab === 'settings' ? 'var(--wp-accent-dim)' : 'none', color: leftTab === 'settings' ? 'var(--wp-accent)' : 'var(--wp-text-3)', border: leftTab === 'settings' ? '1px solid rgba(0,245,160,.2)' : '1px solid transparent' }}
+            >
+              ⚙ Settings
+            </button>
           </div>
-          <div className="wp-tsep" style={{ margin: '0 4px' }} />
-          <button className="wp-tb wp-tb-primary" onClick={handleDeploy}>▶ Deploy</button>
-          <button className="wp-tb" onClick={() => {
-            toast('Pushed', 'Files → master', 'ok')
-            realtime.logActivity('git_push', { branch: 'master' })
-          }}>⬆ Push</button>
-          <button className="wp-tb" onClick={() => toast('Settings', 'Coming soon', 'nfo')}>⚙</button>
+
+          {/* Right: presence + actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+            <div className="wp-avstack">
+              {realtime.teamMembers.slice(0, 4).map((m, i) => (
+                <div key={m.user_id} className="wp-avt" style={{
+                  background: m.user_id === user.id ? 'var(--wp-accent)' : `hsl(${(i * 90 + 260) % 360}, 70%, 65%)`,
+                  color: m.user_id === user.id ? '#000' : '#fff',
+                }}>
+                  {m.user_name?.[0]?.toUpperCase() || '?'}
+                </div>
+              ))}
+              <span className="wp-avcount">{onlineCount} online</span>
+            </div>
+            <div className="wp-tsep" style={{ margin: '0 4px' }} />
+            <button className="wp-tb wp-tb-primary" onClick={handleDeploy}>▶ Deploy</button>
+            <button className="wp-tb" onClick={() => { toast('Pushed', 'Files → master', 'ok'); realtime.logActivity('git_push', { branch: 'master' }) }}>⬆ Push</button>
+          </div>
         </div>
+
+        {/* ═══ OVERLAY PANELS (Theme / Admin / Settings) — slide over left panel ═══ */}
+        {leftTab !== 'chat' && (
+          <div style={{
+            position: 'fixed', top: 48, left: 0, bottom: 32, zIndex: 60,
+            width: leftWidth, background: 'var(--wp-bg-1)',
+            borderRight: '1px solid var(--wp-border)',
+            display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            animation: 'wp-si .2s ease',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid var(--wp-border)', flexShrink: 0 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--wp-text-1)' }}>
+                {leftTab === 'theme' ? '🎨 Theme' : leftTab === 'admin' ? '📊 Admin' : '⚙ Settings'}
+              </span>
+              <button onClick={() => setLeftTab('chat')} style={{ background: 'none', border: 'none', color: 'var(--wp-text-4)', fontSize: 16, cursor: 'pointer', lineHeight: 1 }}>✕</button>
+            </div>
+            <div style={{ flex: 1, overflow: 'auto' }}>
+              {leftTab === 'theme' && (
+                <WPThemePanel activeSchemeId={themeScheme.id} onSchemeChange={(scheme) => setThemeScheme(scheme)} />
+              )}
+              {leftTab === 'admin' && (
+                <WPAdminKeysPanel toast={toast} accessToken={accessToken} />
+              )}
+              {leftTab === 'settings' && (
+                <div style={{ padding: 16, color: 'var(--wp-text-3)', fontSize: 13 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 8, color: 'var(--wp-text-1)' }}>Settings</div>
+                  <div style={{ opacity: .6 }}>Coming soon.</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ═══ SIDEBAR ═══ */}
         <WPSidebar
@@ -544,96 +619,17 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
         {/* ═══ MAIN ═══ */}
         <div className="wp-main">
           {/* ═══ LEFT PANEL ═══ */}
+          {/* ═══ LEFT PANEL — chat only, full height ═══ */}
           <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`} style={{ width: leftWidth }}>
-            {/* Sidebar toggle (shows when sidebar collapsed) */}
-            {sidebarCollapsed && (
-              <div className="wp-lheader">
-                <button className="wp-sb-toggle" onClick={toggleSidebar} title="Open sidebar">☰</button>
-                <div>
-                  <div className="wp-ltitle">File Engine</div>
-                  <div className="wp-lsub">Workplace IDE</div>
-                </div>
-              </div>
-            )}
-            {!sidebarCollapsed && (
-              <div className="wp-lheader">
-                <div className="wp-ltitle">{leftTab.charAt(0).toUpperCase() + leftTab.slice(1)}</div>
-              </div>
-            )}
-            <div className="wp-tbar">
-              <button
-                className={`wp-tbtn${leftTab === 'chat' ? ' on' : ''}`}
-                onClick={() => setLeftTab('chat')}
-              >
-                💬 Chat
-              </button>
-              <button
-                className={`wp-tbtn${leftTab === 'theme' ? ' on' : ''}`}
-                onClick={() => setLeftTab('theme')}
-              >
-                🎨 Theme
-              </button>
-              <button
-                className={`wp-tbtn${leftTab === 'admin' ? ' on' : ''}`}
-                onClick={() => setLeftTab('admin')}
-              >
-                📊 Admin
-              </button>
-              <button
-                className={`wp-tbtn${leftTab === 'settings' ? ' on' : ''}`}
-                onClick={() => setLeftTab('settings')}
-              >
-                ⚙ Settings
-              </button>
-            </div>
-            <div className="wp-tcontent">
-              <div className={`wp-tpane${leftTab === 'chat' ? ' show' : ''}`}>
-                <WPChatPanel
-                  chat={chat}
-                  onExpandBottom={toggleBottomExpand}
-                  onSwitchBottomTab={(tab: string) => setBottomTab(tab as BottomTab)}
-                  onToggleBrowser={() => setShowBrowser(p => !p)}
-                  onPreviewFiles={handlePreviewFiles}
-                  toast={toast}
-                  logActivity={realtime.logActivity}
-                />
-              </div>
-              <div className={`wp-tpane${leftTab === 'routes' ? ' show' : ''}`}>
-                <WPRoutesPanel toast={toast} />
-              </div>
-              <div className={`wp-tpane${leftTab === 'video' ? ' show' : ''}`}>
-                <WPVideoStudio toast={toast} logActivity={realtime.logActivity} />
-              </div>
-              <div className={`wp-tpane${leftTab === 'images' ? ' show' : ''}`}>
-                <WPImageStudio toast={toast} logActivity={realtime.logActivity} />
-              </div>
-              <div className={`wp-tpane${leftTab === 'team' ? ' show' : ''}`}>
-                <WPTeamPanel
-                  currentUserId={user.id}
-                  teamMembers={realtime.teamMembers}
-                  onWatch={realtime.startWatching}
-                  toast={toast}
-                />
-              </div>
-              <div className={`wp-tpane${leftTab === 'feed' ? ' show' : ''}`}>
-                <WPActivityFeed activities={realtime.activities} />
-              </div>
-              <div className={`wp-tpane${leftTab === 'theme' ? ' show' : ''}`}>
-                <WPThemePanel
-                  activeSchemeId={themeScheme.id}
-                  onSchemeChange={(scheme) => setThemeScheme(scheme)}
-                />
-              </div>
-              <div className={`wp-tpane${leftTab === 'admin' ? ' show' : ''}`}>
-                <WPAdminKeysPanel toast={toast} accessToken={accessToken} />
-              </div>
-              <div className={`wp-tpane${leftTab === 'settings' ? ' show' : ''}`}>
-                <div style={{ padding: 16, color: 'var(--wp-text-3)', fontSize: 13 }}>
-                  <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--wp-text-1)', marginBottom: 12 }}>Settings</div>
-                  <div style={{ opacity: .6 }}>Settings panel coming soon.</div>
-                </div>
-              </div>
-            </div>
+            <WPChatPanel
+              chat={chat}
+              onExpandBottom={toggleBottomExpand}
+              onSwitchBottomTab={(tab: string) => setBottomTab(tab as BottomTab)}
+              onToggleBrowser={() => setShowBrowser(p => !p)}
+              onPreviewFiles={handlePreviewFiles}
+              toast={toast}
+              logActivity={realtime.logActivity}
+            />
           </div>
 
           {/* ═══ RESIZE HANDLE ═══ */}
@@ -653,6 +649,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 refreshKey={refreshKey}
                 onCloseBrowser={() => setShowBrowser(false)}
                 onFallbackToCode={() => { toggleBottomExpand(); setBottomTab('sql') }}
+                onElementClick={handleElementClick}
               />
             </div>
             <div className="wp-bottom" style={{ height: bottomHeight }}>
@@ -676,6 +673,8 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                     generatedFiles={generatedFiles}
                     onFilesSave={handleEditorSave}
                     toast={toast}
+                    openFilePath={editorOpenFile}
+                    onOpenFileConsumed={() => setEditorOpenFile(null)}
                   />
               </div>
               <div className="wp-bottom-right">
