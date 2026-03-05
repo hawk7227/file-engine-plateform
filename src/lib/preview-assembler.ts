@@ -442,3 +442,257 @@ export function assemblePreviewHtml(files: GeneratedFile[]): string | null {
 
   return null
 }
+
+// =====================================================
+// REAL-PROJECT PREVIEW
+// Takes a fully-resolved dependency map (path → content)
+// from the dependency resolver and builds a self-contained
+// preview. Local imports are inlined. External npm imports
+// are mapped to CDN globals — NOT stripped.
+// =====================================================
+
+import type { ResolvedFiles } from './dependency-resolver'
+
+// ── CDN globals: npm package → window variable name ──────────────────────
+const NPM_GLOBALS: Record<string, string> = {
+  'react': 'React',
+  'react-dom': 'ReactDOM',
+  'react-dom/client': 'ReactDOM',
+  'next/navigation': '__NextNav',
+  'next/link': '__NextLink',
+  'next/image': '__NextImage',
+  'next/router': '__NextRouter',
+  '@stripe/stripe-js': '__StripeJs',
+  '@stripe/react-stripe-js': '__StripeReact',
+  'lucide-react': '__Lucide',
+  'framer-motion': '__FramerMotion',
+  'react-hook-form': '__ReactHookForm',
+  'zod': '__Zod',
+  'clsx': '__clsx',
+  'class-variance-authority': '__cva',
+  'tailwind-merge': '__twMerge',
+}
+
+// ── CDN scripts to load ───────────────────────────────────────────────────
+const CDN_SCRIPTS = `
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">`
+
+// ── Runtime shims injected as a <script> before Babel modules ─────────────
+// These are window globals that Babel's module system will resolve
+const RUNTIME_SHIMS = `
+<script>
+// Next.js shims
+window.__NextNav = {
+  useRouter: () => ({ push: ()=>{}, back: ()=>{}, replace: ()=>{}, prefetch: ()=>{}, pathname: '/', query: {} }),
+  usePathname: () => '/',
+  useSearchParams: () => ({ get: ()=>null, getAll: ()=>[] }),
+  useParams: () => ({}),
+  redirect: ()=>{},
+  notFound: ()=>{},
+};
+window.__NextLink = { default: ({href,children,...p})=>React.createElement('a',{href:href||'#',...p},children) };
+window.__NextImage = { default: ({src,alt,...p})=>React.createElement('img',{src,alt,...p}) };
+window.__NextRouter = window.__NextNav;
+
+// Stripe shims
+window.__StripeJs = { loadStripe: ()=>Promise.resolve(null) };
+window.__StripeReact = {
+  Elements: ({children})=>React.createElement(React.Fragment,null,children),
+  useStripe: ()=>null,
+  useElements: ()=>null,
+  PaymentElement: ()=>React.createElement('div',{style:{padding:'16px',border:'1px dashed #555',borderRadius:'8px',color:'#888',fontSize:'12px',textAlign:'center'}},'[Stripe PaymentElement]'),
+  ExpressCheckoutElement: ()=>React.createElement('div',{style:{padding:'16px',border:'1px dashed #555',borderRadius:'8px',color:'#888',fontSize:'12px',textAlign:'center'}},'[Stripe ExpressCheckout]'),
+  CardElement: ()=>React.createElement('div',{style:{padding:'12px',border:'1px dashed #555',borderRadius:'6px',color:'#888',fontSize:'11px'}},'[CardElement]'),
+};
+
+// Lucide shims — proxy that returns a simple SVG icon for any name
+window.__Lucide = new Proxy({}, {
+  get: (_, name) => {
+    return function LucideIcon({ size=16, color='currentColor', className='', strokeWidth=2, ...p }) {
+      return React.createElement('svg',{
+        xmlns:'http://www.w3.org/2000/svg',width:size,height:size,viewBox:'0 0 24 24',
+        fill:'none',stroke:color,strokeWidth,strokeLinecap:'round',strokeLinejoin:'round',
+        className, ...p,
+        style:{display:'inline-block',verticalAlign:'middle',...p.style}
+      },React.createElement('circle',{cx:12,cy:12,r:10}));
+    }
+  }
+});
+
+// clsx / tailwind-merge shims
+window.__clsx = { default: (...args) => args.flat().filter(Boolean).join(' ') };
+window.__twMerge = { default: (...args) => args.flat().filter(Boolean).join(' '), twMerge: (...args) => args.flat().filter(Boolean).join(' ') };
+window.__cva = { cva: ()=>()=>'', cx: (...a)=>a.join(' ') };
+
+// Framer Motion shims
+window.__FramerMotion = {
+  motion: new Proxy({}, { get:(_, tag)=>React.forwardRef((p,r)=>React.createElement(tag,{...p,ref:r})) }),
+  AnimatePresence: ({children})=>children,
+  useAnimation: ()=>({ start:()=>{}, stop:()=>{} }),
+  useMotionValue: (v)=>({ get:()=>v, set:()=>{} }),
+};
+
+// zod shim
+window.__Zod = {
+  z: { object:()=>({parse:()=>({}),safeParse:()=>({success:true,data:{}})}), string:()=>({min:()=>({}),email:()=>({}),optional:()=>({})}), number:()=>({min:()=>({})}), boolean:()=>({}), array:()=>({}) }
+};
+</script>`
+
+// ── Replace import statements with CDN global destructures ────────────────
+function replaceImportsWithGlobals(source: string): string {
+  return source.replace(
+    /^import\s+([\s\S]*?)\s+from\s+['"]([^'"]+)['"]\s*;?\s*$/gm,
+    (match, specifiers, pkg) => {
+      // Skip local imports — those are inlined separately
+      if (pkg.startsWith('./') || pkg.startsWith('../') || pkg.startsWith('@/')) {
+        return '' // local imports get inlined — remove the import statement
+      }
+
+      // Find the global for this package
+      // Try exact, then prefix match (e.g. 'lucide-react' matches '@lucide-react/*')
+      const globalName = NPM_GLOBALS[pkg] || NPM_GLOBALS[pkg.split('/')[0]]
+      if (!globalName) {
+        // Unknown external — just remove and hope the code doesn't use it critically
+        return `/* external: ${pkg} (not shimmed) */`
+      }
+
+      // Parse import specifiers into destructuring
+      const trimmed = specifiers.trim()
+
+      // import DefaultExport from 'pkg'
+      if (/^\w+$/.test(trimmed)) {
+        return `const ${trimmed} = (window.${globalName}?.default || window.${globalName});`
+      }
+
+      // import { a, b, c } from 'pkg'
+      if (trimmed.startsWith('{')) {
+        const names = trimmed.replace(/[{}]/g, '').split(',').map((s: string) => {
+          const [orig, alias] = s.trim().split(/\s+as\s+/)
+          return alias ? `${alias}: _${alias}` : orig?.trim()
+        }).filter(Boolean)
+        return `const {${names.join(', ')}} = window.${globalName} || {};`
+      }
+
+      // import Default, { named } from 'pkg'
+      const mixedMatch = trimmed.match(/^(\w+)\s*,\s*(\{[\s\S]+\})$/)
+      if (mixedMatch) {
+        const [, def, named] = mixedMatch
+        const names = named.replace(/[{}]/g, '').split(',').map((s: string) => s.trim()).filter(Boolean)
+        return [
+          `const ${def} = window.${globalName}?.default || window.${globalName};`,
+          `const {${names.join(', ')}} = window.${globalName} || {};`,
+        ].join('\n')
+      }
+
+      // import * as X from 'pkg'
+      const nsMatch = trimmed.match(/^\*\s+as\s+(\w+)$/)
+      if (nsMatch) {
+        return `const ${nsMatch[1]} = window.${globalName} || {};`
+      }
+
+      return `/* unhandled import: ${pkg} */`
+    }
+  )
+}
+
+// ── Strip TypeScript-only syntax (keep JSX intact) ───────────────────────
+function stripTypeScript(code: string): string {
+  return code
+    // "use client" / "use server" directives
+    .replace(/^["']use (?:client|server)["'];?\s*$/gm, '')
+    // interface declarations
+    .replace(/^(?:export\s+)?interface\s+\w[\s\S]*?^}/gm, '')
+    // type aliases
+    .replace(/^(?:export\s+)?type\s+\w+\s*=[\s\S]*?;/gm, '')
+    // : Type annotations on params/vars (conservative)
+    .replace(/:\s*(?:string|number|boolean|void|never|null|undefined|any|unknown|ReactNode|React\.FC|React\.\w+(?:<[^>]+>)?|JSX\.Element|Record<[^,>]+,[^>]+>|Array<[^>]+>|\w+(?:<[^>]*>)?(?:\[\])?)(?=\s*[,)=;{])/g, '')
+    // as Type casts
+    .replace(/\s+as\s+(?:\w+(?:<[^>]*>)?(?:\[\])?|\{[^}]*\})/g, '')
+    // Generic type params on functions
+    .replace(/((?:function\s+\w+|\bconst\s+\w+\s*=\s*(?:async\s+)?(?:function)?)\s*)<[^>]+>(\s*\()/g, '$1$2')
+    // export default
+    .replace(/^export\s+default\s+/gm, '')
+    // export { }
+    .replace(/^export\s+\{[^}]*\}\s*;?\s*$/gm, '')
+    // export const/function/class
+    .replace(/^export\s+(?=(?:const|let|var|function|class|async)\s)/gm, '')
+}
+
+// ── Build entry component name from path ──────────────────────────────────
+function getComponentName(path: string): string {
+  const base = path.split('/').pop()?.replace(/\.(tsx?|jsx?)$/, '') || 'App'
+  // PascalCase the filename
+  return base.charAt(0).toUpperCase() + base.slice(1)
+}
+
+// ── Main: build self-contained preview from resolved files ────────────────
+export function assembleFromResolved(
+  rootPath: string,
+  resolvedFiles: ResolvedFiles,
+  cssFiles: Array<{ path: string; content: string }> = []
+): string {
+  // Process each file: replace imports with globals, strip TS types
+  const processedModules = Object.entries(resolvedFiles).map(([path, content]) => {
+    let code = content
+    code = replaceImportsWithGlobals(code)
+    code = stripTypeScript(code)
+    return `\n// ═══ ${path} ═══\n${code}`
+  }).join('\n\n')
+
+  const rootBase = rootPath.split('/').pop()?.replace(/\.(tsx?|jsx?)$/, '') || 'App'
+  const entryName = rootBase.charAt(0).toUpperCase() + rootBase.slice(1)
+
+  // Find actual exported component name from root file
+  const rootContent = resolvedFiles[rootPath] || ''
+  const exportMatch = rootContent.match(/export\s+default\s+(?:function\s+)?(\w+)/)
+  const componentName = exportMatch?.[1] || entryName
+
+  const cssContent = cssFiles.map(f => f.content).join('\n')
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+${CDN_SCRIPTS}
+${RUNTIME_SHIMS}
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+${cssContent}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react,typescript">
+const { useState, useEffect, useRef, useCallback, useMemo, useContext,
+        createContext, forwardRef, Fragment, memo,
+        useReducer, useLayoutEffect, useId } = React;
+
+${processedModules}
+
+// ── Mount ──
+try {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(React.createElement(${componentName}));
+} catch(e) {
+  document.getElementById('root').innerHTML =
+    '<div style="padding:24px;font-family:monospace;color:#f87171"><b>Mount Error</b><pre style="margin-top:8px;font-size:11px;white-space:pre-wrap">' + e.message + '</pre></div>';
+}
+</script>
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  var el = document.getElementById('root');
+  if (el && !el.hasChildNodes()) {
+    el.innerHTML = '<div style="padding:24px;font-family:monospace"><div style="color:#f87171;font-weight:700;margin-bottom:8px">Runtime Error</div><pre style="color:#fbbf24;font-size:11px;white-space:pre-wrap">' + String(msg) + '</pre><div style="color:#71717a;font-size:10px;margin-top:8px">Line ' + line + '</div></div>';
+  }
+  window.parent.postMessage({ type: 'wp-iframe-error', message: String(msg) }, '*');
+  return true;
+};
+</script>
+</body>
+</html>`
+}

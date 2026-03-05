@@ -39,6 +39,8 @@ import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/t
 import type { ThemeScheme } from '@/lib/theme-engine'
 import { WPDiffPreview } from './WPDiffPreview'
 import { applyVisualEdits } from '@/lib/visual-edit-patcher'
+import { resolveDependencies } from '@/lib/dependency-resolver'
+import { assembleFromResolved } from '@/lib/preview-assembler'
 import type { ElementEdit } from './WPVisualEditor'
 import type { DiffProposal } from './WPDiffPreview'
 
@@ -184,6 +186,19 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   const [zoom, setZoom] = useState(0.7)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   // User-set base URL for real project preview (e.g. https://patient.medazonhealth.com)
+  // GitHub coords for dependency resolution — mirrors what user sets in file editor
+  const [githubOwner, setGithubOwner] = useState<string>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('wp-github-owner') || '' : ''
+  )
+  const [githubRepo, setGithubRepo] = useState<string>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('wp-github-repo') || '' : ''
+  )
+  const [githubBranch, setGithubBranch] = useState<string>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('wp-github-branch') || 'main' : 'main'
+  )
+  const [resolvingDeps, setResolvingDeps] = useState(false)
+  const resolveAbortRef = useRef<AbortController | null>(null)
+
   const [projectBaseUrl, setProjectBaseUrl] = useState<string>(() =>
     typeof window !== 'undefined' ? localStorage.getItem('wp-project-base-url') || '' : ''
   )
@@ -516,36 +531,64 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const text = ev.target?.result as string
       if (typeof text !== 'string') return
 
-      // If a project base URL is set, use the real running app — no Babel needed
-      if (projectBaseUrl.trim()) {
-        const route = deriveRouteFromPath(file.name)
-        const liveUrl = projectBaseUrl.replace(/\/$/, '') + route
-        setPreviewUrl(liveUrl)
-        toast('Preview', `Loading ${liveUrl}`, 'ok')
-      } else {
-        // Fallback: load into assembler (for simple self-contained files)
-        setGeneratedFiles(prev => {
-          const exists = prev.find(f => f.path === file.name)
-          if (exists) return prev.map(f => f.path === file.name ? { ...f, content: text } : f)
-          return [...prev, { path: file.name, content: text, language: file.name.split('.').pop() || 'text' }]
-        })
+      // Always open in editor
+      setEditorOpenFile(file.name)
+      if (!bottomExpanded) { setBottomHeight(320); setBottomExpanded(true) }
+      toast('Opened', file.name, 'ok')
+
+      // If GitHub coords set → resolve full dependency graph from repo
+      if (githubOwner.trim() && githubRepo.trim()) {
+        // Cancel any previous resolution
+        resolveAbortRef.current?.abort()
+        const ctrl = new AbortController()
+        resolveAbortRef.current = ctrl
+
+        setResolvingDeps(true)
+        setPreviewHtml(null)
+        toast('Resolving', 'Fetching dependencies from GitHub…', 'nfo')
+
+        try {
+          const resolved = await resolveDependencies(
+            file.name, text,
+            { owner: githubOwner, repo: githubRepo, branch: githubBranch },
+            ctrl.signal
+          )
+          if (ctrl.signal.aborted) return
+
+          // Build preview from full resolved tree — NO stripping, real imports replaced with CDN globals
+          const html = assembleFromResolved(file.name, resolved)
+          setPreviewHtml(html)
+          setPreviewUrl(null)
+          setRefreshKey(k => k + 1)
+
+          // Put all resolved files into generatedFiles so editor can see them
+          const files = Object.entries(resolved).map(([path, content]) => ({
+            path, content, language: path.split('.').pop() || 'text'
+          }))
+          setGeneratedFiles(files)
+          toast('Ready', `${Object.keys(resolved).length} file(s) resolved`, 'ok')
+        } catch (err) {
+          if (!ctrl.signal.aborted) {
+            toast('Resolve failed', String(err), 'err')
+            // Fallback: put just this file in assembler
+            setGeneratedFiles([{ path: file.name, content: text, language: file.name.split('.').pop() || 'text' }])
+          }
+        } finally {
+          if (!ctrl.signal.aborted) setResolvingDeps(false)
+        }
+        return
       }
 
-      setEditorOpenFile(file.name)
-      // Auto-expand bottom panel so editor is visible
-      if (!bottomExpanded) {
-        setBottomHeight(320)
-        setBottomExpanded(true)
-      }
-      toast('Opened', file.name, 'ok')
+      // No GitHub coords — put single file into assembler (simple self-contained files)
+      setGeneratedFiles([{ path: file.name, content: text, language: file.name.split('.').pop() || 'text' }])
     }
     reader.readAsText(file)
     e.target.value = ''
-  }, [bottomExpanded, projectBaseUrl, deriveRouteFromPath, toast])
+  }, [bottomExpanded, githubOwner, githubRepo, githubBranch, toast])
 
   // ── Visual edit write-back: apply DOM edits to source files ──
   const handleCommitEdits = useCallback((edits: ElementEdit[]) => {
@@ -793,6 +836,34 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                       <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
                         <button className={`wp-dv-btn${!rotated ? ' on' : ''}`} style={{ flex: 1 }} onClick={() => setRotated(false)}>Portrait</button>
                         <button className={`wp-dv-btn${rotated ? ' on' : ''}`} style={{ flex: 1 }} onClick={() => setRotated(true)}>Landscape</button>
+                      </div>
+
+                      <span className="wp-tp-label">GitHub Repo</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 12 }}>
+                        {[
+                          { label: 'Owner', key: 'owner', val: githubOwner, set: setGithubOwner, ph: 'hawk7227' },
+                          { label: 'Repo', key: 'repo', val: githubRepo, set: setGithubRepo, ph: 'patientpanel' },
+                          { label: 'Branch', key: 'branch', val: githubBranch, set: setGithubBranch, ph: 'main' },
+                        ].map(({ label, key, val, set, ph }) => (
+                          <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: 9, color: 'var(--wp-text-4)', width: 36, flexShrink: 0 }}>{label}</span>
+                            <input
+                              style={{ flex: 1, background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)', borderRadius: 6, padding: '5px 7px', fontSize: 10, color: 'var(--wp-text-1)', fontFamily: 'var(--wp-mono)', outline: 'none' }}
+                              placeholder={ph}
+                              value={val}
+                              onChange={e => { set(e.target.value); localStorage.setItem('wp-github-' + key, e.target.value) }}
+                              spellCheck={false}
+                              autoComplete="off"
+                            />
+                          </div>
+                        ))}
+                        <div style={{ fontSize: 8, color: 'var(--wp-text-4)', lineHeight: 1.5, marginTop: 2 }}>
+                          {resolvingDeps
+                            ? '⏳ Resolving dependencies…'
+                            : githubOwner && githubRepo
+                              ? '✓ Uploading a file will fetch its full import tree from this repo'
+                              : 'Set owner + repo to enable real-project preview'}
+                        </div>
                       </div>
 
                       <span className="wp-tp-label">Project URL</span>
