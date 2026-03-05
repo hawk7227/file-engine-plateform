@@ -173,7 +173,6 @@ interface WPEditorProProps {
 }
 
 export function WPEditorPro({ code: externalCode, onCodeChange, visible = true, onClose, liveUrl: externalUrl, filename: externalFilename, previewHtml: externalPreviewHtml }: WPEditorProProps) {
-  if (!visible) return null
   const [internalCode, setInternalCode] = useState(DEFAULT_CODE);
   const code = externalCode || internalCode;
   const setCode = (v: string) => { setInternalCode(v); onCodeChange?.(v); };
@@ -437,6 +436,8 @@ ${inspectScript}
   }, [sel]);
 
   const panelW = panel ? 320 : 0;
+
+  if (!visible) return null;
 
   return (
     <div style={{ height: "100vh", width: "100vw", background: "#050607", color: "#e5e7eb", fontFamily: "'Inter',system-ui,sans-serif", display: "flex", flexDirection: "column", overflow: "hidden" }}>

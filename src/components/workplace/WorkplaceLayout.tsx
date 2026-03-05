@@ -1070,6 +1070,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 )}
               </div>
             </div>
+            {/* eslint-disable-next-line */}
             </>
             )}
           </div>
