@@ -132,6 +132,28 @@ const CSS = `
 .wp-toast.err{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.15);color:#f87171}
 .wp-toast.nfo{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.15);color:#60a5fa}
 @keyframes wp-si{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+.wp-tool-rail{width:40px;flex-shrink:0;background:var(--wp-bg-2);border-right:1px solid var(--wp-border);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;overflow:hidden}
+.wp-tool-btn{width:32px;height:32px;border-radius:8px;border:none;background:none;color:var(--wp-text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;flex-shrink:0;position:relative}
+.wp-tool-btn:hover{background:var(--wp-bg-4);color:var(--wp-text-1)}
+.wp-tool-btn.on{background:var(--wp-accent-dim);color:var(--wp-accent)}
+.wp-tool-btn.danger{color:var(--wp-red)}
+.wp-tool-sep{width:24px;height:1px;background:var(--wp-border);margin:4px 0;flex-shrink:0}
+.wp-tool-panel{position:absolute;top:0;bottom:0;left:40px;width:240px;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);z-index:30;display:flex;flex-direction:column;overflow:hidden;animation:wp-tpslide .18s ease}
+@keyframes wp-tpslide{from{transform:translateX(-10px);opacity:0}to{transform:none;opacity:1}}
+.wp-tp-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--wp-border);flex-shrink:0}
+.wp-tp-hdr-title{font-size:11px;font-weight:700;color:var(--wp-text-1)}
+.wp-tp-close{background:none;border:none;color:var(--wp-text-4);font-size:14px;cursor:pointer;line-height:1;padding:2px}
+.wp-tp-close:hover{color:var(--wp-text-2)}
+.wp-tp-body{flex:1;overflow-y:auto;padding:12px}
+.wp-device-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:12px}
+.wp-dv-btn{padding:6px 4px;border-radius:6px;border:1px solid var(--wp-border);background:var(--wp-bg-3);color:var(--wp-text-3);font-size:9px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--wp-font)}
+.wp-dv-btn:hover{border-color:var(--wp-border-2);color:var(--wp-text-2)}
+.wp-dv-btn.on{border-color:var(--wp-accent);background:var(--wp-accent-dim);color:var(--wp-accent)}
+.wp-tp-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--wp-text-4);margin-bottom:6px;display:block}
+.wp-zoom-row{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.wp-zoom-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--wp-border);background:var(--wp-bg-3);color:var(--wp-text-2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.wp-zoom-btn:hover{border-color:var(--wp-accent);color:var(--wp-accent)}
+.wp-zoom-val{flex:1;text-align:center;font-size:11px;font-weight:700;color:var(--wp-text-1);font-family:var(--wp-mono)}
 @media(max-width:768px){.wp-left{position:fixed;left:0;top:48px;bottom:32px;z-index:50;width:280px;transform:translateX(-100%);transition:transform .22s ease}.wp-left.open{transform:none}.wp-mobile-toggle{display:flex}.wp-center{width:100%}.wp-bottom{height:48px!important}.wp-main{flex-direction:column}.wp-canvas-area{min-height:340px;max-height:50vh}.wp-footer{flex-wrap:wrap;gap:6px}}
 @media(min-width:769px){.wp-mobile-toggle{display:none}.wp-left{transform:none!important}}
 @media(min-width:769px) and (max-width:1024px){.wp-left{width:240px}.wp-canvas-area{min-height:300px}}
@@ -189,6 +211,9 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   })
   const [sidebarNav, setSidebarNav] = useState('chats')
   const [leftWidth, setLeftWidth] = useState(300)
+  const [toolPanel, setToolPanel] = useState<'none'|'device'|'theme'|'admin'|'settings'>('none')
+  const toggleTool = (panel: 'device'|'theme'|'admin'|'settings') =>
+    setToolPanel(p => p === panel ? 'none' : panel)
 
   // ── Horizontal resize (left panel ↔ center) ──
   const startResizeH = useCallback((e: React.MouseEvent) => {
@@ -511,43 +536,11 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
       <div className="wp-root">
         <WPChatThemeOverride />
         <WPChatFontSizer />
-        {/* ═══ TOP BAR ═══ */}
+        {/* ═══ TOP BAR — minimal: logo + team presence + deploy only ═══ */}
         <div className="wp-topbar">
-          {/* Left: logo + title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <button className="wp-tb wp-mobile-toggle" onClick={() => setMobileSidebarOpen(p => !p)} style={{ padding: '3px 6px' }}>☰</button>
-            <div className="wp-logo" style={{ width: 28, height: 28, fontSize: 8, borderRadius: 8 }}>FE</div>
-            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-.3px' }}>Workplace</span>
-          </div>
-
-          <div className="wp-tsep" style={{ margin: '0 8px' }} />
-
-          {/* Centre: Theme / Admin / Settings tabs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <button
-              className="wp-tb"
-              onClick={() => setLeftTab(leftTab === 'theme' ? 'chat' : 'theme')}
-              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: leftTab === 'theme' ? 'var(--wp-accent-dim)' : 'none', color: leftTab === 'theme' ? 'var(--wp-accent)' : 'var(--wp-text-3)', border: leftTab === 'theme' ? '1px solid rgba(0,245,160,.2)' : '1px solid transparent' }}
-            >
-              🎨 Theme
-            </button>
-            <button
-              className="wp-tb"
-              onClick={() => setLeftTab(leftTab === 'admin' ? 'chat' : 'admin')}
-              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: leftTab === 'admin' ? 'var(--wp-accent-dim)' : 'none', color: leftTab === 'admin' ? 'var(--wp-accent)' : 'var(--wp-text-3)', border: leftTab === 'admin' ? '1px solid rgba(0,245,160,.2)' : '1px solid transparent' }}
-            >
-              📊 Admin
-            </button>
-            <button
-              className="wp-tb"
-              onClick={() => setLeftTab(leftTab === 'settings' ? 'chat' : 'settings')}
-              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: leftTab === 'settings' ? 'var(--wp-accent-dim)' : 'none', color: leftTab === 'settings' ? 'var(--wp-accent)' : 'var(--wp-text-3)', border: leftTab === 'settings' ? '1px solid rgba(0,245,160,.2)' : '1px solid transparent' }}
-            >
-              ⚙ Settings
-            </button>
-          </div>
-
-          {/* Right: presence + actions */}
+          <button className="wp-tb wp-mobile-toggle" onClick={() => setMobileSidebarOpen(p => !p)} style={{ padding: '3px 6px' }}>☰</button>
+          <div className="wp-logo" style={{ width: 28, height: 28, fontSize: 8, borderRadius: 8 }}>FE</div>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-.3px' }}>Workplace</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
             <div className="wp-avstack">
               {realtime.teamMembers.slice(0, 4).map((m, i) => (
@@ -566,37 +559,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
           </div>
         </div>
 
-        {/* ═══ OVERLAY PANELS (Theme / Admin / Settings) — slide over left panel ═══ */}
-        {leftTab !== 'chat' && (
-          <div style={{
-            position: 'fixed', top: 48, left: 0, bottom: 32, zIndex: 60,
-            width: leftWidth, background: 'var(--wp-bg-1)',
-            borderRight: '1px solid var(--wp-border)',
-            display: 'flex', flexDirection: 'column', overflow: 'hidden',
-            animation: 'wp-si .2s ease',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid var(--wp-border)', flexShrink: 0 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--wp-text-1)' }}>
-                {leftTab === 'theme' ? '🎨 Theme' : leftTab === 'admin' ? '📊 Admin' : '⚙ Settings'}
-              </span>
-              <button onClick={() => setLeftTab('chat')} style={{ background: 'none', border: 'none', color: 'var(--wp-text-4)', fontSize: 16, cursor: 'pointer', lineHeight: 1 }}>✕</button>
-            </div>
-            <div style={{ flex: 1, overflow: 'auto' }}>
-              {leftTab === 'theme' && (
-                <WPThemePanel activeSchemeId={themeScheme.id} onSchemeChange={(scheme) => setThemeScheme(scheme)} />
-              )}
-              {leftTab === 'admin' && (
-                <WPAdminKeysPanel toast={toast} accessToken={accessToken} />
-              )}
-              {leftTab === 'settings' && (
-                <div style={{ padding: 16, color: 'var(--wp-text-3)', fontSize: 13 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 8, color: 'var(--wp-text-1)' }}>Settings</div>
-                  <div style={{ opacity: .6 }}>Coming soon.</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+
 
         {/* ═══ SIDEBAR ═══ */}
         <WPSidebar
@@ -618,18 +581,170 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
 
         {/* ═══ MAIN ═══ */}
         <div className="wp-main">
-          {/* ═══ LEFT PANEL ═══ */}
-          {/* ═══ LEFT PANEL — chat only, full height ═══ */}
-          <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`} style={{ width: leftWidth }}>
-            <WPChatPanel
-              chat={chat}
-              onExpandBottom={toggleBottomExpand}
-              onSwitchBottomTab={(tab: string) => setBottomTab(tab as BottomTab)}
-              onToggleBrowser={() => setShowBrowser(p => !p)}
-              onPreviewFiles={handlePreviewFiles}
-              toast={toast}
-              logActivity={realtime.logActivity}
-            />
+          {/* ═══ LEFT PANEL — tool rail + chat + slide-in tool panels ═══ */}
+          <div className={`wp-left${mobileSidebarOpen ? ' open' : ''}`} style={{ width: leftWidth, flexDirection: 'row', overflow: 'visible', position: 'relative' }}>
+
+            {/* ── Tool Rail (40px) ── */}
+            <div className="wp-tool-rail">
+              {/* Device picker */}
+              <button
+                className={`wp-tool-btn${toolPanel === 'device' ? ' on' : ''}`}
+                onClick={() => toggleTool('device')}
+                title="Device & Zoom"
+              >📱</button>
+
+              <div className="wp-tool-sep" />
+
+              {/* Zoom in/out */}
+              <button
+                className="wp-tool-btn"
+                onClick={() => setZoom(z => Math.min(1.5, parseFloat((z + 0.1).toFixed(1))))}
+                title="Zoom In"
+              >＋</button>
+              <button
+                className="wp-tool-btn"
+                style={{ fontSize: 11, fontWeight: 900 }}
+                onClick={() => setZoom(z => Math.max(0.2, parseFloat((z - 0.1).toFixed(1))))}
+                title="Zoom Out"
+              >－</button>
+              <button
+                className="wp-tool-btn"
+                style={{ fontSize: 9, fontWeight: 700 }}
+                onClick={() => setZoom(0.7)}
+                title={`Zoom: ${Math.round(zoom * 100)}% — click to reset`}
+              >{Math.round(zoom * 100)}%</button>
+
+              <div className="wp-tool-sep" />
+
+              {/* Rotate */}
+              <button
+                className={`wp-tool-btn${rotated ? ' on' : ''}`}
+                onClick={() => setRotated(r => !r)}
+                title="Rotate landscape"
+              >↺</button>
+
+              {/* Browser overlay */}
+              <button
+                className={`wp-tool-btn${showBrowser ? ' on' : ''}`}
+                onClick={() => setShowBrowser(p => !p)}
+                title="Browser overlay"
+              >🌐</button>
+
+              <div className="wp-tool-sep" />
+
+              {/* Theme */}
+              <button
+                className={`wp-tool-btn${toolPanel === 'theme' ? ' on' : ''}`}
+                onClick={() => toggleTool('theme')}
+                title="Theme"
+              >🎨</button>
+
+              {/* Admin */}
+              <button
+                className={`wp-tool-btn${toolPanel === 'admin' ? ' on' : ''}`}
+                onClick={() => toggleTool('admin')}
+                title="Admin Keys"
+              >🔑</button>
+
+              {/* Settings */}
+              <button
+                className={`wp-tool-btn${toolPanel === 'settings' ? ' on' : ''}`}
+                onClick={() => toggleTool('settings')}
+                title="Settings"
+              >⚙</button>
+            </div>
+
+            {/* ── Slide-in Tool Panel (appears over chat, inside left column) ── */}
+            {toolPanel !== 'none' && (
+              <div className="wp-tool-panel">
+                <div className="wp-tp-hdr">
+                  <span className="wp-tp-hdr-title">
+                    {toolPanel === 'device' ? '📱 Device & Zoom'
+                      : toolPanel === 'theme' ? '🎨 Theme'
+                      : toolPanel === 'admin' ? '🔑 Admin Keys'
+                      : '⚙ Settings'}
+                  </span>
+                  <button className="wp-tp-close" onClick={() => setToolPanel('none')}>✕</button>
+                </div>
+                <div className="wp-tp-body">
+                  {toolPanel === 'device' && (
+                    <>
+                      <span className="wp-tp-label">Device</span>
+                      <div className="wp-device-grid">
+                        {DEVICES.map(d => (
+                          <button
+                            key={d.id}
+                            className={`wp-dv-btn${activeDevice.id === d.id ? ' on' : ''}`}
+                            onClick={() => setActiveDevice(d)}
+                          >
+                            <div>{d.label}</div>
+                            <div style={{ fontSize: 8, opacity: .6, fontWeight: 400 }}>{d.screenSize}</div>
+                          </button>
+                        ))}
+                        <button
+                          className={`wp-dv-btn${activeDevice.id === BROWSER_PRESET.id ? ' on' : ''}`}
+                          onClick={() => setActiveDevice(BROWSER_PRESET)}
+                          style={{ gridColumn: 'span 2' }}
+                        >
+                          <div>🌐 Web Browser</div>
+                          <div style={{ fontSize: 8, opacity: .6, fontWeight: 400 }}>1280×800</div>
+                        </button>
+                      </div>
+
+                      <span className="wp-tp-label">Zoom</span>
+                      <div className="wp-zoom-row">
+                        <button className="wp-zoom-btn" onClick={() => setZoom(z => Math.max(0.2, parseFloat((z - 0.1).toFixed(1))))}>−</button>
+                        <span className="wp-zoom-val">{Math.round(zoom * 100)}%</span>
+                        <button className="wp-zoom-btn" onClick={() => setZoom(z => Math.min(1.5, parseFloat((z + 0.1).toFixed(1))))}>+</button>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, marginBottom: 12 }}>
+                        {[50, 70, 100].map(p => (
+                          <button key={p} className={`wp-dv-btn${Math.round(zoom*100) === p ? ' on' : ''}`} onClick={() => setZoom(p/100)}>{p}%</button>
+                        ))}
+                      </div>
+
+                      <span className="wp-tp-label">Orientation</span>
+                      <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
+                        <button className={`wp-dv-btn${!rotated ? ' on' : ''}`} style={{ flex: 1 }} onClick={() => setRotated(false)}>Portrait</button>
+                        <button className={`wp-dv-btn${rotated ? ' on' : ''}`} style={{ flex: 1 }} onClick={() => setRotated(true)}>Landscape</button>
+                      </div>
+
+                      <span className="wp-tp-label">Info</span>
+                      <div style={{ fontSize: 9, color: 'var(--wp-text-3)', lineHeight: 1.8, fontFamily: 'var(--wp-mono)' }}>
+                        <div>{activeDevice.name}</div>
+                        <div>{activeDevice.cssViewport.width}×{activeDevice.cssViewport.height} @{activeDevice.dpr}x</div>
+                        <div>{activeDevice.screenSize}</div>
+                      </div>
+                    </>
+                  )}
+                  {toolPanel === 'theme' && (
+                    <WPThemePanel activeSchemeId={themeScheme.id} onSchemeChange={(scheme) => { setThemeScheme(scheme); saveThemeId(scheme.id) }} />
+                  )}
+                  {toolPanel === 'admin' && (
+                    <WPAdminKeysPanel toast={toast} accessToken={accessToken} />
+                  )}
+                  {toolPanel === 'settings' && (
+                    <div style={{ color: 'var(--wp-text-3)', fontSize: 12 }}>
+                      <div style={{ fontWeight: 700, marginBottom: 8, color: 'var(--wp-text-1)' }}>Settings</div>
+                      <div style={{ opacity: .6 }}>Coming soon.</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Chat (fills remaining width) ── */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+              <WPChatPanel
+                chat={chat}
+                onExpandBottom={toggleBottomExpand}
+                onSwitchBottomTab={(tab: string) => setBottomTab(tab as BottomTab)}
+                onToggleBrowser={() => setShowBrowser(p => !p)}
+                onPreviewFiles={handlePreviewFiles}
+                toast={toast}
+                logActivity={realtime.logActivity}
+              />
+            </div>
           </div>
 
           {/* ═══ RESIZE HANDLE ═══ */}
