@@ -167,9 +167,12 @@ interface WPEditorProProps {
   onCodeChange?: (code: string) => void
   visible?: boolean
   onClose?: () => void
+  liveUrl?: string          // Load a live URL directly into the device frame
+  filename?: string         // Current filename being edited
+  previewHtml?: string      // Pre-assembled preview HTML from the center preview
 }
 
-export function WPEditorPro({ code: externalCode, onCodeChange, visible = true, onClose }: WPEditorProProps) {
+export function WPEditorPro({ code: externalCode, onCodeChange, visible = true, onClose, liveUrl: externalUrl, filename: externalFilename, previewHtml: externalPreviewHtml }: WPEditorProProps) {
   if (!visible) return null
   const [internalCode, setInternalCode] = useState(DEFAULT_CODE);
   const code = externalCode || internalCode;
@@ -179,10 +182,13 @@ export function WPEditorPro({ code: externalCode, onCodeChange, visible = true, 
   const [zones, setZones] = useState(true);
   const [measures, setMeasures] = useState(true);
   const [sel, setSel] = useState<any>(null);
-  const [panel, setPanel] = useState<string | null>(null); // null | "props" | "devices" | "warnings" | "code"
+  const [panel, setPanel] = useState<string | null>(null);
   const [imgResult, setImgResult] = useState<any>(null);
   const [imgAnalyzing, setImgAnalyzing] = useState(false);
   const [saveStatus, setSaveStatus] = useState("saved");
+  const [inspectMode, setInspectMode] = useState(false);  // NEW: toggle between navigate and inspect
+  const [urlInput, setUrlInput] = useState("");
+  const [liveUrl, setLiveUrl] = useState(externalUrl || "");
   const [ghToken, setGhToken] = useState("");
   const [ghRepo, setGhRepo] = useState("");
   const [ghBranch, setGhBranch] = useState("main");
@@ -219,65 +225,93 @@ export function WPEditorPro({ code: externalCode, onCodeChange, visible = true, 
     return () => ro.disconnect();
   }, [dev, brw]);
 
-  // ═══ PREVIEW HTML ═══
-  const previewHTML = useMemo(() => `<!DOCTYPE html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=${dev.w},initial-scale=1,viewport-fit=cover">
-<style>
-:root{--sat:${et}px;--sab:${eb}px;--sal:0px;--sar:0px;}
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:${dev.w}px;height:${visH}px;overflow:hidden;background:#000;font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
-[data-v-hover]{transition:outline 0.1s;}
-</style>
-<script src="https://cdn.tailwindcss.com"><\/script>
-<script>
+  // ═══ PREVIEW — dual mode: navigate (interactive) vs inspect (click-to-select) ═══
+  // Priority: liveUrl > externalPreviewHtml > code-based HTML
+  const inspectScript = `<script>
+let _epInspect = ${inspectMode ? 'true' : 'false'};
 let lastEl=null;
+window.addEventListener('message',(e)=>{
+  if(e.data?.type==='ep-set-inspect') _epInspect = e.data.value;
+});
 document.addEventListener('mouseover',(e)=>{
+  if(!_epInspect)return;
   if(lastEl)lastEl.style.outline='';
   e.target.style.outline='2px solid rgba(249,115,22,0.4)';
   lastEl=e.target;
 });
-document.addEventListener('mouseout',(e)=>{e.target.style.outline='';});
+document.addEventListener('mouseout',(e)=>{if(_epInspect)e.target.style.outline='';});
 document.addEventListener('click',(e)=>{
+  if(!_epInspect)return;
   e.preventDefault();e.stopPropagation();
-  const el=e.target;const cs=getComputedStyle(el);const r=el.getBoundingClientRect();
-  // Get outer HTML snippet
-  const clone=el.cloneNode(false);
-  const tag=clone.outerHTML.slice(0,200);
-  window.parent.postMessage({type:'sel',tag:el.tagName.toLowerCase(),cls:el.className||'',
-    txt:(el.innerText||'').slice(0,100),html:tag,id:el.id||'',
+  const el=e.target,cs=getComputedStyle(el),r=el.getBoundingClientRect();
+  window.parent.postMessage({type:'ep-sel',tag:el.tagName.toLowerCase(),cls:el.className||'',
+    txt:(el.innerText||'').slice(0,100),
     rect:{x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)},
-    sty:{
-      color:cs.color,backgroundColor:cs.backgroundColor,
-      fontSize:cs.fontSize,fontWeight:cs.fontWeight,fontFamily:cs.fontFamily,fontStyle:cs.fontStyle,
-      textAlign:cs.textAlign,textDecoration:cs.textDecoration,textTransform:cs.textTransform,
-      lineHeight:cs.lineHeight,letterSpacing:cs.letterSpacing,
+    sty:{color:cs.color,backgroundColor:cs.backgroundColor,fontSize:cs.fontSize,fontWeight:cs.fontWeight,
+      fontFamily:cs.fontFamily,textAlign:cs.textAlign,lineHeight:cs.lineHeight,letterSpacing:cs.letterSpacing,
       padding:cs.padding,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom,paddingLeft:cs.paddingLeft,paddingRight:cs.paddingRight,
       margin:cs.margin,marginTop:cs.marginTop,marginBottom:cs.marginBottom,
       width:cs.width,height:cs.height,maxWidth:cs.maxWidth,minHeight:cs.minHeight,
-      border:cs.border,borderRadius:cs.borderRadius,
-      display:cs.display,position:cs.position,
-      flexDirection:cs.flexDirection,justifyContent:cs.justifyContent,alignItems:cs.alignItems,gap:cs.gap,
-      overflow:cs.overflow,opacity:cs.opacity,
-      boxShadow:cs.boxShadow,background:cs.background,
-      transform:cs.transform,transition:cs.transition,
-    }
+      border:cs.border,borderRadius:cs.borderRadius,boxShadow:cs.boxShadow,
+      display:cs.display,position:cs.position,flexDirection:cs.flexDirection,
+      justifyContent:cs.justifyContent,alignItems:cs.alignItems,gap:cs.gap,
+      overflow:cs.overflow,opacity:cs.opacity,background:cs.background}
   },'*');
-});
-<\/script>
-</head><body><div id="root" style="width:${dev.w}px;height:${visH}px;overflow:auto;">${code}</div></body></html>`, [code, dev, brw, et, eb, visH]);
+},true);
+<\/script>`;
 
+  const safeAreaCSS = `<style data-ep-safe>:root{--sat:${et}px;--sab:${eb}px;--sal:0px;--sar:0px;}</style>`;
+
+  // Send inspect mode toggle to iframe
+  useEffect(() => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'ep-set-inspect', value: inspectMode }, '*');
+    }
+  }, [inspectMode]);
+
+  // Update iframe src based on priority
   useEffect(() => {
     if (!iframeRef.current) return;
     if (previewTimer.current) clearTimeout(previewTimer.current);
     previewTimer.current = setTimeout(() => {
-      const blob = new Blob([previewHTML], { type: "text/html" });
-      if (iframeRef.current) iframeRef.current.src = URL.createObjectURL(blob);
-    }, 250);
-  }, [previewHTML]);
+      if (!iframeRef.current) return;
+
+      // Priority 1: Live URL
+      if (liveUrl) {
+        iframeRef.current.src = liveUrl;
+        return;
+      }
+
+      // Priority 2: External preview HTML (from center preview assembler — supports TSX)
+      if (externalPreviewHtml) {
+        // Inject safe area CSS + inspect script
+        let html = externalPreviewHtml;
+        if (html.includes('</head>')) {
+          html = html.replace('</head>', safeAreaCSS + inspectScript + '</head>');
+        } else {
+          html = safeAreaCSS + inspectScript + html;
+        }
+        const blob = new Blob([html], { type: 'text/html' });
+        iframeRef.current.src = URL.createObjectURL(blob);
+        return;
+      }
+
+      // Priority 3: Code-based HTML
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=${dev.w},initial-scale=1,viewport-fit=cover">
+${safeAreaCSS}
+<style>*{margin:0;padding:0;box-sizing:border-box;}html,body{width:${dev.w}px;height:${visH}px;overflow:auto;background:#000;font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}</style>
+<script src="https://cdn.tailwindcss.com"><\/script>
+${inspectScript}
+</head><body><div id="root" style="width:${dev.w}px;height:${visH}px;overflow:auto;">${code}</div></body></html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      iframeRef.current.src = URL.createObjectURL(blob);
+    }, 300);
+  }, [code, dev, brw, et, eb, visH, liveUrl, externalPreviewHtml, inspectMode]);
 
   // ═══ ELEMENT SELECTION ═══
   useEffect(() => {
-    const h = (e: MessageEvent) => { if (e.data?.type === "sel") { setSel(e.data); setPanel("props"); } };
+    const h = (e: MessageEvent) => { if (e.data?.type === "ep-sel") { setSel(e.data); setPanel("props"); } };
     window.addEventListener("message", h);
     return () => window.removeEventListener("message", h);
   }, []);
@@ -433,6 +467,8 @@ document.addEventListener('click',(e)=>{
         {/* Actions */}
         <Tb onClick={() => fileRef.current?.click()}>📂</Tb>
         <input ref={fileRef} type="file" accept=".tsx,.jsx,.html" onChange={onFile} style={{ display: "none" }} />
+        <Tb onClick={() => setInspectMode(!inspectMode)}>{inspectMode ? "👆" : "🖱️"}</Tb>
+        <Tb onClick={() => setPanel(panel === "url" ? null : "url")}>🔗</Tb>
         <Tb onClick={() => imgRef.current?.click()}>🖼️</Tb>
         <input ref={imgRef} type="file" accept="image/*" onChange={onImg} style={{ display: "none" }} />
         <Tb onClick={download}>💾</Tb>
@@ -454,6 +490,8 @@ document.addEventListener('click',(e)=>{
         {dev.s && <span>@{dev.s}x</span>}
         {dev.ppi && <span>{dev.ppi}ppi</span>}
         {vp.overflow > 0 && <span style={{ color: "#ef4444", fontWeight: 700 }}>⚠ 100vh +{vp.overflow}px</span>}
+        {liveUrl && <span style={{ color: "#2dd4a0", fontWeight: 600 }}>LIVE</span>}
+        <span style={{ color: inspectMode ? "#f97316" : "#4b5563", fontWeight: inspectMode ? 700 : 400, cursor: "pointer" }} onClick={() => setInspectMode(!inspectMode)}>{inspectMode ? "👆 INSPECT" : "🖱️ NAVIGATE"}</span>
         <div style={{ flex: 1 }} />
         <button onClick={() => setPanel(panel === "browser-info" ? null : "browser-info")} style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer", fontSize: 9 }}>
           ℹ {brw.n}
@@ -531,7 +569,7 @@ document.addEventListener('click',(e)=>{
             {/* Panel header */}
             <div style={{ flexShrink: 0, height: 36, background: "#0c0d0f", borderBottom: "1px solid #1f2937", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px" }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: "#f97316" }}>
-                {panel === "props" ? "🔍 Properties" : panel === "devices" ? "📱 All Devices" : panel === "warnings" ? "⚠️ Warnings" : panel === "browser-info" ? "ℹ️ Browser Mode" : panel === "code" ? "</> Code" : panel === "image" ? "🖼️ Image AI" : "⬆️ GitHub"}
+                {panel === "props" ? "🔍 Properties" : panel === "devices" ? "📱 All Devices" : panel === "warnings" ? "⚠️ Warnings" : panel === "browser-info" ? "ℹ️ Browser Mode" : panel === "url" ? "🔗 Load URL" : panel === "code" ? "</> Code" : panel === "image" ? "🖼️ Image AI" : "⬆️ GitHub"}
               </span>
               <button onClick={() => { setPanel(null); setSel(null); }} style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: 14 }}>✕</button>
             </div>
@@ -673,6 +711,21 @@ document.addEventListener('click',(e)=>{
                     <p style={{ fontSize: 11 }}>Upload a screenshot to analyze</p>
                   </div>
               )}
+
+              {/* URL LOAD */}
+              {panel === "url" && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <p style={{ fontSize: 10, color: "#9ca3af" }}>Load a live page into the device frame. Click through it normally, then toggle inspect mode (👆) to select elements.</p>
+                <input value={urlInput} onChange={e => setUrlInput(e.target.value)} placeholder="patient.medazonhealth.com/express-checkout" onKeyDown={e => { if (e.key === "Enter") { const u = urlInput.startsWith("http") ? urlInput : "https://" + urlInput; setLiveUrl(u); setPanel(null); }}}
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 6, background: "#111318", border: "1px solid #1f2937", color: "#e5e7eb", fontSize: 11, fontFamily: "monospace", outline: "none" }} />
+                <button onClick={() => { const u = urlInput.startsWith("http") ? urlInput : "https://" + urlInput; setLiveUrl(u); setPanel(null); }} style={{ width: "100%", padding: "10px", borderRadius: 6, background: "linear-gradient(135deg,#2dd4a0,#0d9488)", color: "#000", fontWeight: 700, fontSize: 12, border: "none", cursor: "pointer" }}>Load URL →</button>
+                {liveUrl && <button onClick={() => { setLiveUrl(""); setPanel(null); }} style={{ width: "100%", padding: "8px", borderRadius: 6, background: "#1a1b1e", color: "#e5e7eb", fontWeight: 500, fontSize: 11, border: "1px solid #1f2937", cursor: "pointer" }}>✕ Clear URL (back to code preview)</button>}
+                <div style={{ fontSize: 9, color: "#4b5563", marginTop: 4 }}>
+                  <p style={{ marginBottom: 2 }}>Quick links:</p>
+                  <button onClick={() => { setLiveUrl("https://patient.medazonhealth.com/express-checkout"); setPanel(null); }} style={{ display: "block", background: "none", border: "none", color: "#2dd4a0", cursor: "pointer", fontSize: 9, textAlign: "left", padding: "2px 0" }}>→ patient.medazonhealth.com/express-checkout</button>
+                  <button onClick={() => { setLiveUrl("https://patient.medazonhealth.com"); setPanel(null); }} style={{ display: "block", background: "none", border: "none", color: "#2dd4a0", cursor: "pointer", fontSize: 9, textAlign: "left", padding: "2px 0" }}>→ patient.medazonhealth.com</button>
+                  <button onClick={() => { setLiveUrl("https://doctor.medazonhealth.com"); setPanel(null); }} style={{ display: "block", background: "none", border: "none", color: "#2dd4a0", cursor: "pointer", fontSize: 9, textAlign: "left", padding: "2px 0" }}>→ doctor.medazonhealth.com</button>
+                </div>
+              </div>}
 
               {/* GITHUB */}
               {panel === "github" && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

@@ -1087,6 +1087,8 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
               }}
               visible={editorProVisible}
               onClose={() => setEditorProVisible(false)}
+              previewHtml={previewHtml || undefined}
+              filename={generatedFiles[0]?.path || 'component.tsx'}
             />
           </div>
         )}
