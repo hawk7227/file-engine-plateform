@@ -187,10 +187,12 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
     agentFilesRef.current = []
 
     try {
-      const apiMessages = [...messages, userMessage].map(m => ({
-        role: m.role,
-        content: m.content
-      }))
+      const apiMessages = [...messages, userMessage]
+        .filter(m => typeof m.content === 'string' && m.content.trim().length > 0)
+        .map(m => ({
+          role: m.role,
+          content: m.content
+        }))
 
       const apiAttachments = attachments?.map(a => ({
         type: a.type,
@@ -203,10 +205,8 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
       // NOTE: Using raw localStorage read to avoid navigator.locks deadlock in Supabase JS SDK
       let authHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
       try {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-        const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\./)?.[1] || ''
-        const storageKey = `sb-${projectRef}-auth-token`
-        const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+        // storageKey must match what's set in src/lib/supabase/client.ts (fe-auth-v3)
+        const raw = typeof window !== 'undefined' ? localStorage.getItem('fe-auth-v3') : null
         if (raw) {
           const parsed = JSON.parse(raw)
           const token = parsed?.access_token
@@ -464,12 +464,10 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
       // ── Auto-save chat to DB ──
       try {
         // Raw localStorage read — avoids navigator.locks deadlock in Supabase JS SDK
+        // storageKey must match src/lib/supabase/client.ts (fe-auth-v3)
         let userId: string | null = null
         try {
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-          const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\./)?.[1] || ''
-          const storageKey = `sb-${projectRef}-auth-token`
-          const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+          const raw = typeof window !== 'undefined' ? localStorage.getItem('fe-auth-v3') : null
           if (raw) {
             const parsed = JSON.parse(raw)
             userId = parsed?.user?.id || null
