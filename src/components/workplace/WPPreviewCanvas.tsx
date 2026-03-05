@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import type { DevicePreset } from './WorkplaceLayout'
 import { injectInspector } from '@/lib/preview-assembler'
 import { WPVisualEditor } from './WPVisualEditor'
+import type { ElementEdit } from './WPVisualEditor'
 
 // ============================================
 // CSS — Docked layout: phone centered in panel via flexbox
@@ -85,11 +86,12 @@ interface Props {
   onClosePreview?: () => void
   onFallbackToCode?: () => void
   onElementClick?: (component: string | null, tag: string) => void
+  onCommitEdits?: (edits: ElementEdit[]) => void
 }
 
 export function WPPreviewCanvas({
   activeDevice, showBrowser, zoom, previewUrl, previewHtml,
-  rotated, theme, refreshKey, onCloseBrowser, onFallbackToCode, onElementClick,
+  rotated, theme, refreshKey, onCloseBrowser, onFallbackToCode, onElementClick, onCommitEdits,
 }: Props) {
   const phoneIframeRef = useRef<HTMLIFrameElement>(null)
   const browserIframeRef = useRef<HTMLIFrameElement>(null)
@@ -380,6 +382,7 @@ export function WPPreviewCanvas({
             setVisualEditorOpen(false)
             phoneIframeRef.current?.contentWindow?.postMessage({ type: 'fe-deactivate-inspector' }, '*')
           }}
+          onCommitEdits={onCommitEdits}
         />
     </>
   )

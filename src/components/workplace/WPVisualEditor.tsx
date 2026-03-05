@@ -34,10 +34,18 @@ export interface SelectedElement {
   }
 }
 
+export interface ElementEdit {
+  uid: string
+  tag: string
+  styles: Record<string, string>   // prop → value
+  text?: string                     // new text if changed
+}
+
 interface Props {
   iframeRef: React.RefObject<HTMLIFrameElement>
   visible: boolean
   onClose: () => void
+  onCommitEdits?: (edits: ElementEdit[]) => void
 }
 
 const CSS = `
@@ -199,10 +207,12 @@ function toHex(color: string): string {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function WPVisualEditor({ iframeRef, visible, onClose }: Props) {
+export function WPVisualEditor({ iframeRef, visible, onClose, onCommitEdits }: Props) {
   const [selected, setSelected] = useState<SelectedElement | null>(null)
   const [edits, setEdits] = useState<Record<string, string>>({})
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Accumulate edits across all elements in this session
+  const allEditsRef = useRef<Record<string, ElementEdit>>({})
 
   // ── Listen for element selection from iframe ──────────────────────────────
   useEffect(() => {
@@ -225,11 +235,17 @@ export function WPVisualEditor({ iframeRef, visible, onClose }: Props) {
   const applyStyle = useCallback((prop: string, value: string) => {
     if (!selected) return
     setEdits(prev => ({ ...prev, [prop]: value }))
+    // Accumulate in session edits
+    const uid = selected.uid
+    if (!allEditsRef.current[uid]) {
+      allEditsRef.current[uid] = { uid, tag: selected.tag, styles: {}, text: selected.text }
+    }
+    allEditsRef.current[uid].styles[prop] = value
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       iframeRef.current?.contentWindow?.postMessage({
         type: 'fe-apply-style',
-        uid: selected.uid,
+        uid,
         prop,
         value,
       }, '*')
@@ -240,11 +256,16 @@ export function WPVisualEditor({ iframeRef, visible, onClose }: Props) {
   const applyText = useCallback((text: string) => {
     if (!selected) return
     setEdits(prev => ({ ...prev, __text: text }))
+    const uid = selected.uid
+    if (!allEditsRef.current[uid]) {
+      allEditsRef.current[uid] = { uid, tag: selected.tag, styles: {} }
+    }
+    allEditsRef.current[uid].text = text
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       iframeRef.current?.contentWindow?.postMessage({
         type: 'fe-apply-text',
-        uid: selected.uid,
+        uid,
         text,
       }, '*')
     }, 30)
@@ -485,8 +506,15 @@ export function WPVisualEditor({ iframeRef, visible, onClose }: Props) {
 
             <div className="wve-footer">
               <button className="wve-reset" onClick={reset}>↺ Reset</button>
-              <button className="wve-done" onClick={() => { setSelected(null); setEdits({}) }}>
-                ✓ Done
+              <button className="wve-done" onClick={() => {
+                // Commit all accumulated edits to source
+                const editsArr = Object.values(allEditsRef.current)
+                if (editsArr.length > 0) onCommitEdits?.(editsArr)
+                allEditsRef.current = {}
+                setSelected(null)
+                setEdits({})
+              }}>
+                ✓ Commit {Object.keys(allEditsRef.current).length > 0 ? `(${Object.keys(allEditsRef.current).length})` : ''}
               </button>
             </div>
           </>

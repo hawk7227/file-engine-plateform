@@ -38,6 +38,8 @@ import { WPChatFontSizer } from './WPChatFontSizer'
 import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/theme-engine'
 import type { ThemeScheme } from '@/lib/theme-engine'
 import { WPDiffPreview } from './WPDiffPreview'
+import { applyVisualEdits } from '@/lib/visual-edit-patcher'
+import type { ElementEdit } from './WPVisualEditor'
 import type { DiffProposal } from './WPDiffPreview'
 
 // ============================================
@@ -507,6 +509,15 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     e.target.value = ''
   }, [bottomExpanded, toast])
 
+  // ── Visual edit write-back: apply DOM edits to source files ──
+  const handleCommitEdits = useCallback((edits: ElementEdit[]) => {
+    setGeneratedFiles(prev => {
+      const patched = applyVisualEdits(prev, edits)
+      toast('Edits committed', `${edits.length} element(s) updated in source`, 'ok')
+      return patched
+    })
+  }, [toast])
+
   const handlePreviewFiles = useCallback((files: GeneratedFile[]) => {
     if (files.length > 0) {
       setGeneratedFiles(files)
@@ -802,6 +813,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 onCloseBrowser={() => setShowBrowser(false)}
                 onFallbackToCode={() => { toggleBottomExpand(); setBottomTab('sql') }}
                 onElementClick={handleElementClick}
+                onCommitEdits={handleCommitEdits}
               />
             </div>
             <div className="wp-bottom" style={{ height: bottomHeight }}>
@@ -824,6 +836,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 <WPFileEditor
                     generatedFiles={generatedFiles}
                     onFilesSave={handleEditorSave}
+                    onLiveUpdate={setGeneratedFiles}
                     toast={toast}
                     openFilePath={editorOpenFile}
                     onOpenFileConsumed={() => setEditorOpenFile(null)}
