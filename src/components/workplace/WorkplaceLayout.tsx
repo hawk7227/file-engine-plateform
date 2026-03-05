@@ -183,6 +183,10 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   const [showBrowser, setShowBrowser] = useState(false)
   const [zoom, setZoom] = useState(0.7)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  // User-set base URL for real project preview (e.g. https://patient.medazonhealth.com)
+  const [projectBaseUrl, setProjectBaseUrl] = useState<string>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('wp-project-base-url') || '' : ''
+  )
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([])
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
   const [themeScheme, setThemeScheme] = useState<ThemeScheme>(() => {
@@ -484,6 +488,30 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
 
   // ── Layout-level local file upload — opens file + expands bottom panel ──
   const layoutUploadRef = useRef<HTMLInputElement>(null)
+  // ── Derive a URL route from a Next.js file path ──
+  // page-2026-03-05T063503.402.tsx         → /  (root page by filename heuristic)
+  // app/checkout/page.tsx                   → /checkout
+  // app/(marketing)/about/page.tsx          → /about
+  // src/app/patients/[id]/page.tsx          → /patients/[id]
+  const deriveRouteFromPath = useCallback((filePath: string): string => {
+    // Normalise slashes, remove leading ./
+    let p = filePath.replace(/\\/g, '/').replace(/^\.\//, '')
+    // Strip src/ prefix
+    p = p.replace(/^src\//, '')
+    // If no directory structure (bare filename), treat as root page
+    if (!p.includes('/')) return '/'
+    // Strip app/ prefix
+    p = p.replace(/^app\//, '')
+    // Remove route groups like (marketing)/
+    p = p.replace(/\([^)]+\)\//g, '')
+    // Remove trailing /page.tsx or /route.ts
+    p = p.replace(/\/(page|layout|route|loading|error)\.tsx?$/, '')
+    p = p.replace(/\.(tsx?|jsx?)$/, '')
+    // If empty after stripping, it's the root
+    if (!p || p === 'page' || p === 'index') return '/'
+    return '/' + p
+  }, [])
+
   const handleLayoutUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -491,12 +519,22 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     reader.onload = (ev) => {
       const text = ev.target?.result as string
       if (typeof text !== 'string') return
-      // Set file to open in editor via editorOpenFile prop
-      setGeneratedFiles(prev => {
-        const exists = prev.find(f => f.path === file.name)
-        if (exists) return prev.map(f => f.path === file.name ? { ...f, content: text } : f)
-        return [...prev, { path: file.name, content: text, language: file.name.split('.').pop() || 'text' }]
-      })
+
+      // If a project base URL is set, use the real running app — no Babel needed
+      if (projectBaseUrl.trim()) {
+        const route = deriveRouteFromPath(file.name)
+        const liveUrl = projectBaseUrl.replace(/\/$/, '') + route
+        setPreviewUrl(liveUrl)
+        toast('Preview', `Loading ${liveUrl}`, 'ok')
+      } else {
+        // Fallback: load into assembler (for simple self-contained files)
+        setGeneratedFiles(prev => {
+          const exists = prev.find(f => f.path === file.name)
+          if (exists) return prev.map(f => f.path === file.name ? { ...f, content: text } : f)
+          return [...prev, { path: file.name, content: text, language: file.name.split('.').pop() || 'text' }]
+        })
+      }
+
       setEditorOpenFile(file.name)
       // Auto-expand bottom panel so editor is visible
       if (!bottomExpanded) {
@@ -507,7 +545,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     }
     reader.readAsText(file)
     e.target.value = ''
-  }, [bottomExpanded, toast])
+  }, [bottomExpanded, projectBaseUrl, deriveRouteFromPath, toast])
 
   // ── Visual edit write-back: apply DOM edits to source files ──
   const handleCommitEdits = useCallback((edits: ElementEdit[]) => {
@@ -757,7 +795,40 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                         <button className={`wp-dv-btn${rotated ? ' on' : ''}`} style={{ flex: 1 }} onClick={() => setRotated(true)}>Landscape</button>
                       </div>
 
-                      <span className="wp-tp-label">Info</span>
+                      <span className="wp-tp-label">Project URL</span>
+                      <div style={{ marginBottom: 12 }}>
+                        <input
+                          style={{
+                            width: '100%', background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)',
+                            borderRadius: 6, padding: '6px 8px', fontSize: 10, color: 'var(--wp-text-1)',
+                            fontFamily: 'var(--wp-mono)', outline: 'none',
+                          }}
+                          placeholder="https://patient.medazonhealth.com"
+                          value={projectBaseUrl}
+                          onChange={e => {
+                            setProjectBaseUrl(e.target.value)
+                            localStorage.setItem('wp-project-base-url', e.target.value)
+                          }}
+                          spellCheck={false}
+                          autoComplete="off"
+                        />
+                        <div style={{ fontSize: 8, color: 'var(--wp-text-4)', marginTop: 4, lineHeight: 1.5 }}>
+                          Set your live/staging URL. Uploaded files preview against this instead of Babel.
+                        </div>
+                        {projectBaseUrl && (
+                          <button
+                            onClick={() => setPreviewUrl(projectBaseUrl.replace(/\/$/, '') + '/')}
+                            style={{
+                              marginTop: 6, width: '100%', padding: '5px 0', borderRadius: 6,
+                              background: 'var(--wp-accent-dim)', border: '1px solid rgba(0,245,160,.2)',
+                              color: 'var(--wp-accent)', fontSize: 9, fontWeight: 700, cursor: 'pointer',
+                              fontFamily: 'var(--wp-font)',
+                            }}
+                          >↗ Open root in phone</button>
+                        )}
+                      </div>
+
+                      <span className="wp-tp-label">Device Info</span>
                       <div style={{ fontSize: 9, color: 'var(--wp-text-3)', lineHeight: 1.8, fontFamily: 'var(--wp-mono)' }}>
                         <div>{activeDevice.name}</div>
                         <div>{activeDevice.cssViewport.width}×{activeDevice.cssViewport.height} @{activeDevice.dpr}x</div>
