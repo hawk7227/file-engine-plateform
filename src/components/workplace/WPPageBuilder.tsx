@@ -12,7 +12,14 @@
  * Default workspace = Chat Preview. This is a mode, not the default.
  */
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import {
+  type ProviderConfig, type DesignTokens as PBDesignTokens,
+  loadConfig, saveConfig, resolveProvider,
+  aiVision, aiComplete, generateImage,
+  extractTokensStandalone, generateTSXStandalone,
+  DESIGN_ANALYSIS_SYSTEM, CODE_GEN_SYSTEM,
+} from '@/lib/pb-ai-provider'
 
 // ─────────────────────────────────────────────────────────────────
 // DEVICE DATABASE — spec-accurate (Apple HIG + Android Material)
@@ -126,7 +133,7 @@ const CSS = `
 .pb-sep{width:1px;height:16px;background:var(--wp-border);margin:0 6px}
 
 /* ── Split layout ── */
-.pb-body{flex:1;display:flex;overflow:hidden;min-height:0}
+.pb-body{flex:1;display:flex;overflow:hidden;min-height:0;position:relative}
 .pb-editor-pane{width:40%;min-width:280px;max-width:60%;display:flex;flex-direction:column;border-right:1px solid var(--wp-border);overflow:hidden;flex-shrink:0}
 .pb-preview-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .pb-resize-h{width:6px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background .15s}
@@ -445,16 +452,10 @@ const EMPTY_HTML = `<!DOCTYPE html><html><head><meta name="viewport" content="wi
 // IMAGE ANALYZER (System 3 — Claude-in-Claude)
 // ─────────────────────────────────────────────────────────────────
 
-interface DesignTokens {
-  colors: Array<{ hex: string; name: string; usage: string }>
-  typography: Array<{ size: number; weight: number; family: string; usage: string; lineHeight?: number }>
-  spacing: number[]
-  radii: number[]
-  shadows: string[]
-  layout: string
-}
+// DesignTokens imported from pb-ai-provider
+type DesignTokens = PBDesignTokens
 
-function ImageAnalyzer({ onGenerateCode }: { onGenerateCode: (tokens: DesignTokens, imageB64: string) => void }) {
+function ImageAnalyzer({ onGenerateCode, providerCfg }: { onGenerateCode: (tokens: DesignTokens, imageB64: string) => void; providerCfg: ProviderConfig }) {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [imageB64, setImageB64] = useState<string | null>(null)
@@ -485,44 +486,43 @@ function ImageAnalyzer({ onGenerateCode }: { onGenerateCode: (tokens: DesignToke
     if (!imageB64) return
     setAnalyzing(true)
     setError(null)
+    const provider = resolveProvider(providerCfg)
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 2000,
-          system: `You are a design systems engineer. Analyze the screenshot and extract ALL design tokens.
-Return ONLY valid JSON matching this exact schema — no markdown, no explanation:
-{
-  "colors": [{"hex":"#xxxxxx","name":"Primary Green","usage":"accents"}],
-  "typography": [{"size":16,"weight":400,"family":"Inter","usage":"body","lineHeight":1.5}],
-  "spacing": [4,8,12,16,24,32,48],
-  "radii": [4,8,12,999],
-  "shadows": ["0 4px 14px rgba(0,0,0,.08)"],
-  "layout": "flexbox column"
-}
-Extract every unique color. Include at minimum 3 typography sizes. Spacing must be an array of numbers.`,
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'image', source: { type: 'base64', media_type: 'image/png', data: imageB64 } },
-              { type: 'text', text: 'Extract all design tokens from this UI screenshot. Return only JSON.' }
-            ]
-          }]
-        })
-      })
-      const data = await res.json()
-      const raw = data.content?.[0]?.text || ''
-      const clean = raw.replace(/```json|```/g, '').trim()
-      const parsed: DesignTokens = JSON.parse(clean)
-      setTokens(parsed)
+      if (provider === 'standalone') {
+        // No AI — use canvas pixel sampling
+        if (!imgRef.current) throw new Error('Image not loaded')
+        const tokens = extractTokensStandalone(imgRef.current)
+        setTokens(tokens)
+      } else {
+        // AI vision — OpenAI primary → Claude fallback
+        const result = await aiVision(
+          imageB64,
+          'Extract all design tokens from this UI screenshot. Return only JSON.',
+          { ...providerCfg, openaiEnabled: provider === 'openai' || providerCfg.openaiEnabled },
+        )
+        const clean = result.text.replace(/```json|```/g, '').trim()
+        const parsed: DesignTokens = JSON.parse(clean)
+        setTokens(parsed)
+        setError(null)
+      }
     } catch (e) {
-      setError(String(e))
+      const msg = String(e)
+      if (msg.includes('STANDALONE_MODE') || msg.includes('Both providers failed')) {
+        // Hard fallback to standalone
+        if (imgRef.current) {
+          const tokens = extractTokensStandalone(imgRef.current)
+          setTokens(tokens)
+          setError('AI unavailable — used pixel sampling instead')
+        } else {
+          setError('AI unavailable and image not accessible for fallback')
+        }
+      } else {
+        setError(msg)
+      }
     } finally {
       setAnalyzing(false)
     }
-  }, [imageB64])
+  }, [imageB64, providerCfg])
 
   const handleGenerateCode = useCallback(async () => {
     if (!tokens || !imageB64) return
@@ -674,7 +674,7 @@ interface Props {
   initialFilename?: string
 }
 
-type PBMode = 'preview' | 'editor' | 'analyzer'
+type PBMode = 'preview' | 'editor' | 'analyzer' | 'imagegen'
 
 export function WPPageBuilder({ initialCode = '', initialFilename = 'component.tsx' }: Props) {
   const [mode, setMode] = useState<PBMode>('preview')
@@ -688,6 +688,13 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
   const [selectedElement, setSelectedElement] = useState<{ uid: string; tag: string; styles: Record<string,string> } | null>(null)
   const [editorWidth, setEditorWidth] = useState(42) // percent
+  const [providerCfg, setProviderCfg] = useState<ProviderConfig>(() => loadConfig())
+  const [showProviderPanel, setShowProviderPanel] = useState(false)
+  // Image generation state
+  const [imgGenPrompt, setImgGenPrompt] = useState('')
+  const [imgGenResult, setImgGenResult] = useState<string | null>(null)
+  const [imgGenLoading, setImgGenLoading] = useState(false)
+  const [imgGenError, setImgGenError] = useState<string | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const resizingRef = useRef(false)
   const monacoContainerRef = useRef<HTMLDivElement>(null)
@@ -804,54 +811,96 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
   const handleGenerateCode = useCallback(async (tokens: DesignTokens, imageB64: string) => {
     analyzerTokensRef.current = tokens
     setMode('editor')
-    // Give Monaco a moment to mount then stream code
     setTimeout(async () => {
-      const colorVars = tokens.colors.map(c => `  --color-${c.name.toLowerCase().replace(/\s+/g, '-')}: ${c.hex};`).join('\n')
-      const typographySizes = tokens.typography.map(t => `/* ${t.usage}: ${t.size}px ${t.weight} ${t.family} */`).join('\n')
+      const provider = resolveProvider(providerCfg)
       try {
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 4000,
-            system: `You are an expert React/TSX developer. Generate a pixel-perfect TSX component from the design screenshot.
-Use ONLY these design tokens:
-Colors: ${tokens.colors.map(c => `${c.name}=${c.hex}`).join(', ')}
-Typography: ${tokens.typography.map(t => `${t.usage}:${t.size}px/${t.weight}`).join(', ')}
-Spacing: ${tokens.spacing.join(', ')}px
-Border Radii: ${tokens.radii.join(', ')}px
-Layout: ${tokens.layout}
+        let clean: string
+        if (provider === 'standalone') {
+          // No AI — template-based generation
+          clean = generateTSXStandalone(tokens, 'GeneratedComponent.tsx')
+        } else {
+          const tokenSummary = [
+            `Colors: ${tokens.colors.map(c => `${c.name}=${c.hex}`).join(', ')}`,
+            `Typography: ${tokens.typography.map(t => `${t.usage}:${t.size}px/${t.weight}`).join(', ')}`,
+            `Spacing: ${tokens.spacing.join(', ')}px`,
+            `Radii: ${tokens.radii.join(', ')}px`,
+            `Layout: ${tokens.layout}`,
+          ].join('\n')
 
-Rules:
-- Output ONLY valid TSX code, no markdown, no explanation
-- Use inline styles only (no Tailwind, no CSS imports)
-- Use const Component: React.FC = () => with export default
-- Use React.useState for interactive elements
-- Make it pixel-perfect to the screenshot
-- Component must be self-contained and render immediately`,
-            messages: [{
-              role: 'user',
-              content: [
-                { type: 'image', source: { type: 'base64', media_type: 'image/png', data: imageB64 } },
-                { type: 'text', text: `Generate a pixel-perfect TSX component that matches this screenshot exactly. Use these tokens:\n${colorVars}\n${typographySizes}` }
-              ]
-            }]
-          })
-        })
-        const data = await res.json()
-        const raw = data.content?.[0]?.text || ''
-        const clean = raw.replace(/```tsx?|```/g, '').trim()
+          const messages = [{
+            role: 'user' as const,
+            content: [
+              { type: 'image_url', image_url: { url: `data:image/png;base64,${imageB64}`, detail: 'high' } },
+              { type: 'text', text: `Generate a pixel-perfect TSX component matching this screenshot.\n${tokenSummary}` }
+            ]
+          }]
+
+          // For Claude vision, reformat content
+          const claudeMessages = [{
+            role: 'user' as const,
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: 'image/png', data: imageB64 } },
+              { type: 'text', text: `Generate a pixel-perfect TSX component matching this screenshot.\n${tokenSummary}` }
+            ]
+          }]
+
+          let result
+          if (provider === 'openai' && providerCfg.openaiKey) {
+            result = await aiComplete(
+              [{ role: 'system', content: CODE_GEN_SYSTEM }, { role: 'user', content: `Generate a pixel-perfect TSX component.\n${tokenSummary}\nImage provided separately.` }],
+              providerCfg
+            )
+          } else {
+            result = await aiComplete(
+              [{ role: 'system', content: CODE_GEN_SYSTEM }, { role: 'user', content: `Generate a pixel-perfect TSX component.\n${tokenSummary}` }],
+              providerCfg
+            )
+          }
+          clean = result.text.replace(/\`\`\`tsx?|\`\`\`/g, '').trim()
+        }
         setCode(clean)
         setFilename('GeneratedComponent.tsx')
-        if (editorInstanceRef.current) {
-          editorInstanceRef.current.setValue(clean)
-        }
+        editorInstanceRef.current?.setValue(clean)
       } catch (e) {
         console.error('Code generation failed:', e)
+        // Ultimate fallback — always produce something
+        const fallback = generateTSXStandalone(tokens, 'GeneratedComponent.tsx')
+        setCode(fallback)
+        setFilename('GeneratedComponent.tsx')
+        editorInstanceRef.current?.setValue(fallback)
       }
     }, 500)
+  }, [providerCfg])
+
+  // ── Provider config update ──
+  const updateCfg = useCallback((patch: Partial<ProviderConfig>) => {
+    setProviderCfg(prev => {
+      const next = { ...prev, ...patch }
+      saveConfig(next)
+      return next
+    })
   }, [])
+
+  // ── Image generation ──
+  const handleImageGen = useCallback(async () => {
+    if (!imgGenPrompt.trim()) return
+    setImgGenLoading(true)
+    setImgGenError(null)
+    setImgGenResult(null)
+    try {
+      const result = await generateImage(imgGenPrompt.trim(), providerCfg)
+      setImgGenResult(result.url)
+    } catch (e) {
+      const msg = String(e)
+      if (msg.includes('STANDALONE_MODE')) {
+        setImgGenError('Image generation requires an API key. Add OpenAI, Stability AI, or Replicate key in AI Settings.')
+      } else {
+        setImgGenError(msg)
+      }
+    } finally {
+      setImgGenLoading(false)
+    }
+  }, [imgGenPrompt, providerCfg])
 
   const parsePx = (v: string) => parseFloat(v) || 0
   const toHex = (color: string) => {
@@ -876,11 +925,31 @@ Rules:
 
         {/* ── Mode bar + Device picker ── */}
         <div className="pb-modebar">
-          {(['preview', 'editor', 'analyzer'] as PBMode[]).map(m => (
+          {(['preview', 'editor', 'analyzer', 'imagegen'] as PBMode[]).map(m => (
             <button key={m} className={`pb-mode-btn${mode === m ? ' on' : ''}`} onClick={() => setMode(m)}>
-              {m === 'preview' ? '👁 Preview' : m === 'editor' ? '✏ Editor' : '🔍 Analyzer'}
+              {m === 'preview' ? '👁 Preview'
+                : m === 'editor' ? '✏ Editor'
+                : m === 'analyzer' ? '🔍 Analyzer'
+                : '🖼 Image Gen'}
             </button>
           ))}
+
+          <div className="pb-sep" />
+
+          {/* Provider status pill */}
+          <button
+            className={`pb-mode-btn${showProviderPanel ? ' on' : ''}`}
+            onClick={() => setShowProviderPanel(p => !p)}
+            style={{ fontSize: 9, padding: '0 8px', marginLeft: 'auto' }}
+            title="AI Provider Settings"
+          >
+            {(() => {
+              const p = resolveProvider(providerCfg)
+              return p === 'openai' ? '⚡ OpenAI'
+                : p === 'claude' ? '◆ Claude'
+                : '⬡ Standalone'
+            })()}
+          </button>
 
           <div className="pb-sep" />
 
@@ -1091,10 +1160,153 @@ Rules:
             </div>
           )}
 
+          {/* ── Provider settings panel (overlay) ── */}
+          {showProviderPanel && (
+            <div style={{
+              position: 'absolute', top: 36, right: 0, width: 320, zIndex: 100,
+              background: 'var(--wp-bg-2)', border: '1px solid var(--wp-border)',
+              borderRadius: 12, boxShadow: '0 18px 60px rgba(0,0,0,.4)',
+              overflow: 'hidden',
+            }}>
+              <div style={{ padding: '12px 14px 8px', borderBottom: '1px solid var(--wp-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--wp-text-2)' }}>AI Provider Settings</span>
+                <button onClick={() => setShowProviderPanel(false)} style={{ background: 'none', border: 'none', color: 'var(--wp-text-3)', cursor: 'pointer', fontSize: 12 }}>✕</button>
+              </div>
+              <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                {/* OpenAI */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--wp-text-1)', flex: 1 }}>⚡ OpenAI — Primary</span>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: 'var(--wp-text-3)', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={providerCfg.openaiEnabled} onChange={e => updateCfg({ openaiEnabled: e.target.checked })} />
+                      Enabled
+                    </label>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="sk-..."
+                    value={providerCfg.openaiKey}
+                    onChange={e => updateCfg({ openaiKey: e.target.value })}
+                    style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid var(--wp-border)', background: 'var(--wp-bg-3)', color: 'var(--wp-text-1)', fontSize: 10, fontFamily: 'var(--wp-mono)', outline: 'none', width: '100%' }}
+                  />
+                  <div style={{ fontSize: 8, color: 'var(--wp-text-4)' }}>GPT-4o for text + vision · DALL-E 3 for image generation</div>
+                </div>
+
+                {/* Claude */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--wp-text-1)', flex: 1 }}>◆ Claude — Fallback</span>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: 'var(--wp-text-3)', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={providerCfg.claudeEnabled} onChange={e => updateCfg({ claudeEnabled: e.target.checked })} />
+                      Enabled
+                    </label>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="sk-ant-..."
+                    value={providerCfg.claudeKey}
+                    onChange={e => updateCfg({ claudeKey: e.target.value })}
+                    style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid var(--wp-border)', background: 'var(--wp-bg-3)', color: 'var(--wp-text-1)', fontSize: 10, fontFamily: 'var(--wp-mono)', outline: 'none', width: '100%' }}
+                  />
+                  <div style={{ fontSize: 8, color: 'var(--wp-text-4)' }}>Auto-used if OpenAI fails or is disabled</div>
+                </div>
+
+                {/* Image generation */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--wp-text-1)' }}>🖼 Image Generation</span>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    {(['dalle3', 'stability', 'replicate', 'none'] as const).map(p => (
+                      <button key={p} onClick={() => updateCfg({ imageProvider: p })}
+                        style={{ flex: 1, padding: '4px 0', borderRadius: 5, border: `1px solid ${providerCfg.imageProvider === p ? 'var(--wp-accent)' : 'var(--wp-border)'}`, background: providerCfg.imageProvider === p ? 'var(--wp-accent-dim)' : 'none', color: providerCfg.imageProvider === p ? 'var(--wp-accent)' : 'var(--wp-text-3)', fontSize: 8, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--wp-font)', textTransform: 'uppercase' }}>
+                        {p === 'dalle3' ? 'DALL-E' : p === 'stability' ? 'SD3' : p === 'replicate' ? 'FLUX' : 'Off'}
+                      </button>
+                    ))}
+                  </div>
+                  {providerCfg.imageProvider === 'stability' && (
+                    <input type="password" placeholder="Stability API key" value={providerCfg.stabilityKey} onChange={e => updateCfg({ stabilityKey: e.target.value })}
+                      style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid var(--wp-border)', background: 'var(--wp-bg-3)', color: 'var(--wp-text-1)', fontSize: 10, fontFamily: 'var(--wp-mono)', outline: 'none', width: '100%' }} />
+                  )}
+                  {providerCfg.imageProvider === 'replicate' && (
+                    <input type="password" placeholder="Replicate API key" value={providerCfg.replicateKey} onChange={e => updateCfg({ replicateKey: e.target.value })}
+                      style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid var(--wp-border)', background: 'var(--wp-bg-3)', color: 'var(--wp-text-1)', fontSize: 10, fontFamily: 'var(--wp-mono)', outline: 'none', width: '100%' }} />
+                  )}
+                </div>
+
+                {/* Standalone status */}
+                <div style={{ padding: '8px 10px', borderRadius: 8, background: resolveProvider(providerCfg) === 'standalone' ? 'rgba(251,191,36,.08)' : 'rgba(0,245,160,.05)', border: `1px solid ${resolveProvider(providerCfg) === 'standalone' ? 'rgba(251,191,36,.2)' : 'rgba(0,245,160,.1)'}` }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: resolveProvider(providerCfg) === 'standalone' ? '#fbbf24' : 'var(--wp-accent)', marginBottom: 3 }}>
+                    {resolveProvider(providerCfg) === 'standalone' ? '⬡ Standalone Mode Active' : `✓ ${resolveProvider(providerCfg) === 'openai' ? 'OpenAI' : 'Claude'} Active`}
+                  </div>
+                  <div style={{ fontSize: 8, color: 'var(--wp-text-4)', lineHeight: 1.5 }}>
+                    {resolveProvider(providerCfg) === 'standalone'
+                      ? 'No AI keys set. Design analysis uses pixel sampling. Code generation uses templates. Fully functional without AI.'
+                      : 'AI features active. Disable both providers above to run standalone.'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── Analyzer mode ── */}
           {mode === 'analyzer' && (
             <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <ImageAnalyzer onGenerateCode={handleGenerateCode} />
+              <ImageAnalyzer onGenerateCode={handleGenerateCode} providerCfg={providerCfg} />
+            </div>
+          )}
+
+          {/* ── Image Gen mode ── */}
+          {mode === 'imagegen' && (
+            <div style={{ flex: 1, overflow: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--wp-text-2)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Generate Image from Prompt</div>
+                <div style={{ fontSize: 10, color: 'var(--wp-text-4)' }}>
+                  Provider: {providerCfg.imageProvider === 'dalle3' ? 'DALL-E 3 (OpenAI)' : providerCfg.imageProvider === 'stability' ? 'Stability AI SD3.5' : providerCfg.imageProvider === 'replicate' ? `Replicate / ${providerCfg.imageModel}` : 'None — set a provider in AI Settings'}
+                </div>
+              </div>
+
+              <textarea
+                value={imgGenPrompt}
+                onChange={e => setImgGenPrompt(e.target.value)}
+                placeholder="Describe the image to generate... e.g. 'Modern mobile app login screen with dark background, green accent color, rounded inputs'"
+                style={{ width: '100%', minHeight: 100, padding: '10px 12px', borderRadius: 8, border: '1px solid var(--wp-border)', background: 'var(--wp-bg-2)', color: 'var(--wp-text-1)', fontSize: 12, fontFamily: 'var(--wp-font)', outline: 'none', resize: 'vertical', lineHeight: 1.5 }}
+                onKeyDown={e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') handleImageGen() }}
+              />
+
+              <button
+                onClick={handleImageGen}
+                disabled={imgGenLoading || !imgGenPrompt.trim()}
+                style={{ padding: '10px 0', borderRadius: 8, background: 'var(--wp-accent)', border: 'none', color: '#000', fontSize: 11, fontWeight: 900, cursor: 'pointer', opacity: imgGenLoading || !imgGenPrompt.trim() ? .4 : 1, fontFamily: 'var(--wp-font)', letterSpacing: '.03em' }}
+              >
+                {imgGenLoading ? '⏳ Generating…' : '⚡ Generate Image'}
+              </button>
+
+              {imgGenError && (
+                <div style={{ padding: '10px 12px', borderRadius: 8, background: 'rgba(248,113,113,.08)', border: '1px solid rgba(248,113,113,.2)', color: 'var(--wp-red)', fontSize: 10 }}>
+                  {imgGenError}
+                </div>
+              )}
+
+              {imgGenResult && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <img src={imgGenResult} alt="Generated" style={{ width: '100%', borderRadius: 10, border: '1px solid var(--wp-border)' }} />
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <a
+                      href={imgGenResult}
+                      download="generated.png"
+                      style={{ flex: 1, textAlign: 'center', padding: '7px 0', borderRadius: 6, background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)', color: 'var(--wp-text-2)', fontSize: 9, fontWeight: 700, textDecoration: 'none', fontFamily: 'var(--wp-font)' }}
+                    >
+                      ↓ Download PNG
+                    </a>
+                    <button
+                      onClick={() => { setMode('analyzer'); }}
+                      style={{ flex: 1, padding: '7px 0', borderRadius: 6, background: 'var(--wp-bg-3)', border: '1px solid var(--wp-border)', color: 'var(--wp-text-2)', fontSize: 9, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--wp-font)' }}
+                    >
+                      🔍 Analyze This Image
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
