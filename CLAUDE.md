@@ -1,0 +1,162 @@
+# CLAUDE.md — File Engine Platform
+
+> Read this file before touching any code. No exceptions.
+
+## Project
+
+AI-powered code generation platform. Multi-model (Claude + OpenAI). Supabase backend.
+Vercel deployment. Next.js 14 App Router.
+
+**Repo:** `hawk7227/file-engine-plateform`
+**Branch:** `main`
+**Live:** `file-engine-plateform.vercel.app`
+
+---
+
+## Build Gate — MANDATORY before every commit
+
+```bash
+npm run build        # must produce ✓ Compiled successfully — zero errors
+npx tsc --noEmit     # must produce no output (0 errors)
+npx playwright test  # must pass (or document known flakes)
+```
+
+All three must pass. If any fail, fix before committing. No exceptions.
+
+---
+
+## DO NOT TOUCH — Locked Files
+
+These three files are stabilized. The `navigator.locks` deadlock is resolved.
+**Any edit requires explicit approval from Marcus.**
+
+| File | Reason |
+|------|--------|
+| `src/lib/supabase/client.ts` | navigator.locks bypass with `fe-auth-v3` storageKey + lock override |
+| `src/lib/supabase.ts` | lazy proxy singleton — prevents double-init |
+| `src/app/admin/workplace/page.tsx` | mock user, no auth — do NOT add auth back until navigator.locks issue fully resolved |
+
+---
+
+## Architecture Rules
+
+### No long-running work in HTTP
+- API routes must return within Vercel's 10s default limit
+- Heavy work → queue + worker pattern
+- Page Builder image gen proxy (`/api/pb-image-gen`) has `maxDuration: 90` — only exception
+
+### Schema validation at every boundary
+- All API inputs validated with Zod via `parseBody()` + `parseAIVisionRequest()`
+- Never trust raw `req.json()` shapes in route handlers
+
+### No `any` types
+- 159 remaining violations (was 247) — deferred, fix incrementally
+- New code must never introduce `any`
+- Run `grep -r ": any" src --include="*.ts" --include="*.tsx"` to check your files
+
+### Environment validation on boot
+- All env vars validated in `src/lib/env.ts`
+- Missing vars throw at startup — never silently undefined
+
+---
+
+## Code Rules
+
+### JSX
+- Verify all open/close tags match before committing
+- NEVER put structural closing tags (`</div>`, `</Component>`) inside conditional fragments `{x && (<>...</>)}`
+- Trace the full tag tree after every edit
+
+### State management
+- Every component handles 4 states: `loading` → `error` → `empty` → `success`
+- No happy-path-only code
+- `setError(null)` before every fetch
+- Always render error details in UI — never console.log only
+
+### API ↔ Component contract
+- Write TypeScript interface FIRST
+- Confirm API `SELECT` includes every field the interface requires
+- Confirm JSX uses every field in the interface
+- API joins return arrays → always transform before use
+
+### Fetch discipline
+- Every fetch has timeout + error handling
+- Buttons disabled during loading (`disabled={loading}`)
+- AbortController on all long-running client fetches
+- Cleanup on unmount: `useEffect(() => () => controller.abort(), [])`
+
+### Minimal changes
+- Fix X = only X
+- Never remove existing code, comments, or logs unless explicitly asked
+- If something else needs changing → ASK FIRST, wait for approval
+
+---
+
+## Vertical Slice Rule
+
+Every delivery is a complete slice:
+```
+UI button → API route → DB → response → render → error handling
+```
+Never deliver "just the API" or "just the UI."
+
+---
+
+## AI Provider System (Page Builder)
+
+**Priority:** OpenAI (primary) → Claude (fallback) → Standalone (no AI)
+
+- Config stored in `localStorage` via `src/lib/pb-ai-provider.ts`
+- `resolveProvider(cfg)` determines active provider
+- All vision calls go through `aiVision()` — handles fallback automatically
+- All text calls go through `aiComplete()` — handles fallback automatically
+- Image generation: DALL-E 3 (browser) / Stability AI (browser) / Replicate (via `/api/pb-image-gen` proxy — CORS)
+- Standalone: canvas pixel sampling + template TSX generation — fully functional without any API keys
+
+---
+
+## Supabase Rules
+
+- Patients with `dc-` prefix IDs: use `resolvePatientJsonData()` from `_shared.ts` (JSON only)
+- NEVER add Supabase or DrChrono lookups for `dc-` IDs
+- Explicit FK notation: `!table_column_fkey`
+- Email: consolidate per patient
+
+---
+
+## Test Rules
+
+- Every new feature → Playwright E2E test
+- New page → smoke test (loads, no 500, no error boundary)
+- New button → click test (fires, produces visible result)
+- New API → health test (responds < 500)
+- Tests live in `e2e/` directory
+- Run: `npx playwright test`
+
+---
+
+## Commit Convention
+
+```
+type(scope): description
+
+feat:  new feature
+fix:   bug fix
+chore: tooling/config
+test:  tests only
+refactor: no behavior change
+```
+
+Single responsibility per commit. One commit = one purpose.
+
+---
+
+## System Status (Required — always on)
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/system-status` | Admin dashboard — visual health |
+| `/api/system-status` | JSON health endpoint |
+| `public/build-report.json` | Build artifact — auto-generated by `prebuild` script |
+
+All three must remain functional. Never disable or remove them.
