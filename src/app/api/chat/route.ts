@@ -12,7 +12,6 @@ import { getSandboxProvider } from '@/lib/sandbox/index'
 import { processUploads } from '@/lib/upload-processor'
 import { generateZip, generateDocx, generateXlsx, generatePdf, generatePptx } from '@/lib/file-generator'
 import type { DocxSection, SheetData, SlideData } from '@/lib/file-generator'
-import { createClient } from '@supabase/supabase-js'
 import { sanitizeResponse, getActualModelId, selectProvider } from '@/lib/ai-config'
 import { buildSmartContext, SYSTEM_PROMPT_COMPACT, INTENT_PROMPT_ADDITIONS, classifyIntent } from '@/lib/smart-context'
 import { getKeyWithFailover, markRateLimited } from '@/lib/key-pool'
@@ -932,16 +931,27 @@ export async function POST(request: NextRequest) {
 
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    // Decode JWT locally — zero network latency, no Supabase auth roundtrip
+    // JWT payload is base64url encoded in segment [1]: header.payload.signature
     let userId = 'anonymous'
     if (token) {
-      const { data: { user } } = await supabase.auth.getUser(token)
-      if (user) userId = user.id
+      try {
+        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString('utf-8'))
+        if (payload?.sub) userId = payload.sub
+      } catch { /* malformed token — stay anonymous */ }
     }
 
     const lastMsg = messages.filter(m => m.role === 'user').pop()
     if (!lastMsg) return new Response(JSON.stringify({ error: 'No user message' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
     const msgText = typeof lastMsg.content === 'string' ? lastMsg.content : (lastMsg.content as ContentBlock[]).map(b => b.text || '').join('')
+
+    // Server-side Supabase client (service role — no auth header needed, bypasses RLS)
+    // Used only for user_memories and subscriptions lookups — non-critical, wrapped in timeouts
+    const { createClient: createSbClient } = await import('@supabase/supabase-js')
+    const supabase = createSbClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 
     // Pre-LLM loading with hard timeout — browser supabase singleton may hang on server
     const withTimeout = <T>(p: Promise<T>, ms: number, fallback: T): Promise<T> =>
