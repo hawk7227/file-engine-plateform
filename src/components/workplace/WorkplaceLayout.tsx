@@ -39,6 +39,7 @@ import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/t
 import type { ThemeScheme } from '@/lib/theme-engine'
 import { WPDiffPreview } from './WPDiffPreview'
 import { WPPageBuilder } from './WPPageBuilder'
+import { WPEditorPro } from './WPEditorPro'
 import { applyVisualEdits } from '@/lib/visual-edit-patcher'
 import { resolveDependencies } from '@/lib/dependency-resolver'
 import { assembleFromResolved } from '@/lib/preview-assembler'
@@ -114,6 +115,7 @@ const CSS = `
 .wp-tbtn{flex:1;padding:10px 0;text-align:center;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--wp-text-3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;min-width:44px;white-space:nowrap;font-family:var(--wp-font)}.wp-tbtn:hover{color:var(--wp-text-1)}.wp-tbtn.on{color:var(--wp-accent);border-bottom-color:var(--wp-accent);background:var(--wp-accent-dim)}
 .wp-tcontent{flex:1;overflow:hidden;position:relative}.wp-tpane{display:none;height:100%;flex-direction:column;overflow-y:auto}.wp-tpane.show{display:flex}
 .wp-center{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.wp-right{background:var(--wp-bg-0);border-left:1px solid var(--wp-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;min-width:0}
 .wp-canvas-area{flex:1;display:flex;flex-direction:column;min-height:200px;overflow:hidden;position:relative}
 .wp-bottom{display:flex;border-top:2px solid var(--wp-border);flex-shrink:0;position:relative;transition:height .25s ease;overflow:hidden}
 .wp-bottom-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--wp-border);min-width:0;overflow:hidden}
@@ -234,6 +236,14 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   const [sidebarNav, setSidebarNav] = useState('chats')
   const [leftWidth, setLeftWidth] = useState(300)
   const [pageBuilderMode, setPageBuilderMode] = useState(false)
+  const [editorProVisible, setEditorProVisible] = useState(false)
+  const [rightWidth, setRightWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('wp-right-w')
+      return saved ? parseInt(saved) : Math.min(700, Math.floor(window.innerWidth * 0.45))
+    }
+    return 700
+  })
   const [toolPanel, setToolPanel] = useState<'none'|'device'|'theme'|'admin'|'settings'>('none')
   const toggleTool = (panel: 'device'|'theme'|'admin'|'settings') =>
     setToolPanel(p => p === panel ? 'none' : panel)
@@ -258,6 +268,29 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
   }, [leftWidth])
+
+  // ── Horizontal resize (center ↔ right panel) ──
+  const startResizeRight = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startW = rightWidth
+    const onMove = (ev: MouseEvent) => {
+      const delta = startX - ev.clientX
+      const newW = Math.max(400, Math.min(1200, startW + delta))
+      setRightWidth(newW)
+      try { localStorage.setItem('wp-right-w', String(newW)) } catch {}
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }, [rightWidth])
 
   // ── Load conversation from URL on mount ──
   useEffect(() => {
@@ -794,6 +827,14 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 title={pageBuilderMode ? 'Exit Page Builder' : 'Page Builder — Visual editor, device frames, design analyzer'}
                 style={{ fontSize: 12, fontWeight: 900 }}
               >⊞</button>
+
+              {/* EditorPro right panel toggle */}
+              <button
+                className={`wp-tool-btn${editorProVisible ? ' on' : ''}`}
+                onClick={() => setEditorProVisible(p => !p)}
+                title={editorProVisible ? 'Close EditorPro' : 'EditorPro — Device preview, browser modes, safe zones, visual editing'}
+                style={{ fontSize: 10, fontWeight: 700 }}
+              >EP</button>
             </div>
 
             {/* ── Slide-in Tool Panel (appears over chat, inside left column) ── */}
@@ -953,16 +994,8 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
           {/* ═══ RESIZE HANDLE ═══ */}
           <div className="wp-resize-h" onMouseDown={startResizeH} />
 
-          {/* ═══ CENTER ═══ */}
+          {/* ═══ CENTER — always shows preview ═══ */}
           <div className="wp-center">
-            {pageBuilderMode ? (
-              <WPPageBuilder
-                initialCode={generatedFiles[0]?.content || ''}
-                initialFilename={generatedFiles[0]?.path || 'component.tsx'}
-                externalCode={generatedFiles[0]?.content}
-                externalFilename={generatedFiles[0]?.path}
-              />
-            ) : (
             <>
             <div className="wp-canvas-area">
               <WPPreviewCanvas
@@ -1041,6 +1074,22 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
             )}
           </div>
         </div>
+
+        {/* ═══ RIGHT PANEL — EditorPro ═══ */}
+        {editorProVisible && (
+          <div className="wp-right" style={{ width: rightWidth, transition: 'width .2s' }}>
+            <WPEditorPro
+              code={generatedFiles[0]?.content || ''}
+              onCodeChange={(newCode) => {
+                if (generatedFiles.length > 0) {
+                  setGeneratedFiles(prev => [{ ...prev[0], content: newCode }, ...prev.slice(1)])
+                }
+              }}
+              visible={editorProVisible}
+              onClose={() => setEditorProVisible(false)}
+            />
+          </div>
+        )}
 
         {/* ═══ FOOTER ═══ */}
         <div className="wp-footer">
