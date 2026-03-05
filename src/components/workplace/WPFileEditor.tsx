@@ -101,15 +101,18 @@ interface OpenFile {
   loading?: boolean
 }
 
+// v2 — props stable, cache-bust for Vercel
 interface Props {
   generatedFiles: GeneratedFile[]
   onFilesSave?: (files: GeneratedFile[]) => void
   toast: (title: string, msg: string, type?: string) => void
+  openFilePath?: string | null          // set externally (e.g. from inspector click)
+  onOpenFileConsumed?: () => void        // called after we've opened it
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function WPFileEditor({ generatedFiles, onFilesSave, toast }: Props) {
+export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath, onOpenFileConsumed }: Props) {
   // GitHub repo config
   const [owner, setOwner] = useState('')
   const [repoName, setRepoName] = useState('')
@@ -129,6 +132,22 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast }: Props) {
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const lineNumsRef = useRef<HTMLDivElement>(null)
+
+  // ── Respond to external file open request (e.g. inspector click) ─────────
+  useEffect(() => {
+    if (!openFilePath) return
+    const file = treeFiles.find(f => f.path === openFilePath)
+    if (file) {
+      openTreeFile(file)
+    } else {
+      // File not in tree yet — create a virtual entry for generated file
+      const gf = generatedFiles.find(f => f.path === openFilePath)
+      if (gf) {
+        setOpenFile({ path: gf.path, content: gf.content, originalContent: gf.content, sha: 'generated', source: 'generated' })
+      }
+    }
+    onOpenFileConsumed?.()
+  }, [openFilePath]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Sync generated files into tree ──────────────────────────────────────────
   useEffect(() => {
