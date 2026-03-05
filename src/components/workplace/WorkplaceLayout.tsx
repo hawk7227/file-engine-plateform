@@ -26,6 +26,7 @@ import { WPActivityFeed } from './WPActivityFeed'
 // WPToolbar removed — controls moved to sidebar
 import { WPPreviewCanvas } from './WPPreviewCanvas'
 import { WPCodeOutput } from './WPCodeOutput'
+import { WPFileEditor } from './WPFileEditor'
 import { WPDocViewer } from './WPDocViewer'
 import { WPConsolePanel, useConsoleCapture } from './WPConsolePanel'
 import { useConversation } from '@/hooks/useConversation'
@@ -431,6 +432,10 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const handleEditorSave = useCallback((files: GeneratedFile[]) => {
+    setGeneratedFiles(files)
+  }, [])
+
   const handlePreviewFiles = useCallback((files: GeneratedFile[]) => {
     if (files.length > 0) {
       setGeneratedFiles(files)
@@ -667,7 +672,11 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                     }}></button>
                   </div>
                 </div>
-                <WPCodeOutput files={generatedFiles} />
+                <WPFileEditor
+                    generatedFiles={generatedFiles}
+                    onFilesSave={handleEditorSave}
+                    toast={toast}
+                  />
               </div>
               <div className="wp-bottom-right">
                 {bottomTab === 'console' ? (

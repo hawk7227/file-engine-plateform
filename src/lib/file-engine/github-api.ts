@@ -425,3 +425,114 @@ export {
 
 
 
+
+// ============================================
+// REPO BROWSER — Tree + File Read/Write
+// ============================================
+
+export interface TreeEntry {
+  path: string
+  type: 'blob' | 'tree'
+  sha: string
+  size?: number
+}
+
+export interface FileContent {
+  path: string
+  content: string   // decoded UTF-8
+  sha: string       // needed for update commits
+  encoding: string
+}
+
+/**
+ * Fetch flat file tree for a repo (recursive, max 100k entries)
+ */
+export async function getRepoTree(
+  owner: string,
+  repo: string,
+  branch = 'main',
+  options: GitHubOptions = {}
+): Promise<{ tree: TreeEntry[]; truncated: boolean }> {
+  // First get the branch SHA
+  const branchRes = await githubFetch(`/repos/${owner}/${repo}/branches/${branch}`, options)
+  if (!branchRes.ok) {
+    // Try master as fallback
+    const masterRes = await githubFetch(`/repos/${owner}/${repo}/branches/master`, options)
+    if (!masterRes.ok) throw new Error(`Branch not found: ${branch}`)
+    const masterData = await masterRes.json() as { commit: { sha: string } }
+    const sha = masterData.commit.sha
+    return getTreeBySha(owner, repo, sha, options)
+  }
+  const branchData = await branchRes.json() as { commit: { sha: string } }
+  return getTreeBySha(owner, repo, branchData.commit.sha, options)
+}
+
+async function getTreeBySha(
+  owner: string,
+  repo: string,
+  sha: string,
+  options: GitHubOptions
+): Promise<{ tree: TreeEntry[]; truncated: boolean }> {
+  const res = await githubFetch(`/repos/${owner}/${repo}/git/trees/${sha}?recursive=1`, options)
+  if (!res.ok) throw new Error(`Failed to fetch tree: ${res.status}`)
+  const data = await res.json() as { tree: TreeEntry[]; truncated: boolean }
+  // Filter to blobs only (files), skip binaries by extension
+  const BINARY = new Set(['png','jpg','jpeg','gif','webp','ico','svg','woff','woff2','ttf','eot','otf','mp4','mp3','pdf','zip','tar','gz'])
+  const filtered = data.tree
+    .filter(e => e.type === 'blob')
+    .filter(e => {
+      const ext = e.path.split('.').pop()?.toLowerCase() || ''
+      return !BINARY.has(ext)
+    })
+    // Skip node_modules, .next, dist, build
+    .filter(e => !/(node_modules|\.next|dist\/|build\/|\.git\/)/.test(e.path))
+  return { tree: filtered, truncated: data.truncated }
+}
+
+/**
+ * Get file content (decoded from base64)
+ */
+export async function getFileContent(
+  owner: string,
+  repo: string,
+  path: string,
+  options: GitHubOptions = {}
+): Promise<FileContent> {
+  const res = await githubFetch(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, options)
+  if (!res.ok) throw new Error(`Failed to fetch file: ${res.status}`)
+  const data = await res.json() as { content: string; sha: string; encoding: string; path: string }
+  const decoded = Buffer.from(data.content.replace(/\n/g, ''), 'base64').toString('utf-8')
+  return { path: data.path, content: decoded, sha: data.sha, encoding: data.encoding }
+}
+
+/**
+ * Save (update) a file back to GitHub
+ */
+export async function saveFileContent(
+  owner: string,
+  repo: string,
+  path: string,
+  content: string,
+  sha: string,           // current file SHA — required by GitHub API
+  commitMessage: string,
+  branch = 'main',
+  options: GitHubOptions = {}
+): Promise<{ commitSha: string; commitUrl: string }> {
+  const encoded = Buffer.from(content, 'utf-8').toString('base64')
+  const res = await githubFetch(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+    ...options,
+    method: 'PUT',
+    body: JSON.stringify({
+      message: commitMessage,
+      content: encoded,
+      sha,
+      branch,
+    }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as { message?: string }
+    throw new Error(err.message || `Save failed: ${res.status}`)
+  }
+  const data = await res.json() as { commit: { sha: string; html_url: string } }
+  return { commitSha: data.commit.sha, commitUrl: data.commit.html_url }
+}
