@@ -38,6 +38,7 @@ import { WPChatFontSizer } from './WPChatFontSizer'
 import { loadThemeScheme, applyTheme, saveThemeId, THEME_SCHEMES } from '@/lib/theme-engine'
 import type { ThemeScheme } from '@/lib/theme-engine'
 import { WPDiffPreview } from './WPDiffPreview'
+import { WPPageBuilder } from './WPPageBuilder'
 import { applyVisualEdits } from '@/lib/visual-edit-patcher'
 import { resolveDependencies } from '@/lib/dependency-resolver'
 import { assembleFromResolved } from '@/lib/preview-assembler'
@@ -232,6 +233,7 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
   })
   const [sidebarNav, setSidebarNav] = useState('chats')
   const [leftWidth, setLeftWidth] = useState(300)
+  const [pageBuilderMode, setPageBuilderMode] = useState(false)
   const [toolPanel, setToolPanel] = useState<'none'|'device'|'theme'|'admin'|'settings'>('none')
   const toggleTool = (panel: 'device'|'theme'|'admin'|'settings') =>
     setToolPanel(p => p === panel ? 'none' : panel)
@@ -781,6 +783,17 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 onClick={() => toggleTool('settings')}
                 title="Settings"
               >⚙</button>
+
+              <div style={{ flex: 1 }} />
+              <div className="wp-tool-sep" />
+
+              {/* Page Builder mode toggle */}
+              <button
+                className={`wp-tool-btn${pageBuilderMode ? ' on' : ''}`}
+                onClick={() => setPageBuilderMode(p => !p)}
+                title={pageBuilderMode ? 'Exit Page Builder' : 'Page Builder — Visual editor, device frames, design analyzer'}
+                style={{ fontSize: 12, fontWeight: 900 }}
+              >⊞</button>
             </div>
 
             {/* ── Slide-in Tool Panel (appears over chat, inside left column) ── */}
@@ -942,6 +955,13 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
 
           {/* ═══ CENTER ═══ */}
           <div className="wp-center">
+            {pageBuilderMode ? (
+              <WPPageBuilder
+                initialCode={generatedFiles[0]?.content || ''}
+                initialFilename={generatedFiles[0]?.path || 'component.tsx'}
+              />
+            ) : (
+            <>
             <div className="wp-canvas-area">
               <WPPreviewCanvas
                 activeDevice={activeDevice}
@@ -1015,6 +1035,8 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 )}
               </div>
             </div>
+            </>
+            )}
           </div>
         </div>
 
