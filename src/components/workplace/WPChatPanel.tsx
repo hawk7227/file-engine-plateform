@@ -232,7 +232,7 @@ export function WPChatPanel({ chat, onExpandBottom, onSwitchBottomTab, onToggleB
           </div>
         ))}
       </div>
-      <input ref={fileRef} type="file" multiple accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.png,.jpg,.jpeg,.gif,.svg,.pdf" style={{ display: 'none' }} onChange={e => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = '' }} />
+      <input ref={fileRef} type="file" multiple accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.rb,.go,.rs,.yaml,.yml,.csv,.png,.jpg,.jpeg,.gif,.webp,.svg,.pdf,.docx,.xlsx" style={{ display: 'none' }} onChange={e => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = '' }} />
       {chat.error && (
         <div className="wpc-error-bar">
           <span>⚠</span>
