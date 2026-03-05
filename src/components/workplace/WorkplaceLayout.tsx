@@ -480,6 +480,33 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
     setGeneratedFiles(files)
   }, [])
 
+  // ── Layout-level local file upload — opens file + expands bottom panel ──
+  const layoutUploadRef = useRef<HTMLInputElement>(null)
+  const handleLayoutUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string
+      if (typeof text !== 'string') return
+      // Set file to open in editor via editorOpenFile prop
+      setGeneratedFiles(prev => {
+        const exists = prev.find(f => f.path === file.name)
+        if (exists) return prev.map(f => f.path === file.name ? { ...f, content: text } : f)
+        return [...prev, { path: file.name, content: text, language: file.name.split('.').pop() || 'text' }]
+      })
+      setEditorOpenFile(file.name)
+      // Auto-expand bottom panel so editor is visible
+      if (!bottomExpanded) {
+        setBottomHeight(320)
+        setBottomExpanded(true)
+      }
+      toast('Opened', file.name, 'ok')
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }, [bottomExpanded, toast])
+
   const handlePreviewFiles = useCallback((files: GeneratedFile[]) => {
     if (files.length > 0) {
       setGeneratedFiles(files)
@@ -629,6 +656,16 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 onClick={() => setShowBrowser(p => !p)}
                 title="Browser overlay"
               >🌐</button>
+
+              <div className="wp-tool-sep" />
+
+              {/* Open file from device */}
+              <button
+                className="wp-tool-btn"
+                onClick={() => layoutUploadRef.current?.click()}
+                title="Open file from device"
+                style={{ fontSize: 12 }}
+              >↑📄</button>
 
               <div className="wp-tool-sep" />
 
@@ -839,6 +876,15 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
           </span></span>
           <span style={{ marginLeft: 'auto' }}>Team: <span style={{ color: 'var(--wp-accent)' }}>{onlineCount} online</span></span>
         </div>
+
+        {/* Hidden file input for layout-level upload */}
+        <input
+          ref={layoutUploadRef}
+          type="file"
+          style={{ display: 'none' }}
+          accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.yaml,.yml,.sh,.env,.prisma,.graphql,.vue,.svelte"
+          onChange={handleLayoutUpload}
+        />
 
         {/* Toast container */}
         <div className="wp-toast-wrap" ref={toastRef} />
