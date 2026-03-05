@@ -336,7 +336,7 @@ ${inspectScript}
   useEffect(() => { try { const s = localStorage.getItem("vep-code"); if (s) setCode(s); } catch {} }, []);
 
   // ═══ IMAGE AI ═══
-  const onImg = async (e) => {
+  const onImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
     setImgAnalyzing(true); setPanel("image");
     try {
