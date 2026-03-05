@@ -996,7 +996,6 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
 
           {/* ═══ CENTER — always shows preview ═══ */}
           <div className="wp-center">
-            <>
             <div className="wp-canvas-area">
               <WPPreviewCanvas
                 activeDevice={activeDevice}
@@ -1070,9 +1069,6 @@ export default function WorkplaceLayout({ user, profile, accessToken }: Props) {
                 )}
               </div>
             </div>
-            {/* eslint-disable-next-line */}
-            </>
-            )}
           </div>
         </div>
 
