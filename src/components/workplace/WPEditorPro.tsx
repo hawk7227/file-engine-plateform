@@ -8,49 +8,122 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 
-// ═══ DEVICE DATABASE ═══
-const D = {
-  "i17p":    {n:"iPhone 17 Pro",     w:402,h:874, st:62,sb:34,r:55,di:1,c:"ios"},
-  "i17pm":   {n:"iPhone 17 Pro Max", w:440,h:956, st:62,sb:34,r:55,di:1,c:"ios"},
-  "i16":     {n:"iPhone 16",         w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios"},
-  "i16p":    {n:"iPhone 16 Plus",    w:430,h:932, st:59,sb:34,r:55,di:1,c:"ios"},
-  "i16pro":  {n:"iPhone 16 Pro",     w:402,h:874, st:62,sb:34,r:55,di:1,c:"ios"},
-  "i16pm":   {n:"iPhone 16 Pro Max", w:440,h:956, st:62,sb:34,r:55,di:1,c:"ios"},
-  "i15":     {n:"iPhone 15",         w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios"},
-  "i15p":    {n:"iPhone 15 Pro",     w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios"},
-  "i15pm":   {n:"iPhone 15 Pro Max", w:430,h:932, st:59,sb:34,r:55,di:1,c:"ios"},
-  "i14":     {n:"iPhone 14",         w:390,h:844, st:47,sb:34,r:47,di:0,c:"ios"},
-  "i14p":    {n:"iPhone 14 Pro",     w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios"},
-  "ise":     {n:"iPhone SE",         w:375,h:667, st:20,sb:0, r:0, di:0,c:"ios"},
-  "px9":     {n:"Pixel 9",           w:412,h:915, st:24,sb:0, r:28,di:0,c:"and"},
-  "gs25":    {n:"Galaxy S25",        w:360,h:780, st:24,sb:0, r:24,di:0,c:"and"},
-  "gs25u":   {n:"Galaxy S25 Ultra",  w:384,h:824, st:24,sb:0, r:12,di:0,c:"and"},
-  "gs24":    {n:"Galaxy S24",        w:360,h:780, st:24,sb:0, r:24,di:0,c:"and"},
-  "ipad":    {n:"iPad Air 11\"",     w:820,h:1180,st:24,sb:20,r:18,di:0,c:"tab"},
-  "d1440":   {n:"Desktop 1440",      w:1440,h:900,st:0, sb:0, r:0, di:0,c:"desk"},
+// ═══════════════════════════════════════════════════════════
+// FULL DEVICE DATABASE — 30 devices, research-backed specs
+// Sources: Apple HIG, useyourloaf.com, ios-resolution.com
+// ═══════════════════════════════════════════════════════════
+const D: Record<string, {n:string;w:number;h:number;st:number;sb:number;r:number;di:number;c:string;y?:number;s?:number;ppi?:number;screen?:string;chip?:string;hi?:number;lsafe?:{t:number;b:number;l:number;r:number}}> = {
+  // iPhone 17 Series (2025)
+  "i17":     {n:"iPhone 17",         w:393,h:852, st:62,sb:34,r:55,di:1,c:"ios",y:2025,s:3,ppi:460,screen:"6.3\"",chip:"A19",hi:34,lsafe:{t:20,b:29,l:68,r:68}},
+  "i17p":    {n:"iPhone 17 Pro",     w:402,h:874, st:62,sb:34,r:55,di:1,c:"ios",y:2025,s:3,ppi:460,screen:"6.3\"",chip:"A19 Pro",hi:34,lsafe:{t:20,b:20,l:62,r:62}},
+  "i17pm":   {n:"iPhone 17 Pro Max", w:440,h:956, st:62,sb:34,r:55,di:1,c:"ios",y:2025,s:3,ppi:460,screen:"6.9\"",chip:"A19 Pro",hi:34,lsafe:{t:20,b:20,l:62,r:62}},
+  "i17air":  {n:"iPhone 17 Air",     w:430,h:932, st:62,sb:34,r:55,di:1,c:"ios",y:2025,s:3,ppi:460,screen:"6.5\"",chip:"A19",hi:34,lsafe:{t:20,b:29,l:68,r:68}},
+  // iPhone 16 Series (2024)
+  "i16":     {n:"iPhone 16",         w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios",y:2024,s:3,ppi:460,screen:"6.1\"",chip:"A18",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  "i16p":    {n:"iPhone 16 Plus",    w:430,h:932, st:59,sb:34,r:55,di:1,c:"ios",y:2024,s:3,ppi:460,screen:"6.7\"",chip:"A18",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  "i16pro":  {n:"iPhone 16 Pro",     w:402,h:874, st:62,sb:34,r:55,di:1,c:"ios",y:2024,s:3,ppi:460,screen:"6.3\"",chip:"A18 Pro",hi:34,lsafe:{t:0,b:21,l:62,r:62}},
+  "i16pm":   {n:"iPhone 16 Pro Max", w:440,h:956, st:62,sb:34,r:55,di:1,c:"ios",y:2024,s:3,ppi:460,screen:"6.9\"",chip:"A18 Pro",hi:34,lsafe:{t:0,b:21,l:62,r:62}},
+  "i16e":    {n:"iPhone 16e",        w:375,h:812, st:47,sb:34,r:39,di:0,c:"ios",y:2024,s:3,ppi:326,screen:"6.1\"",chip:"A18",hi:34,lsafe:{t:0,b:21,l:47,r:47}},
+  // iPhone 15 Series (2023)
+  "i15":     {n:"iPhone 15",         w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios",y:2023,s:3,ppi:460,screen:"6.1\"",chip:"A16",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  "i15p":    {n:"iPhone 15 Pro",     w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios",y:2023,s:3,ppi:460,screen:"6.1\"",chip:"A17 Pro",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  "i15pm":   {n:"iPhone 15 Pro Max", w:430,h:932, st:59,sb:34,r:55,di:1,c:"ios",y:2023,s:3,ppi:460,screen:"6.7\"",chip:"A17 Pro",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  "i15plus": {n:"iPhone 15 Plus",    w:430,h:932, st:59,sb:34,r:55,di:1,c:"ios",y:2023,s:3,ppi:460,screen:"6.7\"",chip:"A16",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  // iPhone 14 Series (2022)
+  "i14":     {n:"iPhone 14",         w:390,h:844, st:47,sb:34,r:47,di:0,c:"ios",y:2022,s:3,ppi:460,screen:"6.1\"",chip:"A15",hi:34,lsafe:{t:0,b:21,l:47,r:47}},
+  "i14plus": {n:"iPhone 14 Plus",    w:428,h:926, st:47,sb:34,r:47,di:0,c:"ios",y:2022,s:3,ppi:458,screen:"6.7\"",chip:"A15",hi:34,lsafe:{t:0,b:21,l:47,r:47}},
+  "i14p":    {n:"iPhone 14 Pro",     w:393,h:852, st:59,sb:34,r:55,di:1,c:"ios",y:2022,s:3,ppi:460,screen:"6.1\"",chip:"A16",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  "i14pm":   {n:"iPhone 14 Pro Max", w:430,h:932, st:59,sb:34,r:55,di:1,c:"ios",y:2022,s:3,ppi:460,screen:"6.7\"",chip:"A16",hi:34,lsafe:{t:0,b:21,l:59,r:59}},
+  // iPhone SE
+  "ise":     {n:"iPhone SE 3",       w:375,h:667, st:20,sb:0, r:0, di:0,c:"ios",y:2022,s:2,ppi:326,screen:"4.7\"",chip:"A15",hi:0},
+  // Android — Pixel
+  "px9":     {n:"Pixel 9",           w:412,h:915, st:24,sb:0, r:28,di:0,c:"and",y:2024,s:3,ppi:422,screen:"6.3\"",chip:"Tensor G4",hi:0},
+  "px9p":    {n:"Pixel 9 Pro",       w:412,h:915, st:24,sb:0, r:28,di:0,c:"and",y:2024,s:3,ppi:495,screen:"6.3\"",chip:"Tensor G4",hi:0},
+  "px8":     {n:"Pixel 8",           w:412,h:915, st:24,sb:0, r:28,di:0,c:"and",y:2023,s:3,ppi:428,screen:"6.2\"",chip:"Tensor G3",hi:0},
+  // Android — Samsung
+  "gs25":    {n:"Galaxy S25",        w:360,h:780, st:24,sb:0, r:24,di:0,c:"and",y:2025,s:3,ppi:416,screen:"6.2\"",chip:"Snapdragon 8 Elite",hi:0},
+  "gs25u":   {n:"Galaxy S25 Ultra",  w:384,h:824, st:24,sb:0, r:12,di:0,c:"and",y:2025,s:3.5,ppi:505,screen:"6.9\"",chip:"Snapdragon 8 Elite",hi:0},
+  "gs24":    {n:"Galaxy S24",        w:360,h:780, st:24,sb:0, r:24,di:0,c:"and",y:2024,s:3,ppi:416,screen:"6.2\"",chip:"Snapdragon 8 Gen 3",hi:0},
+  "gs24u":   {n:"Galaxy S24 Ultra",  w:384,h:824, st:24,sb:0, r:12,di:0,c:"and",y:2024,s:3.5,ppi:505,screen:"6.8\"",chip:"Snapdragon 8 Gen 3",hi:0},
+  // Tablets
+  "ipad":    {n:"iPad Air 11\"",     w:820,h:1180,st:24,sb:20,r:18,di:0,c:"tab",y:2025,s:2,ppi:264,screen:"10.9\"",chip:"M3",hi:20},
+  "ipadp":   {n:"iPad Pro 13\"",     w:1024,h:1366,st:24,sb:20,r:18,di:0,c:"tab",y:2024,s:2,ppi:264,screen:"12.9\"",chip:"M4",hi:20},
+  // Desktop
+  "d1280":   {n:"Desktop 720p",      w:1280,h:720,st:0, sb:0, r:0, di:0,c:"desk"},
+  "d1440":   {n:"Desktop 900p",      w:1440,h:900,st:0, sb:0, r:0, di:0,c:"desk"},
   "d1920":   {n:"Desktop 1080p",     w:1920,h:1080,st:0,sb:0, r:0, di:0,c:"desk"},
+  "mac15":   {n:"MacBook Air 15\"",  w:1710,h:1112,st:0,sb:0, r:0, di:0,c:"desk",y:2024,s:2,ppi:224,screen:"15.3\"",chip:"M3"},
 };
 
-const B = {
-  "saf":  {n:"Safari (visible)",  tc:50,bc:44,p:"ios"},
-  "safc": {n:"Safari (collapsed)",tc:0, bc:0, p:"ios"},
-  "safb": {n:"Safari (bottom bar)",tc:0,bc:56,p:"ios"},
-  "pwa":  {n:"PWA / Standalone",  tc:0, bc:0, p:"ios"},
-  "chr":  {n:"Chrome (visible)",  tc:56,bc:48,p:"and"},
-  "chrc": {n:"Chrome (collapsed)",tc:0, bc:48,p:"and"},
-  "desk": {n:"Desktop Browser",   tc:0, bc:0, p:"desk"},
+// ═══════════════════════════════════════════════════════════
+// BROWSER MODES — real chrome heights, viewport behavior
+// ═══════════════════════════════════════════════════════════
+const B: Record<string, {n:string;tc:number;bc:number;p:string;desc:string;unit:string;warnings:string[];pros:string[];cons:string[]}> = {
+  "saf":  {n:"Safari (visible)",     tc:50,bc:44,p:"ios",   desc:"Default state on page load. URL bar at top + bottom toolbar.", unit:"svh",
+    warnings:["100vh is LARGER than visible area — content cut off at bottom","env(safe-area-inset-top) = 0 because Safari handles it","env(safe-area-inset-bottom) = 0 when bottom toolbar visible"],
+    pros:["User sees URL for trust","Bottom toolbar provides navigation","Most common initial state — test this FIRST"],
+    cons:["Reduces viewport by ~94px","Sticky footers hidden behind bottom toolbar","Most common source of layout bugs"]},
+  "safc": {n:"Safari (collapsed)",   tc:0, bc:0, p:"ios",   desc:"After scrolling down. URL bar collapses, toolbar hides. Max viewport.", unit:"lvh",
+    warnings:["This is what 100vh is calculated for — matches here","env(safe-area-inset-bottom) changes from 0 to device value","Tapping bottom edge (~44px) triggers toolbar return"],
+    pros:["Maximum usable viewport","100vh works correctly here","Best for immersive content"],
+    cons:["User loses navigation controls","Not the initial state","Content near bottom can trigger toolbar"]},
+  "safb": {n:"Safari (bottom bar)",  tc:0, bc:56,p:"ios",   desc:"iOS 15+ option. Address bar moved to bottom, merged with toolbar.", unit:"svh",
+    warnings:["Bottom bar is ~56px — different from top mode's 44px","env(safe-area-inset-bottom) may not account for this","Users can choose this in Settings > Safari"],
+    pros:["More natural thumb-reachable URL bar","More vertical space at top"],
+    cons:["Bottom CTAs and pay buttons can be obscured","Different from default — inconsistent testing","Bar collapses on scroll but trigger zone stays"]},
+  "pwa":  {n:"PWA / Standalone",     tc:0, bc:0, p:"ios",   desc:"Added to Home Screen. No browser chrome at all.", unit:"vh",
+    warnings:["env(safe-area-inset-top) = FULL device safe area (59-62px)","YOU must handle all safe areas — no browser protection","Status bar overlays your content — use viewport-fit=cover","Home indicator area is your responsibility"],
+    pros:["Maximum possible viewport","No browser interference","App-like experience","No accidental toolbar triggers"],
+    cons:["No URL bar — user can't verify site","No back/forward — app must provide own nav","Must handle ALL safe areas yourself"]},
+  "chr":  {n:"Chrome (visible)",     tc:56,bc:48,p:"and",   desc:"Default Chrome on Android. Address bar at top, gesture nav at bottom.", unit:"svh",
+    warnings:["100vh = viewport with toolbar hidden — same Safari issue","Gesture nav bar is ~48px at bottom","Samsung Internet has different chrome heights"],
+    pros:["Consistent Chrome behavior across Android","Gesture nav bar is semi-transparent"],
+    cons:["~104px chrome reduces viewport","Different OEMs have different nav bar heights"]},
+  "chrc": {n:"Chrome (collapsed)",   tc:0, bc:48,p:"and",   desc:"After scrolling. URL bar hides but gesture nav stays.", unit:"lvh",
+    warnings:["Gesture nav usually persists when URL bar hides","Some browsers (Samsung Internet) collapse differently"],
+    pros:["More viewport than expanded state"],
+    cons:["Gesture nav still takes ~48px at bottom"]},
+  "desk": {n:"Desktop Browser",      tc:0, bc:0, p:"desk",  desc:"Desktop Chrome/Safari/Firefox. No safe areas. Viewport = window size.", unit:"vh",
+    warnings:["No safe area issues on desktop","Viewport is any size — user resizes freely"],
+    pros:["100vh = actual visible height","No browser chrome in viewport","No safe area complexity"],
+    cons:["Can't predict viewport size","Need responsive breakpoints"]},
 };
 
 const bForD = (d: any) => d.c==="ios"?["saf","safc","safb","pwa"]:d.c==="and"?["chr","chrc"]:["desk"];
 
+// ═══════════════════════════════════════════════════════════
+// WARNINGS — severity-tagged, device-specific
+// ═══════════════════════════════════════════════════════════
 const WARN = [
-  {s:"critical",t:"100vh Bug",d:"100vh ignores browser chrome. Content cut off on load.",f:"Use 100dvh or 100svh"},
-  {s:"high",t:"Dynamic Island",d:"126×37pt cutout at top center hides content.",f:"env(safe-area-inset-top) padding"},
-  {s:"high",t:"Home Indicator",d:"34px bottom zone. Don't put buttons here.",f:"env(safe-area-inset-bottom) padding"},
-  {s:"high",t:"Keyboard",d:"Opens ~260-300px. Fixed elements may overlap.",f:"scrollIntoView + visualViewport API"},
-  {s:"medium",t:"Safari Bottom Bar",d:"iOS 15+ option. 56px at bottom hides CTAs.",f:"Test both bar positions"},
-  {s:"medium",t:"Gesture Nav",d:"48px Android bottom bar conflicts with swipes.",f:"Avoid swipeable UI in bottom 48px"},
+  {s:"critical",t:"100vh Bug",       d:"100vh = viewport with toolbar hidden. Content cut off at bottom on initial page load. This is the #1 mobile layout bug.",f:"Use 100dvh or 100svh. Fallback: JS window.innerHeight. Never use 100vh for full-screen mobile layouts.",affects:"All mobile browsers"},
+  {s:"high",    t:"Dynamic Island",   d:"126×37pt pill-shaped cutout at top center. Content behind it is completely invisible. Interactive elements here are untappable.",f:"Use env(safe-area-inset-top) or hardcode 59-62px top padding. Never place interactive elements in top-center ~130px zone.",affects:"iPhone 14 Pro+, 15+, 16+, 17+"},
+  {s:"high",    t:"Home Indicator",   d:"134×5px translucent bar at bottom. Swiping it dismisses the app. Safe area is 34px portrait, 21px landscape.",f:"Never place buttons or interactive elements in bottom 34px. Use env(safe-area-inset-bottom). Pay buttons, CTAs, and navigation must clear this zone.",affects:"All Face ID iPhones (X and newer)"},
+  {s:"high",    t:"Keyboard Resize",  d:"Software keyboard opens ~260-300px (varies by device and language). Fixed/sticky elements may overlap or be pushed off screen. The visual viewport shrinks but layout viewport may not.",f:"Use visualViewport API to detect keyboard. scrollIntoView({ block: 'center' }) for inputs. Avoid position:fixed on elements near keyboard.",affects:"All mobile devices"},
+  {s:"medium",  t:"Safari Bottom Bar",d:"iOS 15+ users can optionally move Safari's address bar to the bottom. This creates a ~56px bar at the bottom that can obscure CTAs, pay buttons, and important actions.",f:"Always test with both top and bottom bar positions. Add extra bottom padding for critical CTAs. Use env(safe-area-inset-bottom) as a minimum.",affects:"All iPhones with iOS 15+"},
+  {s:"medium",  t:"Android Gesture Nav",d:"Gesture navigation adds a ~48px transparent bar at the bottom. Content shows through it but swipe gestures in this zone trigger back/home navigation instead of your UI.",f:"Avoid placing swipeable UI elements (carousels, sliders, drawer handles) in the bottom 48px. Use Android WindowInsets API.",affects:"Most Android 10+ devices"},
+  {s:"medium",  t:"Orientation Change",d:"Rotating the device changes ALL safe area values. Portrait top:59px becomes landscape left:59px. Bottom 34px becomes 21px. Width and height swap completely.",f:"Test landscape mode. Use env() for all safe areas — never hardcode values. Consider locking orientation for app-like experiences.",affects:"All mobile devices"},
+  {s:"low",     t:"dvh Jank",         d:"100dvh causes visible layout shift when browser toolbar animates in/out during scroll. Elements resize smoothly but the motion can feel janky.",f:"Use 100svh for stable height (always accounts for toolbar). Or use 100lvh if targeting toolbar-hidden state. Only use dvh if you specifically want the dynamic behavior.",affects:"All mobile browsers with collapsing chrome"},
 ];
+
+// ═══════════════════════════════════════════════════════════
+// VIEWPORT CALCULATOR
+// ═══════════════════════════════════════════════════════════
+function calcViewport(d: any, b: any) {
+  const visH = d.h - b.tc - b.bc;
+  const envT = (b.tc > 0) ? 0 : d.st;  // browser handles safe area when chrome visible
+  const envB = (b.tc > 0) ? 0 : d.sb;  // same for bottom
+  const safeH = visH - envT - envB;
+  const vh100 = d.h;                     // what 100vh resolves to (always full screen)
+  const svh100 = visH;                   // what 100svh resolves to (smallest viewport)
+  const dvh100 = visH;                   // what 100dvh resolves to (current state)
+  const lvh100 = d.h;                    // what 100lvh resolves to (largest viewport)
+  const overflow = vh100 - visH;         // how much 100vh overflows visible area
+  return { visH, envT, envB, safeH, vh100, svh100, dvh100, lvh100, overflow,
+    // CSS recommendation
+    css: `padding-top: max(env(safe-area-inset-top, ${envT}px), ${envT}px);\npadding-bottom: max(env(safe-area-inset-bottom, ${envB}px), ${envB}px);`,
+    heightRec: overflow > 0 ? "Use 100dvh or 100svh — NOT 100vh" : "100vh is safe here",
+  };
+}
 
 const DEFAULT_CODE = `<div style="max-width:430px;margin:0 auto;height:100%;background:#0b0f0c;color:#fff;font-family:system-ui,-apple-system,sans-serif;display:flex;flex-direction:column;overflow:hidden;">
   <div style="flex-shrink:0;padding:max(var(--sat,8px),8px) 16px 6px;background:linear-gradient(180deg,#0b0f0c,rgba(11,15,12,0.97));">
@@ -264,14 +337,17 @@ document.addEventListener('click',(e)=>{
   };
 
   const rgb2hex = (rgb: string) => { if (!rgb || rgb === "transparent" || rgb.includes("0, 0, 0, 0")) return "transparent"; const m = rgb.match(/\d+/g); if (!m || m.length < 3) return rgb; return "#" + m.slice(0, 3).map((n: string) => parseInt(n).toString(16).padStart(2, "0")).join(""); };
-  const sc = { critical: "#ef4444", high: "#f97316", medium: "#eab308" };
+  const sc: Record<string,string> = { critical: "#ef4444", high: "#f97316", medium: "#eab308", low: "#6b7280" };
+  const vp = calcViewport(dev, brw);
   const deviceWarnings = useMemo(() => {
     const w = [WARN[0]]; // 100vh always
-    if (dev.di) w.push(WARN[1]);
-    if (dev.sb > 0) w.push(WARN[2]);
-    w.push(WARN[3]); // keyboard always
-    if (dev.c === "ios") w.push(WARN[4]);
-    if (dev.c === "and") w.push(WARN[5]);
+    if (dev.di) w.push(WARN[1]);       // Dynamic Island
+    if (dev.sb > 0) w.push(WARN[2]);   // Home Indicator
+    w.push(WARN[3]);                    // Keyboard always
+    if (dev.c === "ios") w.push(WARN[4]);  // Safari Bottom Bar
+    if (dev.c === "and") w.push(WARN[5]);  // Android Gesture Nav
+    if (dev.c !== "desk") w.push(WARN[6]); // Orientation Change
+    w.push(WARN[7]);                       // dvh jank
     return w;
   }, [did]);
 
@@ -341,7 +417,7 @@ document.addEventListener('click',(e)=>{
 
         {/* Device quick select */}
         <div style={{ display: "flex", gap: 2, overflow: "auto" }}>
-          {Object.entries(D).filter(([k]) => ["i15p","i16pro","ise","px9","gs24","ipad","d1440"].includes(k)).map(([k, d]) =>
+          {Object.entries(D).filter(([k]) => ["i17p","i16pro","i15p","ise","px9","gs25","ipad","d1440"].includes(k)).map(([k, d]) =>
             <Chip key={k} active={k === did} onClick={() => setDid(k)}>{d.n}</Chip>
           )}
           <Chip onClick={() => setPanel(panel === "devices" ? null : "devices")} accent>All ▾</Chip>
@@ -367,14 +443,21 @@ document.addEventListener('click',(e)=>{
       </div>
 
       {/* ═══ INFO BAR ═══ */}
-      <div style={{ flexShrink: 0, height: 24, background: "#08090a", borderBottom: "1px solid #111318", display: "flex", alignItems: "center", padding: "0 12px", gap: 10, fontSize: 9, color: "#4b5563" }}>
+      <div style={{ flexShrink: 0, height: 24, background: "#08090a", borderBottom: "1px solid #111318", display: "flex", alignItems: "center", padding: "0 12px", gap: 8, fontSize: 9, color: "#4b5563" }}>
         <span style={{ fontWeight: 600, color: "#9ca3af" }}>{dev.n}</span>
+        {dev.y && <span style={{ color: "#374151" }}>{dev.y}</span>}
         <span>{dev.w}×{dev.h}</span>
-        <span>Visible: {visH}px</span>
-        <span>Safe: {safeH}px</span>
-        <span>↑{et} ↓{eb}</span>
-        {overflow > 0 && <span style={{ color: "#ef4444" }}>⚠ 100vh +{overflow}px</span>}
+        <span>Vis:{vp.visH}px</span>
+        <span>Safe:{vp.safeH}px</span>
+        <span>env(↑):{vp.envT}</span>
+        <span>env(↓):{vp.envB}</span>
+        {dev.s && <span>@{dev.s}x</span>}
+        {dev.ppi && <span>{dev.ppi}ppi</span>}
+        {vp.overflow > 0 && <span style={{ color: "#ef4444", fontWeight: 700 }}>⚠ 100vh +{vp.overflow}px</span>}
         <div style={{ flex: 1 }} />
+        <button onClick={() => setPanel(panel === "browser-info" ? null : "browser-info")} style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer", fontSize: 9 }}>
+          ℹ {brw.n}
+        </button>
         <label style={{ display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>
           <input type="checkbox" checked={zones} onChange={e => setZones(e.target.checked)} style={{ accentColor: "#ef4444", width: 10, height: 10 }} />
           <span style={{ color: zones ? "#ef4444" : "#4b5563" }}>Zones</span>
@@ -448,7 +531,7 @@ document.addEventListener('click',(e)=>{
             {/* Panel header */}
             <div style={{ flexShrink: 0, height: 36, background: "#0c0d0f", borderBottom: "1px solid #1f2937", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px" }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: "#f97316" }}>
-                {panel === "props" ? "🔍 Properties" : panel === "devices" ? "📱 All Devices" : panel === "warnings" ? "⚠️ Warnings" : panel === "code" ? "</> Code" : panel === "image" ? "🖼️ Image AI" : "⬆️ GitHub"}
+                {panel === "props" ? "🔍 Properties" : panel === "devices" ? "📱 All Devices" : panel === "warnings" ? "⚠️ Warnings" : panel === "browser-info" ? "ℹ️ Browser Mode" : panel === "code" ? "</> Code" : panel === "image" ? "🖼️ Image AI" : "⬆️ GitHub"}
               </span>
               <button onClick={() => { setPanel(null); setSel(null); }} style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: 14 }}>✕</button>
             </div>
@@ -492,7 +575,9 @@ document.addEventListener('click',(e)=>{
                       <button key={k} onClick={() => { setDid(k); setPanel(null); }} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 8px", borderRadius: 6, background: k === did ? "#1f2937" : "transparent", border: k === did ? "1px solid #f97316" : "1px solid transparent", cursor: "pointer", marginBottom: 2, textAlign: "left" }}>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: 11, fontWeight: 600, color: k === did ? "#fff" : "#9ca3af" }}>{d.n}</div>
-                          <div style={{ fontSize: 9, color: "#4b5563" }}>{d.w}×{d.h} · ↑{d.st} ↓{d.sb}{d.di ? " · DI" : ""}</div>
+                          <div style={{ fontSize: 8, color: "#4b5563" }}>
+                            {d.w}×{d.h} · ↑{d.st} ↓{d.sb}{d.di ? " · DI" : ""}{d.y ? ` · ${d.y}` : ""}{d.screen ? ` · ${d.screen}` : ""}{d.ppi ? ` · ${d.ppi}ppi` : ""}{d.chip ? ` · ${d.chip}` : ""}
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -502,15 +587,58 @@ document.addEventListener('click',(e)=>{
 
               {/* WARNINGS */}
               {panel === "warnings" && deviceWarnings.map((w, i) => (
-                <div key={i} style={{ background: "#111318", borderRadius: 6, padding: 8, border: `1px solid ${(sc as any)[w.s]}33`, marginBottom: 6 }}>
+                <div key={i} style={{ background: "#111318", borderRadius: 6, padding: 8, border: `1px solid ${sc[w.s] || '#333'}33`, marginBottom: 6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <span style={{ fontSize: 8, fontWeight: 700, color: (sc as any)[w.s], textTransform: "uppercase" }}>{w.s}</span>
+                    <span style={{ fontSize: 8, fontWeight: 700, color: sc[w.s] || '#6b7280', textTransform: "uppercase" }}>{w.s}</span>
                     <span style={{ fontSize: 11, fontWeight: 600, color: "#e5e7eb" }}>{w.t}</span>
                   </div>
-                  <p style={{ fontSize: 10, color: "#6b7280", marginBottom: 4 }}>{w.d}</p>
-                  <p style={{ fontSize: 9, color: "#2dd4a0" }}>Fix: {w.f}</p>
+                  <p style={{ fontSize: 10, color: "#9ca3af", marginBottom: 3 }}>{w.d}</p>
+                  <p style={{ fontSize: 9, color: "#2dd4a0", marginBottom: 2 }}>Fix: {w.f}</p>
+                  {w.affects && <p style={{ fontSize: 8, color: "#4b5563" }}>Affects: {w.affects}</p>}
                 </div>
               ))}
+
+              {/* BROWSER MODE INFO */}
+              {panel === "browser-info" && brw && (
+                <div>
+                  <div style={{ background: "#111318", borderRadius: 8, padding: 10, border: "1px solid #1f2937", marginBottom: 10 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#e5e7eb", marginBottom: 4 }}>{brw.n}</div>
+                    <p style={{ fontSize: 10, color: "#9ca3af", marginBottom: 6 }}>{brw.desc}</p>
+                    <div style={{ display: "flex", gap: 8, fontSize: 9, color: "#6b7280", fontFamily: "monospace" }}>
+                      <span>Top chrome: {brw.tc}px</span>
+                      <span>Bottom chrome: {brw.bc}px</span>
+                      <span>Unit: {brw.unit}</span>
+                    </div>
+                  </div>
+                  {/* Viewport calculations */}
+                  <div style={{ fontSize: 9, color: "#4b5563", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Viewport</div>
+                  <div style={{ background: "#111318", borderRadius: 6, padding: 8, border: "1px solid #1f2937", marginBottom: 10, fontSize: 10, fontFamily: "monospace", color: "#9ca3af" }}>
+                    <div>100vh = {vp.vh100}px {vp.overflow > 0 && <span style={{ color: "#ef4444" }}>(overflows by {vp.overflow}px!)</span>}</div>
+                    <div>100svh = {vp.svh100}px</div>
+                    <div>100dvh = {vp.dvh100}px</div>
+                    <div>100lvh = {vp.lvh100}px</div>
+                    <div style={{ marginTop: 4, color: "#2dd4a0" }}>{vp.heightRec}</div>
+                  </div>
+                  {/* CSS recommendation */}
+                  <div style={{ fontSize: 9, color: "#4b5563", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Recommended CSS</div>
+                  <div style={{ background: "#111318", borderRadius: 6, padding: 8, border: "1px solid #1f2937", marginBottom: 10, fontSize: 9, fontFamily: "monospace", color: "#86efac", whiteSpace: "pre-wrap" }}>{vp.css}</div>
+                  {/* Warnings */}
+                  {brw.warnings?.length > 0 && <>
+                    <div style={{ fontSize: 9, color: "#ef4444", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>⚠ Warnings</div>
+                    {brw.warnings.map((w: string, i: number) => <div key={i} style={{ fontSize: 9, color: "#f87171", marginBottom: 3, paddingLeft: 8, borderLeft: "2px solid #7f1d1d" }}>{w}</div>)}
+                  </>}
+                  {/* Pros */}
+                  {brw.pros?.length > 0 && <>
+                    <div style={{ fontSize: 9, color: "#2dd4a0", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, marginTop: 8 }}>✓ Pros</div>
+                    {brw.pros.map((p: string, i: number) => <div key={i} style={{ fontSize: 9, color: "#86efac", marginBottom: 3, paddingLeft: 8, borderLeft: "2px solid #065f46" }}>{p}</div>)}
+                  </>}
+                  {/* Cons */}
+                  {brw.cons?.length > 0 && <>
+                    <div style={{ fontSize: 9, color: "#f59e0b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, marginTop: 8 }}>✗ Cons</div>
+                    {brw.cons.map((c: string, i: number) => <div key={i} style={{ fontSize: 9, color: "#fbbf24", marginBottom: 3, paddingLeft: 8, borderLeft: "2px solid #78350f" }}>{c}</div>)}
+                  </>}
+                </div>
+              )}
 
               {/* CODE */}
               {panel === "code" && <div>
