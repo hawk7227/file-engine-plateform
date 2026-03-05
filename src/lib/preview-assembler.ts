@@ -129,15 +129,42 @@ const CONSOLE_CAPTURE = `
 })();
 <\\/script>`
 
+// ── Sanitize TS patterns that Babel standalone 7.x chokes on ──────────────
+// data-presets="react,typescript" handles most TS but has known gaps:
+//   1. `"value" as SomeType` inside array/object literals
+//   2. `satisfies Type` operator (TS 4.9+)
+//   3. `const x = y!` non-null assertions in some positions
+//   4. Decorator metadata (@decorator) without experimentalDecorators config
+//   5. `declare` statements
+//
+// None of these have runtime meaning — safe to strip before Babel.
+function sanitizeForBabel(code: string): string {
+  return code
+    // 1. `as Type` casts — value as TypeName (including generics like as Array<Foo>)
+    //    Matches: as Identifier, as Identifier<...>, as string[], as { key: Type }
+    .replace(/\s+as\s+(?:[A-Z][A-Za-z0-9]*(?:<[^>]*>)?(?:\[\])*|string|number|boolean|null|undefined|any|unknown|never|void|object)(?=\s*[,)\]};])/g, '')
+    // 2. `satisfies Type` operator
+    .replace(/\s+satisfies\s+\w+(?:<[^>]*>)?/g, '')
+    // 3. Non-null assertions `expr!` — strip trailing ! from identifiers/brackets
+    .replace(/(\w|\)|\])!/g, '$1')
+    // 4. `declare const/let/var/function/class` statements
+    .replace(/^\s*declare\s+(?:const|let|var|function|class|type|interface|module|namespace|global|abstract)\b[^\n]*/gm, '')
+    // 5. Type-only imports (already handled by stripImports but belt+suspenders)
+    .replace(/^import\s+type\s+.*$/gm, '')
+    // 6. Angle-bracket type assertions <Type>value (old TS style, not JSX)
+    //    Only strip when NOT followed by JSX content (ie. not <Component>)
+    .replace(/<([A-Z][A-Za-z0-9]*(?:\[\])?)>(?=\s*[a-z('"_$])/g, '')
+}
+
 function buildReactPreview(cat: CategorizedFiles): string {
   const allReactFiles = [...cat.react, ...cat.script]
   const entryName = findEntryComponent(cat.react)
   const sorted = sortFiles(allReactFiles, entryName)
 
-  // With data-presets="react,typescript" Babel handles all TS natively.
-  // We only need to: strip import statements (inlined) + strip export keywords.
+  // Process: strip imports → sanitize TS patterns Babel standalone can't handle → strip exports
   const processedScripts = sorted.map(f => {
     let code = stripImports(f.content)
+    code = sanitizeForBabel(code)
     // Strip export keywords — everything is in same scope
     code = code.replace(/^export\s+default\s+/gm, '')
     code = code.replace(/^export\s+(?=(?:const|let|var|function|class|async|type|interface)\s)/gm, '')
@@ -651,6 +678,7 @@ export function assembleFromResolved(
     let code = content
     code = replaceImportsWithGlobals(code)
     code = stripTypeScript(code)
+    code = sanitizeForBabel(code)
     return `\n// ═══ ${path} ═══\n${code}`
   }).join('\n\n')
 
