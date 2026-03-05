@@ -377,42 +377,21 @@ async function generateReplicate(
   cfg: ProviderConfig,
   signal?: AbortSignal
 ): Promise<ImageGenResult> {
-  // Kick off prediction
+  // FIX: Replicate does not set CORS headers for browser fetch — route through our API proxy
+  // /api/pb-image-gen handles the Replicate call server-side and returns the result
   const model = cfg.imageModel || 'black-forest-labs/flux-schnell'
-  const res = await fetch(`https://api.replicate.com/v1/models/${model}/predictions`, {
+  const res = await fetch('/api/pb-image-gen', {
     method: 'POST',
     signal,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${cfg.replicateKey}`,
-    },
-    body: JSON.stringify({ input: { prompt, num_outputs: 1, output_format: 'png' } }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ provider: 'replicate', prompt, model, apiKey: cfg.replicateKey }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(`Replicate: ${err?.detail || res.statusText}`)
+    throw new Error(`Replicate (via proxy): ${err?.error || res.statusText}`)
   }
-  const prediction = await res.json()
-
-  // Poll until complete (max 60s)
-  const pollUrl = prediction.urls?.get
-  if (!pollUrl) throw new Error('Replicate: no polling URL')
-
-  for (let i = 0; i < 30; i++) {
-    if (signal?.aborted) throw new Error('Aborted')
-    await new Promise(r => setTimeout(r, 2000))
-    const poll = await fetch(pollUrl, {
-      headers: { 'Authorization': `Bearer ${cfg.replicateKey}` },
-      signal,
-    })
-    const p = await poll.json()
-    if (p.status === 'succeeded') {
-      const url = Array.isArray(p.output) ? p.output[0] : p.output
-      return { url, provider: `Replicate/${model}`, prompt }
-    }
-    if (p.status === 'failed') throw new Error(`Replicate failed: ${p.error}`)
-  }
-  throw new Error('Replicate: timed out after 60s')
+  const data = await res.json()
+  return { url: data.url, provider: `Replicate/${model}`, prompt }
 }
 
 export async function generateImage(

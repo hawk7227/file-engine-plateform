@@ -120,7 +120,7 @@ const PB_DEVICES: PBDevice[] = [
 // ─────────────────────────────────────────────────────────────────
 
 const CSS = `
-.pb-root{display:flex;flex-direction:column;height:100%;background:var(--wp-bg-0);overflow:hidden;font-family:var(--wp-font)}
+.pb-root{display:flex;flex-direction:column;height:100%;background:var(--wp-bg-0);overflow:hidden;font-family:var(--wp-font);position:relative}
 .pb-root *{box-sizing:border-box;margin:0;padding:0}
 .pb-root ::-webkit-scrollbar{width:4px;height:4px}
 .pb-root ::-webkit-scrollbar-thumb{background:var(--wp-border-2);border-radius:4px}
@@ -701,7 +701,11 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [monacoLoaded, setMonacoLoaded] = useState(false)
   const editorInstanceRef = useRef<any>(null)
+  const codeRef = useRef<string>(initialCode) // mirrors code state without closure staleness
   const analyzerTokensRef = useRef<DesignTokens | null>(null)
+
+  // ── Keep codeRef in sync (used by Monaco initMonaco to avoid stale closure) ──
+  useEffect(() => { codeRef.current = code }, [code])
 
   // ── Build preview HTML whenever code changes ──
   useEffect(() => {
@@ -716,26 +720,16 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
     return () => clearTimeout(timer)
   }, [code, filename])
 
-  // ── Load Monaco from CDN ──
-  useEffect(() => {
-    if (mode !== 'editor' || monacoLoaded) return
-    if ((window as any).monaco) { initMonaco(); return }
-    const script = document.createElement('script')
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js'
-    script.onload = () => {
-      const require = (window as any).require
-      require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } })
-      require(['vs/editor/editor.main'], () => { initMonaco() })
-    }
-    document.head.appendChild(script)
-  }, [mode])
+  // ── Load Monaco from CDN (FIX: dedup injection, onerror, no stale closure) ──
+  const [monacoLoadFailed, setMonacoLoadFailed] = useState(false)
 
   const initMonaco = useCallback(() => {
+    // FIX: no 'code' dep — read current value from ref, not closure
     if (!monacoContainerRef.current || editorInstanceRef.current) return
     const monaco = (window as any).monaco
     if (!monaco) return
     const editor = monaco.editor.create(monacoContainerRef.current, {
-      value: code,
+      value: codeRef.current,
       language: 'typescript',
       theme: 'vs-dark',
       fontSize: 12,
@@ -756,7 +750,28 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
     })
     editorInstanceRef.current = editor
     setMonacoLoaded(true)
-  }, [code])
+  }, []) // FIX: empty dep array — stable reference, reads codeRef not code
+
+  useEffect(() => {
+    if (mode !== 'editor') return
+    // FIX: check for existing script to prevent dup injection on mode toggle
+    if (document.querySelector('script[data-monaco]')) {
+      if ((window as any).monaco) { initMonaco() }
+      return
+    }
+    if ((window as any).monaco) { initMonaco(); return }
+    const script = document.createElement('script')
+    script.setAttribute('data-monaco', '1')
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js'
+    // FIX: onerror handler — show fallback textarea if CDN fails
+    script.onerror = () => { setMonacoLoadFailed(true) }
+    script.onload = () => {
+      const require = (window as any).require
+      require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } })
+      require(['vs/editor/editor.main'], () => { initMonaco() })
+    }
+    document.head.appendChild(script)
+  }, [mode, initMonaco])
 
   // ── Listen for element clicks from iframe ──
   useEffect(() => {
@@ -881,16 +896,22 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
     })
   }, [])
 
-  // ── Image generation ──
+  // ── Image generation with AbortController (FIX: no stale state on unmount) ──
+  const imgGenAbortRef = useRef<AbortController | null>(null)
   const handleImageGen = useCallback(async () => {
     if (!imgGenPrompt.trim()) return
+    // Cancel any in-flight request
+    imgGenAbortRef.current?.abort()
+    imgGenAbortRef.current = new AbortController()
+    const signal = imgGenAbortRef.current.signal
     setImgGenLoading(true)
     setImgGenError(null)
     setImgGenResult(null)
     try {
-      const result = await generateImage(imgGenPrompt.trim(), providerCfg)
-      setImgGenResult(result.url)
+      const result = await generateImage(imgGenPrompt.trim(), providerCfg, signal)
+      if (!signal.aborted) setImgGenResult(result.url)
     } catch (e) {
+      if (signal.aborted) return
       const msg = String(e)
       if (msg.includes('STANDALONE_MODE')) {
         setImgGenError('Image generation requires an API key. Add OpenAI, Stability AI, or Replicate key in AI Settings.')
@@ -898,9 +919,12 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
         setImgGenError(msg)
       }
     } finally {
-      setImgGenLoading(false)
+      if (!signal.aborted) setImgGenLoading(false)
     }
   }, [imgGenPrompt, providerCfg])
+
+  // Abort on unmount
+  useEffect(() => () => { imgGenAbortRef.current?.abort() }, [])
 
   const parsePx = (v: string) => parseFloat(v) || 0
   const toHex = (color: string) => {
@@ -1001,16 +1025,23 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
                   {/* Monaco container */}
                   <div ref={monacoContainerRef} className="pb-monaco" style={{ display: monacoLoaded ? 'block' : 'none' }} />
                   {/* Fallback textarea until Monaco loads */}
-                  {!monacoLoaded && (
-                    <textarea
-                      ref={textareaRef}
-                      className="pb-editor-fallback"
-                      value={code}
-                      onChange={e => setCode(e.target.value)}
-                      placeholder="// Paste or type TSX here..."
-                      spellCheck={false}
-                      autoComplete="off"
-                    />
+                  {(!monacoLoaded || monacoLoadFailed) && (
+                    <>
+                      {monacoLoadFailed && (
+                        <div style={{ padding: '6px 12px', background: 'rgba(251,191,36,.08)', borderBottom: '1px solid rgba(251,191,36,.15)', fontSize: 9, color: '#fbbf24', fontFamily: 'var(--wp-mono)' }}>
+                          ⚠ Monaco unavailable (CDN unreachable) — using text editor
+                        </div>
+                      )}
+                      <textarea
+                        ref={textareaRef}
+                        className="pb-editor-fallback"
+                        value={code}
+                        onChange={e => setCode(e.target.value)}
+                        placeholder="// Paste or type TSX here..."
+                        spellCheck={false}
+                        autoComplete="off"
+                      />
+                    </>
                   )}
                 </div>
               </div>
@@ -1163,7 +1194,7 @@ export function WPPageBuilder({ initialCode = '', initialFilename = 'component.t
           {/* ── Provider settings panel (overlay) ── */}
           {showProviderPanel && (
             <div style={{
-              position: 'absolute', top: 36, right: 0, width: 320, zIndex: 100,
+              position: 'fixed', top: 40, right: 16, width: 320, zIndex: 9999,
               background: 'var(--wp-bg-2)', border: '1px solid var(--wp-border)',
               borderRadius: 12, boxShadow: '0 18px 60px rgba(0,0,0,.4)',
               overflow: 'hidden',
