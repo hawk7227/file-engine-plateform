@@ -200,13 +200,19 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
       }))
 
       // Get auth token for user identification
+      // NOTE: Using raw localStorage read to avoid navigator.locks deadlock in Supabase JS SDK
       let authHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.access_token) {
-          authHeaders['Authorization'] = `Bearer ${session.access_token}`
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+        const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\./)?.[1] || ''
+        const storageKey = `sb-${projectRef}-auth-token`
+        const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          const token = parsed?.access_token
+          if (token) authHeaders['Authorization'] = `Bearer ${token}`
         }
-      } catch { /* non-fatal */ }
+      } catch { /* non-fatal — unauthenticated request still works */ }
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -457,8 +463,19 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
 
       // ── Auto-save chat to DB ──
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
+        // Raw localStorage read — avoids navigator.locks deadlock in Supabase JS SDK
+        let userId: string | null = null
+        try {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+          const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\./)?.[1] || ''
+          const storageKey = `sb-${projectRef}-auth-token`
+          const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+          if (raw) {
+            const parsed = JSON.parse(raw)
+            userId = parsed?.user?.id || null
+          }
+        } catch { /* non-fatal */ }
+        if (userId) {
           const allMessages = [...messages, userMessage, {
             ...assistantMessage,
             content: finalContent,
@@ -478,7 +495,7 @@ export function useChat(options: ChatOptions = {}): UseChatReturn {
             // Create new chat
             const title = content.trim().split('\n')[0].slice(0, 40) || 'New Chat'
             const { data: newChat } = await supabase.from('chats').insert({
-              user_id: user.id,
+              user_id: userId,
               project_id: projectId || null,
               title,
               messages: allMessages,
