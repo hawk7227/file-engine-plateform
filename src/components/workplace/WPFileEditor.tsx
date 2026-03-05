@@ -56,6 +56,10 @@ const CSS = `
 .wfe-saved-badge.show{opacity:1}
 .wfe-copy-btn{padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;background:none;border:1px solid var(--wp-border);color:var(--wp-text-4);cursor:pointer;font-family:var(--wp-font);transition:all .15s;flex-shrink:0}
 .wfe-copy-btn:hover{background:var(--wp-bg-4);color:var(--wp-text-2)}
+.wfe-upload-btn{padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.2);color:var(--wp-accent);cursor:pointer;font-family:var(--wp-font);transition:all .15s;flex-shrink:0;white-space:nowrap}
+.wfe-upload-btn:hover{background:rgba(0,245,160,.15);border-color:rgba(0,245,160,.35)}
+.wfe-download-btn{padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:#a5b4fc;cursor:pointer;font-family:var(--wp-font);transition:all .15s;flex-shrink:0;white-space:nowrap}
+.wfe-download-btn:hover{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.35)}
 .wfe-editor-body{flex:1;position:relative;overflow:hidden}
 .wfe-line-numbers{position:absolute;left:0;top:0;bottom:0;width:40px;padding:12px 0;background:var(--wp-bg-1);border-right:1px solid var(--wp-border);font-size:10px;line-height:1.6;font-family:var(--wp-mono);color:var(--wp-text-4);text-align:right;padding-right:8px;overflow:hidden;pointer-events:none;z-index:2;user-select:none}
 .wfe-ln{display:block;height:16px}
@@ -132,6 +136,7 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath,
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const lineNumsRef = useRef<HTMLDivElement>(null)
+  const localUploadRef = useRef<HTMLInputElement>(null)
 
   // ── Respond to external file open request (e.g. inspector click) ─────────
   useEffect(() => {
@@ -259,6 +264,47 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath,
       setSaving(false)
     }
   }, [openFile, saving, generatedFiles, onFilesSave, owner, repoName, branch, toast])
+
+  // ── Open local file from device ──────────────────────────────────────────────
+  const handleLocalUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string
+      if (typeof text !== 'string') return
+      setOpenFile({
+        path: file.name,
+        content: text,
+        originalContent: text,
+        sha: 'local',
+        source: 'generated',
+      })
+      // Add to tree so it shows in sidebar
+      setTreeFiles(prev => {
+        const exists = prev.find(f => f.path === file.name)
+        if (exists) return prev
+        return [...prev, { path: file.name, sha: 'local', source: 'generated' as const }]
+      })
+      toast('Opened', file.name, 'ok')
+    }
+    reader.readAsText(file)
+    // Reset so same file can be re-opened
+    e.target.value = ''
+  }, [toast])
+
+  // ── Download current file to device ──────────────────────────────────────────
+  const downloadFile = useCallback(() => {
+    if (!openFile) return
+    const blob = new Blob([openFile.content], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = openFile.path.split('/').pop() || 'file.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+    toast('Downloaded', a.download, 'ok')
+  }, [openFile, toast])
 
   // ── Keyboard shortcut: Cmd/Ctrl+S ───────────────────────────────────────────
   useEffect(() => {
@@ -393,10 +439,25 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath,
       <div className="wfe-tree">
         <div className="wfe-tree-header">
           <span>📁</span> Files
+          <span
+            style={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 9, color: 'var(--wp-accent)', fontWeight: 700, opacity: .8 }}
+            onClick={() => localUploadRef.current?.click()}
+            title="Open file from device"
+          >
+            ↑ Open
+          </span>
           {treeFiles.length > 0 && (
-            <span style={{ marginLeft: 'auto', opacity: .5 }}>{treeFiles.length}</span>
+            <span style={{ opacity: .5 }}>{treeFiles.length}</span>
           )}
         </div>
+        {/* Hidden file input for local upload */}
+        <input
+          ref={localUploadRef}
+          type="file"
+          style={{ display: 'none' }}
+          accept=".ts,.tsx,.js,.jsx,.html,.css,.json,.md,.txt,.py,.sql,.yaml,.yml,.sh,.env,.prisma,.graphql,.vue,.svelte"
+          onChange={handleLocalUpload}
+        />
 
         {/* GitHub repo input */}
         <div className="wfe-repo-form">
@@ -448,6 +509,13 @@ export function WPFileEditor({ generatedFiles, onFilesSave, toast, openFilePath,
                 onClick={() => navigator.clipboard.writeText(openFile.content).then(() => toast('Copied', '', 'ok'))}
               >
                 📋
+              </button>
+              <button
+                className="wfe-download-btn"
+                onClick={downloadFile}
+                title="Download file to device"
+              >
+                ↓ Download
               </button>
               <button
                 className={`wfe-save-btn${isDirty ? ' dirty' : ' clean'}`}
