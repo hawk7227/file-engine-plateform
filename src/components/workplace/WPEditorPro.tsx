@@ -519,8 +519,7 @@ ${inspectScript}
 
         {/* ═══ CENTER: DEVICE PREVIEW ═══ */}
         <div ref={containerRef} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", background: "#050607", transition: "all 0.2s" }}>
-          <div style={{ width: (dev.w + 2) * autoScale, height: (dev.h + brw.tc + brw.bc) * autoScale, position: "relative", flexShrink: 0 }}>
-            <div style={{ transform: `scale(${autoScale})`, transformOrigin: "top left", transition: "transform 0.15s", position: "absolute", top: 0, left: 0 }}>
+          <div style={{ transform: `scale(${autoScale})`, transformOrigin: "center center", transition: "transform 0.15s" }}>
             <div style={{ width: dev.w + 2, position: "relative", borderRadius: dev.r, overflow: "hidden", boxShadow: "0 0 0 1px #1f2937, 0 25px 80px rgba(0,0,0,0.6)", background: "#000" }}>
 
               {/* Top chrome */}
@@ -566,7 +565,6 @@ ${inspectScript}
                 </> : <div style={{ width: 134, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.12)" }} />}
               </div>}
             </div>
-          </div>
           </div>
         </div>
 
