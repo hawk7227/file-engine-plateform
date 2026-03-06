@@ -444,7 +444,7 @@ ${inspectScript}
   if (!visible) return null;
 
   return (
-    <div style={{ height: "100vh", width: "100vw", background: "#050607", color: "#e5e7eb", fontFamily: "'Inter',system-ui,sans-serif", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ height: "100%", width: "100%", background: "#050607", color: "#e5e7eb", fontFamily: "'Inter',system-ui,sans-serif", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
       {/* ═══ TOP BAR ═══ */}
       <div style={{ flexShrink: 0, height: 42, background: "#0a0b0d", borderBottom: "1px solid #1f2937", display: "flex", alignItems: "center", padding: "0 12px", gap: 6 }}>
