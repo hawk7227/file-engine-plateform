@@ -518,9 +518,9 @@ ${inspectScript}
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
         {/* ═══ CENTER: DEVICE PREVIEW ═══ */}
-        <div ref={containerRef} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", background: "#050607", transition: "all 0.2s" }}>
+        <div ref={containerRef} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", background: "radial-gradient(ellipse at center, #0f1218 0%, #080a0d 100%)", transition: "all 0.2s" }}>
           <div style={{ transform: `scale(${autoScale})`, transformOrigin: "center center", transition: "transform 0.15s" }}>
-            <div style={{ width: dev.w + 2, position: "relative", borderRadius: dev.r, overflow: "hidden", boxShadow: "0 0 0 1px #1f2937, 0 25px 80px rgba(0,0,0,0.6)", background: "#000" }}>
+            <div style={{ width: dev.w + 2, height: dev.h + brw.tc + brw.bc, position: "relative", borderRadius: dev.r, overflow: "hidden", boxShadow: "0 0 0 2px #374151, 0 0 0 12px rgba(30,30,30,0.5), 0 25px 80px rgba(0,0,0,0.6)", background: "#111" }}>
 
               {/* Top chrome */}
               {brw.tc > 0 && <div style={{ height: brw.tc, background: "#1a1b1e", borderBottom: "1px solid #333", display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 6 }}>
